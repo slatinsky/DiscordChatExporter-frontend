@@ -1,5 +1,5 @@
 <script>
-	import { copyTextToClipboard } from '../../../helpers';
+	import { copyTextToClipboard } from '../../../../helpers';
 	import { onlyMatches, foundMessageIds, searchTerm} from './searchStore';
 	export let messages = {};
 	export let authors = {};

@@ -1,7 +1,6 @@
 <script>
 	import { onlyMatches, searchTerm, foundMessageIds } from "./searchStore";
 
-
 	export let messages;
 
 	let resultsCount = 0;

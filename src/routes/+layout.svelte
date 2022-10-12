@@ -12,7 +12,7 @@
 <!--        guild list-->
         {#if data.guilds}
             {#each Object.values(data.guilds) as guild}
-                <a href="/{guild.id}">
+                <a href="/channels/{guild.id}">
                     <div><img src="{guild.iconUrl}" alt="{guild.name}"></div>
                 </a>
 
