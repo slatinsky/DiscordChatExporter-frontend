@@ -218,12 +218,16 @@ class GuildPreprocess:
         # group messages by channels
         messages_by_channel, categories = self.group_messages_and_channels(messages, channels)
 
+        # get message ids
+        message_ids = list(messages.keys())
+
         # group channels and others attributes to single dict
         guild = {
             'categories': categories,
             'authors': authors,
             'emojis': emojis,
             'channels': channels,
+            'message_ids': message_ids,
             'messages': messages_by_channel,
             'version': '1.0.0'
         }

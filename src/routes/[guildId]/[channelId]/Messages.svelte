@@ -58,12 +58,27 @@
 				}
 			}
 		}
-
 		return messages;
 	}
 
+    function addReferencedMessages(messages) {
+        for (var messageId of Object.keys(messages)) {
+            let message = messages[messageId];
+
+            if (message.reference) {
+                console.log(message.reference);
+                message.referencedMessage = messages.find(m => m.id === message.reference.messageId);
+                console.log(message.referencedMessage);
+            }
+        }
+        return messages;
+    }
+
+    $: console.log("mmmm", messages);
+
 	$: messages = addAuthorsToMessages(messages, authors);
 	$: messages = addEmojisToMessages(messages, emojis);
+	$: messages = addReferencedMessages(messages);
 	// $: console.log('authors', authors);
 	// $: console.log('messages', messages);
 </script>
@@ -98,6 +113,7 @@
 
 					<div class="chatlog__message-primary">
 						{#if message.referencedMessage}
+                        <a href="#{message.referencedMessage.id}">
 							<div class="chatlog__reference">
 								<img
 									class="chatlog__reference-avatar"
@@ -120,6 +136,7 @@
 									>
 								</div>
 							</div>
+                        </a>
 						{/if}
 						<div class="chatlog__header">
 							<span
@@ -128,7 +145,7 @@
 								data-user-id={message.author.id}>{message.author.nickname}</span
 							>
 							<span class="chatlog__timestamp"
-								><a href="#chatlog__message-container-{message.id}"
+								><a href="#{message.id}"
 									>{human_timestamp_format(message.timestamp)}</a
 								></span
 							>
