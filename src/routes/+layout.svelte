@@ -1,53 +1,52 @@
 <script>
-	import Header from './Header.svelte';
-	import './styles.css';
+    import './styles.css';
+
+    export let data
+    // console.log("data", data);
 </script>
 
+
 <div class="app">
-	<Header />
+    <div class="guilds">
+        <a href="/">HOME</a>
+<!--        guild list-->
+        {#if data.guilds}
+            {#each Object.values(data.guilds) as guild}
+                <a href="/{guild.id}">
+                    <div><img src="{guild.iconUrl}" alt="{guild.name}"></div>
+                </a>
 
-	<main>
-		<slot />
-	</main>
-
-	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
-	</footer>
+            {/each}
+        {/if}
+    </div>
+    <div class="right">
+<!--        others-->
+        <main>
+            <slot/>
+        </main>
+    </div>
 </div>
 
 <style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-	}
+    .app {
+        display: grid;
+        grid-template-columns: 60px 1fr;
+        height: 100vh;
+    }
+    .guilds {
+        background-color: #202225;
+        height: 100%;
+        overflow-y: auto;
+    }
 
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
+    .right {
+        height: 100%;
+    }
 
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
 
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
-	}
+    img {
+        width: 48px;
+        height: 48px;
+        margin: 5px;
+    }
 </style>
