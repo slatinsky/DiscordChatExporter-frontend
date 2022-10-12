@@ -1,3 +1,4 @@
+from concurrent.futures import thread
 import glob
 import json
 import os
@@ -6,13 +7,13 @@ import re
 import shutil
 from hashlib import sha256
 
+
 class GuildPreprocess:
     def __init__(self, guild_id, input_dir, json_filepaths, media_filepaths):
         self.input_dir = input_dir
         self.guild_id = guild_id
         self.json_filepaths = json_filepaths
         self.media_filepaths = media_filepaths
-
 
     def read_channels_messages_from_files(self):
         channels = {}
@@ -27,7 +28,8 @@ class GuildPreprocess:
 
                 # Copy messages temporarily to the guild
                 for message in data['messages']:
-                    message['channelId'] = channel['id']  # temporary marker for channel id
+                    # temporary marker for channel id
+                    message['channelId'] = channel['id']
                     messages[message['id']] = message
         return channels, messages
 
@@ -63,7 +65,8 @@ class GuildPreprocess:
             author['message_id'] = message['id']
             if author['id'] not in authors:  # new author
                 authors[author['id']] = author
-            elif authors[author['id']]['message_id'] < message['id']:  # extract author information from his last message (by message id)
+            # extract author information from his last message (by message id)
+            elif authors[author['id']]['message_id'] < message['id']:
                 authors[author['id']] = author
 
         # cleanup temp message_ids
@@ -92,27 +95,29 @@ class GuildPreprocess:
 
         return messages, emojis
 
-
     def _calculate_filename(self, url):
         """calculate the filename based on the data"""
         if url is None:
             return ""
         filename = url.split('/')[-1]
         # remove get parameters
-        filename = filename.split('?')[0]
+        # hashed filename must contain get parameters
         hash_sha256 = sha256(url.encode('utf-8')).hexdigest()[:5].upper()
 
+        filename = filename.split('?')[0]
         base, extension = os.path.splitext(filename)
         filename = base + "-" + hash_sha256 + extension
         return filename
 
-    def _find_filepath(self, filename):
+    def _find_filepath(self, filename, ignore_not_found=False):
         if filename in self.media_filepaths:
-            filepath = self.media_filepaths[filename].replace('\\', '/').replace(self.input_dir, '/input/')
+            filepath = self.media_filepaths[filename].replace(
+                '\\', '/').replace(self.input_dir, '/input/')
             # print("Found file: " + filepath)
             return filepath
         else:
-            print("File not found: " + filename)
+            if not ignore_not_found:
+                print("File not found: " + filename)
             return None
         return None
 
@@ -120,8 +125,10 @@ class GuildPreprocess:
         for message in messages.values():
             # calculate attachement filenames
             for attachment in message['attachments']:
-                attachment['localFileName'] = self._calculate_filename(attachment['url'])
-                attachment['localFilePath'] = self._find_filepath(attachment['localFileName'])
+                attachment['localFileName'] = self._calculate_filename(
+                    attachment['url'])
+                attachment['localFilePath'] = self._find_filepath(
+                    attachment['localFileName'])
 
                 # if image, tag it as such
                 if attachment['localFileName'] is not None and attachment['localFileName'].endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
@@ -129,9 +136,23 @@ class GuildPreprocess:
 
             # calculate embed filenames
             for embed in message['embeds']:
+                if "thumbnail" in embed and embed["thumbnail"] is not None:
+                    # image embed is calculated from embed["url"]
+                    embed["thumbnail"]["localFileName"] = self._calculate_filename(
+                        embed["url"])
+                    embed["thumbnail"]["localFilePath"] = self._find_filepath(
+                        embed["thumbnail"]["localFileName"], ignore_not_found=True)
+
+                    # non image embeds is calculated from embed["thumbnail"]["url"]
+                    if (embed["thumbnail"]["localFilePath"] is None):
+                        embed["thumbnail"]["localFileName"] = self._calculate_filename(
+                            embed["thumbnail"]["url"])
+                        embed["thumbnail"]["localFilePath"] = self._find_filepath(
+                            embed["thumbnail"]["localFileName"])
+
                 # if embed['type'] == 'image':
-                embed['localFileName'] = self._calculate_filename(embed['url'])
-                embed['localFilePath'] = self._find_filepath(embed['localFileName'])
+                # embed['localFileName'] = self._calculate_filename(embed['url'])
+                # embed['localFilePath'] = self._find_filepath(embed['localFileName'])
 
             # calculate sticker filenames
             # for sticker in message['stickers']:
@@ -139,12 +160,16 @@ class GuildPreprocess:
             #     sticker['localFilePath'] = self._find_filepath(sticker['localFileName'])
 
         for emoji in emojis.values():
-            emoji['localFileName'] = self._calculate_filename(emoji['imageUrl'])
-            emoji['localFilePath'] = self._find_filepath(emoji['localFileName'])
+            emoji['localFileName'] = self._calculate_filename(
+                emoji['imageUrl'])
+            emoji['localFilePath'] = self._find_filepath(
+                emoji['localFileName'])
 
         for author in authors.values():
-            author['localFileName'] = self._calculate_filename(author['avatarUrl'])
-            author['localFilePath'] = self._find_filepath(author['localFileName'])
+            author['localFileName'] = self._calculate_filename(
+                author['avatarUrl'])
+            author['localFilePath'] = self._find_filepath(
+                author['localFileName'])
 
         return messages
 
@@ -164,28 +189,70 @@ class GuildPreprocess:
                 messages_by_channel[channel_id] = []
             messages_by_channel[channel_id].append(message)
 
+        # spli channels into threads or normal channels
+        threads = {}
+        normal_channels = {}  # non thread channels
+        for channel in channels.values():
+            if channel['type'] == "GuildTextChat":
+                normal_channels[channel['id']] = channel
+            elif channel['type'] == "GuildPublicThread":
+                threads[channel['id']] = channel
+            else:
+                print("Unknown channel type: " + channel['type'])
+
+
+                
+
+        pprint(normal_channels)
+        print("---")
+        pprint(threads)
         # group channels by categories
         categories = {}
-        for channel in channels.values():
-            if channel['type'] == 4:
-                continue
+
+        for channel in normal_channels.values():
+            # if channel['type'] == 4:
+            #     continue
             if channel['categoryId'] not in categories:
+                if 'threads' not in channel:
+                    channel['threads'] = []
+
                 categories[channel['categoryId']] = {
                     'id': channel['categoryId'],
                     'name': channel['category'],
+                    'threads': channel['threads'],
+
                     'channelIds': []
                 }
+
+
             categories[channel['categoryId']]['channelIds'].append({
                 'id': channel['id'],
                 'name': channel['name'],
+                'type': "text",
             })
-        return messages_by_channel, categories
 
+        # pprint(threads)
+        for category in categories.values():
+            # loop category['channelIds']
+            for channel_info in category['channelIds']:
+            # for channel_id in category['channelIds']:
+                channel_id = channel_info['id']
+                for thread in threads.values():
+                    if thread['categoryId'] == channel_id:
+                        if 'threads' not in channel_info:
+                            channel_info['threads'] = []
+                        channel_info['threads'].append({
+                            'id': thread['id'],
+                            'name': thread['name'],
+                            'type': "thread",
+                        })
 
+        return messages_by_channel, categories, threads
 
     def cleanup_out_directory(self, output_dir):
         if os.path.exists(output_dir):
-            shutil.rmtree(output_dir) # delete existing output_dir directory and all its contents
+            # delete existing output_dir directory and all its contents
+            shutil.rmtree(output_dir)
         os.makedirs(output_dir)  # recreate the directory
 
     def write_json(self, data, filename):
@@ -195,7 +262,6 @@ class GuildPreprocess:
         # minified
         with open(filename.replace('.json', '.min.json'), 'w', encoding="utf8") as f:
             json.dump(data, f)
-
 
     def process(self):
         # step 1 - read data from json files
@@ -218,7 +284,8 @@ class GuildPreprocess:
 
         # step 6 - grouping to single json file
         # group messages by channels
-        messages_by_channel, categories = self.group_messages_and_channels(messages, channels)
+        messages_by_channel, categories, threads = self.group_messages_and_channels(
+            messages, channels)
 
         # get message ids
         message_ids = list(messages.keys())
@@ -228,17 +295,15 @@ class GuildPreprocess:
             'categories': categories,
             'authors': authors,
             'emojis': emojis,
-            'channels': channels,
+            # merge channels and threads
+            'channels': {**channels, **threads},
             'message_ids': message_ids,
             'messages': messages_by_channel,
             'version': '1.0.0'
         }
 
-
         # step 7 - write data to json files
         self.write_json(guild, output_dir + 'guild.json')
-
-
 
 
 class Preprocess:
@@ -246,11 +311,11 @@ class Preprocess:
         self.input_directory = input_directory
         self.files = self._find_json_files(self.input_directory)
         self.guilds = {}  # guild id is key
-        self.channels = {} # channel id is key
-        self.messages = {} # message id is key
-        self.authors = {} # author id is key
-        self.emojis = {} # emoji id is key
-        self.mentions = {} # mention id is key
+        self.channels = {}  # channel id is key
+        self.messages = {}  # message id is key
+        self.authors = {}  # author id is key
+        self.emojis = {}  # emoji id is key
+        self.mentions = {}  # mention id is key
 
     # recursively find all json files in the current directory
     # and print the thread ids to stdout
@@ -262,7 +327,6 @@ class Preprocess:
                 files.append(filename)
         return files
 
-    
     def _find_all_mediafiles_paths(self, directory):
         all_files = {}
         regex_pattern = re.compile(r'.+\-[A-F0-9]{5}\..+')
@@ -272,10 +336,6 @@ class Preprocess:
                 all_files[filename] = path
 
         return all_files
-
-
-
-
 
     # def remove_duplicates(self):
     #     """remove duplicates based on id"""
@@ -290,8 +350,6 @@ class Preprocess:
     #     self.channels = sorted(self.channels, key=lambda d: d['categoryId'])
     #     self.guilds = sorted(self.guilds, key=lambda d: d['name'])
     #     return
-
-
 
     def process(self):
         json_files = self._find_json_files(self.input_directory)
@@ -313,7 +371,8 @@ class Preprocess:
 
         # loop through each guild
         for guild_id, json_filepaths in json_paths_by_guild.items():
-            gp = GuildPreprocess(guild_id, self.input_directory, json_filepaths, media_filepaths)
+            gp = GuildPreprocess(guild_id, self.input_directory,
+                                 json_filepaths, media_filepaths)
             gp.process()
 
         # write guilds to json file
@@ -321,151 +380,6 @@ class Preprocess:
             json.dump(guilds, f, indent=4)
         with open('../static/data/guilds.min.json', 'w', encoding="utf8") as f:
             json.dump(guilds, f)
-        return
-
-
-        all_messages = []
-        all_filenames = []
-        for filename in json_files:
-            with open(filename, encoding="utf8") as f:
-                data = json.load(f)
-                guild = data['guild']
-                channel = data['channel']
-                messages = data['messages']
-
-                channel['guildId'] = guild['id']
-
-                processed_messages = {}
-                for message in messages:
-                    message['channelId'] = channel['id']
-                    # message['guildId'] = guild['id']
-
-                    processed_messages[message['id']] = message
-
-
-                    self.authors[message['author']['id']] = message['author']
-
-                    message['authorId'] = message['author']['id']
-                    del message['author']
-
-                    # for reaction in message['reactions']:
-                    #     if reaction['emoji']['id'] is "":
-                    #         self.emojis[reaction['emoji']['name']] = reaction['emoji']
-                    #         reaction['emojiName'] = reaction['emoji']['name']
-                    #     else:
-                    #         self.emojis[reaction['emoji']['id']] = reaction['emoji']
-                    #         reaction['emojiId'] = reaction['emoji']['id']
-
-                    #     del reaction['emoji']
-
-                    message['mentionIds'] = []
-                    for mention in message['mentions']:
-                        self.mentions[mention['id']] = mention
-                        message['mentionIds'].append(mention['id'])
-                    del message['mentions']
-
-                    # calculate attachement filenames
-                    for attachment in message['attachments']:
-                        attachment['fileName'] = self.calculate_filename(attachment['url'])
-                        all_filenames.append(attachment['fileName'])
-
-                    # # cleanup unused fields
-                    # if message['attachments'] == []:
-                    #     del message['attachments']
-
-                    # if message['embeds'] == []:
-                    #     del message['embeds']
-
-                    # if message['reactions'] == []:
-                    #     del message['reactions']
-
-                    # if message['timestampEdited'] is None:
-                    #     del message['timestampEdited']
-
-                    # if message['mentionIds'] == []:
-                    #     del message['mentionIds']
-
-
-                self.guilds[guild['id']] = guild
-                self.channels[channel['id']] = channel
-                self.messages = self.messages | processed_messages  # merge dicts together
-
-
-        # print(all_filenames)
-
-        # self.sort()
-        # self.remove_duplicates()
-
-        # sort channels by guild
-        guilds_channels = {}
-        for channel in self.channels.values():
-            if channel['guildId'] not in guilds_channels:
-                guilds_channels[channel['guildId']] = {}
-            guilds_channels[channel['guildId']][channel['id']] = channel
-
-        # sort messages by channel
-        channels_messages = {}
-        for message in self.messages.values():
-            if message['channelId'] not in channels_messages:
-                channels_messages[message['channelId']] = {}
-            channels_messages[message['channelId']][message['id']] = message
-
-
-
-
-
-        out_dir = '../static/data/'
-
-        # delete contents of out_dir if it exists
-        if os.path.exists(out_dir):
-            shutil.rmtree(out_dir)
-
-        # create out directory if it doesn't exist
-        if not os.path.exists(out_dir):
-            print('creating directory: ' + out_dir)
-            os.makedirs(out_dir)
-        else:
-            print('directory exists: ' + out_dir)
-
-        # create emojis directory if it doesn't exist
-        emojis_dir = out_dir + 'emojis/'
-        if not os.path.exists(emojis_dir):
-            os.makedirs(emojis_dir)
-
-        # calculate emoji filenames
-        for emoji in self.emojis.values():
-            emoji['fileName'] = self.calculate_filename(emoji['imageUrl'])
-            all_filenames.append(emoji['fileName'])
-            # copy emoji file to emojis_dir directory
-            shutil.copyfile(media_filepaths[emoji['fileName']], emojis_dir + emoji['fileName'])
-
-
-        # save emojis.json
-        with open(out_dir + 'emojis.json', 'w') as f:
-            json.dump(self.emojis, f, indent=4)
-
-        # save authors.json
-        with open(out_dir + 'authors.json', 'w') as f:
-            json.dump(self.authors, f, indent=4)
-
-        with open(out_dir + 'guilds.json', 'w') as f:
-            json.dump(self.guilds, f, indent=4)
-
-        # create a directory for each guild
-        for guild in self.guilds.values():
-            os.mkdir(out_dir + guild['id'])
-            # create channels.json
-            with open(out_dir + guild['id'] + '/channels.json', 'w') as f:
-                json.dump(guilds_channels[guild['id']], f, indent=4)
-
-            # create a directory for each channel
-            for channel in guilds_channels[guild['id']].values():
-                os.mkdir(out_dir + guild['id'] + '/' + channel['id'])
-                # create messages.json
-                with open(out_dir + guild['id'] + '/' + channel['id'] + '/messages.json', 'w') as f:
-                    json.dump(channels_messages[channel['id']], f, indent=4)
-
-        # with open('channels.json', 'w') as f:
 
     def get_files(self):
         return self.files
