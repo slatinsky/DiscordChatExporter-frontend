@@ -7,7 +7,7 @@ export const ssr = false;
 
 export async function load({ params, parent }) {
     let guildId = params.guildId
-    let response = await fetch('/data/' + guildId + '/guild.json')
+    let response = await fetch('/data/' + guildId + '/guild.min.json')
     let guild = await response.json()
     // console.log("eee", params.guildId);
     // console.log("iii", guild);

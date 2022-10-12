@@ -5,7 +5,7 @@ export const prerender = false;
 export const ssr = false;
 
 export async function load({ fetch, params }) {
-    let response = await fetch('/data/guilds.json')
+    let response = await fetch('/data/guilds.min.json')
     let guilds = await response.json()
     // console.log(guilds)
     return {

@@ -16,17 +16,26 @@
 		if (page > 0) {
 			page--;
 		}
+		window.location.hash = '';
+		setTimeout(() => {
+			window.location.hash = 'bottom';
+		}, 0);
 	}
 
 	function nextPage() {
 		if (page < pages - 1) {
 			page++;
 		}
+		window.location.hash = '';
+		setTimeout(() => {
+			window.location.hash = 'top';
+		}, 0);
 	}
 
 	function messagesChanged(messages) {
 		setTimeout(() => {
-			page = pages - 1;
+			// page = pages - 1;
+			page = 0;
 		}, 0);
 	}
 
@@ -109,9 +118,17 @@
 	// $: console.log('messages', messages);
 </script>
 
-<button on:click={prevPage}>PREV PAGE</button>
-<button on:click={nextPage}>NEXT PAGE</button>
-<div>Page {page + 1} of {pages}</div>
+<div id="top" />
+<div class="pagination">
+	{#if pages > 1}
+		<button on:click={prevPage} disabled={page == 0}>PREV PAGE</button>
+	{/if}
+	<div>Page {page + 1} of {pages}</div>
+	{#if pages > 1}
+		<button on:click={nextPage} disabled={page == pages-1}>NEXT PAGE</button>
+	{/if}
+</div>
+
 {#each Object.values(pageMessages) as message}
 	<!-- <p>{message.content} {message.author}</p> -->
 	{#if !$onlyMatches || $searchTerm == '' || $foundMessageIds.includes(message.id)}
@@ -133,12 +150,12 @@
 						{/if}
 
 						{#if message.type != 'ThreadCreated'}
-						<img
-							class="chatlog__avatar"
-							src={message.author.localFilePath}
-							alt="Avatar"
-							loading="lazy"
-						/>
+							<img
+								class="chatlog__avatar"
+								src={message.author.localFilePath}
+								alt="Avatar"
+								loading="lazy"
+							/>
 						{/if}
 					</div>
 
@@ -152,7 +169,11 @@
 									data-user-id={full_name(message.author)}>{message.author.nickname}</span
 								>
 								<span class="chatlog__system-notification-content">
-									<span><a href="/channels/{guildId}/{message.reference.channelId}"> started a thread.</a></span>
+									<span
+										><a href="/channels/{guildId}/{message.reference.channelId}" target="_blank">
+											started a thread.</a
+										></span
+									>
 								</span>
 								<span class="chatlog__system-notification-timestamp">
 									<a href="#chatlog__message-container-{message.reference.channelId}"
@@ -217,6 +238,7 @@
 								<span
 									class="chatlog__author"
 									title={message.author.nickname}
+									style="color:{message.author.color}"
 									data-user-id={message.author.id}>{message.author.nickname}</span
 								>
 								<span class="chatlog__timestamp"
@@ -326,3 +348,26 @@
 	{/if}
 	<!-- <pre>{JSON.stringify(message, null, 2)}</pre> -->
 {/each}
+<div id="bottom" />
+
+<style>
+	.pagination {
+		position: fixed;
+		display: flex;
+		/* justify-content: space-between; */
+		align-items: center;
+		gap: 10px;
+
+		background-color: #202225;
+		width: 100%;
+
+		padding: 17px;
+		margin-top: -67px;
+
+		z-index: 100;
+	}
+
+	#top {
+		padding-bottom: 50px;
+	}
+</style>

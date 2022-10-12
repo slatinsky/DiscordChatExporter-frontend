@@ -203,9 +203,9 @@ class GuildPreprocess:
 
                 
 
-        pprint(normal_channels)
-        print("---")
-        pprint(threads)
+        # pprint(normal_channels)
+        # print("---")
+        # pprint(threads)
         # group channels by categories
         categories = {}
 
@@ -266,6 +266,9 @@ class GuildPreprocess:
     def process(self):
         # step 1 - read data from json files
         channels, messages = self.read_channels_messages_from_files()
+
+        # print message count
+        print("Message count: " + str(len(messages)))
 
         # step 2 - extract author information from messages
         messages, authors = self.extract_authors(messages)
