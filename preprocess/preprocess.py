@@ -95,6 +95,8 @@ class GuildPreprocess:
 
     def _calculate_filename(self, url):
         """calculate the filename based on the data"""
+        if url is None:
+            return ""
         filename = url.split('/')[-1]
         # remove get parameters
         filename = filename.split('?')[0]
@@ -132,9 +134,9 @@ class GuildPreprocess:
                 embed['localFilePath'] = self._find_filepath(embed['localFileName'])
 
             # calculate sticker filenames
-            for sticker in message['stickers']:
-                sticker['localFileName'] = self._calculate_filename(sticker['url'])
-                sticker['localFilePath'] = self._find_filepath(sticker['localFileName'])
+            # for sticker in message['stickers']:
+            #     sticker['localFileName'] = self._calculate_filename(sticker['url'])
+            #     sticker['localFilePath'] = self._find_filepath(sticker['localFileName'])
 
         for emoji in emojis.values():
             emoji['localFileName'] = self._calculate_filename(emoji['imageUrl'])

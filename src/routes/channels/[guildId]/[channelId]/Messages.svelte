@@ -5,6 +5,27 @@
 	export let authors = {};
 	export let emojis = {};
 
+	let page = 0;
+	let pageSize = 300;
+	$: pages = Math.ceil(messages.length / pageSize);
+	$: pageMessages = messages.slice(page * pageSize, (page + 1) * pageSize);
+
+
+	function prevPage() {
+		if (page > 0) {
+			page--;
+		}
+	}
+
+
+
+	function nextPage() {
+		if (page < pages - 1) {
+			page++;
+		}
+	}
+
+
 	function human_timestamp_format(timestamp) {
 		return timestamp.replace('T', ' ').split('.')[0];
 	}
@@ -13,11 +34,11 @@
 		return author.name + '#' + author.discriminator;
 	}
 
-	function addAuthorsToMessages(messages, authors) {
+	function addAuthorsToMessages(pageMessages, authors) {
 		// go through each message, messages is object
 
-		for (var messageId of Object.keys(messages)) {
-			let message = messages[messageId];
+		for (var messageId of Object.keys(pageMessages)) {
+			let message = pageMessages[messageId];
 
 			// add author to message
 			if (message.authorId) {
@@ -26,17 +47,17 @@
 			}
 
 			// apply changes
-			messages[messageId] = message;
+			pageMessages[messageId] = message;
 		}
 
-		return messages;
+		return pageMessages;
 	}
 
-	function addEmojisToMessages(messages, emojis) {
+	function addEmojisToMessages(pageMessages, emojis) {
 		// go through each message, messages is object
 
-		for (var messageId of Object.keys(messages)) {
-			let message = messages[messageId];
+		for (var messageId of Object.keys(pageMessages)) {
+			let message = pageMessages[messageId];
 
 			if (message.reactions) {
 				for (let i = 0; i < message.reactions.length; i++) {
@@ -58,32 +79,35 @@
 				}
 			}
 		}
-		return messages;
+		return pageMessages;
 	}
 
-    function addReferencedMessages(messages) {
-        for (var messageId of Object.keys(messages)) {
-            let message = messages[messageId];
+    function addReferencedMessages(pageMessages) {
+        for (var messageId of Object.keys(pageMessages)) {
+            let message = pageMessages[messageId];
 
             if (message.reference) {
                 console.log(message.reference);
-                message.referencedMessage = messages.find(m => m.id === message.reference.messageId);
+                message.referencedMessage = pageMessages.find(m => m.id === message.reference.messageId);
                 console.log(message.referencedMessage);
             }
         }
-        return messages;
+        return pageMessages;
     }
 
-    $: console.log("mmmm", messages);
+    $: console.log("mmmm", pageMessages);
 
-	$: messages = addAuthorsToMessages(messages, authors);
-	$: messages = addEmojisToMessages(messages, emojis);
-	$: messages = addReferencedMessages(messages);
+	$: pageMessages = addAuthorsToMessages(pageMessages, authors);
+	$: pageMessages = addEmojisToMessages(pageMessages, emojis);
+	$: pageMessages = addReferencedMessages(pageMessages);
 	// $: console.log('authors', authors);
 	// $: console.log('messages', messages);
 </script>
 
-{#each Object.values(messages) as message}
+<button on:click={prevPage}>PREV PAGE</button>
+<button on:click={nextPage}>NEXT PAGE</button>
+<div>Page {page+1} of {pages}</div>
+{#each Object.values(pageMessages) as message}
 	<!-- <p>{message.content} {message.author}</p> -->
 	{#if !$onlyMatches || $searchTerm == "" || $foundMessageIds.includes(message.id)}
 		<div class="chatlog__message-group">
