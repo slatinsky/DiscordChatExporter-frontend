@@ -12,3 +12,5 @@ node_modules
 /static/in
 /static/input
 /static/data
+/releases/bin/preprocess.exe
+/releases/static/

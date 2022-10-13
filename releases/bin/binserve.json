@@ -1,0 +1,38 @@
+{
+    "server": {
+        "host": "127.0.0.1:1337",
+        "tls": {
+            "host": "127.0.0.1:443",
+            "enable": false,
+            "key": "key.pem",
+            "cert": "cert.pem"
+        }
+    },
+
+    "routes": {
+        "/": "../static/index.html"
+    },
+	
+
+    "static": {
+        "directory": "../static/",
+        "served_from": "/",
+        "error_pages": {
+            "404": "../static/index.html"
+        }
+    },
+
+    "config": {
+        "enable_hot_reload": false,
+        "fast_mem_cache": false,
+        "enable_cache_control": true,
+        "enable_directory_listing": true,
+        "minify_html": false,
+        "follow_symlinks": false,
+        "enable_logging": false
+    },
+
+    "insert_headers": {
+        "x-greetings": "hellooo!"
+    }
+}
