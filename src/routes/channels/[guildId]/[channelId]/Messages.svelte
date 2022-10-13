@@ -1,125 +1,66 @@
 <script>
 	import { copyTextToClipboard } from '../../../../helpers';
 	import { onlyMatches, foundMessageIds, searchTerm } from './searchStore';
-	export let messages = {};
-	export let authors = {};
-	export let emojis = {};
+	import VirtualList from 'svelte-tiny-virtual-list';
+	import Message from './Message.svelte';
+	export let messages;
+	export let authors;
+	export let emojis;
 
 	export let guildId;
 
-	let page = 0;
-	let pageSize = 300;
-	$: pages = Math.ceil(messages.length / pageSize);
-	$: pageMessages = messages.slice(page * pageSize, (page + 1) * pageSize);
+	// let page = 0;
+	// let pageSize = 10000;
+	// $: pages = Math.ceil(messages.length / pageSize);
+	// $: pageMessages = messages.slice(page * pageSize, (page + 1) * pageSize);
 
-	function prevPage() {
-		if (page > 0) {
-			page--;
-		}
-		window.location.hash = '';
-		setTimeout(() => {
-			window.location.hash = 'bottom';
-		}, 0);
-	}
+	// $: console.log('pageMessages.length', pageMessages.length);
 
-	function nextPage() {
-		if (page < pages - 1) {
-			page++;
-		}
-		window.location.hash = '';
-		setTimeout(() => {
-			window.location.hash = 'top';
-		}, 0);
-	}
+	// function prevPage() {
+	// 	if (page > 0) {
+	// 		page--;
+	// 	}
+	// 	window.location.hash = '';
+	// 	setTimeout(() => {
+	// 		window.location.hash = 'bottom';
+	// 	}, 0);
+	// }
 
-	function messagesChanged(messages) {
-		setTimeout(() => {
-			// page = pages - 1;
-			page = 0;
-		}, 0);
-	}
+	// function nextPage() {
+	// 	if (page < pages - 1) {
+	// 		page++;
+	// 	}
+	// 	window.location.hash = '';
+	// 	setTimeout(() => {
+	// 		window.location.hash = 'top';
+	// 	}, 0);
+	// }
 
-	function human_timestamp_format(timestamp) {
-		return timestamp.replace('T', ' ').split('.')[0];
-	}
+	// function messagesChanged(messages) {
+	// 	setTimeout(() => {
+	// 		// page = pages - 1;
+	// 		page = 0;
+	// 	}, 0);
+	// }
 
-	function full_name(author) {
-		return author.name + '#' + author.discriminator;
-	}
+	console.error('messages-----',  Object.keys(messages)[0]);
 
-	function addAuthorsToMessages(pageMessages, authors) {
-		// go through each message, messages is object
 
-		for (var messageId of Object.keys(pageMessages)) {
-			let message = pageMessages[messageId];
 
-			// add author to message
-			if (message.authorId) {
-				message.author = authors[message.authorId];
-				delete message.authorId;
-			}
 
-			// apply changes
-			pageMessages[messageId] = message;
-		}
-
-		return pageMessages;
-	}
-
-	function addEmojisToMessages(pageMessages, emojis) {
-		// go through each message, messages is object
-
-		for (var messageId of Object.keys(pageMessages)) {
-			let message = pageMessages[messageId];
-
-			if (message.reactions) {
-				for (let i = 0; i < message.reactions.length; i++) {
-					let reaction = message.reactions[i];
-
-					// add emoji to reaction
-					if (reaction.emojiId) {
-						reaction.emoji = emojis[reaction.emojiId];
-						delete reaction.emojiId;
-					}
-
-					if (reaction.emojiName) {
-						reaction.emoji = emojis[reaction.emojiName];
-						delete reaction.reactionId;
-					}
-
-					// apply changes
-					message.reactions[i] = reaction;
-				}
-			}
-		}
-		return pageMessages;
-	}
-
-	function addReferencedMessages(pageMessages) {
-		for (var messageId of Object.keys(pageMessages)) {
-			let message = pageMessages[messageId];
-
-			if (message.reference) {
-				// console.log(message.reference);
-				message.referencedMessage = pageMessages.find((m) => m.id === message.reference.messageId);
-				// console.log(message.referencedMessage);
-			}
-		}
-		return pageMessages;
-	}
 
 	// $: console.log('mmmm', pageMessages);
-	$: messagesChanged(messages);
+	// $: messagesChanged(messages);
 
-	$: pageMessages = addAuthorsToMessages(pageMessages, authors);
-	$: pageMessages = addEmojisToMessages(pageMessages, emojis);
-	$: pageMessages = addReferencedMessages(pageMessages);
+	// $: pageMessages = addAuthorsToMessages(pageMessages, authors);
+	// $: pageMessages = addEmojisToMessages(pageMessages, emojis);
+	// $: pageMessages = addReferencedMessages(pageMessages);
 	// $: console.log('authors', authors);
 	// $: console.log('messages', messages);
 </script>
 
 <div id="top" />
-<div class="pagination">
+<!-- <div class="pagination">
 	{#if pages > 1}
 		<button on:click={prevPage} disabled={page == 0}>PREV PAGE</button>
 	{/if}
@@ -127,234 +68,33 @@
 	{#if pages > 1}
 		<button on:click={nextPage} disabled={page == pages-1}>NEXT PAGE</button>
 	{/if}
-</div>
+</div> -->
 
-{#each Object.values(pageMessages) as message}
-	<!-- <p>{message.content} {message.author}</p> -->
-	{#if !$onlyMatches || $searchTerm == '' || $foundMessageIds.includes(message.id)}
-		<div class="chatlog__message-group">
-			<!-- <button on:click={()=>copyTextToClipboard(message.id)}>Copy ID</button> -->
-			<div
-				id={message.id}
-				class="chatlog__message-container {message.isPinned
-					? 'chatlog__message-container--pinned'
-					: ''}"
-				data-message-id={message.id}
-			>
-				<div class="chatlog__message">
-					<!--            TODO: system notification-->
-					<!--            Regular message-->
-					<div class="chatlog__message-aside">
-						{#if message.referencedMessage}
-							<div class="chatlog__reference-symbol" />
-						{/if}
+<!-- <VirtualList
+    width="100%"
+    height="600px"
+    itemCount={pageMessages.length}
+    itemSize={150}>
+  <div slot="item" let:index let:style {style}>
+	<Message message={pageMessages[index]} {messages} {authors} {emojis} />
+  </div>
+</VirtualList> -->
 
-						{#if message.type != 'ThreadCreated'}
-							<img
-								class="chatlog__avatar"
-								src={message.author.localFilePath}
-								alt="Avatar"
-								loading="lazy"
-							/>
-						{/if}
-					</div>
+{#each Object.values(messages) as message}
+	<Message message={message} messages={messages} {authors} {emojis} {guildId} />
 
-					<div class="chatlog__message-primary">
-						{#if message.type == 'ThreadCreated'}
-							<div class="chatlog__message-primary">
-								<span
-									class="chatlog__system-notification-author"
-									style="color:{message.author.color}"
-									title={full_name(message.author)}
-									data-user-id={full_name(message.author)}>{message.author.nickname}</span
-								>
-								<span class="chatlog__system-notification-content">
-									<span
-										><a href="/channels/{guildId}/{message.reference.channelId}" target="_blank">
-											started a thread.</a
-										></span
-									>
-								</span>
-								<span class="chatlog__system-notification-timestamp">
-									<a href="#chatlog__message-container-{message.reference.channelId}"
-										>{human_timestamp_format(message.timestamp)}</a
-									>
-								</span>
-							</div>
-
-							<!-- <div class="message thread-created">
-								<div class="message-header">
-									<div class="message-header-left">
-										<div class="message-author">
-											{message.author ? message.author.name : 'Unknown'}
-										</div>
-										<div class="message-timestamp">
-											{human_timestamp_format(message.timestamp)}
-										</div>
-									</div>
-									<div class="message-header-right">
-										<div class="message-id">
-											{message.id}
-										</div>
-										<div class="message-copy-id" on:click={() => copyTextToClipboard(message.id)}>
-											Copy ID
-										</div>
-									</div>
-								</div>
-								<div class="message-content">
-									<div class="message-content-text">
-										{message.content}
-									</div>
-								</div>
-							</div> -->
-						{:else}
-							{#if message.referencedMessage}
-								<a href="#{message.referencedMessage.id}">
-									<div class="chatlog__reference">
-										<img
-											class="chatlog__reference-avatar"
-											src={message.referencedMessage.author.localFilePath}
-											alt="Avatar"
-											loading="lazy"
-										/>
-										<div
-											class="chatlog__reference-author"
-											style="color: {message.referencedMessage.author.color}"
-											title={full_name(message.referencedMessage.author)}
-										>
-											{message.referencedMessage.author.name}
-										</div>
-										<div class="chatlog__reference-content">
-											<span
-												class="chatlog__reference-link"
-												onclick="scrollToMessage(event,message.reference.messageId)"
-												>{message.referencedMessage.content}</span
-											>
-										</div>
-									</div>
-								</a>
-							{/if}
-							<div class="chatlog__header">
-								<span
-									class="chatlog__author"
-									title={message.author.nickname}
-									style="color:{message.author.color}"
-									data-user-id={message.author.id}>{message.author.nickname}</span
-								>
-								<span class="chatlog__timestamp"
-									><a href="#{message.id}">{human_timestamp_format(message.timestamp)}</a></span
-								>
-							</div>
-							<div class="chatlog__content chatlog__markdown">
-								<span class="chatlog__markdown-preserve">{message.content}</span>
-								{#if message.timestampEdited != null}
-									<span class="chatlog__edited-timestamp" title={message.timestampEdited}
-										>(edited)</span
-									>
-								{/if}
-							</div>
-							{#if message.attachments}
-								{#each message.attachments as attachment}
-									{#if attachment.type == 'image'}
-										<div class="chatlog__attachment">
-											<a href={attachment.localFilePath} target="_blank">
-												<img
-													class="chatlog__attachment-media"
-													src={attachment.localFilePath}
-													alt="Attachment"
-													title="Image: {attachment.fileName} ({attachment.fileSizeBytes} KB)"
-													loading="lazy"
-												/>
-											</a>
-										</div>
-									{:else}
-										<div class="chatlog__attachment">
-											<a href={attachment.localFilePath} target="_blank">
-												<div class="chatlog__attachment-generic">
-													<svg class="chatlog__attachment-generic-icon">
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															width="24"
-															height="24"
-															viewBox="0 0 24 24"
-															fill="none"
-															stroke="currentColor"
-															stroke-width="2"
-															stroke-linecap="round"
-															stroke-linejoin="round"
-															class="feather feather-file"
-														>
-															<path
-																d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-															/>
-															<polyline points="14 2 14 8 20 8" />
-															<line x1="16" y1="13" x2="8" y2="13" />
-															<line x1="16" y1="17" x2="8" y2="17" />
-															<polyline points="10 9 9 9 8 9" />
-														</svg>
-													</svg>
-													<div class="chatlog__attachment-generic-name">
-														<a href={attachment.localFilePath} target="_blank">
-															{attachment.fileName}
-														</a>
-													</div>
-													<div class="chatlog__attachment-generic-size">
-														{Math.round(attachment.fileSizeBytes / 1024)} KB
-													</div>
-												</div>
-											</a>
-										</div>
-									{/if}
-								{/each}
-							{/if}
-						{/if}
-
-						{#if message.embeds}
-							{#each message.embeds as embed}
-								{#if embed.thumbnail}
-									<div class="chatlog__embed">
-										<a href={embed.thumbnail.localFilePath} target="_blank">
-											<img
-												class="chatlog__embed-generic-image"
-												src={embed.thumbnail.localFilePath}
-												alt="Embedded image"
-												loading="lazy"
-											/>
-										</a>
-									</div>
-								{/if}
-							{/each}
-						{/if}
-						<!--                TODO: stickers-->
-						<!--                REACTIONS-->
-						<div class="chatlog__reactions">
-							{#if message.reactions}
-								{#each message.reactions as reaction}
-									<div class="chatlog__reaction" title={reaction.emoji.name}>
-										<img
-											class="chatlog__emoji chatlog__emoji--small"
-											alt="🍰"
-											src={reaction.emoji.localFilePath}
-											loading="lazy"
-										/> <span class="chatlog__reaction-count">{reaction.count}</span>
-									</div>
-								{/each}
-							{/if}
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	{/if}
+	<!-- <p>{pageMessages[index].content} {pageMessages[index].author}</p> -->
+	<!-- {#if !$onlyMatches || $searchTerm == '' || $foundMessageIds.includes(pageMessages[index].id)}
+		
+	{/if} -->
 	<!-- <pre>{JSON.stringify(message, null, 2)}</pre> -->
 {/each}
 <div id="bottom" />
 
 <style>
-	.pagination {
+	/* .pagination {
 		position: fixed;
 		display: flex;
-		/* justify-content: space-between; */
 		align-items: center;
 		gap: 10px;
 
@@ -365,9 +105,9 @@
 		margin-top: -67px;
 
 		z-index: 100;
-	}
+	} */
 
 	#top {
-		padding-bottom: 50px;
+		/* padding-bottom: 50px; */
 	}
 </style>

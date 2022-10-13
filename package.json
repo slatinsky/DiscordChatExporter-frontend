@@ -35,6 +35,7 @@
 	"type": "module",
 	"dependencies": {
 		"@sveltejs/adapter-static": "^1.0.0-next.44",
-		"axios": "^1.1.2"
+		"axios": "^1.1.2",
+		"svelte-tiny-virtual-list": "^2.0.5"
 	}
 }
