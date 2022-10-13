@@ -729,3 +729,13 @@ img {
 .chatlog__attachment--hidden .chatlog__attachment-media {
 	filter: blur(44px);
 }
+
+
+
+/* thin dark scrollbar */
+::-webkit-scrollbar { width: 10px; height: 3px;}
+::-webkit-scrollbar-track {  background-color: #2F3136;}
+::-webkit-scrollbar-track-piece { background-color: #2F3136;}
+::-webkit-scrollbar-thumb { height: 50px; background-color: #202225; border-radius: 3px;}
+::-webkit-scrollbar-corner { background-color: #646464;}
+::-webkit-resizer { background-color: #666;}

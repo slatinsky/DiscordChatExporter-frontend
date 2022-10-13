@@ -1,7 +1,7 @@
 pushd "%~dp0"
 @REM Move user files outside build directory
-move "releases/static/input" "releases/input"
-move "releases/static/data" "releases/data"
+@REM move "releases/static/input" "releases/input"
+@REM move "releases/static/data" "releases/data"
 
 @REM Relete old build
 rmdir "releases/static/" /s /q
@@ -21,8 +21,8 @@ call npm run build
 move "build" "releases/static"
 
 @REM Move user files back
-move "releases/input" "releases/static/input"
-move "releases/data" "releases/static/data"
+@REM move "releases/input" "releases/static/input"
+@REM move "releases/data" "releases/static/data"
 
 @REM Remove not needed files and folders
 del preprocess\preprocess.spec

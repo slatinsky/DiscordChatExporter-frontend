@@ -24,7 +24,7 @@
 
     "config": {
         "enable_hot_reload": false,
-        "fast_mem_cache": false,
+        "fast_mem_cache": true,
         "enable_cache_control": true,
         "enable_directory_listing": true,
         "minify_html": false,

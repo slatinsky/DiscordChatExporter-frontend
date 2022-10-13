@@ -6,14 +6,16 @@
 	<div class="channels">
 		<div class="guild-name">{data.guilds[data.guildId].name}</div>
 		{#each Object.values(data.guild.categories) as category}
-			<div>{category.name}</div>
+			<div class="category">{category.name}</div>
 			{#each category.channelIds as channel}
 				<div class="channel">
-					<a href="/channels/{data.guildId}/{channel.id}"># {channel.name}</a>
+					<a href="/channels/{data.guildId}/{channel.id}" class={data.channelId == channel.id ? 'selected' : ''}># {channel.name}</a>
 					{#if channel.threads}
 						{#each channel.threads as thread}
+						<div>
+							<div class="thread" title={thread.name}>
 								<!-- {thread.id} -->
-								<br /><a href="/channels/{data.guildId}/{thread.id}" class="thread">
+								<a href="/channels/{data.guildId}/{thread.id}" class="{data.channelId == thread.id ? 'selected' : ''}">
 									<!-- svg -->
 									<svg
 										class="thread-svg-icon"
@@ -29,6 +31,8 @@
 									>
 									{thread.name}</a
 								> 
+								</div>
+							</div>
 						{/each}
 					{/if}
 				</div>
@@ -41,15 +45,40 @@
 </div>
 
 <style>
+
+	.category {
+		padding-top: 15px;
+		font-size: 0.9rem;
+		text-transform: uppercase;
+	}
 	.channel {
 		margin: 5px 15px;
+	}
+
+	.channel > a {
+		/* color: #b9bbbe; */
+		/* color: white !important; */
+		color: #DCDDDE;
+
+	}
+
+	.selected {
+		color: chartreuse !important;
 	}
 
 	.thread {
 		margin: 5px 15px 5px 30px;
 		font-size: small;
-		color: gray;
+		
 		text-decoration: none;
+		display: -webkit-box;
+		-webkit-line-clamp: 1;
+		-webkit-box-orient: vertical;  
+		overflow: hidden;
+	}
+
+	.thread > a {
+		color: gray;
 	}
 
 	.thread:hover {
@@ -63,8 +92,10 @@
 	.channels {
 		display: flex;
 		flex-direction: column;
-		margin: 10px 15px;
+		padding: 0 15px 10px 15px;
+		margin-right: 5px;
 		overflow-y: auto;
+
 	}
 
 	.columns {
@@ -76,8 +107,14 @@
 	}
 
 	.guild-name {
+		padding: 10px 0 10px 0;
 		font-size: 20px;
 		font-weight: 600;
+		position: sticky;
+		top: 0;
+		background-color: #2f3136;
+		border-bottom: 2px solid #202225;
+		margin-bottom: 10px;
 	}
 
 	.category-name {

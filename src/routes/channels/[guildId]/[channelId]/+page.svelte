@@ -51,6 +51,7 @@
  .chatlog {
      overflow-y: auto;
      max-height: calc(100vh - 96px);
+     margin-right: 5px;
  }
 </style>
 

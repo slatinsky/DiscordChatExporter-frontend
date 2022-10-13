@@ -1,7 +1,9 @@
-<style>
-    h1 {
-        margin-left: 10px;
-    }
-</style>
+<div>Select guild</div>
 
-<h1>Select guild</h1>
+<style>
+	div {
+		font-size: 32px;
+		padding-top: 20px;
+		padding-left: 20px;
+	}
+</style>

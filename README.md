@@ -126,9 +126,10 @@ npm run dev -- --open
 
 ## Roadmap:
 - Fix search with pagination
+- Support Direct messages
 - Screenshots in documentation
 - Markdown rendering support
-- Better discord like GUI
+- Better GUI
 - Better search
 - Guild-wide search
 - Improve code readability
