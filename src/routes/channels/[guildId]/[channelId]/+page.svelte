@@ -26,7 +26,7 @@
         <!-- {/each} -->
         <div class="chatlog">
             <div class=chatlog__message-group>
-                <Messages messages={data.messages} authors={data.guild.authors} emojis={data.guild.emojis} guildId={data.guildId}/>
+                <Messages messages={data.messages} authors={data.guild.authors} emojis={data.guild.emojis} guildId={data.guildId} channelId={data.channelId}/>
             </div>
         </div>
 

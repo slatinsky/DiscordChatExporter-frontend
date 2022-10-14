@@ -9,9 +9,15 @@ Tyrrrz/DiscordChatExporter is a well maintained tool to export Discord chat logs
 - ability to merge multiple JSON exports and view them in the browser
 - discord like user interface to switch between exported guilds, channels, threads
 - threads support
-- pagination
+- message lazy loading (original html export of large channel crashes the browser)
 
 So I made this tool to fill those gaps.
+
+# Features
+- View your JSON exports as if you were using Discord interface
+- Advanced message lazy loading (only messages that are visible in the viewport are loaded) - Even channels with 100k+ messages are loaded under a second
+- Threads support
+- In channel search
 
 
 ## Using prebuilt binary release

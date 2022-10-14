@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from "svelte";
 	import { onlyMatches, searchTerm, foundMessageIds } from "./searchStore";
 
 	export let messages;
@@ -45,9 +46,70 @@
 		return searchResults;
 	}
 
+	/**
+	 * Because messages are wrapped in message groups for performance reasons,
+	 * we need to find recursivelly the message group that contains the message we want to scroll to.
+	 */
+	function searchForMessageId(messageId, recursionDepth = 0) {
+		if (recursionDepth > 100) {
+			console.error('recursion depth exceeded');
+			return;
+		}
+		let elMessage = document.getElementById(messageId);
+		if (elMessage) {
+			elMessage.scrollIntoView();
+			console.log('found message', messageId, "- recursion depth", recursionDepth);
+			return;
+		}
+
+		let visibleMessageIds = []
+		for (const mg of document.querySelectorAll('.message-group')) {
+			visibleMessageIds.push([BigInt(mg.dataset.mgfirst), BigInt(mg.dataset.mglast)]);
+		}
+
+		// console.log('visibleMessageIds', visibleMessageIds);
+
+		let bestRange = null;
+		let bestError = BigInt("999999999999999999999999999999")
+
+		for (let i = 0; i < visibleMessageIds.length; i++) {
+			let first = BigInt(visibleMessageIds[i][0]);
+			let last = BigInt(visibleMessageIds[i][1]);
+			let currentError = last - first;  // we want to find the smallest message group that contains the message we want to scroll to
+			if (messageId >= first && messageId <= last && currentError < bestError) {
+				bestError = currentError;
+				bestRange = [first,last];
+				// console.log('found message in visible range', messageId, first, last, bestError);
+			}
+		}
+
+		if (bestRange) {
+			let first = bestRange[0];
+			let last = bestRange[1];
+			let el = document.querySelector('.message-group[data-mgfirst="' + first + '"][data-mglast="' + last + '"]')
+				if (el) {
+					el.scrollIntoView();
+					setTimeout(() => {
+						searchForMessageId(messageId, recursionDepth+1)
+					}, 1);
+				}
+				else {
+					console.log('could not find message group with id', closestMessageId);
+				}
+				return;
+		} else {
+			console.log('message not found', messageId);
+		}
+
+
+
+
+	}
+
 	function addHashToUrl(messages, searchTerm, messageId) {
+		searchForMessageId(BigInt(messageId))
 		window.location.hash = messageId;
-		console.log('added hash to url', window.location.hash, elSearchInput);
+		// console.log('added hash to url', window.location.hash, elSearchInput);
 
 		if (elSearchInput) {
 			elSearchInput.focus();
@@ -67,6 +129,14 @@
 			// scrollToMessage(searchResults[resultsIndex]);
 		}
 	}
+
+	onMount(() => {
+		// if hash is present in url, search for it
+		if (window.location.hash) {
+			let messageId = window.location.hash.replace('#', '');
+			searchForMessageId(BigInt(messageId));
+		}
+	});
 
 	$: searchResults = searchMessages(messages, $searchTerm, resultsIndex);
 </script>

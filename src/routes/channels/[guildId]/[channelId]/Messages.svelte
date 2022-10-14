@@ -1,11 +1,12 @@
 <script>
 	import { copyTextToClipboard } from '../../../../helpers';
-	import Message from './Message.svelte';
+	import MessageGroup from './MessageGroup.svelte';
 	export let messages;
 	export let authors;
 	export let emojis;
 
 	export let guildId;
+	export let channelId;
 
 	// }
 
@@ -16,9 +17,10 @@
 
 <div id="top" />
 
-{#each Object.values(messages) as message (message['id'])}
-	<Message message={message} messages={messages} {authors} {emojis} {guildId} />
-{/each}
+{#key channelId}
+	<MessageGroup messages={messages} splitMessages={Object.values(messages)} {authors} {emojis} {guildId}></MessageGroup>
+{/key}
+
 <div id="bottom" />
 
 <style>

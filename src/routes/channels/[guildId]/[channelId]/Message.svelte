@@ -88,7 +88,7 @@
 		if (message.reference) {
 			// console.log(message.reference);
 			message.referencedMessage = messages[message.reference.messageId];
-            if (message.referencedMessage.authorId) {
+            if (message.referencedMessage && message.referencedMessage?.authorId) {
                 message.referencedMessage.author = authors[message.referencedMessage.authorId];
                 delete message.referencedMessage.authorId;
                 // message = message; // apply changes
