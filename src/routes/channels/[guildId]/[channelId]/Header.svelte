@@ -1,45 +1,51 @@
 <script>
-	import Search from "./Search.svelte";
+	import Search from './Search.svelte';
 
-
-    export let channel;
-    export let messages
-    
+	export let channel;
+	export let messages;
 </script>
 
 <section>
-    <div class="channel-header">
-        <div class="channel-header__left">
-            <div class="channel-name"># {channel.name}</div>
-            <div class="topic">| {channel.topic}</div>
-            <Search messages={messages}></Search>
-            
-        </div>
-    </div>
+	<div class="channel-header">
+		<div class="channel-header__left">
+			<div class="channel-name elipsis"># {channel.name}</div>
+            {#if channel.topic}
+			    <div class="topic elipsis">| {channel.topic}</div>
+            {/if}
+			<Search {messages} />
+		</div>
+	</div>
 </section>
 
-
 <style>
-    .channel-header__left {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+	.channel-header__left {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
 
-        gap: 15px;
+		gap: 15px;
 
-        padding: 10px 20px;
+		padding: 10px 20px;
+	}
+
+	.channel-name {
+		font-size: 1.5rem;
+		font-weight: 700;
+	}
+
+	.topic {
+		font-size: 1rem;
+		font-weight: 400;
+		color: gray;
+
+		
+	}
+
+    .elipsis {
+        display: -webkit-box;
+		-webkit-line-clamp: 1;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
     }
-
-    .channel-name {
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-    .topic {
-        font-size: 1rem;
-        font-weight: 400;
-        color: gray;
-    }
-
-
 </style>

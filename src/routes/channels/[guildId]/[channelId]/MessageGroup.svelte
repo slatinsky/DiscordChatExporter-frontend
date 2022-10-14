@@ -16,13 +16,12 @@
 	let loaded = false;
 	let root;
 	let observer;
-    let firstMessageId
-    let lastMessageId
-    
+	let firstMessageId;
+	let lastMessageId;
 
 	if (createGroup) {
-        firstMessageId = splitMessages[0].id
-        lastMessageId = splitMessages[splitMessages.length - 1].id
+		firstMessageId = splitMessages[0].id;
+		lastMessageId = splitMessages[splitMessages.length - 1].id;
 		firstHalfMessages = splitMessages.slice(0, messageCount / 2);
 		secondHalfMessages = splitMessages.slice(messageCount / 2, messageCount);
 		observer = new IntersectionObserver(
@@ -58,19 +57,26 @@
 </script>
 
 {#if createGroup}
-    <div bind:this={root} class="message-group" data-mgfirst={firstMessageId} data-mglast={lastMessageId}>
-        {#if loaded}
-            <svelte:self {messages} splitMessages={firstHalfMessages} {authors} {emojis} {guildId} />
-            <svelte:self {messages} splitMessages={secondHalfMessages} {authors} {emojis} {guildId} />
-        {:else}
-            <div class="not-loaded" style="height: {messageCount * 50}px;width: 100%;" />
-        {/if}
-    </div>
+	<div
+		bind:this={root}
+		class="message-group"
+		data-mgfirst={firstMessageId}
+		data-mglast={lastMessageId}
+	>
+		{#if loaded}
+			<svelte:self {messages} splitMessages={firstHalfMessages} {authors} {emojis} {guildId} />
+			<svelte:self {messages} splitMessages={secondHalfMessages} {authors} {emojis} {guildId} />
+		{:else}
+			<div class="not-loaded" style="height: {messageCount * 50}px;width: 100%;" />
+		{/if}
+	</div>
 {:else}
-    <div>
-        {#each splitMessages as message (message['id'])}
-            <Message {message} {messages} {authors} {emojis} {guildId} />
-        {/each}
-    </div>
+	<div>
+		{#each splitMessages as message (message['id'])}
+			<!-- skip thread start msg -->
+			{#if message.type !== '21'}
+				<Message {message} {messages} {authors} {emojis} {guildId} />
+			{/if}
+		{/each}
+	</div>
 {/if}
-

@@ -130,18 +130,20 @@
 
 					<div class="chatlog__message-primary">
 						{#if message.type == 'ThreadCreated'}
-							<div class="chatlog__message-primary">
+                        <a href="/channels/{guildId}/{message.reference.channelId}">
+							<div class="chatlog__message-primary thread-created">
+                                <div><span class="thread-name">{message.threadName}</span> <span class="thread-msg-count">{message.threadMsgCount} messages</span></div>
 								<span
 									class="chatlog__system-notification-author"
 									style="color:{message.author.color}"
 									title={full_name(message.author)}
 									data-user-id={full_name(message.author)}>{nickname(message.author)}</span
 								>
+
 								<span class="chatlog__system-notification-content">
 									<span
-										><a href="/channels/{guildId}/{message.reference.channelId}">
-											started a thread.</a
-										></span
+										>
+											started a thread.</span
 									>
 								</span>
 								<span class="chatlog__system-notification-timestamp">
@@ -150,6 +152,7 @@
 									>
 								</span>
 							</div>
+                        </a>
 
 							<!-- <div class="message thread-created">
                         <div class="message-header">
@@ -325,5 +328,22 @@
     .not-loaded {
         height: 50px;
         width: 100%;
+    }
+
+    .thread-created {
+        background-color: #2F3136;
+        padding: 15px 10px;
+    }
+
+    .thread-name {
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+
+    .thread-msg-count {
+        font-weight: 600;
+        color: #0FAFF4;
+        margin-left: 10px;
     }
 </style>

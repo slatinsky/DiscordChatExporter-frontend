@@ -28,7 +28,7 @@ export async function load({ params, parent }) {
         console.log('data.messages', messages);
         for (let channelIdLoop in guild.messages) {
             if (guild.messages[channelIdLoop][messageIdBack]) {
-                console.log('found message', guild.messages[channelIdLoop][messageIdBack]);
+                // console.log('found message', guild.messages[channelIdLoop][messageIdBack]);
                 mainChannelMessage = guild.messages[channelIdLoop][messageIdBack]
                 break
             }

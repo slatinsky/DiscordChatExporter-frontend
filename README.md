@@ -1,7 +1,5 @@
 # DiscordChatExporter-jsonViewer
-
-Tool to browse DiscordChatExporter multiple json exports in the browser.
-
+View your JSON DiscordChatExporter exports as if you were using Discord interface
 
 ## Why it was made
 Tyrrrz/DiscordChatExporter is a well maintained tool to export Discord chat logs. But I felt that it was missing a few things:
@@ -61,7 +59,9 @@ v16.14.2
 5.5
 ```
 
-4. Run the build script
+4. Kill `npm run dev` if it is running
+
+5. Run the build script
 ```bash
 BUILD_RELEASE.bat
 ```
@@ -128,13 +128,14 @@ npm run dev -- --open
 
 
 ## How to view threads
-- This viewer supports viewing threads, they need to be exported by Tyrrrz/DiscordChatExporter. Export them the same way you export channels, but instead of channel_ID, use thread_ID.
+- This viewer supports viewing threads, but they need to be exported by Tyrrrz/DiscordChatExporter. Export them the same way you export channels, but instead of channel_ID, use thread_ID.
 
 ## Roadmap:
-- Fix search with pagination
+- Support JSON exports with local media urls
+- Better handle edge cases (if something is missing in the backup)
 - Support Direct messages
 - Screenshots in documentation
-- Markdown rendering support
+- Message markdown rendering support
 - Better GUI
 - Better search
 - Guild-wide search
@@ -142,7 +143,7 @@ npm run dev -- --open
 - Discord forums support
 
 ## Thanks
-- Tyrrrz/DiscordChatExporter - for a great tool. I used many CSS definitions from it's web html exporter.
+- Tyrrrz/DiscordChatExporter - for a great tool. Many CSS definitions from this tool are used in our viewer.
 - Discord - for a great chat app
 - mufeedvh/binserve - for local webserver binary
 - pyinstaller - for python to binary converter
@@ -151,3 +152,6 @@ npm run dev -- --open
 GNU GENERAL PUBLIC LICENSE
 
 included binserve binary uses MIT license
+
+## Contributing
+Feel free to open issues and pull requests.

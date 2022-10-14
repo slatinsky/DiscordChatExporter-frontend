@@ -51,7 +51,7 @@
 	 * we need to find recursivelly the message group that contains the message we want to scroll to.
 	 */
 	function searchForMessageId(messageId, recursionDepth = 0) {
-		if (recursionDepth > 100) {
+		if (recursionDepth > 300) {
 			console.error('recursion depth exceeded');
 			return;
 		}
@@ -135,8 +135,11 @@
 		// if hash is present in url, search for it
 		if (window.location.hash) {
 			let messageId = window.location.hash.replace('#', '');
-			if (messageId)
+			try {
 				searchForMessageId(BigInt(messageId));
+			} catch (e) {
+				console.warn("Url hash does not contain a valid message id");
+			}
 		}
 		else {
 			// scroll to top
@@ -149,7 +152,7 @@
 
 <input
 	type="text"
-	placeholder="search"
+	placeholder="Search channel"
 	id="search-input"
 	class={resultsCount == 0 ? 'not-found' : ''}
 	bind:value={$searchTerm}
@@ -176,5 +179,17 @@
 
 	.not-found-txt {
 		color: red;
+	}
+
+	input {
+		background-color: #202225;
+		color: white;
+		height: 25px;
+		border: 0px;
+		border-radius: 3px;
+	}
+
+	input::placeholder {
+		color: #909297;
 	}
 </style>
