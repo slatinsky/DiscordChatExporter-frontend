@@ -136,6 +136,10 @@
 			let messageId = window.location.hash.replace('#', '');
 			searchForMessageId(BigInt(messageId));
 		}
+		else {
+			// scroll to top
+			document.querySelector('#top').scrollIntoView();
+		}
 	});
 
 	$: searchResults = searchMessages(messages, $searchTerm, resultsIndex);

@@ -18,6 +18,7 @@
 	let observer;
     let firstMessageId
     let lastMessageId
+    
 
 	if (createGroup) {
         firstMessageId = splitMessages[0].id

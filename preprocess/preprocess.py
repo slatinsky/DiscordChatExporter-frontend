@@ -263,6 +263,19 @@ class GuildPreprocess:
         with open(filename.replace('.json', '.min.json'), 'w', encoding="utf8") as f:
             json.dump(data, f)
 
+    def get_thread_id_to_message_id(self, messages, messages_by_channel):
+        thread_id_to_message_id = {}
+        for message in messages.values():
+            # if type:"ThreadCreated"
+            if message['type'] == "ThreadCreated":
+                newThreadChannelId = message['reference']['channelId']
+                thread_id_to_message_id[message['reference']['channelId']] = message['id']
+                # print("ThreadCreated: " + newThreadChannelId)
+
+        pprint(thread_id_to_message_id)
+
+        return thread_id_to_message_id
+
     def process(self):
         # step 1 - read data from json files
         channels, messages = self.read_channels_messages_from_files()
@@ -293,6 +306,8 @@ class GuildPreprocess:
         # get message ids
         message_ids = list(messages.keys())
 
+        thread_id_to_message_id = self.get_thread_id_to_message_id(messages, messages_by_channel)
+
         # group channels and others attributes to single dict
         guild = {
             'categories': categories,
@@ -302,6 +317,7 @@ class GuildPreprocess:
             'channels': {**channels, **threads},
             'message_ids': message_ids,
             'messages': messages_by_channel,
+            'threadIdToMessageId': thread_id_to_message_id,
             'version': '1.0.0'
         }
 

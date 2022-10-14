@@ -139,7 +139,7 @@
 								>
 								<span class="chatlog__system-notification-content">
 									<span
-										><a href="/channels/{guildId}/{message.reference.channelId}" target="_blank">
+										><a href="/channels/{guildId}/{message.reference.channelId}">
 											started a thread.</a
 										></span
 									>

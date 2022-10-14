@@ -15,13 +15,12 @@
 
 </script>
 
-<div id="top" />
+
 
 {#key channelId}
 	<MessageGroup messages={messages} splitMessages={Object.values(messages)} {authors} {emojis} {guildId}></MessageGroup>
 {/key}
 
-<div id="bottom" />
 
 <style>
 </style>

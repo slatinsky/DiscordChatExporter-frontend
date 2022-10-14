@@ -1,6 +1,8 @@
 <script>
+	import { onMount } from "svelte";
+
     // import Preamble from "../../../components/Preamble.svelte";
-	import Header from "./Header.svelte";
+import Header from "./Header.svelte";
 	import Messages from "./Messages.svelte";
 
     let title = "JSON READER";
@@ -9,7 +11,9 @@
     // console.log('data3', data);
 
 
+    onMount(() => {
 
+	});
 
 </script>
 
@@ -20,15 +24,27 @@
 
 <section>
     <!-- {#if messages} -->
-        <Header channel={data.channel} messages={data.messages} />
+    {#key data.channelId}
+    <Header channel={data.channel} messages={data.messages} />
+    {/key}
         <!-- {#each data.messages as message} -->
             <!-- <Message message={message}/> -->
         <!-- {/each} -->
-        <div class="chatlog">
-            <div class=chatlog__message-group>
-                <Messages messages={data.messages} authors={data.guild.authors} emojis={data.guild.emojis} guildId={data.guildId} channelId={data.channelId}/>
-            </div>
+    <div class="chatlog">
+        <div class=chatlog__message-group>
+            <div id="top" />
+            {#key data.channelId}
+                {#if data.mainChannelMessage}
+                <div class="back-main-channel">
+                    <a href="/channels/{data.guildId}/{data.mainChannelMessage.channelId}/#{data.mainChannelMessage.id}">← BACK TO MAIN CHANNEL</a>
+                </div>
+                {/if}
+            {/key}
+            <Messages messages={data.messages} authors={data.guild.authors} emojis={data.guild.emojis} guildId={data.guildId} channelId={data.channelId}/>
+
+            <div id="bottom" />
         </div>
+    </div>
 
 <!--        <Postamble messageCount="{messages.length}"/>-->
 <!--        <pre>{JSON.stringify(json, null, 2)}</pre>-->
@@ -52,6 +68,11 @@
      overflow-y: auto;
      max-height: calc(100vh - 96px);
      margin-right: 5px;
+ }
+
+ .back-main-channel {
+     padding: 10px 25px;
+     margin-bottom: 5px;
  }
 </style>
 
