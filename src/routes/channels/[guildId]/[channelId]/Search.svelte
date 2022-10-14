@@ -107,7 +107,8 @@
 	}
 
 	function addHashToUrl(messages, searchTerm, messageId) {
-		searchForMessageId(BigInt(messageId))
+		if (messageId)
+			searchForMessageId(BigInt(messageId))
 		window.location.hash = messageId;
 		// console.log('added hash to url', window.location.hash, elSearchInput);
 
@@ -134,7 +135,8 @@
 		// if hash is present in url, search for it
 		if (window.location.hash) {
 			let messageId = window.location.hash.replace('#', '');
-			searchForMessageId(BigInt(messageId));
+			if (messageId)
+				searchForMessageId(BigInt(messageId));
 		}
 		else {
 			// scroll to top
