@@ -19,7 +19,8 @@
                 processMessage()
 
 				observer.disconnect();
-				loaded = true;
+
+                loaded = true;
 			}
 		});
 	}, {
@@ -87,7 +88,12 @@
 		if (message.reference) {
 			// console.log(message.reference);
 			message.referencedMessage = messages[message.reference.messageId];
-			console.log(message.reference, message.referencedMessage, messages.length, Object.keys(messages)[0]);
+            if (message.referencedMessage.authorId) {
+                message.referencedMessage.author = authors[message.referencedMessage.authorId];
+                delete message.referencedMessage.authorId;
+                // message = message; // apply changes
+            }
+			// console.log(message.reference, message.referencedMessage, messages.length, Object.keys(messages)[0]);
 		}
 	}
 

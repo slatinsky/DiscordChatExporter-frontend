@@ -28,7 +28,7 @@
 	function searchMessages(messages, searchTerm, resultsIndex) {
         if (searchTerm === '') {
             $foundMessageIds = [];
-            resultsCount = messages.length;
+            resultsCount = Object.keys(messages).length;
             return;
         }
 		console.log('searching for', searchTerm);

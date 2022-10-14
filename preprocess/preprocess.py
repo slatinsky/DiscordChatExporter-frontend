@@ -186,8 +186,8 @@ class GuildPreprocess:
         for message in messages.values():
             channel_id = message['channelId']
             if channel_id not in messages_by_channel:
-                messages_by_channel[channel_id] = []
-            messages_by_channel[channel_id].append(message)
+                messages_by_channel[channel_id] = {}
+            messages_by_channel[channel_id][message['id']] = message
 
         # spli channels into threads or normal channels
         threads = {}
