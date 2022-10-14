@@ -99,14 +99,20 @@ class GuildPreprocess:
         """calculate the filename based on the data"""
         if url is None:
             return ""
-        filename = url.split('/')[-1]
-        # remove get parameters
-        # hashed filename must contain get parameters
-        hash_sha256 = sha256(url.encode('utf-8')).hexdigest()[:5].upper()
+        is_url = re.match(r'^https?://', url)
 
-        filename = filename.split('?')[0]
-        base, extension = os.path.splitext(filename)
-        filename = base + "-" + hash_sha256 + extension
+        filename = url.replace('\\', '/').split('/')[-1]
+
+        if is_url:  # calculate filename for url
+            # remove get parameters
+            # hashed filename must contain get parameters
+            hash_sha256 = sha256(url.encode('utf-8')).hexdigest()[:5].upper()
+
+            filename = filename.split('?')[0]
+            base, extension = os.path.splitext(filename)
+            filename = base + "-" + hash_sha256 + extension
+        else:  # filename already contains hash
+            pass
         return filename
 
     def _find_filepath(self, filename, ignore_not_found=False):
@@ -119,7 +125,11 @@ class GuildPreprocess:
             if not ignore_not_found:
                 print("File not found: " + filename)
             return None
-        return None
+
+    def calculateGuildFilename(self, guild):
+        guild['localFileName'] = self._calculate_filename(guild['iconUrl'])
+        guild['localFilePath'] = self._find_filepath(guild['localFileName'])
+        return guild
 
     def calculate_local_filenames(self, messages, authors, emojis):
         for message in messages.values():
@@ -393,6 +403,7 @@ class Preprocess:
         for guild_id, json_filepaths in json_paths_by_guild.items():
             gp = GuildPreprocess(guild_id, self.input_directory,
                                  json_filepaths, media_filepaths)
+            guilds[guild_id] = gp.calculateGuildFilename(guilds[guild_id])
             gp.process()
 
         # write guilds to json file

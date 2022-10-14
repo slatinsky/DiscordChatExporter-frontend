@@ -24,7 +24,7 @@
                         {#if data.guildId === guild.id}
                             <div class="guild-selected"></div>
                         {/if}
-                        <img src="{guild.iconUrl}" alt="{guild.name}">
+                        <img src="{guild.localFilePath}" alt="{guild.name}">
                     </div>
                 </a>
 

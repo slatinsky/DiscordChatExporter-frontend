@@ -27,8 +27,8 @@ Using prebuilt binaries is the easiest way to use this tool. Builds are Windows 
 4. Run `START_VIEWER.bat` - DiscordChatExporter-jsonViewer will open in your default browser
 
 
-## Building release from source
-### Requirements
+# Building release from source
+## Requirements
 - Node.js 16
 - Python 3.9+
 - pyinstaller (installled globally)
@@ -36,7 +36,7 @@ Using prebuilt binaries is the easiest way to use this tool. Builds are Windows 
 py -m pip install pyinstaller
 ```
 
-### Steps
+## Steps
 1. Clone this repository
 ```bash
 git clone URL
@@ -66,7 +66,7 @@ v16.14.2
 BUILD_RELEASE.bat
 ```
 
-### Tested on
+## Tested on
 
 ```
 >winver
@@ -94,8 +94,11 @@ AMD Ryzen™ 7 5800H
 
 But should work on any Windows 10 / Windows 11 x64 computer
 
-## Development
-### Preprocessor
+# Development
+This tool consists of two parts:
+- Frontend - Sveltekit app
+- Backend - Python3 script to preprocess JSON exports for frontend
+## Preprocessor
 For development make sure you have nodemon installed globally (used for hot reloading)
 ```
 npm install -g nodemon
@@ -115,7 +118,7 @@ preprocess script will:
 
 After running preprocess script, don't remove `/static/input/` folder - it's needed to serve media files.
 
-### Frontend
+## Frontend
 Run dev webserver:
 ```
 npm run dev -- --open
@@ -126,18 +129,32 @@ npm run dev -- --open
 
 
 
+# Which JSON exports are supported?
+Supported are JSON exports exported with media
+```
+DiscordChatExporter.Cli export --token DISCORD_TOKEN  --media True --reuse-media True --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID
+```
+
+Or exported without media, but coupled with another html export with media
+```
+DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID
+DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media True --reuse-media True --format HtmlDark --channel CHANNEL_OR_THREAD_ID
+```
+
+The main requirement now is that media files (`--media True --reuse-media True`) are exported.
+
+Tested with DiscordChatExporter v2.36.1 exports
 
 ## How to view threads
-- This viewer supports viewing threads, but they need to be exported by Tyrrrz/DiscordChatExporter. Export them the same way you export channels, but instead of channel_ID, use thread_ID.
+- This viewer supports viewing threads, but they need to be exported by Tyrrrz/DiscordChatExporter. Export them the same way you export channels (`--channel`), but instead of CHANNEL_ID, use THREAD_ID. Because threads are channels.
 
 ## Roadmap:
-- Support JSON exports with local media urls
-- Better handle edge cases (if something is missing in the backup)
+- Better handling of edge cases (if something is missing in the backup)
 - Support Direct messages
 - Screenshots in documentation
 - Message markdown rendering support
 - Better GUI
-- Better search
+- Better search (by author, by date)
 - Guild-wide search
 - Improve code readability
 - Discord forums support
