@@ -1,6 +1,7 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
     import { fade } from "svelte/transition";
+	import MessageContent from './MessageContent.svelte';
 
 
 	export let message;
@@ -222,7 +223,7 @@
 								>
 							</div>
 							<div class="chatlog__content chatlog__markdown">
-								<span class="chatlog__markdown-preserve">{message.content}</span>
+								<span class="chatlog__markdown-preserve"><MessageContent content={message.content}></MessageContent></span>
 								{#if message.timestampEdited != null}
 									<span class="chatlog__edited-timestamp" title={message.timestampEdited}
 										>(edited)</span

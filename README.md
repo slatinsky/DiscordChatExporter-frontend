@@ -183,10 +183,11 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 ## Why this tool was made
 [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) is a well made tool to export Discord chats. But to actually view them, you had to download them in HTML format, which more inconvenient to parse than JSON. And If you wanted to extend your backup, it would be broken into multiple files, which is not very convenient.
 ## Thanks
-- Tyrrrz/DiscordChatExporter - for a great tool. Many CSS definitions from this tool are used in our viewer.
+- [Tyrrrz/DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) - for a great tool. Many CSS definitions from this tool are used in our viewer.
 - Discord - for a great chat app
-- mufeedvh/binserve - for local webserver binary
 - pyinstaller - for python to binary converter
+- [mufeedvh/binserve](https://github.com/mufeedvh/binserve) - for local webserver binary
+- [brussell98/discord-markdown](https://github.com/brussell98/discord-markdown) - for discord markdown rendering
 
 
 ## License
