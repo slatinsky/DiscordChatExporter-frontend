@@ -14,5 +14,7 @@ node_modules
 /static/data
 /releases/bin/preprocess.exe
 /releases/static/
+/releases/*.zip
 /_temp_input/
 /_temp_data/
+/preprocess/export_helpers

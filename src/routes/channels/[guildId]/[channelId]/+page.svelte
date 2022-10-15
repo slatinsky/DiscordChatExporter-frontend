@@ -5,7 +5,7 @@
 import Header from "./Header.svelte";
 	import Messages from "./Messages.svelte";
 
-    let title = "JSON READER";
+    let title = "DiscordChatExporter frontend";
 
     export let data;
     // console.log('data3', data);

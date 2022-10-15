@@ -160,14 +160,7 @@ class GuildPreprocess:
                         embed["thumbnail"]["localFilePath"] = self._find_filepath(
                             embed["thumbnail"]["localFileName"])
 
-                # if embed['type'] == 'image':
-                # embed['localFileName'] = self._calculate_filename(embed['url'])
-                # embed['localFilePath'] = self._find_filepath(embed['localFileName'])
-
-            # calculate sticker filenames
-            # for sticker in message['stickers']:
-            #     sticker['localFileName'] = self._calculate_filename(sticker['url'])
-            #     sticker['localFilePath'] = self._find_filepath(sticker['localFileName'])
+            # TODO: other embeds and stickers
 
         for emoji in emojis.values():
             emoji['localFileName'] = self._calculate_filename(
@@ -184,12 +177,6 @@ class GuildPreprocess:
         return messages
 
     def group_messages_and_channels(self, messages, channels):
-        # add messages to channels
-        # for message in messages.values():
-        #     channel_id = message['channelId']
-        #     if 'messages' not in channels[channel_id]:
-        #         channels[channel_id]['messages'] = []
-        #     channels[channel_id]['messages'].append(message)
 
         # messages by channel
         messages_by_channel = {}
@@ -211,11 +198,6 @@ class GuildPreprocess:
                 print("Unknown channel type: " + channel['type'])
 
 
-                
-
-        # pprint(normal_channels)
-        # print("---")
-        # pprint(threads)
         # group channels by categories
         categories = {}
 
@@ -279,8 +261,13 @@ class GuildPreprocess:
             if message['type'] == "ThreadCreated":
                 newThreadChannelId = message['reference']['channelId']
                 thread_id_to_message_id[message['reference']['channelId']] = message['id']
-                message['threadName'] = threads[message['reference']['channelId']]['name']
-                message['threadMsgCount'] = len(threads[message['reference']['channelId']])
+                if message['reference']['channelId'] in threads:
+                    message['threadName'] = threads[message['reference']['channelId']]['name']
+                    message['threadMsgCount'] = len(threads[message['reference']['channelId']])
+                else:
+                    message['threadName'] = 'Thread not exported'
+                    message['threadMsgCount'] = None  # fallback value
+                
                 # print("ThreadCreated: " + newThreadChannelId)
 
         pprint(thread_id_to_message_id)
@@ -352,7 +339,7 @@ class Preprocess:
     def _find_json_files(self, directory):
         files = []
         for filename in glob.glob(directory + '**/*.json', recursive=True):
-            if filename.endswith('].json'):
+            if filename.endswith('.json'):
                 # print(filename)
                 files.append(filename)
         return files
@@ -391,7 +378,13 @@ class Preprocess:
         json_paths_by_guild = {}
         for filename in json_files:  # each filename contains channel/thread dump
             with open(filename, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+                try:
+                    data = json.load(f)
+                except json.decoder.JSONDecodeError:
+                    print("JSONDecodeError: " + filename)  # probably media file too
+                    continue
+                if 'guild' not in data:  # this is not a channel export, but a downloaded media json file
+                    continue
                 guild_id = data['guild']['id']
                 guilds[guild_id] = data['guild']
                 if guild_id not in json_paths_by_guild:
