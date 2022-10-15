@@ -132,7 +132,11 @@
 						{#if message.type == 'ThreadCreated'}
                         <a href="/channels/{guildId}/{message.reference.channelId}">
 							<div class="chatlog__message-primary thread-created">
-                                <div><span class="thread-name">{message.threadName}</span> <span class="thread-msg-count">{message.threadMsgCount} messages</span></div>
+                                <div><span class="thread-name">{message.threadName}</span>
+									{#if message.threadMsgCount}
+										<span class="thread-msg-count">{message.threadMsgCount} messages</span>
+									{/if}
+								</div>
 								<span
 									class="chatlog__system-notification-author"
 									style="color:{message.author.color}"
@@ -147,7 +151,7 @@
 									>
 								</span>
 								<span class="chatlog__system-notification-timestamp">
-									<a href="#chatlog__message-container-{message.reference.channelId}"
+									<a href="#{message.reference.channelId}"
 										>{human_timestamp_format(message.timestamp)}</a
 									>
 								</span>

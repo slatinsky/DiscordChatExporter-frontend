@@ -5,6 +5,8 @@
 	export let messages;
 </script>
 
+
+{#if channel}
 <section>
 	<div class="channel-header">
 		<div class="channel-header__left">
@@ -16,6 +18,9 @@
 		</div>
 	</div>
 </section>
+{:else}
+	<div class="info-text">Channel/Thread not exported</div>
+{/if}
 
 <style>
 	.channel-header__left {
@@ -48,4 +53,10 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
     }
+
+	.info-text {
+		font-size: 32px;
+		padding-top: 20px;
+		padding-left: 20px;
+	}
 </style>

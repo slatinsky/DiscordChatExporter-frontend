@@ -18,9 +18,16 @@
 
 
 {#key channelId}
-	<MessageGroup messages={messages} splitMessages={Object.values(messages)} {authors} {emojis} {guildId}></MessageGroup>
+	{#if messages}
+		<MessageGroup messages={messages} splitMessages={Object.values(messages)} {authors} {emojis} {guildId}></MessageGroup>
+	{:else}
+		<div class="no-messages">No messages</div>
+	{/if}
 {/key}
 
 
 <style>
+	.no-messages {
+		padding-left: 46px;
+	}
 </style>
