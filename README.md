@@ -1,4 +1,7 @@
-# DiscordChatExporter-jsonViewer
+![](docs/screenshot.png)
+
+
+# DiscordChatExporter-frontend
 View your JSON DiscordChatExporter exports as if you were using Discord interface
 
 ## Why it was made
@@ -19,7 +22,7 @@ So I made this tool to fill those gaps.
 
 
 ## Using prebuilt binary release
-Using prebuilt binaries is the easiest way to use this tool. Builds are Windows only, because Tyrrrz/DiscordChatExporter is Windows only too.
+Using prebuilt binaries is the easiest way to use this tool. Builds are for Windows, but if you follow Development section, it should work on linux too.,
 
 1. Download the latest release from releases
 2. Extract the archive
