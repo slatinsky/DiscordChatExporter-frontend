@@ -316,7 +316,7 @@ class GuildPreprocess:
             'message_ids': message_ids,
             'messages': messages_by_channel,
             'threadIdToMessageId': thread_id_to_message_id,
-            'version': '1.0.0'
+            'id': self.guild_id,
         }
 
         # step 7 - write data to json files

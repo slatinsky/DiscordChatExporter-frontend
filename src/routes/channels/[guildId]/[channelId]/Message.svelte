@@ -1,36 +1,36 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
-    import { fade } from "svelte/transition";
+	import { fade } from 'svelte/transition';
 	import MessageContent from './MessageContent.svelte';
 
-
 	export let message;
-	export let messages;
+	// export let messages;
 	export let guild;
-	export let guildId;
-	export let search = false
+	export let search = false;
 
 	let DEBUG = false;
-	
 
 	// https://svelte.dev/repl/4b8ccdf1d01545baa0ab6a858bc05abb?version=3.32.1
 	let loaded = false;
 	let root;
 
-	let observer = new IntersectionObserver((entries) => {
-		entries.forEach((entry) => {
-			if (entry.isIntersecting) {
-                processMessage()
+	let observer = new IntersectionObserver(
+		(entries) => {
+			entries.forEach((entry) => {
+				if (entry.isIntersecting) {
+					processMessage();
 
-				observer.disconnect();
+					observer.disconnect();
 
-                loaded = true;
-			}
-		});
-	}, {
-        rootMargin: '100% 0px 100% 0px',
-        threshold: .1
-    });
+					loaded = true;
+				}
+			});
+		},
+		{
+			rootMargin: '100% 0px 100% 0px',
+			threshold: 0.1
+		}
+	);
 
 	onMount(() => {
 		observer.observe(root);
@@ -40,11 +40,11 @@
 		observer.disconnect();
 	});
 
-    function processMessage() {
+	function processMessage() {
 		addAuthorToMessage();
 		addEmojiToMessage();
 		addReferencedMessage();
-    }
+	}
 
 	function human_timestamp_format(timestamp) {
 		return timestamp.replace('T', ' ').split('.')[0];
@@ -54,9 +54,9 @@
 		return author.name + '#' + author.discriminator;
 	}
 
-    function nickname(author) {
-        return author?.nickname ?? full_name(message.author)
-    }
+	function nickname(author) {
+		return author?.nickname ?? full_name(message.author);
+	}
 
 	function addAuthorToMessage() {
 		if (message.authorId) {
@@ -91,20 +91,23 @@
 	function addReferencedMessage() {
 		if (message.reference) {
 			// console.log(message.reference);
-			message.referencedMessage = guild.messages[message.reference.channelId][message.reference.messageId];
-            if (message.referencedMessage && message.referencedMessage?.authorId) {
-                message.referencedMessage.author = guild.authors[message.referencedMessage.authorId];
-                // delete message.referencedMessage.authorId;
-            }
+			message.referencedMessage =
+				guild.messages[message.reference.channelId][message.reference.messageId];
+			if (message.referencedMessage && message.referencedMessage?.authorId) {
+				message.referencedMessage.author = guild.authors[message.referencedMessage.authorId];
+				// delete message.referencedMessage.authorId;
+			}
 			// console.log(message.reference, message.referencedMessage, messages.length, Object.keys(messages)[0]);
 		}
 	}
-
 </script>
 
 <div bind:this={root}>
 	{#if loaded}
-		<div class="chatlog__message-group" transition:fade={{duration: 125}}>
+		{#if search&& message.searchPrevMessageChannelId && message.searchPrevMessageChannelId !== message.channelId}
+			<div class="channel-name"># {guild.channels[message.channelId]?.name}</div>
+		{/if}
+		<div class="chatlog__message-group" transition:fade={{ duration: 125 }}>
 			<!-- <button on:click={()=>copyTextToClipboard(message.id)}>Copy ID</button> -->
 			<div
 				id="{search ? 'search-id-' : ''}{message.id}"
@@ -133,59 +136,31 @@
 
 					<div class="chatlog__message-primary">
 						{#if message.type == 'ThreadCreated'}
-                        <a href="/channels/{guildId}/{message.reference.channelId}">
-							<div class="chatlog__message-primary thread-created">
-                                <div><span class="thread-name">{message.threadName}</span>
-									{#if message.threadMsgCount}
-										<span class="thread-msg-count">{message.threadMsgCount} messages</span>
-									{/if}
-								</div>
-								<span
-									class="chatlog__system-notification-author"
-									style="color:{message.author.color}"
-									title={full_name(message.author)}
-									data-user-id={full_name(message.author)}>{nickname(message.author)}</span
-								>
-
-								<span class="chatlog__system-notification-content">
+							<a href="/channels/{guild.id}/{message.reference.channelId}">
+								<div class="chatlog__message-primary thread-created">
+									<div>
+										<span class="thread-name">{message.threadName}</span>
+										{#if message.threadMsgCount}
+											<span class="thread-msg-count">{message.threadMsgCount} messages</span>
+										{/if}
+									</div>
 									<span
-										>
-											started a thread.</span
+										class="chatlog__system-notification-author"
+										style="color:{message.author.color}"
+										title={full_name(message.author)}
+										data-user-id={full_name(message.author)}>{nickname(message.author)}</span
 									>
-								</span>
-								<span class="chatlog__system-notification-timestamp">
-									<a href="#{message.reference.channelId}"
-										>{human_timestamp_format(message.timestamp)}</a
-									>
-								</span>
-							</div>
-                        </a>
 
-							<!-- <div class="message thread-created">
-                        <div class="message-header">
-                            <div class="message-header-left">
-                                <div class="message-author">
-                                    {message.author ? message.author.name : 'Unknown'}
-                                </div>
-                                <div class="message-timestamp">
-                                    {human_timestamp_format(message.timestamp)}
-                                </div>
-                            </div>
-                            <div class="message-header-right">
-                                <div class="message-id">
-                                    {message.id}
-                                </div>
-                                <div class="message-copy-id" on:click={() => copyTextToClipboard(message.id)}>
-                                    Copy ID
-                                </div>
-                            </div>
-                        </div>
-                        <div class="message-content">
-                            <div class="message-content-text">
-                                {message.content}
-                            </div>
-                        </div>
-                    </div> -->
+									<span class="chatlog__system-notification-content">
+										<span> started a thread.</span>
+									</span>
+									<span class="chatlog__system-notification-timestamp">
+										<a href="#{message.reference.channelId}"
+											>{human_timestamp_format(message.timestamp)}</a
+										>
+									</span>
+								</div>
+							</a>
 						{:else}
 							{#if message.referencedMessage}
 								<a href="#{message.referencedMessage.id}">
@@ -221,11 +196,15 @@
 									data-user-id={message.author.id}>{nickname(message.author)}</span
 								>
 								<span class="chatlog__timestamp"
-									><a href="/channels/{guildId}/{message.channelId}#{message.id}">{human_timestamp_format(message.timestamp)}</a></span
+									><a href="/channels/{guild.id}/{message.channelId}#{message.id}"
+										>{human_timestamp_format(message.timestamp)}</a
+									></span
 								>
 							</div>
 							<div class="chatlog__content chatlog__markdown">
-								<span class="chatlog__markdown-preserve"><MessageContent content={message.content}></MessageContent></span>
+								<span class="chatlog__markdown-preserve"
+									><MessageContent content={message.content} /></span
+								>
 								{#if message.timestampEdited != null}
 									<span class="chatlog__edited-timestamp" title={message.timestampEdited}
 										>(edited)</span
@@ -323,36 +302,42 @@
 					</div>
 				</div>
 			</div>
-			{#if DEBUG}				
-            	<pre>{JSON.stringify(message, null, 2)}</pre>
+			{#if DEBUG}
+				<pre>{JSON.stringify(message, null, 2)}</pre>
 			{/if}
 		</div>
-        {:else}
-        <div class="not-loaded" id={message.id}></div>
+	{:else}
+		<div class="not-loaded" id={message.id} />
 	{/if}
 </div>
 
-
 <style>
-    .not-loaded {
-        height: 50px;
-        width: 100%;
-    }
+	.not-loaded {
+		height: 50px;
+		width: 100%;
+	}
 
-    .thread-created {
-        background-color: #2F3136;
-        padding: 15px 10px;
-    }
+	.thread-created {
+		background-color: #2f3136;
+		padding: 15px 10px;
+	}
 
-    .thread-name {
-        font-weight: 600;
-        color: #fff;
-        margin-bottom: 5px;
-    }
+	.thread-name {
+		font-weight: 600;
+		color: #fff;
+		margin-bottom: 5px;
+	}
 
-    .thread-msg-count {
-        font-weight: 600;
-        color: #0FAFF4;
-        margin-left: 10px;
-    }
+	.thread-msg-count {
+		font-weight: 600;
+		color: #0faff4;
+		margin-left: 10px;
+	}
+
+	.channel-name {
+		font-weight: 600;
+		color: #fff;
+		margin-bottom: 5px;
+		margin: 15px 30px 5px 15px;
+	}
 </style>

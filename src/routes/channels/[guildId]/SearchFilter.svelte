@@ -1,10 +1,12 @@
 <script>
-	import Messages from "./[channelId]/Messages.svelte";
+	import SearchResults from './SearchResults.svelte';
+	// import Messages from './[channelId]/Messages.svelte';
 
-	export let guild
-	export let authors;
-	export let all_messages;
-	export let guildId;
+	export let guild;
+	let authors;
+	$: authors = guild.authors;
+	let all_messages;
+	$: all_messages = guild.messages;
 
 	let value = '';
 	let filters = [];
@@ -13,6 +15,7 @@
 
 	let isInputFocused = false;
 	let cursorPosition = 0;
+	export let searched = false;
 
 	function selectFullOption(newKey, newValue) {
 		if ('content' in parsedCursorHere) {
@@ -148,21 +151,18 @@
 		);
 	}
 
-
-	let found_messages = [];
+	export let found_messages = [];
 	function findMessages() {
 		console.log('searching for messages');
 		found_messages = [];
 		let limit = 100;
-
 
 		console.log('--', Object.keys(all_messages).length, 'messages to search through');
 		console.log('--filters', JSON.stringify(filters, null, 2));
 
 		for (const [channelId, channel] of Object.entries(all_messages)) {
 			let channelMessages = Object.values(channel);
-			console.log("channelMessages.length", channelMessages.length);
-
+			console.log('channelMessages.length', channelMessages.length);
 
 			for (const filter of filters) {
 				if (filter.content) {
@@ -250,8 +250,7 @@
 					channelMessages = channelMessages.filter((message) => {
 						return message.author && message.author.isWebhook;
 					});
-				}
-				else if (filter.key === 'in') {
+				} else if (filter.key === 'in') {
 					let channel = Object.values(guild.channels).find((channel) => {
 						return channel.name === filter.value;
 					});
@@ -260,41 +259,64 @@
 					});
 				}
 			}
+			// order by timestamp - not working
+			// channelMessages = channelMessages.sort((a, b) => {
+			// 	return a.timestamp < b.timestamp;
+			// });
+
+			// add searchPrevMessage and searchNextMessage to all messages
+			for (let i = 0; i < channelMessages.length; i++) {
+				let message = channelMessages[i];
+				let prevMessage = channelMessages[i - 1];
+				let nextMessage = channelMessages[i + 1];
+				if (prevMessage) {
+					message.searchPrevMessageChannelId = prevMessage.channelId;
+				} else {
+					message.searchPrevMessageChannelId = 'first';
+				}
+				if (nextMessage) {
+					message.searchNextMessageChannelId = nextMessage.channelId;
+				} else {
+					message.searchNextMessageChannelId = 'last';
+				}
+			}
 
 			found_messages.push(...channelMessages);
-
+			searched = true;
 		}
 		console.log('found messages', found_messages);
 	}
 
-	console.log("----", guild.channels)
+	console.log('----', guild.channels);
 </script>
 
 <div class="search">
-	<input
-		type="text"
-		placeholder="Search in guild"
-		bind:value
-		bind:this={input}
-		on:focus={() => {
-			inputValueChanged(value);
-			isInputFocused = true;
-		}}
-		on:blur={() => (unfocusTimeout = setTimeout(() => (isInputFocused = false), 100))}
-		on:keydown={(e) => {
-			inputValueChanged(value);
+	<div class="search-input-container">
+		<input
+			type="text"
+			placeholder="Search in guild"
+			bind:value
+			bind:this={input}
+			on:focus={() => {
+				inputValueChanged(value);
+				isInputFocused = true;
+			}}
+			on:blur={() => (unfocusTimeout = setTimeout(() => (isInputFocused = false), 100))}
+			on:keydown={(e) => {
+				inputValueChanged(value);
 
-			if (e.key === 'ArrowDown') {
-				selectedMenuIndex++;
-				e.preventDefault();
-			} else if (e.key === 'ArrowUp') {
-				selectedMenuIndex--;
-				e.preventDefault();
-			}
-		}}
-		on:input={() => inputValueChanged(value)}
-	/>
-	<button on:click={findMessages}>Find</button>
+				if (e.key === 'ArrowDown') {
+					selectedMenuIndex++;
+					e.preventDefault();
+				} else if (e.key === 'ArrowUp') {
+					selectedMenuIndex--;
+					e.preventDefault();
+				}
+			}}
+			on:input={() => inputValueChanged(value)}
+		/>
+		<button on:click={findMessages}>Find</button>
+	</div>
 
 	{#if isInputFocused}
 		<div class="search-options">
@@ -382,24 +404,11 @@
 	{/if}
 </div>
 
-<br>
-<div>Found {found_messages.length} messages</div>
-
-<Messages messages={found_messages} guild={guild} guildId={guildId} channelId={0} search={true}/>
-<!-- {#each found_messages as message} -->
-	<!-- <pre>{JSON.stringify(message, null, 2)}</pre> -->
-	
-	<!-- <div>
-		<a href="/channels/{guildId}/{message.channelId}#{message.id}" target="_blank">
-			{message.content}</a
-		>
-	</div> -->
-<!-- {/each} -->
-
+<!-- <SearchResults {found_messages} {guild} /> -->
 <style>
 	input {
-		width: 100%;
-		max-width: 500px;
+		/* width: 100%; */
+		width: 250px;
 		background-color: #202225;
 		color: white;
 		height: 25px;
@@ -411,6 +420,7 @@
 	}
 	.search {
 		position: relative;
+		background-color: #2f3136;
 	}
 	.search-options {
 		background-color: #18191c;
@@ -444,5 +454,11 @@
 		width: 30px;
 		height: 30px;
 		border-radius: 50%;
+	}
+	.search-input-container {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		/* margin: 15px 30px; */
 	}
 </style>

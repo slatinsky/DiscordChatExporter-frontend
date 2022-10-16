@@ -3,6 +3,7 @@
 
     // import Preamble from "../../../components/Preamble.svelte";
 	import Messages from "./Messages.svelte";
+	import WatchHash from "./WatchHash.svelte";
 
     let title = "DiscordChatExporter frontend";
 
@@ -21,6 +22,7 @@
     <meta name="description" content="Svelte demo app"/>
 </svelte:head>
 
+<WatchHash messages={data.messages} />
 <section>
     <!-- {#if messages} -->
 

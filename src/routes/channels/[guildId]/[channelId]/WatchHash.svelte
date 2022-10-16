@@ -1,10 +1,10 @@
 <script>
 	import { onDestroy, onMount } from "svelte";
-	import { onlyMatches, searchTerm, foundMessageIds } from "./searchStore";
+	import { searchTerm, foundMessageIds } from "./searchStore";
 
 	export let messages;
 
-	let resultsCount = 0;
+    // let resultCount = 0;
 	let resultsIndex = 0;
 
 	// dom elements
@@ -27,6 +27,7 @@
     $: newMessages(messages)
 
 	function searchMessages(messages, searchTerm, resultsIndex) {
+        let resultsCount
         if (searchTerm === '') {
             $foundMessageIds = [];
             resultsCount = Object.keys(messages).length;
@@ -117,23 +118,11 @@
 		}
 	}
 
-	function prev() {
-		if (resultsIndex > 0) {
-			resultsIndex--;
-			// scrollToMessage(searchResults[resultsIndex]);
-		}
-	}
-
-	function next() {
-		if (resultsIndex < resultsCount - 1) {
-			resultsIndex++;
-			// scrollToMessage(searchResults[resultsIndex]);
-		}
-	}
-
+	let previousHash = '';
 	function hashChanged() {
 		// if hash is present in url, search for it
-		if (window.location.hash) {
+		if (window.location.hash && window.location.hash !== previousHash) {
+			previousHash = window.location.hash;
 			let messageId = window.location.hash.replace('#', '');
 			try {
 				searchForMessageId(BigInt(messageId));
@@ -143,64 +132,28 @@
 		}
 		else {
 			// scroll to top
-			document.querySelector('#top').scrollIntoView();
+			// document.querySelector('#top').scrollIntoView();
 		}
 	}
 
+	let interval
 	onMount(() => {
-		
-
 		window.addEventListener("hashchange", hashChanged);
 		hashChanged()
+		// check for hash changes every 100ms
+		interval = setInterval(() => {
+			hashChanged()
+		}, 100);
 	});
 
 	onDestroy(() => {
 		window.removeEventListener("hashchange", hashChanged);
+		clearInterval(interval);
 	});
 
 	$: searchResults = searchMessages(messages, $searchTerm, resultsIndex);
 </script>
 
-<input
-	type="text"
-	placeholder="Search channel"
-	id="search-input"
-	class={resultsCount == 0 ? 'not-found' : ''}
-	bind:value={$searchTerm}
-	bind:this={elSearchInput}
-/>
-{#if resultsCount == 0}
-	<div class="search-results-count not-found-txt">No results</div>
-{:else if $searchTerm}
-	<div class="search-results-count">Showing result {resultsIndex + 1} / {resultsCount}</div>
-	<button on:click={prev}>Prev</button>
-	<button on:click={next}>Next</button>
-	<label>
-		<input type="checkbox" id="show-only-matches" bind:checked={$onlyMatches} />
-        show only matches
-	</label>
-{:else}
-	<div>{resultsCount} messages</div>
-{/if}
-
 <style>
-	.not-found {
-		background-color: red;
-	}
 
-	.not-found-txt {
-		color: red;
-	}
-
-	input {
-		background-color: #202225;
-		color: white;
-		height: 25px;
-		border: 0px;
-		border-radius: 3px;
-	}
-
-	input::placeholder {
-		color: #909297;
-	}
 </style>
