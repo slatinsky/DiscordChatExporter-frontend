@@ -6,6 +6,7 @@
 	export let splitMessages;
 	export let guild;
 	export let guildId;
+	export let search = false
 
 	let messageCount = splitMessages.length;
 	let createGroup = messageCount > 16;
@@ -63,8 +64,8 @@
 		data-mglast={lastMessageId}
 	>
 		{#if loaded}
-			<svelte:self {messages} splitMessages={firstHalfMessages} {guild} {guildId} />
-			<svelte:self {messages} splitMessages={secondHalfMessages} {guild} {guildId} />
+			<svelte:self {messages} splitMessages={firstHalfMessages} {guild} {guildId} {search}/>
+			<svelte:self {messages} splitMessages={secondHalfMessages} {guild} {guildId} {search}/>
 		{:else}
 			<div class="not-loaded" style="height: {messageCount * 50}px;width: 100%;" />
 		{/if}
@@ -74,7 +75,7 @@
 		{#each splitMessages as message (message['id'])}
 			<!-- skip thread start msg -->
 			{#if message.type !== '21'}
-				<Message {message} {messages} {guild} {guildId} />
+				<Message {message} {messages} {guild} {guildId} {search}/>
 			{/if}
 		{/each}
 	</div>

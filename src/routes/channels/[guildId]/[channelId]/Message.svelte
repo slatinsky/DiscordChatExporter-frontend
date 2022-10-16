@@ -8,6 +8,7 @@
 	export let messages;
 	export let guild;
 	export let guildId;
+	export let search = false
 
 	let DEBUG = false;
 	
@@ -106,7 +107,7 @@
 		<div class="chatlog__message-group" transition:fade={{duration: 125}}>
 			<!-- <button on:click={()=>copyTextToClipboard(message.id)}>Copy ID</button> -->
 			<div
-				id={message.id}
+				id="{search ? 'search-id-' : ''}{message.id}"
 				class="chatlog__message-container {message.isPinned
 					? 'chatlog__message-container--pinned'
 					: ''}"

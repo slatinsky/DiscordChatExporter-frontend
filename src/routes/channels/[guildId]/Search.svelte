@@ -1,5 +1,5 @@
 <script>
-	import Messages from "../[channelId]/Messages.svelte";
+	import Messages from "./[channelId]/Messages.svelte";
 
 	export let guild
 	export let authors;
@@ -385,7 +385,7 @@
 <br>
 <div>Found {found_messages.length} messages</div>
 
-<Messages messages={found_messages} guild={guild} guildId={guildId} channelId={0}/>
+<Messages messages={found_messages} guild={guild} guildId={guildId} channelId={0} search={true}/>
 <!-- {#each found_messages as message} -->
 	<!-- <pre>{JSON.stringify(message, null, 2)}</pre> -->
 	

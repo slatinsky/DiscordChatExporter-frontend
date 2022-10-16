@@ -1,11 +1,15 @@
 <script>
+	import Search from './Search.svelte';
+	import Header from "./Header.svelte";
 	export let data;
 </script>
 
+{#key data.channelId}
+<Header channel={data.guild.channels[data.channelId]} messages={data.messages} />
+{/key}
 <div class="columns">
 	<div class="channels">
 		<div class="guild-name">{data.guilds[data.guildId].name}</div>
-		<div><a href="/channels/{data.guildId}/search">Guild search</a></div>
 		{#each Object.values(data.guild.categories) as category}
 			<div class="category">{category.name}</div>
 			{#each category.channelIds as channel}
@@ -42,6 +46,15 @@
 	</div>
 	<div>
 		<slot />
+	</div>
+
+	<div class="search-container">
+		<Search
+			authors={data.guild.authors}
+			all_messages={data.guild.messages}
+			guild={data.guild}
+			guildId={data.guildId}
+		/>
 	</div>
 </div>
 
@@ -101,7 +114,7 @@
 
 	.columns {
 		display: grid;
-		grid-template-columns: 250px auto;
+		grid-template-columns: 250px auto 350px;
 		flex-direction: row;
 		background-color: #2f3136;
 		height: 100vh;
@@ -122,5 +135,11 @@
 		font-size: 16px;
 		font-weight: 600;
 		margin: 15px 0 0px 0;
+	}
+
+	.search-container {
+		overflow-y: auto;
+		max-height: calc(100vh - 96px);
+		margin-right: 5px;
 	}
 </style>

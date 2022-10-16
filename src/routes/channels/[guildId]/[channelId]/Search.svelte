@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import { onlyMatches, searchTerm, foundMessageIds } from "./searchStore";
 
 	export let messages;
@@ -131,7 +131,7 @@
 		}
 	}
 
-	onMount(() => {
+	function hashChanged() {
 		// if hash is present in url, search for it
 		if (window.location.hash) {
 			let messageId = window.location.hash.replace('#', '');
@@ -145,6 +145,17 @@
 			// scroll to top
 			document.querySelector('#top').scrollIntoView();
 		}
+	}
+
+	onMount(() => {
+		
+
+		window.addEventListener("hashchange", hashChanged);
+		hashChanged()
+	});
+
+	onDestroy(() => {
+		window.removeEventListener("hashchange", hashChanged);
 	});
 
 	$: searchResults = searchMessages(messages, $searchTerm, resultsIndex);

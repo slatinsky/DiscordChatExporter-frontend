@@ -1,8 +1,8 @@
 <script>
-	import Search from './Search.svelte';
+	import Search from './[channelId]/Search.svelte';
 
 	export let channel;
-	export let messages;
+	// export let messages;
 </script>
 
 
@@ -14,7 +14,7 @@
             {#if channel.topic}
 			    <div class="topic elipsis">| {channel.topic}</div>
             {/if}
-			<Search {messages} />
+			<!-- <Search {messages} /> -->
 		</div>
 	</div>
 </section>

@@ -2,7 +2,6 @@
 	import { onMount } from "svelte";
 
     // import Preamble from "../../../components/Preamble.svelte";
-import Header from "./Header.svelte";
 	import Messages from "./Messages.svelte";
 
     let title = "DiscordChatExporter frontend";
@@ -24,9 +23,7 @@ import Header from "./Header.svelte";
 
 <section>
     <!-- {#if messages} -->
-    {#key data.channelId}
-    <Header channel={data.channel} messages={data.messages} />
-    {/key}
+
         <!-- {#each data.messages as message} -->
             <!-- <Message message={message}/> -->
         <!-- {/each} -->
