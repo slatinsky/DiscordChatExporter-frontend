@@ -6,9 +6,9 @@
 
 	export let message;
 	export let messages;
-	export let authors;
-	export let emojis;
+	export let guild;
 	export let guildId;
+	
 
 	// https://svelte.dev/repl/4b8ccdf1d01545baa0ab6a858bc05abb?version=3.32.1
 	let loaded = false;
@@ -57,7 +57,7 @@
 
 	function addAuthorToMessage() {
 		if (message.authorId) {
-			message.author = authors[message.authorId];
+			message.author = guild.authors[message.authorId];
 			delete message.authorId;
 			message = message; // apply changes
 		}
@@ -71,13 +71,13 @@
 
 				// add emoji to reaction
 				if (reaction.emojiId) {
-					reaction.emoji = emojis[reaction.emojiId];
+					reaction.emoji = guild.emojis[reaction.emojiId];
 					delete reaction.emojiId;
 					message = message; // apply changes
 				}
 
 				if (reaction.emojiName) {
-					reaction.emoji = emojis[reaction.emojiName];
+					reaction.emoji = guild.emojis[reaction.emojiName];
 					delete reaction.reactionId;
 					message = message; // apply changes
 				}
@@ -90,7 +90,7 @@
 			// console.log(message.reference);
 			message.referencedMessage = messages[message.reference.messageId];
             if (message.referencedMessage && message.referencedMessage?.authorId) {
-                message.referencedMessage.author = authors[message.referencedMessage.authorId];
+                message.referencedMessage.author = guild.authors[message.referencedMessage.authorId];
                 delete message.referencedMessage.authorId;
                 // message = message; // apply changes
             }
@@ -219,7 +219,7 @@
 									data-user-id={message.author.id}>{nickname(message.author)}</span
 								>
 								<span class="chatlog__timestamp"
-									><a href="#{message.id}">{human_timestamp_format(message.timestamp)}</a></span
+									><a href="/channels/{guildId}/{message.channelId}#{message.id}">{human_timestamp_format(message.timestamp)}</a></span
 								>
 							</div>
 							<div class="chatlog__content chatlog__markdown">

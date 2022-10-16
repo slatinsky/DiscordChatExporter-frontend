@@ -4,8 +4,7 @@
 
 	export let messages;
 	export let splitMessages;
-	export let authors;
-	export let emojis;
+	export let guild;
 	export let guildId;
 
 	let messageCount = splitMessages.length;
@@ -64,8 +63,8 @@
 		data-mglast={lastMessageId}
 	>
 		{#if loaded}
-			<svelte:self {messages} splitMessages={firstHalfMessages} {authors} {emojis} {guildId} />
-			<svelte:self {messages} splitMessages={secondHalfMessages} {authors} {emojis} {guildId} />
+			<svelte:self {messages} splitMessages={firstHalfMessages} {guild} {guildId} />
+			<svelte:self {messages} splitMessages={secondHalfMessages} {guild} {guildId} />
 		{:else}
 			<div class="not-loaded" style="height: {messageCount * 50}px;width: 100%;" />
 		{/if}
@@ -75,7 +74,7 @@
 		{#each splitMessages as message (message['id'])}
 			<!-- skip thread start msg -->
 			{#if message.type !== '21'}
-				<Message {message} {messages} {authors} {emojis} {guildId} />
+				<Message {message} {messages} {guild} {guildId} />
 			{/if}
 		{/each}
 	</div>

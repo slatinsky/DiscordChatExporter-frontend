@@ -1,4 +1,7 @@
 <script>
+	import Messages from "../[channelId]/Messages.svelte";
+
+	export let guild
 	export let authors;
 	export let all_messages;
 	export let guildId;
@@ -139,6 +142,12 @@
 		);
 	}
 
+	function filterChannels(channels, _) {
+		return Object.values(channels).filter((channel) =>
+			channel.name.toLowerCase().includes(parsedCursorHere.value.toLowerCase())
+		);
+	}
+
 
 	let found_messages = [];
 	function findMessages() {
@@ -240,14 +249,14 @@
 						return message.author && message.author.isWebhook;
 					});
 				}
-				// else if (filter.key === 'in') {
-				//     let channel = Object.values(channels).find((channel) => {
-				//         return channel.name === filter.value
-				//     })
-				//     channelMessages = channelMessages.filter((message) => {
-				//         return message.channelId === channel.id
-				//     });
-				// }
+				else if (filter.key === 'in') {
+					let channel = Object.values(guild.channels).find((channel) => {
+						return channel.name === filter.value;
+					});
+					channelMessages = channelMessages.filter((message) => {
+						return message.channelId === channel.id;
+					});
+				}
 			}
 
 			found_messages.push(...channelMessages);
@@ -255,14 +264,14 @@
 		}
 		console.log('found messages', found_messages);
 	}
-</script>
 
-isInputFocused: {isInputFocused} <br />
-cursorPosition: {cursorPosition} <br />
+	console.log("----", guild.channels)
+</script>
 
 <div class="search">
 	<input
 		type="text"
+		placeholder="Search in guild"
 		bind:value
 		bind:this={input}
 		on:focus={() => {
@@ -300,6 +309,14 @@ cursorPosition: {cursorPosition} <br />
 						</div>
 					{/key}
 				{/each}
+			{:else if 'key' in parsedCursorHere && parsedCursorHere.key === 'in' && value.length > 0}
+				{#each filterChannels(guild.channels, value) as channel, i}
+					{#key channel.id}
+						<div class="channel search-option" on:click={() => selectOptionValue(channel.name)}>
+							# {channel.name}
+						</div>
+					{/key}
+				{/each}
 			{:else}
 				<div>
 					{#if !value.includes('from:')}
@@ -332,11 +349,11 @@ cursorPosition: {cursorPosition} <br />
 							<b>before: </b>specific date
 						</div>
 					{/if}
-					{#if !value.includes('during:')}
+					<!-- {#if !value.includes('during:')}
 						<div class="search-option" on:click={() => selectOptionKey('during')}>
 							<b>[WIP] during: </b>specific date
 						</div>
-					{/if}
+					{/if} -->
 					{#if !value.includes('after:')}
 						<div class="search-option" on:click={() => selectOptionKey('after')}>
 							<b>after: </b>specific date
@@ -344,7 +361,7 @@ cursorPosition: {cursorPosition} <br />
 					{/if}
 					{#if !value.includes('in:')}
 						<div class="search-option" on:click={() => selectOptionKey('in')}>
-							<b>[WIP] in: </b>channel
+							<b>in: </b>channel
 						</div>
 					{/if}
 					{#if !value.includes('pinned:')}
@@ -363,19 +380,32 @@ cursorPosition: {cursorPosition} <br />
 	{/if}
 </div>
 
-{#each found_messages as message}
+<br>
+<div>Found {found_messages.length} messages</div>
+
+<Messages messages={found_messages} guild={guild} guildId={guildId} channelId={0}/>
+<!-- {#each found_messages as message} -->
 	<!-- <pre>{JSON.stringify(message, null, 2)}</pre> -->
-	<div>
+	
+	<!-- <div>
 		<a href="/channels/{guildId}/{message.channelId}#{message.id}" target="_blank">
 			{message.content}</a
 		>
-	</div>
-{/each}
+	</div> -->
+<!-- {/each} -->
 
 <style>
 	input {
 		width: 100%;
 		max-width: 500px;
+		background-color: #202225;
+		color: white;
+		height: 25px;
+		border: 0px;
+		border-radius: 3px;
+	}
+	input::placeholder {
+		color: #909297;
 	}
 	.search {
 		position: relative;
@@ -389,6 +419,8 @@ cursorPosition: {cursorPosition} <br />
 
 		position: absolute;
 		top: 50px;
+
+		z-index: 100;
 	}
 	.search-option {
 		padding: 5px 5px;

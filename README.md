@@ -197,3 +197,5 @@ included binserve binary uses MIT license
 
 ## Contributing
 Feel free to open issues and pull requests.
+
+The best way to support this project is to star it here on GitHub.

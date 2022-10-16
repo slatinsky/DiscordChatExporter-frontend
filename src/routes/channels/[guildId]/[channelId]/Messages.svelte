@@ -2,8 +2,7 @@
 	import { copyTextToClipboard } from '../../../../helpers';
 	import MessageGroup from './MessageGroup.svelte';
 	export let messages;
-	export let authors;
-	export let emojis;
+	export let guild;
 
 	export let guildId;
 	export let channelId;
@@ -19,7 +18,7 @@
 
 {#key channelId}
 	{#if messages}
-		<MessageGroup messages={messages} splitMessages={Object.values(messages)} {authors} {emojis} {guildId}></MessageGroup>
+		<MessageGroup messages={messages} splitMessages={Object.values(messages)} {guild} {guildId}></MessageGroup>
 	{:else}
 		<div class="no-messages">No messages</div>
 	{/if}

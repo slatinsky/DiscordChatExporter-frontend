@@ -40,8 +40,7 @@ import Header from "./Header.svelte";
                 </div>
                 {/if}
             {/key}
-            <Messages messages={data.messages} authors={data.guild.authors} emojis={data.guild.emojis} guildId={data.guildId} channelId={data.channelId}/>
-
+            <Messages messages={data.messages} guild={data.guild} guildId={data.guildId} channelId={data.channelId}/>
             <div id="bottom" />
         </div>
     </div>
