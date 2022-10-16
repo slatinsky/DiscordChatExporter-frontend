@@ -8,6 +8,8 @@
 	export let messages;
 	export let guild;
 	export let guildId;
+
+	let DEBUG = false;
 	
 
 	// https://svelte.dev/repl/4b8ccdf1d01545baa0ab6a858bc05abb?version=3.32.1
@@ -88,7 +90,7 @@
 	function addReferencedMessage() {
 		if (message.reference) {
 			// console.log(message.reference);
-			message.referencedMessage = messages[message.reference.messageId];
+			message.referencedMessage = guild.messages[message.reference.channelId][message.reference.messageId];
             if (message.referencedMessage && message.referencedMessage?.authorId) {
                 message.referencedMessage.author = guild.authors[message.referencedMessage.authorId];
                 // delete message.referencedMessage.authorId;
@@ -320,7 +322,9 @@
 					</div>
 				</div>
 			</div>
-            <!-- <pre>{JSON.stringify(message, null, 2)}</pre> -->
+			{#if DEBUG}				
+            	<pre>{JSON.stringify(message, null, 2)}</pre>
+			{/if}
 		</div>
         {:else}
         <div class="not-loaded" id={message.id}></div>
