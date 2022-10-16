@@ -5,6 +5,7 @@
 <div class="columns">
 	<div class="channels">
 		<div class="guild-name">{data.guilds[data.guildId].name}</div>
+		<div><a href="/channels/{data.guildId}/search">Guild search</a></div>
 		{#each Object.values(data.guild.categories) as category}
 			<div class="category">{category.name}</div>
 			{#each category.channelIds as channel}
