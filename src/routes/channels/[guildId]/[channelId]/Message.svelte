@@ -58,7 +58,7 @@
 	function addAuthorToMessage() {
 		if (message.authorId) {
 			message.author = guild.authors[message.authorId];
-			delete message.authorId;
+			// delete message.authorId;
 			message = message; // apply changes
 		}
 	}
@@ -72,13 +72,13 @@
 				// add emoji to reaction
 				if (reaction.emojiId) {
 					reaction.emoji = guild.emojis[reaction.emojiId];
-					delete reaction.emojiId;
+					// delete reaction.emojiId;
 					message = message; // apply changes
 				}
 
 				if (reaction.emojiName) {
 					reaction.emoji = guild.emojis[reaction.emojiName];
-					delete reaction.reactionId;
+					// delete reaction.reactionId;
 					message = message; // apply changes
 				}
 			}
@@ -91,8 +91,7 @@
 			message.referencedMessage = messages[message.reference.messageId];
             if (message.referencedMessage && message.referencedMessage?.authorId) {
                 message.referencedMessage.author = guild.authors[message.referencedMessage.authorId];
-                delete message.referencedMessage.authorId;
-                // message = message; // apply changes
+                // delete message.referencedMessage.authorId;
             }
 			// console.log(message.reference, message.referencedMessage, messages.length, Object.keys(messages)[0]);
 		}

@@ -155,12 +155,14 @@
 		found_messages = [];
 		let limit = 100;
 
-		console.log(all_messages);
 
 		console.log('--', Object.keys(all_messages).length, 'messages to search through');
+		console.log('--filters', JSON.stringify(filters, null, 2));
 
 		for (const [channelId, channel] of Object.entries(all_messages)) {
 			let channelMessages = Object.values(channel);
+			console.log("channelMessages.length", channelMessages.length);
+
 
 			for (const filter of filters) {
 				if (filter.content) {

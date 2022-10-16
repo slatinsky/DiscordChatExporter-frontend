@@ -1,5 +1,4 @@
 <script>
-	import { copyTextToClipboard } from '../../../../helpers';
 	import MessageGroup from './MessageGroup.svelte';
 	export let messages;
 	export let guild;
