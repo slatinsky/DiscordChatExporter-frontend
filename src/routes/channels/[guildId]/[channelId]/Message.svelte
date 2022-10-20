@@ -222,11 +222,15 @@
 													class="chatlog__attachment-media"
 													src={attachment?.localFilePath}
 													alt="Attachment"
-													title="Image: {attachment.fileName} ({attachment.fileSizeBytes} KB)"
+													title="Image: {attachment.fileName} ({attachment.fileSizeBytes} B)"
 													loading="lazy"
 												/>
 											</a>
 										</div>
+									{:else if attachment.type == 'video'}
+										<video class="chatlog__attachment-media" controls>
+											<source src="{attachment?.localFilePath}" alt="{attachment?.Description ?? 'Video attachment'}" title="Video: {attachment.fileName} ({attachment.fileSizeBytes} B)">
+										</video>
 									{:else}
 										<div class="chatlog__attachment">
 											<a href={attachment?.localFilePath} target="_blank">
@@ -444,5 +448,9 @@
 		color: #fff;
 		margin-bottom: 5px;
 		margin: 15px 30px 5px 15px;
+	}
+
+	.chatlog__attachment-media {
+		max-width: calc(100% - 10px);
 	}
 </style>

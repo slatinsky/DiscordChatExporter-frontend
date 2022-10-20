@@ -14,6 +14,7 @@
 			$found_messages = [];
 			$searched = false;
 		}
+		console.log('current guild', data.guild);
 	}
 	$: guildChanged(data);
 </script>

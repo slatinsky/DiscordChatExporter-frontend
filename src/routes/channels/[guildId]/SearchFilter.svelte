@@ -17,7 +17,6 @@
 	let isInputFocused = false;
 	let cursorPosition = 0;
 
-
 	function selectFullOption(newKey, newValue) {
 		if ('content' in parsedCursorHere) {
 			parsedCursorHere.key = newKey;
@@ -151,7 +150,26 @@
 			channel.name.toLowerCase().includes(parsedCursorHere.value.toLowerCase())
 		);
 	}
+	
+	function filterEmojis(emojis, _) {
+		return Object.values(emojis).filter((emoji) =>
+			emoji.name.toLowerCase().includes(parsedCursorHere.value.toLowerCase())
+		).sort((a, b) => {
+			if (a.name < b.name) {
+				return -1;
+			} else if (a.name > b.name) {
+				return 1;
+			} else {
+				return 0;
+			}
+		});
+	}
 
+	function filterFiletypes(extensions, _) {
+		return Object.values(extensions).filter((extension) =>
+			extension.toLowerCase().includes(parsedCursorHere.value.toLowerCase())
+		);
+	}
 	function findMessages() {
 		console.log('searching for messages');
 		let found_messages_temp = [];
@@ -220,7 +238,32 @@
 					});
 				} else if (filter.key === 'has' && filter.value === 'image') {
 					channelMessages = channelMessages.filter((message) => {
-						return message.attachments && message.attachments.length > 0;
+						return (
+							message.attachments &&
+							message.attachments.some((attachment) => attachment.type === 'image')
+						);
+					});
+				} else if (filter.key === 'has' && filter.value === 'video') {
+					channelMessages = channelMessages.filter((message) => {
+						return (
+							message.attachments &&
+							message.attachments.some((attachment) => attachment.type === 'video')
+						);
+					});
+				} else if (filter.key === 'filetype') {
+					channelMessages = channelMessages.filter((message) => {
+						return (
+							message.attachments &&
+							message.attachments.some((attachment) => attachment.extension === filter.value)
+						);
+					});
+				} else if (filter.key === 'reaction') {
+					let emoji = Object.values(guild.emojis).find((emoji) => emoji.name === filter.value);
+					channelMessages = channelMessages.filter((message) => {
+						return (
+							message.reactions &&
+							message.reactions.some((reaction) => reaction.emojiName === filter.value || reaction.emojiId === emoji.id)
+						);
 					});
 				} else if (filter.key === 'has' && filter.value === 'reaction') {
 					channelMessages = channelMessages.filter((message) => {
@@ -266,7 +309,6 @@
 
 			found_messages_temp.push(...channelMessages);
 			$searched = true;
-
 		}
 
 		found_messages_temp = found_messages_temp.sort((a, b) => {
@@ -351,11 +393,40 @@
 			{:else if 'key' in parsedCursorHere && parsedCursorHere.key === 'in' && value.length > 0}
 				{#each filterChannels(guild.channels, value) as channel, i}
 					{#key channel.id}
-						<div class="channel search-option" on:click={() => selectOptionValue(channel.name.replaceAll(' ', '_'))}>
+						<div
+							class="channel search-option"
+							on:click={() => selectOptionValue(channel.name.replaceAll(' ', '_'))}
+						>
 							# {channel.name}
 						</div>
 					{/key}
 				{/each}
+			{:else if 'key' in parsedCursorHere && parsedCursorHere.key === 'reaction' && value.length > 0}
+				<div class="emoji-search-container">
+				{#each filterEmojis(guild.emojis, value) as emoji, i}
+					{#key emoji.name}
+						<div
+							class="emoji search-option"
+							on:click={() => selectOptionValue(emoji.name)}
+						>
+							<img class="emoji" src={emoji?.localFilePath} alt="Emoji" loading="lazy" width="30" height="30" title={emoji.name} />
+						</div>
+					{/key}
+				{/each}
+				</div>
+			{:else if 'key' in parsedCursorHere && parsedCursorHere.key === 'filetype' && value.length > 0}
+				<div class="emoji-search-container">
+				{#each filterFiletypes(guild.extensions, value) as extension, i}
+					{#key extension}
+						<div
+							class="filetype search-option"
+							on:click={() => selectOptionValue(extension)}
+						>
+							{extension}
+						</div>
+					{/key}
+				{/each}
+				</div>
 			{:else}
 				<div>
 					{#if !value.includes('from:')}
@@ -383,9 +454,29 @@
 							<b>has: </b>file
 						</div>
 					{/if}
+					{#if !value.includes('has:image')}
+						<div class="search-option" on:click={() => selectFullOption('has', 'image')}>
+							<b>has: </b>image
+						</div>
+					{/if}
+					{#if !value.includes('has:video')}
+						<div class="search-option" on:click={() => selectFullOption('has', 'video')}>
+							<b>has: </b>video
+						</div>
+					{/if}
 					{#if !value.includes('before:')}
 						<div class="search-option" on:click={() => selectOptionKey('before')}>
 							<b>before: </b>specific date
+						</div>
+					{/if}
+					{#if !value.includes('reaction:')}
+						<div class="search-option" on:click={() => selectOptionKey('reaction')}>
+							<b>reaction: </b>emoji
+						</div>
+					{/if}
+					{#if !value.includes('filetype:')}
+						<div class="search-option" on:click={() => selectOptionKey('filetype')}>
+							<b>filetype: </b>extension
 						</div>
 					{/if}
 					<!-- {#if !value.includes('during:')}
@@ -475,5 +566,11 @@
 		align-items: center;
 		gap: 15px;
 		/* margin: 15px 30px; */
+	}
+
+	.emoji-search-container {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
 	}
 </style>

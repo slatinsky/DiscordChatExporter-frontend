@@ -95,6 +95,14 @@ class GuildPreprocess:
 
         return messages, emojis
 
+    def _get_extensions(self, messages):
+        extensions = set()
+        for message in messages.values():
+            for attachment in message['attachments']:
+                extensions.add(os.path.splitext(attachment['localFileName'])[-1].replace('.', '').lower())
+        return list(extensions)
+
+
     def _calculate_filename(self, url):
         """calculate the filename based on the data"""
         if url is None:
@@ -139,10 +147,13 @@ class GuildPreprocess:
                     attachment['url'])
                 attachment['localFilePath'] = self._find_filepath(
                     attachment['localFileName'])
+                attachment['extension'] = os.path.splitext(attachment['localFileName'])[-1].replace('.', '').lower()
 
                 # if image, tag it as such
                 if attachment['localFileName'] is not None and attachment['localFileName'].endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
                     attachment['type'] = 'image'
+                elif attachment['localFileName'] is not None and attachment['localFileName'].endswith(('.mp4', '.webm')):
+                    attachment['type'] = 'video'
 
             # calculate embed filenames
             for embed in message['embeds']:
@@ -300,6 +311,11 @@ class GuildPreprocess:
 
         messages = self.calculate_local_filenames(messages, authors, emojis)
 
+        extensions = self._get_extensions(messages)
+
+
+
+
         # step 4 - cleanup empty fields
         messages = self.cleanup_empty_fields(messages)
 
@@ -319,15 +335,16 @@ class GuildPreprocess:
 
         # group channels and others attributes to single dict
         guild = {
+            'id': self.guild_id,
             'categories': categories,
             'authors': authors,
             'emojis': emojis,
             # merge channels and threads
             'channels': {**channels, **threads},
             'message_ids': message_ids,
-            'messages': messages_by_channel,
             'threadIdToMessageId': thread_id_to_message_id,
-            'id': self.guild_id,
+            'extensions': extensions,
+            'messages': messages_by_channel,
         }
 
         # step 7 - write data to json files
