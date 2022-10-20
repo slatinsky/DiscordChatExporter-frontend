@@ -264,29 +264,46 @@
 			// 	return a.timestamp < b.timestamp;
 			// });
 
-			// add searchPrevMessage and searchNextMessage to all messages
-			for (let i = 0; i < channelMessages.length; i++) {
-				let message = channelMessages[i];
-				let prevMessage = channelMessages[i - 1];
-				let nextMessage = channelMessages[i + 1];
-				if (prevMessage) {
-					message.searchPrevMessageChannelId = prevMessage.channelId;
-				} else {
-					message.searchPrevMessageChannelId = 'first';
-				}
-				if (nextMessage) {
-					message.searchNextMessageChannelId = nextMessage.channelId;
-				} else {
-					message.searchNextMessageChannelId = 'last';
-				}
-			}
-
 			found_messages_temp.push(...channelMessages);
 			$searched = true;
 
 		}
+
+		found_messages_temp = found_messages_temp.sort((a, b) => {
+			console.log(a.id, b.id, BigInt(a.id) < BigInt(b.id));
+			return BigInt(a.id) > BigInt(b.id) ? -1 : 1;
+		});
+
+		// loop through found messages and print channel name
+		for (let i = 0; i < found_messages_temp.length; i++) {
+			let message = found_messages_temp[i];
+			let channel = guild.channels[message.channelId]?.name
+			// console.log('channel', channel);
+			console.log('id', message.id);
+		}
+		// add searchPrevMessage and searchNextMessage to all messages
+		for (let i = 0; i < found_messages_temp.length; i++) {
+			let message = found_messages_temp[i];
+			let prevMessage = found_messages_temp[i - 1];
+			let nextMessage = found_messages_temp[i + 1];
+			if (prevMessage) {
+				message.searchPrevMessageChannelId = prevMessage.channelId;
+			} else {
+				message.searchPrevMessageChannelId = 'first';
+			}
+			if (nextMessage) {
+				message.searchNextMessageChannelId = nextMessage.channelId;
+			} else {
+				message.searchNextMessageChannelId = 'last';
+			}
+		}
 		console.log('found messages', found_messages_temp);
+
+
+
+		// set found messages
 		$found_messages = found_messages_temp;
+
 	}
 
 	console.log('----', guild.channels);

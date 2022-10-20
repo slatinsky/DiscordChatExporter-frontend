@@ -39,7 +39,7 @@
                 </div>
                 {/if}
             {/key}
-            <Messages messages={data.messages} guild={data.guild} guildId={data.guildId} channelId={data.channelId}/>
+            <Messages messages={Object.values(data.messages)} guild={data.guild} guildId={data.guildId} channelId={data.channelId}/>
             <div id="bottom" />
         </div>
     </div>
