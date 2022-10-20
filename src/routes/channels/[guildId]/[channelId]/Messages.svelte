@@ -14,13 +14,13 @@
 
 
 
-<!-- {#key channelId} -->
+{#key channelId}
 	{#if messages}
 		<MessageGroup messages={messages} splitMessages={Object.values(messages)} {guild} {search}></MessageGroup>
 	{:else}
 		<div class="no-messages">No messages</div>
 	{/if}
-<!-- {/key} -->
+{/key}
 
 
 <style>

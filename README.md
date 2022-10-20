@@ -9,8 +9,9 @@ View your JSON [DiscordChatExporter](Tyrrrz/DiscordChatExporter) exports as if y
 - Message deduplication - merge multiple JSON exports and view them as if they were one
 - Advanced message lazy loading and grouping (infinite scroll without pagination) - even channels with 100k+ messages are loaded almost instantly
 - Threads support (go to thread, go back to channel where thread was created)
-- Simple channel content search (because lazy loading makes it hard to use browser search)
+- Guild search
 - View media files locally
+- Discord Markdown rendering support
 
 
 
@@ -170,8 +171,6 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 - rerun preprocess only if it is needed
 - Better handling of edge cases (if something is missing in the backup)
 - Support Direct messages
-- Screenshots in documentation
-- Message markdown rendering support
 - Better GUI
 - Better search (by author, by date)
 - make readme easy to understand

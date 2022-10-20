@@ -1,10 +1,8 @@
 <script>
 	import Header from './Header.svelte';
 	import SearchResults from './SearchResults.svelte';
+	import { searched, found_messages } from './searchStores';
 	export let data;
-
-	let found_messages = [];
-	let searched = false;
 
 	$: console.warn('found_messages', found_messages);
 	$: console.warn('searched', searched);
@@ -13,14 +11,14 @@
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time
 		if (currentGuildId !== data.guildId) {
 			currentGuildId = data.guildId;
-			found_messages = [];
-			searched = false;
+			$found_messages = [];
+			$searched = false;
 		}
 	}
 	$: guildChanged(data);
 </script>
 
-<div id="guild-layout" class={searched ? 'with-search' : ''}>
+<div id="guild-layout" class={$searched ? 'with-search' : ''}>
 	<div id="channels">
 		<div class="guild-name">{data.guilds[data.guildId].name}</div>
 		{#each Object.values(data.guild.categories) as category}
@@ -69,17 +67,15 @@
 				guild={data.guild}
 				channel={data.guild.channels[data.channelId]}
 				messages={data.messages}
-				bind:found_messages
-				bind:searched
 			/>
 		{/key}
 	</div>
 	<div id="messages">
 		<slot />
 	</div>
-	{#if searched}
+	{#if $searched}
 		<div id="search">
-			<SearchResults {found_messages} guild={data.guild} bind:searched />
+			<SearchResults guild={data.guild} />
 		</div>
 	{/if}
 </div>

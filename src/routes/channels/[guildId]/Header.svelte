@@ -3,10 +3,7 @@
 
 	export let channel;
 	// export let messages;
-	export let search;
 	export let guild;
-	export let found_messages;
-	export let searched;
 </script>
 
 <section class="header-container">
@@ -19,8 +16,7 @@
 				{/if}
 			{/if}
 			<div class="spacer" />
-			<SearchFilter bind:found_messages bind:searched {guild} />
-			<!-- <Search {messages} /> -->
+			<SearchFilter {guild} />
 		</div>
 	</div>
 </section>

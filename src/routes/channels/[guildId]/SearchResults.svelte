@@ -1,19 +1,18 @@
 <script>
+	import { found_messages, searched } from './searchStores';
     import Messages from './[channelId]/Messages.svelte';
-    export let searched = false;
-    export let found_messages = [];
     export let guild
 </script>
 
-{#key found_messages}
-	{#if searched}
+{#key $found_messages}
+	{#if $searched}
 		<div class="search-found-count">
-			<div>{found_messages.length} Results</div>
+			<div>{$found_messages.length} Results</div>
 			<button on:click={()=>searched=false}>×</button>
 		</div>
 	{/if}
 	<div class="search-results">
-		<Messages messages={found_messages} {guild} channelId={0} search={true} />
+		<Messages messages={$found_messages} {guild} channelId={0} search={true} />
 	</div>
 {/key}
 

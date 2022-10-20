@@ -1,5 +1,6 @@
 <script>
 	import SearchResults from './SearchResults.svelte';
+	import { searched, found_messages } from './searchStores';
 	// import Messages from './[channelId]/Messages.svelte';
 
 	export let guild;
@@ -15,7 +16,7 @@
 
 	let isInputFocused = false;
 	let cursorPosition = 0;
-	export let searched = false;
+
 
 	function selectFullOption(newKey, newValue) {
 		if ('content' in parsedCursorHere) {
@@ -151,10 +152,9 @@
 		);
 	}
 
-	export let found_messages = [];
 	function findMessages() {
 		console.log('searching for messages');
-		found_messages = [];
+		let found_messages_temp = [];
 		let limit = 100;
 
 		console.log('--', Object.keys(all_messages).length, 'messages to search through');
@@ -281,10 +281,12 @@
 				}
 			}
 
-			found_messages.push(...channelMessages);
-			searched = true;
+			found_messages_temp.push(...channelMessages);
+			$searched = true;
+
 		}
-		console.log('found messages', found_messages);
+		console.log('found messages', found_messages_temp);
+		$found_messages = found_messages_temp;
 	}
 
 	console.log('----', guild.channels);
