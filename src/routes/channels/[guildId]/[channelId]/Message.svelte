@@ -1,7 +1,9 @@
 <script>
+	import { nameRenderer } from '../../../settingsStore';
 	import { onMount, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import MessageContent from './MessageContent.svelte';
+	import { renderTimestamp } from '../../../time';
 
 	export let message;
 	// export let messages;
@@ -46,16 +48,16 @@
 		addReferencedMessage();
 	}
 
-	function human_timestamp_format(timestamp) {
-		return timestamp.replace('T', ' ').split('.')[0];
-	}
-
 	function full_name(author) {
 		return author.name + '#' + author.discriminator;
 	}
 
 	function nickname(author) {
-		return author?.nickname ?? full_name(message.author);
+		if ($nameRenderer === 'nickname') {
+			return author?.nickname ?? full_name(author);
+		} else {
+			return full_name(author);
+		}
 	}
 
 	function addAuthorToMessage() {
@@ -157,7 +159,7 @@
 									</span>
 									<span class="chatlog__system-notification-timestamp">
 										<a href="#{message.reference.channelId}"
-											>{human_timestamp_format(message.timestamp)}</a
+											>{renderTimestamp(message.timestamp)}</a
 										>
 									</span>
 								</div>
@@ -197,7 +199,7 @@
 								>
 								<span class="chatlog__timestamp"
 									><a href="/channels/{guild.id}/{message.channelId}#{message.id}"
-										>{human_timestamp_format(message.timestamp)}</a
+										>{renderTimestamp(message.timestamp)}</a
 									></span
 								>
 							</div>

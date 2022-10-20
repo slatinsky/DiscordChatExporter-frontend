@@ -36,6 +36,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-static": "^1.0.0-next.44",
 		"axios": "^1.1.2",
+		"moment": "^2.29.4",
 		"svelte-tiny-virtual-list": "^2.0.5"
 	}
 }
