@@ -159,6 +159,17 @@ class GuildPreprocess:
                             embed["thumbnail"]["url"])
                         embed["thumbnail"]["localFilePath"] = self._find_filepath(
                             embed["thumbnail"]["localFileName"])
+                if "image" in embed and embed["image"] is not None:
+                    embed["image"]["localFileName"] = self._calculate_filename(
+                        embed["image"]["url"])
+                    embed["image"]["localFilePath"] = self._find_filepath(
+                        embed["image"]["localFileName"])
+                if "images" in embed:
+                    for image in embed["images"]:
+                        image["localFileName"] = self._calculate_filename(
+                            image["url"])
+                        image["localFilePath"] = self._find_filepath(
+                            image["localFileName"])
 
             # TODO: other embeds and stickers
 

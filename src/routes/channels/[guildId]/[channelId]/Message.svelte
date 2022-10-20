@@ -102,6 +102,7 @@
 	}
 </script>
 
+<!-- Rewritten https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/Html/MessageGroupTemplate.cshtml to svelte -->
 <div bind:this={root}>
 	{#if loaded}
 		{#if search&& message.searchPrevMessageChannelId && message.searchPrevMessageChannelId !== message.channelId}
@@ -181,7 +182,6 @@
 										<div class="chatlog__reference-content">
 											<span
 												class="chatlog__reference-link"
-												onclick="scrollToMessage(event,message.reference.messageId)"
 												>{message.referencedMessage.content}</span
 											>
 										</div>
@@ -269,18 +269,121 @@
 
 						{#if message.embeds}
 							{#each message.embeds as embed}
-								{#if embed.thumbnail}
-									<div class="chatlog__embed">
-										<a href={embed.thumbnail?.localFilePath} target="_blank">
-											<img
-												class="chatlog__embed-generic-image"
-												src={embed.thumbnail?.localFilePath}
-												alt="Embedded image"
-												loading="lazy"
-											/>
-										</a>
+								<div class="chatlog__embed">
+									<!-- @{/* Color pill */} -->
+									{#if embed.color}
+										<div class="chatlog__embed-color-pill" style="background-color: {embed.color}"></div>
+									{:else}
+										<div class="chatlog__embed-color-pill chatlog__embed-color-pill--default"></div>
+									{/if}
+
+									<div class="chatlog__embed-content-container">
+										<div class="chatlog__embed-content">
+											<div class="chatlog__embed-text">
+												<!-- @{/* Embed author */} -->
+												{#if embed.author}
+													<div class="chatlog__embed-author-container">
+														<!-- embed.author.iconUrl -->
+														{#if embed.author.localFilePath}
+															<img class="chatlog__embed-author-icon" src="{embed.author.localFilePath}" alt="Author icon" loading="lazy" onerror="this.style.visibility='hidden'">
+														{/if}
+														{#if embed.author.name}
+															{#if embed.author.url}
+																<a class="chatlog__embed-author-link" href="{embed.author.url}">
+																	<div class="chatlog__embed-author">{embed.author.name}</div>
+																</a>
+															{:else}
+																<div class="chatlog__embed-author">{embed.author.name}</div>
+															{/if}
+														{/if}
+													</div>
+												{/if}
+
+												<!-- @{/* Embed title */} -->
+												{#if embed.title}
+													<div class="chatlog__embed-title">
+														{#if embed.url}
+															<a class="chatlog__embed-title-link" href="@embed.Url">
+																<div class="chatlog__markdown chatlog__markdown-preserve">{embed.title}</div>
+															</a>
+														{:else}
+															<div class="chatlog__markdown chatlog__markdown-preserve">{embed.title}</div>
+														{/if}
+													</div>
+												{/if}
+
+												<!-- @{/* Embed description */} -->
+												{#if embed.description}
+													<div class="chatlog__embed-description">
+														<div class="chatlog__markdown chatlog__markdown-preserve">{embed.description}</div>
+													</div>
+												{/if}
+
+												<!-- @{/* Embed fields */} -->
+												{#if embed.fields}
+													<div class="chatlog__embed-fields">
+														{#each embed.fields as field}
+															<div class="chatlog__embed-field">
+																{#if field.name}
+																	<div class="chatlog__embed-field-name">
+																		<div class="chatlog__markdown chatlog__markdown-preserve">{field.name}</div>
+																	</div>
+																{/if}
+
+																{#if field.value}
+																	<div class="chatlog__embed-field-value">
+																		<div class="chatlog__markdown chatlog__markdown-preserve">{field.value}</div>
+																	</div>
+																{/if}
+															</div>
+														{/each}
+													</div>
+												{/if}
+
+
+											<!-- @{/* Embed content */} -->
+												{#if embed.thumbnail}
+													<div class="chatlog__embed-thumbnail-container">
+														<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.localFilePath}" target="_blank">
+															<img class="chatlog__embed-thumbnail" src="{embed.thumbnail?.localFilePath}" alt="Thumbnail" loading="lazy">
+														</a>
+													</div>
+												{/if}
+
+												<!-- @{/* Embed images */} -->
+												{#if embed.images}
+													{#each embed.images as image}
+														<div class="chatlog__embed-images">
+															<div class="chatlog__embed-image-container">
+																<a class="chatlog__embed-image-link" href="{image.localFilePath}" target="_blank">
+																	<img class="chatlog__embed-image" src="{image.localFilePath}" alt="Image" loading="lazy">
+																</a>
+															</div>
+														</div>
+													{/each}
+												{/if}
+
+												<!-- @{/* Embed footer & icon */} -->
+												{#if embed.footer}
+													<div class="chatlog__embed-footer">
+														{#if embed.footer.localFilePath}
+															<img class="chatlog__embed-footer-icon" src="{embed.footer.localFilePath}" alt="Footer icon" loading="lazy">
+														{/if}
+
+														<span class="chatlog__embed-footer-text">
+														{#if embed.footer.text}
+															{embed.footer.text}
+															{#if embed.timestamp}
+																{" • "} {embed.timestamp}
+															{/if}
+														{/if}
+														</span>
+													</div>
+												{/if}
+											</div>
+										</div>
 									</div>
-								{/if}
+								</div>
 							{/each}
 						{/if}
 						<!--                TODO: stickers-->
@@ -291,7 +394,7 @@
 									<div class="chatlog__reaction" title={reaction.emoji.name}>
 										<img
 											class="chatlog__emoji chatlog__emoji--small"
-											alt="🍰"
+											alt="{reaction.emoji.name}"
 											src={reaction.emoji?.localFilePath}
 											loading="lazy"
 										/> <span class="chatlog__reaction-count">{reaction.count}</span>
