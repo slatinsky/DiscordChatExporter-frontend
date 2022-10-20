@@ -190,7 +190,7 @@ class GuildPreprocess:
         threads = {}
         normal_channels = {}  # non thread channels
         for channel in channels.values():
-            if channel['type'] == "GuildTextChat":
+            if channel['type'] == "GuildTextChat" or channel['type'] == "DirectTextChat" or channel['type'] == "DirectGroupTextChat":
                 normal_channels[channel['id']] = channel
             elif channel['type'] == "GuildPublicThread":
                 threads[channel['id']] = channel

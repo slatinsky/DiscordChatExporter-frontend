@@ -105,7 +105,7 @@
 <div bind:this={root}>
 	{#if loaded}
 		{#if search&& message.searchPrevMessageChannelId && message.searchPrevMessageChannelId !== message.channelId}
-			<div class="channel-name"># {guild.channels[message.channelId]?.name}</div>
+			<div class="channel-name"><a href="/channels/{guild.id}/{message.channelId}/"># {guild.channels[message.channelId]?.name}</a></div>
 		{/if}
 		<div class="chatlog__message-group" transition:fade={{ duration: 125 }}>
 			<!-- <button on:click={()=>copyTextToClipboard(message.id)}>Copy ID</button> -->

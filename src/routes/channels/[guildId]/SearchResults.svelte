@@ -8,7 +8,7 @@
 	{#if $searched}
 		<div class="search-found-count">
 			<div>{$found_messages.length} Results</div>
-			<button on:click={()=>searched=false}>×</button>
+			<button on:click={()=>$searched=false}>×</button>
 		</div>
 	{/if}
 	<div class="search-results">
