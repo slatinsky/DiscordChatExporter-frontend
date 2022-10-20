@@ -9,7 +9,7 @@ View your JSON [DiscordChatExporter](Tyrrrz/DiscordChatExporter) exports as if y
 - Message deduplication - merge multiple JSON exports and view them as if they were one
 - Advanced message lazy loading and grouping (infinite scroll without pagination) - even channels with 100k+ messages are loaded almost instantly
 - Threads support (go to thread, go back to channel where thread was created)
-- Guild search
+- Guild search with autocomplete
 - View media files locally
 - Browse guild or direct messages
 - Discord Markdown rendering support
