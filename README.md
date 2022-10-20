@@ -11,6 +11,7 @@ View your JSON [DiscordChatExporter](Tyrrrz/DiscordChatExporter) exports as if y
 - Threads support (go to thread, go back to channel where thread was created)
 - Guild search
 - View media files locally
+- Browse guild or direct messages
 - Discord Markdown rendering support
 
 
@@ -170,11 +171,8 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 ## Roadmap / planned features:
 - rerun preprocess only if it is needed
 - Better handling of edge cases (if something is missing in the backup)
-- Support Direct messages
 - Better GUI
-- Better search (by author, by date)
 - make readme easy to understand
-- Guild-wide search
 - Linux support (docker?)
 - Improve code readability
 - Discord forums support

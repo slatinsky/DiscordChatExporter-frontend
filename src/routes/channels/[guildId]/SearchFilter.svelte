@@ -270,17 +270,16 @@
 		}
 
 		found_messages_temp = found_messages_temp.sort((a, b) => {
-			console.log(a.id, b.id, BigInt(a.id) < BigInt(b.id));
 			return BigInt(a.id) > BigInt(b.id) ? -1 : 1;
 		});
 
-		// loop through found messages and print channel name
-		for (let i = 0; i < found_messages_temp.length; i++) {
-			let message = found_messages_temp[i];
-			let channel = guild.channels[message.channelId]?.name
-			// console.log('channel', channel);
-			console.log('id', message.id);
-		}
+		// DEBUG loop through found messages and print channel name
+		// for (let i = 0; i < found_messages_temp.length; i++) {
+		// 	let message = found_messages_temp[i];
+		// 	let channel = guild.channels[message.channelId]?.name
+		// 	// console.log('channel', channel);
+		// 	console.log('id', message.id);
+		// }
 		// add searchPrevMessage and searchNextMessage to all messages
 		for (let i = 0; i < found_messages_temp.length; i++) {
 			let message = found_messages_temp[i];
@@ -299,11 +298,8 @@
 		}
 		console.log('found messages', found_messages_temp);
 
-
-
 		// set found messages
 		$found_messages = found_messages_temp;
-
 	}
 
 	console.log('----', guild.channels);
