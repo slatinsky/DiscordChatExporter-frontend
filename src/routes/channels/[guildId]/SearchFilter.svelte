@@ -252,7 +252,7 @@
 					});
 				} else if (filter.key === 'in') {
 					let channel = Object.values(guild.channels).find((channel) => {
-						return channel.name === filter.value;
+						return channel.name.replaceAll(' ', '_') === filter.value;
 					});
 					channelMessages = channelMessages.filter((message) => {
 						return message.channelId === channel.id;
@@ -326,7 +326,7 @@
 						<div
 							class="author search-option"
 							on:click={() =>
-								selectOptionValue(author.name.replace(' ', '_') + '#' + author.discriminator)}
+								selectOptionValue(author.name.replaceAll(' ', '_') + '#' + author.discriminator)}
 						>
 							<img class="avatar" src={author?.localFilePath} alt="Avatar" loading="lazy" />
 							<div>{author.nickname} ({author.name}#{author.discriminator})</div>
@@ -336,7 +336,7 @@
 			{:else if 'key' in parsedCursorHere && parsedCursorHere.key === 'in' && value.length > 0}
 				{#each filterChannels(guild.channels, value) as channel, i}
 					{#key channel.id}
-						<div class="channel search-option" on:click={() => selectOptionValue(channel.name)}>
+						<div class="channel search-option" on:click={() => selectOptionValue(channel.name.replaceAll(' ', '_'))}>
 							# {channel.name}
 						</div>
 					{/key}
