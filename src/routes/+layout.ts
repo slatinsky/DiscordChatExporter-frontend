@@ -5,13 +5,23 @@ export const prerender = false;
 export const ssr = false;
 
 export async function load({ fetch, params }) {
-    let response = await fetch('/data/guilds.min.json')
-    let guilds = await response.json()
-    let guildId = params.guildId
+    let response
+    let guilds
+    let guildId
+    let failed = false
+    try {
+        response = await fetch('/data/guilds.min.json')
+        guilds = await response.json()
+        guildId = params.guildId
+    }
+    catch (e) {
+        failed = true
+    }
+
     // console.log(guilds)
     return {
         guilds: guilds,
-        guildId: guildId
+        guildId: guildId,
+        failed: failed
     };
-    throw error(404, 'Not found');
 }

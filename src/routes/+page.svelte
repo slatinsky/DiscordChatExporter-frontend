@@ -14,11 +14,11 @@
 	{#key $nameRenderer}
 	<label>
 		<input type="radio" name="nameRenderer" value={"nickname"} bind:group={$nameRenderer} />
-		<span>Render nicknames (Deleted User)</span>
+		<span>Nickname (Deleted User)</span>
 	</label>
 	<label>
 		<input type="radio" name="nameRenderer" value={"handle"} bind:group={$nameRenderer} />
-		<span>Render handles (Deleted_User#0000)</span>
+		<span>Name with handle (Deleted_User#0000)</span>
 	</label>
 	{/key}
 </div>
