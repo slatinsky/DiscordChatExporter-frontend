@@ -5,8 +5,6 @@
 	import Messages from "./Messages.svelte";
 	import WatchHash from "./WatchHash.svelte";
 
-    let title = "DiscordChatExporter frontend";
-
     export let data;
     // console.log('data3', data);
 
@@ -18,7 +16,7 @@
 </script>
 
 <svelte:head>
-    <title>{title}</title>
+    <title>{data.guild.channels[data.channelId].name} | DiscordChatExporter frontend</title>
     <meta name="description" content="Svelte demo app"/>
 </svelte:head>
 

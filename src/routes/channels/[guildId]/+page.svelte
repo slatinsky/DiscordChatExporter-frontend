@@ -1,6 +1,15 @@
+<script>
+	export let data
+</script>
+
 <div class="container">
 	<div class="txt">Select channel</div>
 </div>
+
+<svelte:head>
+    <title>{data.guilds[data.guildId].name} | DiscordChatExporter frontend</title>
+    <meta name="description" content="Svelte demo app"/>
+</svelte:head>
 
 <style>
 	.container {

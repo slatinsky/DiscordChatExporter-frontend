@@ -13,6 +13,7 @@ node_modules
 /static/input
 /static/data
 /releases/bin/preprocess.exe
+/releases/bin/http-server.exe
 /releases/static/
 /releases/*.zip
 /_temp_input/

@@ -396,9 +396,48 @@ class Preprocess:
     #     self.guilds = sorted(self.guilds, key=lambda d: d['name'])
     #     return
 
+    def should_process(self, json_files, media_filepaths):
+        file_count = len(json_files) + len(media_filepaths)
+        print("Found " + str(file_count) + " files")
+
+        # make directory if it doesn't exist
+        if not os.path.exists('../static/data'):
+            os.makedirs('../static/data')
+
+        # if data/hash.txt does exists read the hash
+        if os.path.exists('../static/data/hash.txt'):
+            with open('../static/data/hash.txt', 'r') as f:
+                hash_from_file = f.read()
+                print("Hash: " + hash_from_file) 
+        else:
+            print("Hash file does not exist")
+            hash_from_file = None
+
+
+        # create hash of all files
+        # if hash is the same, then we can skip processing
+        # because reprocessing takes a lot of time
+        new_hash = sha256((str(json_files) + str(media_filepaths)).encode('utf-8')).hexdigest()
+
+        if hash_from_file == new_hash:
+            print("Hash is the same, skipping processing")
+            return False
+        else:
+            # write new hash to file
+            with open('../static/data/hash.txt', 'w') as f:
+                f.write(new_hash)
+
+            print("Hash is different, processing")
+            return True
+
+
     def process(self):
         json_files = self._find_json_files(self.input_directory)
         media_filepaths = self._find_all_mediafiles_paths(self.input_directory)
+
+        if not self.should_process(json_files, media_filepaths):
+            print("Skipping processing")
+            return
 
         guilds = {}
 

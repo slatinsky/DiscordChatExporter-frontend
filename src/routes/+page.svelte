@@ -5,6 +5,11 @@
 	let testDate = '2020-09-16T11:04:47.215+00:00';
 </script>
 
+<svelte:head>
+    <title>DiscordChatExporter frontend</title>
+    <meta name="description" content="Svelte demo app"/>
+</svelte:head>
+
 <!-- <div class="title">Select guild</div> -->
 
 <div class="title">Settings</div>

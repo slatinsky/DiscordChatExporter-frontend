@@ -19,6 +19,8 @@
 	$: guildChanged(data);
 </script>
 
+
+
 <div id="guild-layout" class={$searched ? 'with-search' : ''}>
 	<div id="channels">
 		<div class="guild-name">{data.guilds[data.guildId].name}</div>

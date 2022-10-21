@@ -228,7 +228,7 @@
 											</a>
 										</div>
 									{:else if attachment.type == 'video'}
-										<video class="chatlog__attachment-media" controls>
+										<video class="chatlog__attachment-media" controls preload="metadata">
 											<source src="{attachment?.localFilePath}" alt="{attachment?.Description ?? 'Video attachment'}" title="Video: {attachment.fileName} ({attachment.fileSizeBytes} B)">
 										</video>
 									{:else}

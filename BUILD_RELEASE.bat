@@ -11,8 +11,10 @@ del releases\bin\preprocess.exe
 cd preprocess
 pyinstaller preprocess.py -F
 cd ..
+call pkg server/node_modules/http-server/bin/http-server --target node16-win-x64
 @REM Move build to releases
 move "preprocess\dist\preprocess.exe" "releases\bin\preprocess.exe"
+move "http-server.exe" "releases\bin\http-server.exe"
 
 @REM Build sveltekit frontend
 call npm run build

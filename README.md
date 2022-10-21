@@ -92,15 +92,22 @@ npm run dev -- --open
 ```
 py -m pip install pyinstaller
 ```
+pkg (installed globally)
+```
+npm install -g pkg
+```
 
 ## Steps
 1. Clone this repository
 ```bash
-git clone URL
+git clone https://github.com/slatinsky/DiscordChatExporter-frontend
 ```
 2. Install dependencies
 ```bash
 npm install
+cd server
+npm install
+cd ..
 ```
 3. Make sure you have Python3.9+ Node.js 16 and pyinstaller installed:
 ```
@@ -144,8 +151,8 @@ v16.14.2
 >pyinstaller --version
 5.5
 
-Binserve version:
-binserve-v0.2.0-i686-pc-windows-msvc
+>pkg --version
+5.8.0
 
 DiscordChatExporter version:
 v2.36.1
@@ -183,14 +190,11 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 - [Tyrrrz/DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) - for a great tool. Many CSS definitions from this tool are used in our viewer.
 - Discord - for a great chat app
 - pyinstaller - for python to binary converter
-- [mufeedvh/binserve](https://github.com/mufeedvh/binserve) - for local webserver binary
 - [brussell98/discord-markdown](https://github.com/brussell98/discord-markdown) - for discord markdown rendering
 
 
 ## License
 GNU GENERAL PUBLIC LICENSE
-
-included binserve binary uses MIT license
 
 ## Contributing
 Feel free to open issues and pull requests.
