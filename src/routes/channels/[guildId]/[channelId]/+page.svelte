@@ -27,7 +27,7 @@
         <!-- {#each data.messages as message} -->
             <!-- <Message message={message}/> -->
         <!-- {/each} -->
-    <div class="chatlog">
+    <div class="chatlog" id="main-chatlog">
         <div class=chatlog__message-group>
             <div id="top" />
             {#key data.channelId}
@@ -37,7 +37,7 @@
                 </div>
                 {/if}
             {/key}
-            <Messages messages={Object.values(data.messages)} guild={data.guild} guildId={data.guildId} channelId={data.channelId}/>
+            <Messages messages={Object.values(data.messages)} guild={data.guild} guildId={data.guildId} channelId={data.channelId} rootId="main-chatlog"/>
             <div id="bottom" />
         </div>
     </div>

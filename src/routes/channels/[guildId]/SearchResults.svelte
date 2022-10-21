@@ -11,13 +11,13 @@
 			<button on:click={()=>$searched=false}>×</button>
 		</div>
 	{/if}
-	<div class="search-results">
-		<Messages messages={$found_messages} {guild} channelId={0} search={true} />
+	<div id="search-results">
+		<Messages messages={$found_messages} {guild} channelId={0} search={true} rootId="searchResults"/>
 	</div>
 {/key}
 
 <style>
-    .search-results {
+    #search-results {
 		overflow-y: auto;
 		overflow-x: hidden;
 		max-height: calc(100vh - 96px);

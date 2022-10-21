@@ -9,10 +9,12 @@
 	// export let messages;
 	export let guild;
 	export let search = false;
+	export let rootId
 
 	let DEBUG = false;
 
 	// https://svelte.dev/repl/4b8ccdf1d01545baa0ab6a858bc05abb?version=3.32.1
+	// processMessage();
 	let loaded = false;
 	let root;
 
@@ -29,8 +31,9 @@
 			});
 		},
 		{
-			rootMargin: '100% 0px 100% 0px',
-			threshold: 0.1
+			root: document.querySelector('#' + rootId),
+			rootMargin: '200% 0px',
+			threshold: 0
 		}
 	);
 
@@ -43,6 +46,7 @@
 	});
 
 	function processMessage() {
+		console.log();
 		addAuthorToMessage();
 		addEmojiToMessage();
 		addReferencedMessage();
@@ -108,7 +112,7 @@
 </script>
 
 <!-- Rewritten https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/Html/MessageGroupTemplate.cshtml to svelte -->
-<div bind:this={root}>
+<div bind:this={root} class="msg-root">
 	{#if loaded}
 		{#if search&& message.searchPrevMessageChannelId && message.searchPrevMessageChannelId !== message.channelId}
 			<div class="channel-name"><a href="/channels/{guild.id}/{message.channelId}/"># {guild.channels[message.channelId]?.name}</a></div>
@@ -136,6 +140,8 @@
 								src={message.author?.localFilePath}
 								alt="Avatar"
 								loading="lazy"
+								width="{message.author?.width ?? 40}"
+								height="{message.author?.height ?? 40}"
 							/>
 						{/if}
 					</div>
@@ -176,6 +182,8 @@
 											src={message.referencedMessage.author?.localFilePath}
 											alt="Avatar"
 											loading="lazy"
+											width="{message.referencedMessage.author?.width ?? 16}"
+											height="{message.referencedMessage.author?.height ?? 16}"
 										/>
 										<div
 											class="chatlog__reference-author"
@@ -227,6 +235,9 @@
 													alt="Attachment"
 													title="Image: {attachment.fileName} ({attachment.fileSizeBytes} B)"
 													loading="lazy"
+													
+													width="{attachment?.width ?? 16}"
+													height="{attachment?.height ?? 16}"
 												/>
 											</a>
 										</div>
@@ -294,7 +305,10 @@
 													<div class="chatlog__embed-author-container">
 														<!-- embed.author.iconUrl -->
 														{#if embed.author.localFilePath}
-															<img class="chatlog__embed-author-icon" src="{embed.author.localFilePath}" alt="Author icon" loading="lazy" onerror="this.style.visibility='hidden'">
+															<img class="chatlog__embed-author-icon" src="{embed.author.localFilePath}" alt="Author icon" loading="lazy" onerror="this.style.visibility='hidden'"
+													width="{embed.author?.width ?? 16}"
+													height="{embed.author?.height ?? 16}"
+													>
 														{/if}
 														{#if embed.author.name}
 															{#if embed.author.url}
@@ -354,7 +368,10 @@
 												{#if embed.thumbnail}
 													<div class="chatlog__embed-thumbnail-container">
 														<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.localFilePath}" target="_blank">
-															<img class="chatlog__embed-thumbnail" src="{embed.thumbnail?.localFilePath}" alt="Thumbnail" loading="lazy">
+															<img class="chatlog__embed-thumbnail" src="{embed.thumbnail?.localFilePath}" alt="Thumbnail" loading="lazy"
+															width="{embed.thumbnail?.width ?? 16}"
+															height="{embed.thumbnail?.height ?? 16}"
+															>
 														</a>
 													</div>
 												{/if}
@@ -365,7 +382,10 @@
 														<div class="chatlog__embed-images">
 															<div class="chatlog__embed-image-container">
 																<a class="chatlog__embed-image-link" href="{image.localFilePath}" target="_blank">
-																	<img class="chatlog__embed-image" src="{image.localFilePath}" alt="Image" loading="lazy">
+																	<img class="chatlog__embed-image" src="{image.localFilePath}" alt="Image" loading="lazy"
+																	width="{image?.width ?? 16}"
+																	height="{image?.height ?? 16}"
+																	>
 																</a>
 															</div>
 														</div>
@@ -406,6 +426,8 @@
 											alt="{reaction.emoji.name}"
 											src={reaction.emoji?.localFilePath}
 											loading="lazy"
+											width="{reaction.emoji?.width ?? 17}"
+											height="{reaction.emoji?.height ?? 17}"
 										/> <span class="chatlog__reaction-count">{reaction.count}</span>
 									</div>
 								{/each}
@@ -425,8 +447,16 @@
 
 <style>
 	.not-loaded {
-		height: 50px;
+		height: 75px;
 		width: 100%;
+	}
+
+	.msg-root {
+		/* background-color: #0faff4; */
+	}
+
+	.chatlog__message-group {
+		/* height: 5px !important; */
 	}
 
 	.thread-created {
@@ -455,5 +485,6 @@
 
 	.chatlog__attachment-media {
 		max-width: calc(100% - 10px);
+		object-position:left
 	}
 </style>

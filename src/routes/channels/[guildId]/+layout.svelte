@@ -1,4 +1,5 @@
 <script>
+	import { onDestroy, onMount } from 'svelte';
 	import Header from './Header.svelte';
 	import SearchResults from './SearchResults.svelte';
 	import { searched, found_messages } from './searchStores';
@@ -17,6 +18,22 @@
 		console.log('current guild', data.guild);
 	}
 	$: guildChanged(data);
+
+	let memoryInterval
+	let objectsCount = 0
+	let memoryUsage = {}
+	onMount(() => {
+		if (window?.performance?.memory?.usedJSHeapSize) {
+			memoryInterval = setInterval(() => {
+				memoryUsage = window.performance.memory
+				objectsCount = document.getElementsByTagName('*').length
+			}, 1000)
+		}
+	});
+
+	onDestroy(() => {
+		clearInterval(memoryInterval);
+	});
 </script>
 
 
@@ -24,6 +41,13 @@
 <div id="guild-layout" class={$searched ? 'with-search' : ''}>
 	<div id="channels">
 		<div class="guild-name">{data.guilds[data.guildId].name}</div>
+		{#if "usedJSHeapSize" in memoryUsage}
+		<div>
+			Memory used:<br>
+			{Math.round(memoryUsage.usedJSHeapSize / 1024 / 1024)} MB / {Math.round(memoryUsage.jsHeapSizeLimit / 1024 / 1024)} MB ({Math.round(memoryUsage.usedJSHeapSize / memoryUsage.jsHeapSizeLimit * 100)}%)<br>
+			Objects: {objectsCount}
+		</div>
+		{/if}
 		{#each Object.values(data.guild.categories) as category}
 			<div class="category">{category.name}</div>
 			{#each category.channelIds as channel}
@@ -66,6 +90,7 @@
 		{#if data.guildId != '0'}
 			<a href="/channels/{data.guildId}/continue">Backup helper</a>
 		{/if}
+
 	</div>
 	<div id="header">
 		{#key data.channelId}

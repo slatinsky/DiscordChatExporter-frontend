@@ -74,6 +74,11 @@ For development make sure you have nodemon installed globally (used for hot relo
 npm install -g nodemon
 ```
 
+Then install python3 dependencies
+```
+py -m pip install imagesize
+```
+
 Then run
 ```
 cd preprocessor

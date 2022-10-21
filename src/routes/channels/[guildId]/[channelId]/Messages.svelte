@@ -4,6 +4,7 @@
 	export let guild;
 	export let channelId;
 	export let search = false
+	export let rootId
 
 	// }
 
@@ -16,7 +17,7 @@
 
 {#key channelId}
 	{#if messages}
-		<MessageGroup messages={messages} splitMessages={messages} {guild} {search}></MessageGroup>
+		<MessageGroup messages={messages} splitMessages={messages} {guild} {search} {rootId}></MessageGroup>
 	{:else}
 		<div class="no-messages">No messages</div>
 	{/if}

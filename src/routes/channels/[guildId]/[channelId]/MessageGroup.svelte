@@ -6,6 +6,7 @@
 	export let splitMessages;
 	export let guild;
 	export let search = false
+	export let rootId
 
 	let messageCount = splitMessages.length;
 	let createGroup = messageCount > 16;
@@ -35,7 +36,8 @@
 				});
 			},
 			{
-				rootMargin: '100% 0px 100% 0px'
+				root: document.querySelector('#' + rootId),
+				rootMargin: '500% 0px',
 			}
 		);
 	}
@@ -63,8 +65,8 @@
 		data-mglast={search ? undefined : lastMessageId}
 	>
 		{#if loaded}
-			<svelte:self {messages} splitMessages={firstHalfMessages} {guild} {search}/>
-			<svelte:self {messages} splitMessages={secondHalfMessages} {guild} {search}/>
+			<svelte:self {messages} splitMessages={firstHalfMessages} {guild} {search} {rootId}/>
+			<svelte:self {messages} splitMessages={secondHalfMessages} {guild} {search} {rootId}/>
 		{:else}
 			<div class="not-loaded" style="height: {messageCount * 50}px;width: 100%;" />
 		{/if}
@@ -74,7 +76,7 @@
 		{#each splitMessages as message (message['id'])}
 			<!-- skip thread start msg -->
 			{#if message.type !== '21'}
-				<Message {message} {guild} {search}/>
+				<Message {message} {guild} {search} {rootId}/>
 			{/if}
 		{/each}
 	</div>

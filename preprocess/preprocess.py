@@ -6,6 +6,7 @@ from pprint import pprint
 import re
 import shutil
 from hashlib import sha256
+import imagesize
 
 def pad_id(id):
     return str(id).zfill(24)
@@ -193,9 +194,14 @@ class GuildPreprocess:
                     attachment['localFileName'])
                 attachment['extension'] = os.path.splitext(attachment['localFileName'])[-1].replace('.', '').lower()
 
+
                 # if image, tag it as such
                 if attachment['localFileName'] is not None and attachment['localFileName'].endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
                     attachment['type'] = 'image'
+                    try:
+                        attachment['width'], attachment['height'] = imagesize.get("../static/" + attachment['localFilePath'])
+                    except:
+                        pass
                 elif attachment['localFileName'] is not None and attachment['localFileName'].endswith(('.mp4', '.webm')):
                     attachment['type'] = 'video'
 
@@ -214,17 +220,33 @@ class GuildPreprocess:
                             embed["thumbnail"]["url"])
                         embed["thumbnail"]["localFilePath"] = self._find_filepath(
                             embed["thumbnail"]["localFileName"])
+        
+                    try:
+                        embed["thumbnail"]['width'], embed["thumbnail"]['height'] = imagesize.get("../static/" + embed["thumbnail"]['localFilePath'])
+                    except:
+                        pass
+
                 if "image" in embed and embed["image"] is not None:
                     embed["image"]["localFileName"] = self._calculate_filename(
                         embed["image"]["url"])
                     embed["image"]["localFilePath"] = self._find_filepath(
                         embed["image"]["localFileName"])
+
+                    try:
+                        embed["image"]['width'], embed["image"]['height'] = imagesize.get("../static/" + embed["image"]['localFilePath'])
+                    except:
+                        pass
                 if "images" in embed:
                     for image in embed["images"]:
                         image["localFileName"] = self._calculate_filename(
                             image["url"])
                         image["localFilePath"] = self._find_filepath(
                             image["localFileName"])
+
+                        try:
+                            image['width'], image['height'] = imagesize.get("../static/" + image['localFilePath'])
+                        except:
+                            pass
 
             # TODO: other embeds and stickers
 
@@ -233,12 +255,22 @@ class GuildPreprocess:
                 emoji['imageUrl'])
             emoji['localFilePath'] = self._find_filepath(
                 emoji['localFileName'])
+            
+            try:
+                emoji['width'], emoji['height'] = imagesize.get("../static/" + emoji['localFilePath'])
+            except:
+                pass
 
         for author in authors.values():
             author['localFileName'] = self._calculate_filename(
                 author['avatarUrl'])
             author['localFilePath'] = self._find_filepath(
                 author['localFileName'])
+            
+            try:
+                author['width'], author['height'] = imagesize.get("../static/" + author['localFilePath'])
+            except:
+                pass
 
         return messages
 
@@ -463,11 +495,19 @@ class Preprocess:
             print("Hash file does not exist")
             hash_from_file = None
 
+        # create hash of this script
+        if os.path.exists(__file__):
+            hash_of_script = sha256(open(__file__, 'rb').read()).hexdigest()
+        elif os.path.exists('preprocess.exe'):
+            hash_of_script = sha256(open('preprocess.exe', 'rb').read()).hexdigest()
+        else:
+            hash_of_script = ""
+            print("Could not find preprocess file")
 
         # create hash of all files
         # if hash is the same, then we can skip processing
         # because reprocessing takes a lot of time
-        new_hash = sha256((str(json_files) + str(media_filepaths)).encode('utf-8')).hexdigest()
+        new_hash = sha256((str(json_files) + str(media_filepaths) + hash_of_script).encode('utf-8')).hexdigest()
 
         if hash_from_file == new_hash:
             print("Hash is the same, skipping processing")
