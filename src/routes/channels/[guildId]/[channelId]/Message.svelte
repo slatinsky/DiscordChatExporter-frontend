@@ -93,8 +93,11 @@
 	function addReferencedMessage() {
 		if (message.reference) {
 			// console.log(message.reference);
-			message.referencedMessage =
-				guild.messages[message.reference.channelId][message.reference.messageId];
+			try {
+				message.referencedMessage = guild.messages[message.reference.channelId][message.reference.messageId];
+			} catch (e) {
+				console.warn("Couldn't find referenced message");  // if channel is not exported and we try to get first referenced message from thread
+			}
 			if (message.referencedMessage && message.referencedMessage?.authorId) {
 				message.referencedMessage.author = guild.authors[message.referencedMessage.authorId];
 				// delete message.referencedMessage.authorId;

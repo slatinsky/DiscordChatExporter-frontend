@@ -7,6 +7,10 @@ import re
 import shutil
 from hashlib import sha256
 
+def pad_id(id):
+    return str(id).zfill(24)
+    # return str(id).rjust(24, '0')
+
 
 class GuildPreprocess:
     def __init__(self, guild_id, input_dir, json_filepaths, media_filepaths):
@@ -15,12 +19,52 @@ class GuildPreprocess:
         self.json_filepaths = json_filepaths
         self.media_filepaths = media_filepaths
 
+    ## if any field in data has key 'id', pad it with zeros for fast sorting
+    def pad_ids(self, data):
+        data['guild']['id'] = pad_id(data['guild']['id'])
+        data['channel']['id'] = pad_id(data['channel']['id'])
+
+        data['channel']['categoryId'] = pad_id(data['channel']['categoryId'])
+
+
+        # for message in data.messages:
+        for message in data['messages']:
+            message['id'] = pad_id(message['id'])
+            message['author']['id'] = pad_id(message['author']['id'])
+
+            for reaction in message['reactions']:
+                reaction['emoji']['id'] = pad_id(reaction['emoji']['id'])
+
+            # mentions
+            for mention in message['mentions']:
+                mention['id'] = pad_id(mention['id'])
+
+            # attachments
+            for attachment in message['attachments']:
+                attachment['id'] = pad_id(attachment['id'])
+
+            # sticker
+            for sticker in message['stickers']:
+                sticker['id'] = pad_id(sticker['id'])
+
+            if 'reference' in message:
+                if message['reference']['messageId'] is not None:
+                    message['reference']['messageId'] = pad_id(message['reference']['messageId'])
+                if message['reference']['channelId'] is not None:
+                    message['reference']['channelId'] = pad_id(message['reference']['channelId'])
+                if message['reference']['guildId'] is not None:
+                    message['reference']['guildId'] = pad_id(message['reference']['guildId'])
+        return data
+
+
     def read_channels_messages_from_files(self):
         channels = {}
         messages = {}
         for path in self.json_filepaths:
             with open(path, 'r', encoding="utf8") as f:
+                print("Reading file: " + path)
                 data = json.load(f)
+                data = self.pad_ids(data)
                 channel = data['channel']
 
                 if channel['id'] not in channels:
@@ -300,6 +344,12 @@ class GuildPreprocess:
         # step 1 - read data from json files
         channels, messages = self.read_channels_messages_from_files()
 
+        # sort messages dict by key
+        messages = dict(sorted(messages.items()))
+
+        # sort channels dict by key
+        channels = dict(sorted(channels.items()))
+
         # print message count
         print("Message count: " + str(len(messages)))
 
@@ -452,7 +502,8 @@ class Preprocess:
                     continue
                 if 'guild' not in data:  # this is not a channel export, but a downloaded media json file
                     continue
-                guild_id = data['guild']['id']
+                guild_id = pad_id(data['guild']['id'])
+                data['guild']['id'] = guild_id
                 guilds[guild_id] = data['guild']
                 if guild_id not in json_paths_by_guild:
                     json_paths_by_guild[guild_id] = []

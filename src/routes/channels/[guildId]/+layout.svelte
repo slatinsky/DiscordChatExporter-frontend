@@ -63,6 +63,9 @@
 				</div>
 			{/each}
 		{/each}
+		{#if data.guildId != '0'}
+			<a href="/channels/{data.guildId}/continue">Backup helper</a>
+		{/if}
 	</div>
 	<div id="header">
 		{#key data.channelId}

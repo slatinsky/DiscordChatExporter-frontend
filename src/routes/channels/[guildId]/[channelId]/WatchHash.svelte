@@ -56,7 +56,7 @@
 			console.error('recursion depth exceeded');
 			return;
 		}
-		let elMessage = document.getElementById(messageId);
+		let elMessage = document.getElementById(messageId.toString().padStart(24, '0'));
 		if (elMessage) {
 			elMessage.scrollIntoView();
 			console.log('found message', messageId, "- recursion depth", recursionDepth);
@@ -87,7 +87,7 @@
 		if (bestRange) {
 			let first = bestRange[0];
 			let last = bestRange[1];
-			let el = document.querySelector('.message-group[data-mgfirst="' + first + '"][data-mglast="' + last + '"]')
+			let el = document.querySelector('.message-group[data-mgfirst="' + first.toString().padStart(24, '0') + '"][data-mglast="' + last.toString().padStart(24, '0') + '"]')
 				if (el) {
 					el.scrollIntoView();
 					setTimeout(() => {
@@ -127,6 +127,7 @@
 			try {
 				searchForMessageId(BigInt(messageId));
 			} catch (e) {
+				console.error(e);
 				console.warn("Url hash does not contain a valid message id");
 			}
 		}

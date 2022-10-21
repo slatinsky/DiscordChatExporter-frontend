@@ -13,6 +13,7 @@ View your JSON [DiscordChatExporter](Tyrrrz/DiscordChatExporter) exports as if y
 - View media files locally
 - Browse guild or direct messages
 - Discord Markdown rendering support
+- Command generator to extend your export with more messages (backup helper)
 
 
 
@@ -20,8 +21,16 @@ View your JSON [DiscordChatExporter](Tyrrrz/DiscordChatExporter) exports as if y
 Using prebuilt binaries is the easiest way to use this tool on Windows.
 1. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
 2. Extract the archive
-3. Move your JSON+media [DiscordChatExporter](Tyrrrz/DiscordChatExporter) exports to `/static/input/` folder ([supported exports](#custom_anchor_name)). Folder structure inside this folder doesn't matter, script will find everything it needs.
+3. Move your JSON+media [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/static/input/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs.
 4. Run `START_VIEWER.bat` - DiscordChatExporter-frontend will open in your default browser
+
+## Upgrade guide
+Want to upgrade from previous version? Follow these steps:
+
+1. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
+2. Extract the archive
+3. Move your `/static/input/` folder to the new release folder. DO NOT MOVE `/static/data/` folder, because the format is not compatible between releases.
+4. Delete old release folder
 
 ## Linux
 This tool uses Sveltekit and Python3 as main dependencies. You won't be able to run premade Windows batch scripts, but running this tool on Linux is possible. Linux support is WIP.
@@ -46,6 +55,10 @@ The main requirement is that media files (`--media True --reuse-media True`) are
 
 ## How to view threads
 - This viewer supports viewing threads, but they need to be exported by [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter). Export them the same way you export channels (`--channel`), but instead of CHANNEL_ID, use THREAD_ID. Because threads are channels.
+
+Don't know how to get THREAD_IDs? Handy backup helper is included to extend your backup and to find missing threads. You can find it at the end of channel list.
+
+![](docs/backup_helper.png)
 
 # Development
 You don't need to follow development steps if you don't need to modify the code.
@@ -176,13 +189,13 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 
 
 ## Roadmap / planned features:
-- rerun preprocess only if it is needed
 - Better handling of edge cases (if something is missing in the backup)
 - Better GUI
 - make readme easy to understand
 - Linux support (docker?)
 - Improve code readability
-- Discord forums support
+- online mode - view media files directly from Discord servers
+- Discord forums support - waiting for DiscordChatExporter export support
 
 ## Why this tool was made
 [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) is a well made tool to export Discord chats. But to actually view them, you had to download them in HTML format, which more inconvenient to parse than JSON. And If you wanted to extend your backup, it would be broken into multiple files, which is not very convenient.
