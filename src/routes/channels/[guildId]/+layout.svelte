@@ -2,11 +2,8 @@
 	import { onDestroy, onMount } from 'svelte';
 	import Header from './Header.svelte';
 	import SearchResults from './SearchResults.svelte';
-	import { searched, found_messages } from './searchStores';
+	import { searched, found_messages, filters } from './searchStores';
 	export let data;
-
-	$: console.warn('found_messages', found_messages);
-	$: console.warn('searched', searched);
 
 	let currentGuildId = data.guildId;
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time
@@ -106,7 +103,10 @@
 	</div>
 	{#if $searched}
 		<div id="search">
-			<SearchResults guild={data.guild} />
+			{#key $filters}
+				<SearchResults guild={data.guild} />
+			{/key}
+			
 		</div>
 	{/if}
 </div>

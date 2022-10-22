@@ -19,6 +19,7 @@
 	let firstMessageId;
 	let lastMessageId;
 
+	// console.error('createGroup', document.querySelector('#' + rootId));
 	if (createGroup) {
 		firstMessageId = splitMessages[0].id;
 		lastMessageId = splitMessages[splitMessages.length - 1].id;
@@ -36,14 +37,14 @@
 				});
 			},
 			{
-				root: document.querySelector('#' + rootId),
+				root: rootId,
 				rootMargin: '500% 0px',
 			}
 		);
 	}
 
+
 	onMount(() => {
-		// console.log('onMount');
 		if (createGroup) {
 			observer.observe(root);
 		}
@@ -51,7 +52,7 @@
 
 	onDestroy(() => {
 		// console.log('onDestroy');
-		if (createGroup) {
+		if (observer) {
 			observer.disconnect();
 		}
 	});

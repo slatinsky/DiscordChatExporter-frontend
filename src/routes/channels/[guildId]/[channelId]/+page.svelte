@@ -13,6 +13,8 @@
 
 	});
 
+    let mainChatlog
+
 </script>
 
 <svelte:head>
@@ -27,7 +29,7 @@
         <!-- {#each data.messages as message} -->
             <!-- <Message message={message}/> -->
         <!-- {/each} -->
-    <div class="chatlog" id="main-chatlog">
+    <div class="chatlog" id="main-chatlog" bind:this={mainChatlog}>
         <div class=chatlog__message-group>
             <div id="top" />
             {#key data.channelId}
@@ -37,7 +39,9 @@
                 </div>
                 {/if}
             {/key}
-            <Messages messages={Object.values(data.messages)} guild={data.guild} guildId={data.guildId} channelId={data.channelId} rootId="main-chatlog"/>
+            {#if mainChatlog}
+                <Messages messages={Object.values(data.messages)} guild={data.guild} guildId={data.guildId} channelId={data.channelId} rootId={mainChatlog}/>
+            {/if}
             <div id="bottom" />
         </div>
     </div>
@@ -62,7 +66,7 @@
 
  .chatlog {
      overflow-y: auto;
-     max-height: calc(100vh - 96px);
+     max-height: calc(100vh - 88px);
      margin-right: 5px;
  }
 

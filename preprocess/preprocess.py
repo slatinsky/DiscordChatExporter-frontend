@@ -146,9 +146,15 @@ class GuildPreprocess:
             author['message_id'] = message['id']
             if author['id'] not in authors:  # new author
                 authors[author['id']] = author
+                authors[author['id']]['messagesCount'] = 0
+
             # extract author information from his last message (by message id)
             elif authors[author['id']]['message_id'] < message['id']:
-                authors[author['id']] = author
+                messages_count = authors[author['id']]['messagesCount']
+                authors[author['id']] = author  # overwrite the same author with more recent data
+                authors[author['id']]['messagesCount'] = messages_count
+
+            authors[author['id']]['messagesCount'] += 1
 
         # cleanup temp message_ids
         for author in authors.values():
@@ -159,6 +165,9 @@ class GuildPreprocess:
             message['authorId'] = message['author']['id']
             del message['author']
 
+        # order authors by messagesCount desc
+        authors = {k: v for k, v in sorted(authors.items(), key=lambda item: item[1]['messagesCount'], reverse=True)}
+
         return messages, authors
 
     def extract_emoji(self, messages):
@@ -166,13 +175,23 @@ class GuildPreprocess:
         for message in messages.values():
             for reaction in message['reactions']:
                 if reaction['emoji']['id'] == "":
-                    emojis[reaction['emoji']['name']] = reaction['emoji']
-                    reaction['emojiName'] = reaction['emoji']['name']
+                    emoji_id = reaction['emoji']['name']
                 else:
-                    emojis[reaction['emoji']['id']] = reaction['emoji']
-                    reaction['emojiId'] = reaction['emoji']['id']
+                    emoji_id = reaction['emoji']['id'] + "_" + reaction['emoji']['name']
 
+                if emoji_id not in emojis:
+                    reaction['emoji']['usedCount'] = reaction['count']
+                    emojis[emoji_id] = reaction['emoji']
+                else:
+                    reaction['emoji']['usedCount'] = emojis[emoji_id]['usedCount'] + reaction['count']
+                    emojis[emoji_id] = reaction['emoji']
+
+                emojis[emoji_id]['key'] = emoji_id
+                reaction['emojiId'] = emoji_id
                 del reaction['emoji']
+
+        # order emojis by usedCount desc
+        emojis = {k: v for k, v in sorted(emojis.items(), key=lambda item: item[1]['usedCount'], reverse=True)}
 
         return messages, emojis
 
@@ -183,8 +202,10 @@ class GuildPreprocess:
                 if 'extension' in attachment:
                     # extensions.add(attachment['extension'])
                     # extensions.add(os.path.splitext(attachment['localFileName'])[-1].replace('.', '').lower())
-                    extensions.add(os.path.splitext(attachment['extension']))
-        return list(extensions)
+                    extensions.add(os.path.splitext(attachment['extension'])[0])
+        exten_list = list(extensions)
+        exten_list.sort()
+        return exten_list
 
 
     def _calculate_filename(self, url):
@@ -330,6 +351,14 @@ class GuildPreprocess:
             if channel_id not in messages_by_channel:
                 messages_by_channel[channel_id] = {}
             messages_by_channel[channel_id][message['id']] = message
+
+        # add messageCount to channels
+        for channel in channels.values():
+            channel_id = channel['id']
+            if channel_id in messages_by_channel:
+                channel['messageCount'] = len(messages_by_channel[channel_id])
+            else:
+                channel['messageCount'] = 0
 
         # spli channels into threads or normal channels
         threads = {}

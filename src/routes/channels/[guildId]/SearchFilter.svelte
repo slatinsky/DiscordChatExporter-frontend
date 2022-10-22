@@ -148,21 +148,16 @@
 	function filterChannels(channels, _) {
 		return Object.values(channels).filter((channel) =>
 			channel.name.toLowerCase().includes(parsedCursorHere.value.toLowerCase())
-		);
+		).sort((a, b) => {
+			// sort by messageCount
+			return b.messageCount - a.messageCount;
+		});
 	}
 	
 	function filterEmojis(emojis, _) {
 		return Object.values(emojis).filter((emoji) =>
 			emoji.name.toLowerCase().includes(parsedCursorHere.value.toLowerCase())
-		).sort((a, b) => {
-			if (a.name < b.name) {
-				return -1;
-			} else if (a.name > b.name) {
-				return 1;
-			} else {
-				return 0;
-			}
-		});
+		)
 	}
 
 	function filterFiletypes(extensions, _) {
@@ -183,12 +178,15 @@
 			console.log('channelMessages.length', channelMessages.length);
 
 			for (const filter of filters) {
+				
 				if (filter.content) {
 					channelMessages = channelMessages.filter((message) => {
 						return normalizeSearchTerm(message.content).includes(
 							normalizeSearchTerm(filter.content)
 						);
 					});
+				} else if (filter.key !== '' && filter.value === '') {
+					// incomplete filter, ignoring
 				} else if (filter.key === 'from') {
 					let author = Object.values(authors).find((author) => {
 						return author.name.replace(' ', '_') + '#' + author.discriminator === filter.value;
@@ -262,7 +260,7 @@
 					channelMessages = channelMessages.filter((message) => {
 						return (
 							message.reactions &&
-							message.reactions.some((reaction) => reaction.emojiName === filter.value || reaction.emojiId === emoji.id)
+							message.reactions.some((reaction) => reaction.emojiId.includes(filter.value))
 						);
 					});
 				} else if (filter.key === 'has' && filter.value === 'reaction') {
@@ -342,6 +340,7 @@
 
 		// set found messages
 		$found_messages = found_messages_temp;
+		$searched = true;
 	}
 
 	console.log('----', guild.channels);
@@ -369,10 +368,15 @@
 					selectedMenuIndex--;
 					e.preventDefault();
 				}
+				// if enter
+				else if (e.key === 'Enter') {
+					e.target.blur()
+					findMessages()
+				}
 			}}
 			on:input={() => inputValueChanged(value)}
 		/>
-		<button on:click={findMessages}>Find</button>
+		<button on:click={findMessages} id="search-submit-btn">Search</button>
 	</div>
 
 	{#if isInputFocused}
@@ -387,6 +391,8 @@
 						>
 							<img class="avatar" src={author?.localFilePath} alt="Avatar" loading="lazy" />
 							<div>{author.nickname} ({author.name}#{author.discriminator})</div>
+							<div class="spacer"></div>
+							<div>{author.messagesCount}x</div>
 						</div>
 					{/key}
 				{/each}
@@ -398,6 +404,7 @@
 							on:click={() => selectOptionValue(channel.name.replaceAll(' ', '_'))}
 						>
 							# {channel.name}
+							<div>({channel.messageCount}x)</div>
 						</div>
 					{/key}
 				{/each}
@@ -409,7 +416,7 @@
 							class="emoji search-option"
 							on:click={() => selectOptionValue(emoji.name)}
 						>
-							<img class="emoji" src={emoji?.localFilePath} alt="Emoji" loading="lazy" width="30" height="30" title={emoji.name} />
+							<img class="emoji" src={emoji?.localFilePath} alt="Emoji" loading="lazy" width="30" height="30" title={emoji.name+" (" + emoji.usedCount + "x)"} />
 						</div>
 					{/key}
 				{/each}
@@ -512,6 +519,11 @@
 
 <!-- <SearchResults {found_messages} {guild} /> -->
 <style>
+
+
+	.spacer {
+		width: 100%;
+	}
 	input {
 		/* width: 100%; */
 		width: 250px;
@@ -532,13 +544,16 @@
 		background-color: #18191c;
 		border-radius: 5px;
 		padding: 2px 5px;
-		max-width: 500px;
-		min-width: 300px;
+		max-width: 700px;
+		min-width: 500px;
 
 		position: absolute;
 		top: 50px;
+		right: 50px;
 
 		z-index: 100;
+		max-height: 70vh;
+		overflow-y: auto;
 	}
 	.search-option {
 		padding: 5px 5px;
@@ -553,6 +568,7 @@
 	.author {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: 15px;
 		margin: 15px 30px;
 	}
@@ -564,13 +580,32 @@
 	.search-input-container {
 		display: flex;
 		align-items: center;
-		gap: 15px;
+		/* gap: 15px; */
 		/* margin: 15px 30px; */
+	}
+
+	#search-submit-btn {
+		height: 100%;
+		background: none;
+		border: none;
+		background-color: #DCDDDE;
+		color: #18191c;
+		cursor: pointer;
+		padding: 5px 10px;
+		/* width: 60px; */
 	}
 
 	.emoji-search-container {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
+	}
+
+	.channel{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 15px;
+		/* margin: 5px 30px; */
 	}
 </style>

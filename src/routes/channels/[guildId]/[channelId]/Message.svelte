@@ -31,7 +31,7 @@
 			});
 		},
 		{
-			root: document.querySelector('#' + rootId),
+			root: rootId,
 			rootMargin: '200% 0px',
 			threshold: 0
 		}
