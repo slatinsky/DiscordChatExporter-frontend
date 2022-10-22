@@ -8,9 +8,44 @@ import shutil
 from hashlib import sha256
 import imagesize
 
+def is_compiled():
+    if os.path.exists(__file__):
+        return False
+    elif os.path.exists('preprocess.exe'):
+        return True
+    else:
+        raise Exception('Cannot determine if compiled or not')
+
+if is_compiled():
+    print('Running compiled version of preprocess.py')
+    # Production settings
+    DEV = False
+    SKIP_PREPROCESSING_IMAGES = False
+else:
+    print('Running uncompiled version of preprocess.py')
+    # Dev settings
+    DEV = True
+    SKIP_PREPROCESSING_IMAGES = False
+
 def pad_id(id):
     return str(id).zfill(24)
     # return str(id).rjust(24, '0')
+
+class Progress:
+    def __init__(self, objects, name=''):
+        self.total = len(objects)
+        self.increments = round(self.total / 100)
+        self.iteration = 0
+        self.name = name
+
+    def increment(self):
+        self.iteration += 1
+        if self.iteration % self.increments == 0:
+            print("  ", self.name, self.iteration, "/", self.total, '(' + str(round(self.iteration / self.total * 100)) + '%)', end="\r") # print progress
+
+    def finish(self):
+        print("  ", self.name, "done                                     ")
+
 
 
 class GuildPreprocess:
@@ -61,9 +96,10 @@ class GuildPreprocess:
     def read_channels_messages_from_files(self):
         channels = {}
         messages = {}
+        
         for path in self.json_filepaths:
             with open(path, 'r', encoding="utf8") as f:
-                print("Reading file: " + path)
+                # print("Reading file: " + path)
                 data = json.load(f)
                 data = self.pad_ids(data)
                 channel = data['channel']
@@ -129,7 +165,7 @@ class GuildPreprocess:
         emojis = {}
         for message in messages.values():
             for reaction in message['reactions']:
-                if reaction['emoji']['id'] is "":
+                if reaction['emoji']['id'] == "":
                     emojis[reaction['emoji']['name']] = reaction['emoji']
                     reaction['emojiName'] = reaction['emoji']['name']
                 else:
@@ -144,7 +180,10 @@ class GuildPreprocess:
         extensions = set()
         for message in messages.values():
             for attachment in message['attachments']:
-                extensions.add(os.path.splitext(attachment['localFileName'])[-1].replace('.', '').lower())
+                if 'extension' in attachment:
+                    # extensions.add(attachment['extension'])
+                    # extensions.add(os.path.splitext(attachment['localFileName'])[-1].replace('.', '').lower())
+                    extensions.add(os.path.splitext(attachment['extension']))
         return list(extensions)
 
 
@@ -176,7 +215,8 @@ class GuildPreprocess:
             return filepath
         else:
             if not ignore_not_found:
-                print("File not found: " + filename)
+                pass
+                # print("File not found: " + filename)
             return None
 
     def calculateGuildFilename(self, guild):
@@ -184,93 +224,100 @@ class GuildPreprocess:
         guild['localFilePath'] = self._find_filepath(guild['localFileName'])
         return guild
 
+    def calculateLocalFileAttributes(self, object, url1, url2=None):
+        if url1 is None:  # no url
+            return object
+
+        file_name = self._calculate_filename(url1)
+        file_path = self._find_filepath(file_name)
+
+        if url2 is None and file_path is None:  # local file for url1 not found
+            # print("File not found (url1): " + file_name)
+            return object
+
+        if url2 is not None:  # url2 is set, check it
+            file_name = self._calculate_filename(url2)
+            file_path = self._find_filepath(file_name)
+
+        if file_path is None:  # local file for url2 not found
+            # print("File not found (url2): " + file_name)
+            return object
+
+        # now we know that the local file exists
+        extension = os.path.splitext(file_name)[-1].replace('.', '').lower()
+
+        # if image
+        if extension is not None and extension in ('png', 'jpg', 'jpeg', 'gif', 'webp'):
+            # calculate dimension
+            object_type = 'image'
+            if not SKIP_PREPROCESSING_IMAGES:
+                try:
+                    # imagesize library reads the dimensions from header. It is much faster than by loading the image with PIL
+                    object['width'], object['height'] = imagesize.get("../static/" + file_path)
+                except:
+                    # imagesize doesn't support this image format
+                    print("imagesize library doesn't support this image format: " + file_path)
+                    pass
+        # if video=
+        elif extension is not None and extension in ('mp4', 'webm'):
+            object_type = 'video'
+        elif extension is not None and extension in('mp3', 'ogg', 'wav'):
+            # if audio, tag it as such
+            object_type = 'audio'
+        else:
+            # if unknown, tag it as such
+            object_type = 'unknown'
+
+        # save found info to object
+        object['localFileName'] = file_name
+        object['localFilePath'] = file_path
+        object['extension'] = extension
+        object['type'] = object_type
+        return object
+
+
+
+
     def calculate_local_filenames(self, messages, authors, emojis):
+        progress = Progress(messages, 'step 1/3')
         for message in messages.values():
             # calculate attachement filenames
             for attachment in message['attachments']:
-                attachment['localFileName'] = self._calculate_filename(
-                    attachment['url'])
-                attachment['localFilePath'] = self._find_filepath(
-                    attachment['localFileName'])
-                attachment['extension'] = os.path.splitext(attachment['localFileName'])[-1].replace('.', '').lower()
-
-
-                # if image, tag it as such
-                if attachment['localFileName'] is not None and attachment['localFileName'].endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
-                    attachment['type'] = 'image'
-                    try:
-                        attachment['width'], attachment['height'] = imagesize.get("../static/" + attachment['localFilePath'])
-                    except:
-                        pass
-                elif attachment['localFileName'] is not None and attachment['localFileName'].endswith(('.mp4', '.webm')):
-                    attachment['type'] = 'video'
+                attachment = self.calculateLocalFileAttributes(attachment, attachment['url'])
 
             # calculate embed filenames
             for embed in message['embeds']:
                 if "thumbnail" in embed and embed["thumbnail"] is not None:
-                    # image embed is calculated from embed["url"]
-                    embed["thumbnail"]["localFileName"] = self._calculate_filename(
-                        embed["url"])
-                    embed["thumbnail"]["localFilePath"] = self._find_filepath(
-                        embed["thumbnail"]["localFileName"], ignore_not_found=True)
-
-                    # non image embeds is calculated from embed["thumbnail"]["url"]
-                    if (embed["thumbnail"]["localFilePath"] is None):
-                        embed["thumbnail"]["localFileName"] = self._calculate_filename(
-                            embed["thumbnail"]["url"])
-                        embed["thumbnail"]["localFilePath"] = self._find_filepath(
-                            embed["thumbnail"]["localFileName"])
-        
-                    try:
-                        embed["thumbnail"]['width'], embed["thumbnail"]['height'] = imagesize.get("../static/" + embed["thumbnail"]['localFilePath'])
-                    except:
-                        pass
+                    embed["thumbnail"] = self.calculateLocalFileAttributes(embed["thumbnail"], embed["url"], embed["thumbnail"]["url"])
 
                 if "image" in embed and embed["image"] is not None:
-                    embed["image"]["localFileName"] = self._calculate_filename(
-                        embed["image"]["url"])
-                    embed["image"]["localFilePath"] = self._find_filepath(
-                        embed["image"]["localFileName"])
+                    embed["image"] = self.calculateLocalFileAttributes(embed["image"], embed["image"]["url"])
 
-                    try:
-                        embed["image"]['width'], embed["image"]['height'] = imagesize.get("../static/" + embed["image"]['localFilePath'])
-                    except:
-                        pass
                 if "images" in embed:
                     for image in embed["images"]:
-                        image["localFileName"] = self._calculate_filename(
-                            image["url"])
-                        image["localFilePath"] = self._find_filepath(
-                            image["localFileName"])
+                        image = self.calculateLocalFileAttributes(image, image["url"])
 
-                        try:
-                            image['width'], image['height'] = imagesize.get("../static/" + image['localFilePath'])
-                        except:
-                            pass
-
+            progress.increment()
+        progress.finish()
             # TODO: other embeds and stickers
 
-        for emoji in emojis.values():
-            emoji['localFileName'] = self._calculate_filename(
-                emoji['imageUrl'])
-            emoji['localFilePath'] = self._find_filepath(
-                emoji['localFileName'])
-            
-            try:
-                emoji['width'], emoji['height'] = imagesize.get("../static/" + emoji['localFilePath'])
-            except:
-                pass
 
+        progress = Progress(messages, 'step 2/3')
+        for emoji in emojis.values():
+            if "imageUrl" in emoji:
+                emoji = self.calculateLocalFileAttributes(emoji, emoji["imageUrl"])
+            else:
+                print("Emoji without imageUrl: " + emoji["name"])
+
+            progress.increment()
+        progress.finish()
+
+        progress = Progress(messages, 'step 3/3')
         for author in authors.values():
-            author['localFileName'] = self._calculate_filename(
-                author['avatarUrl'])
-            author['localFilePath'] = self._find_filepath(
-                author['localFileName'])
-            
-            try:
-                author['width'], author['height'] = imagesize.get("../static/" + author['localFilePath'])
-            except:
-                pass
+            author = self.calculateLocalFileAttributes(author, author["avatarUrl"])
+
+            progress.increment()
+        progress.finish()
 
         return messages
 
@@ -346,8 +393,9 @@ class GuildPreprocess:
         os.makedirs(output_dir)  # recreate the directory
 
     def write_json(self, data, filename):
-        with open(filename, 'w', encoding="utf8") as f:
-            json.dump(data, f, indent=4)
+        if not is_compiled():
+            with open(filename, 'w', encoding="utf8") as f:
+                json.dump(data, f, indent=4)
 
         # minified
         with open(filename.replace('.json', '.min.json'), 'w', encoding="utf8") as f:
@@ -368,51 +416,51 @@ class GuildPreprocess:
                 
                 # print("ThreadCreated: " + newThreadChannelId)
 
-        pprint(thread_id_to_message_id)
+        # pprint(thread_id_to_message_id)
 
         return thread_id_to_message_id
 
     def process(self):
-        # step 1 - read data from json files
+        print("Step 1 - Reading data from json files...")
         channels, messages = self.read_channels_messages_from_files()
 
+        print("Step 2 - Sorting messages and channels...")
         # sort messages dict by key
         messages = dict(sorted(messages.items()))
-
         # sort channels dict by key
         channels = dict(sorted(channels.items()))
 
         # print message count
         print("Message count: " + str(len(messages)))
 
-        # step 2 - extract author information from messages
+        print("Step 3 - Deduplicating authors...")
         messages, authors = self.extract_authors(messages)
 
-        # step 3 - extract emoji information from messages
+        print("Step 4 - Deduplicating reactions...")
         messages, emojis = self.extract_emoji(messages)
 
+        print("Step 5 - Finding and preprocessing referenced local filenames...")
         messages = self.calculate_local_filenames(messages, authors, emojis)
 
+        print("Step 6 - Getting file extensions...")
         extensions = self._get_extensions(messages)
 
-
-
-
-        # step 4 - cleanup empty fields
+        print("Step 7 - Removing unused fields...")
         messages = self.cleanup_empty_fields(messages)
 
-        # step 5 - cleanup existing output directory
         output_dir = '../static/data/' + self.guild_id + '/'
+        print("Step 8 - Deleting cache directory '" + output_dir + "'...")
         self.cleanup_out_directory(output_dir)
 
-        # step 6 - grouping to single json file
         # group messages by channels
+        print("Step 9 - Grouping messages by channel...")
         messages_by_channel, categories, threads = self.group_messages_and_channels(
             messages, channels)
 
         # get message ids
         message_ids = list(messages.keys())
 
+        print("Step 9 - Creating lookup thread ids -> to message ids...")
         thread_id_to_message_id = self.get_thread_id_to_message_id(messages, messages_by_channel, threads)
 
         # group channels and others attributes to single dict
@@ -429,7 +477,7 @@ class GuildPreprocess:
             'messages': messages_by_channel,
         }
 
-        # step 7 - write data to json files
+        print("Step 10 - Writing guild JSON...")
         self.write_json(guild, output_dir + 'guild.json')
 
 
@@ -479,8 +527,8 @@ class Preprocess:
     #     return
 
     def should_process(self, json_files, media_filepaths):
-        file_count = len(json_files) + len(media_filepaths)
-        print("Found " + str(file_count) + " files")
+        print("Found " + str(len(json_files)) + " JSON files")
+        print("Found " + str(len(media_filepaths)) + " media files\n")
 
         # make directory if it doesn't exist
         if not os.path.exists('../static/data'):
@@ -510,14 +558,14 @@ class Preprocess:
         new_hash = sha256((str(json_files) + str(media_filepaths) + hash_of_script).encode('utf-8')).hexdigest()
 
         if hash_from_file == new_hash:
-            print("Hash is the same, skipping processing")
+            print("Hash is the same, /static/data is up to date")
             return False
         else:
             # write new hash to file
             with open('../static/data/hash.txt', 'w') as f:
                 f.write(new_hash)
 
-            print("Hash is different, processing")
+            print("Hash is different, /static/data is not up to date")
             return True
 
 
@@ -526,11 +574,12 @@ class Preprocess:
         media_filepaths = self._find_all_mediafiles_paths(self.input_directory)
 
         if not self.should_process(json_files, media_filepaths):
-            print("Skipping processing")
             return
 
         guilds = {}
 
+        print("\nSorting JSONs by guild_id...")
+        progress = Progress(json_files, '')
         # sort filenames by guild to attempt to split ram usage
         json_paths_by_guild = {}
         for filename in json_files:  # each filename contains channel/thread dump
@@ -550,18 +599,26 @@ class Preprocess:
 
                 json_paths_by_guild[guild_id].append(filename)
 
+            progress.increment()
+        progress.finish()
+
         # loop through each guild
         for guild_id, json_filepaths in json_paths_by_guild.items():
+            print("\nProcessing guild '" + guilds[guild_id]['name'] + "'")
             gp = GuildPreprocess(guild_id, self.input_directory,
                                  json_filepaths, media_filepaths)
             guilds[guild_id] = gp.calculateGuildFilename(guilds[guild_id])
             gp.process()
 
+        print("\nWriting guild list JSON")
         # write guilds to json file
-        with open('../static/data/guilds.json', 'w', encoding="utf8") as f:
-            json.dump(guilds, f, indent=4)
+        if not is_compiled():
+            with open('../static/data/guilds.json', 'w', encoding="utf8") as f:
+                json.dump(guilds, f, indent=4)
         with open('../static/data/guilds.min.json', 'w', encoding="utf8") as f:
             json.dump(guilds, f)
+
+        print("PREPROCESS DONE")
 
     def get_files(self):
         return self.files
