@@ -8,4 +8,4 @@
     $: process(content)
 </script>
 
-<div>{@html processedContent}</div>
+<span>{@html processedContent}</span>

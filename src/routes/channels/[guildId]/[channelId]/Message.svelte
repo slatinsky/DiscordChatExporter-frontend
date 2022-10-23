@@ -2,7 +2,7 @@
 	import { nameRenderer } from '../../../settingsStore';
 	import { onMount, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import MessageContent from './MessageContent.svelte';
+	import MessageMarkdown from './MessageMarkdown.svelte';
 	import { renderTimestamp } from '../../../time';
 
 	export let message;
@@ -142,6 +142,7 @@
 								loading="lazy"
 								width="{message.author?.width ?? 40}"
 								height="{message.author?.height ?? 40}"
+								onerror="this.style.visibility='hidden'"
 							/>
 						{/if}
 					</div>
@@ -184,6 +185,7 @@
 											loading="lazy"
 											width="{message.referencedMessage.author?.width ?? 16}"
 											height="{message.referencedMessage.author?.height ?? 16}"
+											onerror="this.style.visibility='hidden'"
 										/>
 										<div
 											class="chatlog__reference-author"
@@ -216,7 +218,7 @@
 							</div>
 							<div class="chatlog__content chatlog__markdown">
 								<span class="chatlog__markdown-preserve"
-									><MessageContent content={message.content} /></span
+									><MessageMarkdown content={message.content} /></span
 								>
 								{#if message.timestampEdited != null}
 									<span class="chatlog__edited-timestamp" title={message.timestampEdited}
@@ -238,6 +240,7 @@
 													
 													width="{attachment?.width ?? 16}"
 													height="{attachment?.height ?? 16}"
+													onerror="this.style.visibility='hidden'"
 												/>
 											</a>
 										</div>
@@ -327,10 +330,10 @@
 													<div class="chatlog__embed-title">
 														{#if embed.url}
 															<a class="chatlog__embed-title-link" href="@embed.Url">
-																<div class="chatlog__markdown chatlog__markdown-preserve">{embed.title}</div>
+																<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} /></div>
 															</a>
 														{:else}
-															<div class="chatlog__markdown chatlog__markdown-preserve">{embed.title}</div>
+															<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} /></div>
 														{/if}
 													</div>
 												{/if}
@@ -338,7 +341,7 @@
 												<!-- @{/* Embed description */} -->
 												{#if embed.description}
 													<div class="chatlog__embed-description">
-														<div class="chatlog__markdown chatlog__markdown-preserve">{embed.description}</div>
+														<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.description} /></div>
 													</div>
 												{/if}
 
@@ -349,13 +352,13 @@
 															<div class="chatlog__embed-field">
 																{#if field.name}
 																	<div class="chatlog__embed-field-name">
-																		<div class="chatlog__markdown chatlog__markdown-preserve">{field.name}</div>
+																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.name} /></div>
 																	</div>
 																{/if}
 
 																{#if field.value}
 																	<div class="chatlog__embed-field-value">
-																		<div class="chatlog__markdown chatlog__markdown-preserve">{field.value}</div>
+																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.value} /></div>
 																	</div>
 																{/if}
 															</div>
@@ -368,10 +371,18 @@
 												{#if embed.thumbnail}
 													<div class="chatlog__embed-thumbnail-container">
 														<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.localFilePath}" target="_blank">
-															<img class="chatlog__embed-thumbnail" src="{embed.thumbnail?.localFilePath}" alt="Thumbnail" loading="lazy"
-															width="{embed.thumbnail?.width ?? 16}"
-															height="{embed.thumbnail?.height ?? 16}"
-															>
+															<!-- {console.warn(embed.thumbnail.type)} -->
+															{#if embed.thumbnail.type === 'video'}
+																<video class="chatlog__embed-thumbnail-video" src="{embed.thumbnail?.localFilePath}" autoplay loop muted playsinline
+																width="{embed.thumbnail?.width ?? 16}"
+																height="{embed.thumbnail?.height ?? 16}"/>
+															{:else}
+																<img class="chatlog__embed-thumbnail" src="{embed.thumbnail?.localFilePath}" alt="Thumbnail" loading="lazy"
+																width="{embed.thumbnail?.width ?? 16}"
+																height="{embed.thumbnail?.height ?? 16}"
+																onerror="this.style.visibility='hidden'"
+																>
+															{/if}
 														</a>
 													</div>
 												{/if}
@@ -385,6 +396,7 @@
 																	<img class="chatlog__embed-image" src="{image.localFilePath}" alt="Image" loading="lazy"
 																	width="{image?.width ?? 16}"
 																	height="{image?.height ?? 16}"
+																	onerror="this.style.visibility='hidden'"
 																	>
 																</a>
 															</div>
@@ -396,7 +408,7 @@
 												{#if embed.footer}
 													<div class="chatlog__embed-footer">
 														{#if embed.footer.localFilePath}
-															<img class="chatlog__embed-footer-icon" src="{embed.footer.localFilePath}" alt="Footer icon" loading="lazy">
+															<img class="chatlog__embed-footer-icon" src="{embed.footer.localFilePath}" alt="Footer icon" loading="lazy" onerror="this.style.visibility='hidden'">
 														{/if}
 
 														<span class="chatlog__embed-footer-text">
@@ -428,6 +440,7 @@
 											loading="lazy"
 											width="{reaction.emoji?.width ?? 17}"
 											height="{reaction.emoji?.height ?? 17}"
+											onerror="this.style.visibility='hidden'"
 										/> <span class="chatlog__reaction-count">{reaction.count}</span>
 									</div>
 								{/each}
@@ -486,5 +499,9 @@
 	.chatlog__attachment-media {
 		max-width: calc(100% - 10px);
 		object-position:left
+	}
+
+	.chatlog__embed-thumbnail-video {
+		max-width: 100%;
 	}
 </style>

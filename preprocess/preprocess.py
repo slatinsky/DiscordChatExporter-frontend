@@ -34,26 +34,37 @@ def pad_id(id):
 class Progress:
     def __init__(self, objects, name=''):
         self.total = len(objects)
-        self.increments = round(self.total / 100)
+        self.increments = max(round(self.total / 100), 1)
         self.iteration = 0
         self.name = name
 
     def increment(self):
         self.iteration += 1
-        if self.iteration % self.increments == 0:
+        if self.total > 0 and self.iteration % self.increments == 0:
             print("  ", self.name, self.iteration, "/", self.total, '(' + str(round(self.iteration / self.total * 100)) + '%)', end="\r") # print progress
 
     def finish(self):
-        print("  ", self.name, "done                                     ")
+        if self.name != '':
+            print("  ", self.name, "done                                     ")
+        else:
+            print("  ", "done                                     ")
 
 
 
 class GuildPreprocess:
-    def __init__(self, guild_id, input_dir, json_filepaths, media_filepaths):
+    def __init__(self, guild_id, input_dir, json_filepaths, media_filepaths, ids_from_html):
         self.input_dir = input_dir
         self.guild_id = guild_id
         self.json_filepaths = json_filepaths
         self.media_filepaths = media_filepaths
+        self.ids_from_html = ids_from_html
+
+        # loop throught ids_from_html and find 'hello world'
+        for id_ in self.ids_from_html:
+            # if includes
+            if 'hello world' in id_:
+                print(id_)
+                exit()
 
     ## if any field in data has key 'id', pad it with zeros for fast sorting
     def pad_ids(self, data):
@@ -209,35 +220,49 @@ class GuildPreprocess:
 
 
     def _calculate_filename(self, url):
-        """calculate the filename based on the data"""
+        """
+        calculate the filename based on the data
+        """
         if url is None:
             return ""
         is_url = re.match(r'^https?://', url)
 
-        filename = url.replace('\\', '/').split('/')[-1]
+        # filename = url.replace('\\', '/').split('/')[-1]
 
         if is_url:  # calculate filename for url
+            # should be reimplemented the same way as https://github.com/Tyrrrz/DiscordChatExporter/blob/38be44debbd25f73eef4f7c51c6af7420626d261/DiscordChatExporter.Core/Exporting/MediaDownloader.cs#L89 in javascript
+            # C#: var fileName = Regex.Match(url, @".+/([^?]*)").Groups[1].Value;
+            filename = re.match(r'.+/([^?]*)', url).groups()[0]
+            filename_without_ext, filename_ext = os.path.splitext(filename)
+
+            if len(filename_ext) > 41:
+                filename_without_ext = filename
+                filename_ext = ""
+
+            # if filename == "":
+            #     filename = url.replace('\\', '/').split('/')[-2]
+
+
+
+
             # remove get parameters
             # hashed filename must contain get parameters
             hash_sha256 = sha256(url.encode('utf-8')).hexdigest()[:5].upper()
 
-            filename = filename.split('?')[0]
-            base, extension = os.path.splitext(filename)
-            filename = base + "-" + hash_sha256 + extension
+            # filename = filename.split('?')[0]
+            # base, extension = os.path.splitext(filename)
+            filename = filename_without_ext[:42] + "-" + hash_sha256 + filename_ext
         else:  # filename already contains hash
             pass
         return filename
 
-    def _find_filepath(self, filename, ignore_not_found=False):
+    def _find_filepath(self, filename):
         if filename in self.media_filepaths:
             filepath = self.media_filepaths[filename].replace(
                 '\\', '/').replace(self.input_dir, '/input/')
             # print("Found file: " + filepath)
             return filepath
         else:
-            if not ignore_not_found:
-                pass
-                # print("File not found: " + filename)
             return None
 
     def calculateGuildFilename(self, guild):
@@ -245,23 +270,42 @@ class GuildPreprocess:
         guild['localFilePath'] = self._find_filepath(guild['localFileName'])
         return guild
 
-    def calculateLocalFileAttributes(self, object, url1, url2=None):
-        if url1 is None:  # no url
-            return object
+    def findInHtmlIds(self, messageId, url):
+        if messageId in self.ids_from_html:
+            for filename in self.ids_from_html[messageId]:
+                # get string from filename start to the first '-', without extension
+                reduced_filename = filename.split('-')[0]
+                reduced_url = url.split('/')[-1].split('-')[0].split('.')[0]
 
-        file_name = self._calculate_filename(url1)
-        file_path = self._find_filepath(file_name)
+                if reduced_url == 'tenor':
+                    return filename
+                if reduced_filename == reduced_url:
+                    # print("Found file: " + filename)
+                    return filename
+        return None
 
-        if url2 is None and file_path is None:  # local file for url1 not found
-            # print("File not found (url1): " + file_name)
-            return object
+    def calculateLocalFileAttributes(self, messageId, object, url1, url2=None):
+        file_name = None
+        file_path = None
+        for url in [url1, url2]:
+            if url is None:
+                continue
 
-        if url2 is not None:  # url2 is set, check it
-            file_name = self._calculate_filename(url2)
+            file_name = self._calculate_filename(url)
             file_path = self._find_filepath(file_name)
 
-        if file_path is None:  # local file for url2 not found
-            # print("File not found (url2): " + file_name)
+            if file_path is None:
+                file_name = self.findInHtmlIds(messageId, url)  # try to recover filename from html
+                if file_name is not None:
+                    file_path = self._find_filepath(file_name)
+                    break
+
+        if file_path is None:
+            # local file not found, simulate local file
+            # object['localFileName'] = url1.split('/')[-1]
+            # object['localFilePath'] = url1
+            # object['extension'] = os.path.splitext(object['localFileName'])[1]
+            # object['type'] = 'url'
             return object
 
         # now we know that the local file exists
@@ -277,7 +321,7 @@ class GuildPreprocess:
                     object['width'], object['height'] = imagesize.get("../static/" + file_path)
                 except:
                     # imagesize doesn't support this image format
-                    print("imagesize library doesn't support this image format: " + file_path)
+                    print("   imagesize library doesn't support this image format (is the file corrupted?): ", file_path)
                     pass
         # if video=
         elif extension is not None and extension in ('mp4', 'webm'):
@@ -304,19 +348,19 @@ class GuildPreprocess:
         for message in messages.values():
             # calculate attachement filenames
             for attachment in message['attachments']:
-                attachment = self.calculateLocalFileAttributes(attachment, attachment['url'])
+                attachment = self.calculateLocalFileAttributes(message['id'], attachment, attachment['url'])
 
             # calculate embed filenames
             for embed in message['embeds']:
                 if "thumbnail" in embed and embed["thumbnail"] is not None:
-                    embed["thumbnail"] = self.calculateLocalFileAttributes(embed["thumbnail"], embed["url"], embed["thumbnail"]["url"])
+                    embed["thumbnail"] = self.calculateLocalFileAttributes(message['id'], embed["thumbnail"], embed["url"], embed["thumbnail"]["url"])
 
                 if "image" in embed and embed["image"] is not None:
-                    embed["image"] = self.calculateLocalFileAttributes(embed["image"], embed["image"]["url"])
+                    embed["image"] = self.calculateLocalFileAttributes(message['id'], embed["image"], embed["image"]["url"])
 
                 if "images" in embed:
                     for image in embed["images"]:
-                        image = self.calculateLocalFileAttributes(image, image["url"])
+                        image = self.calculateLocalFileAttributes(message['id'], image, image["url"])
 
             progress.increment()
         progress.finish()
@@ -326,7 +370,7 @@ class GuildPreprocess:
         progress = Progress(messages, 'step 2/3')
         for emoji in emojis.values():
             if "imageUrl" in emoji:
-                emoji = self.calculateLocalFileAttributes(emoji, emoji["imageUrl"])
+                emoji = self.calculateLocalFileAttributes(message['id'], emoji, emoji["imageUrl"])
             else:
                 print("Emoji without imageUrl: " + emoji["name"])
 
@@ -335,7 +379,7 @@ class GuildPreprocess:
 
         progress = Progress(messages, 'step 3/3')
         for author in authors.values():
-            author = self.calculateLocalFileAttributes(author, author["avatarUrl"])
+            author = self.calculateLocalFileAttributes(message['id'], author, author["avatarUrl"])
 
             progress.increment()
         progress.finish()
@@ -442,7 +486,7 @@ class GuildPreprocess:
                 else:
                     message['threadName'] = 'Thread not exported'
                     message['threadMsgCount'] = None  # fallback value
-                
+
                 # print("ThreadCreated: " + newThreadChannelId)
 
         # pprint(thread_id_to_message_id)
@@ -530,6 +574,13 @@ class Preprocess:
                 # print(filename)
                 files.append(filename)
         return files
+    def _find_html_files(self, directory):
+        files = []
+        for filename in glob.glob(directory + '**/*.html', recursive=True):
+            if filename.endswith('.html'):
+                # print(filename)
+                files.append(filename)
+        return files
 
     def _find_all_mediafiles_paths(self, directory):
         all_files = {}
@@ -555,8 +606,9 @@ class Preprocess:
     #     self.guilds = sorted(self.guilds, key=lambda d: d['name'])
     #     return
 
-    def should_process(self, json_files, media_filepaths):
+    def should_process(self, json_files, media_filepaths, html_filepaths):
         print("Found " + str(len(json_files)) + " JSON files")
+        print("Found " + str(len(html_filepaths)) + " HTML files\n")
         print("Found " + str(len(media_filepaths)) + " media files\n")
 
         # make directory if it doesn't exist
@@ -584,7 +636,7 @@ class Preprocess:
         # create hash of all files
         # if hash is the same, then we can skip processing
         # because reprocessing takes a lot of time
-        new_hash = sha256((str(json_files) + str(media_filepaths) + hash_of_script).encode('utf-8')).hexdigest()
+        new_hash = sha256((str(json_files) + str(media_filepaths) + str(html_filepaths) + hash_of_script).encode('utf-8')).hexdigest()
 
         if hash_from_file == new_hash:
             print("Hash is the same, /static/data is up to date")
@@ -597,12 +649,44 @@ class Preprocess:
             print("Hash is different, /static/data is not up to date")
             return True
 
+    def parse_html(self, html_filepaths):
+        """
+        hacky way to parse html files, because BeautifulSoup is too slow on large HTML files
+        Be need theses files to pair embeds with local messages
+        """
+        ids_from_html = {}
+        regex_pattern_message_id = re.compile(r'^(\d+)')
+        regex_pattern_files = re.compile(r'chatlog__embed.*?html_Files\/([^ >]+)>? (?!alt=Avatar)')
+        for html_filepath in html_filepaths:
+            with open(html_filepath, 'r', encoding='utf-8') as f:
+                html = f.read()
+                messages = html.split('chatlog__message-container-')
+                for message in messages:
+                    matches = regex_pattern_message_id.findall(message) 
+                    if len(matches) == 0:
+                        continue
+                    message_id = matches[0]
+                    padded_id = pad_id(message_id)
+                    matches = regex_pattern_files.findall(message)
+                    for filename in matches:
+                        if padded_id not in ids_from_html:
+                            ids_from_html[padded_id] = []
+
+                        ids_from_html[padded_id].append(filename)
+                        ids_from_html[padded_id] = list(set(ids_from_html[padded_id]))  # deduplicate
+
+        print("   Found " + str(len(ids_from_html)) + " message ids in HTML files")
+        # save to file
+        # with open('../static/data/ids_from_html.json', 'w') as f:
+        #     json.dump(ids_from_html, f, indent=4)
+        return ids_from_html
 
     def process(self):
         json_files = self._find_json_files(self.input_directory)
+        html_files = self._find_html_files(self.input_directory)
         media_filepaths = self._find_all_mediafiles_paths(self.input_directory)
 
-        if not self.should_process(json_files, media_filepaths):
+        if not self.should_process(json_files, media_filepaths, html_files):
             return
 
         guilds = {}
@@ -631,11 +715,14 @@ class Preprocess:
             progress.increment()
         progress.finish()
 
+        print("\nProcessing HTML...")
+        ids_from_html = self.parse_html(html_files)
+
         # loop through each guild
         for guild_id, json_filepaths in json_paths_by_guild.items():
             print("\nProcessing guild '" + guilds[guild_id]['name'] + "'")
             gp = GuildPreprocess(guild_id, self.input_directory,
-                                 json_filepaths, media_filepaths)
+                                 json_filepaths, media_filepaths, ids_from_html)
             guilds[guild_id] = gp.calculateGuildFilename(guilds[guild_id])
             gp.process()
 
