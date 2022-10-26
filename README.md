@@ -14,6 +14,7 @@ View your JSON [DiscordChatExporter](Tyrrrz/DiscordChatExporter) exports as if y
 - Browse guild or direct messages
 - Discord Markdown rendering support
 - Command generator to extend your export with more messages (backup helper)
+- Right click message and select "Open in discord" to jump to message in Discord
 
 
 
@@ -71,6 +72,7 @@ This tool consists of two parts:
 ## Preprocessor
 For development make sure you have nodemon installed globally (used for hot reloading)
 ```
+nvm use 16.16.0
 npm install -g nodemon
 ```
 

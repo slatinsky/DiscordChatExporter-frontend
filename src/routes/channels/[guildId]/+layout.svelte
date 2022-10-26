@@ -1,8 +1,13 @@
 <script>
+	import { developerMode } from '../../settingsStore';
+	import ContextMenu from '../../../components/menu/ContextMenu.svelte';
+	import MenuOption from '../../../components/menu/MenuOption.svelte';
+	import { isMenuVisible, setMenuVisible } from '../../../components/menu/menuStore';
 	import { onDestroy, onMount } from 'svelte';
 	import Header from './Header.svelte';
 	import SearchResults from './SearchResults.svelte';
 	import { searched, found_messages, filters } from './searchStores';
+	import { copyTextToClipboard } from '../../../helpers';
 	export let data;
 
 	let currentGuildId = data.guildId;
@@ -31,6 +36,19 @@
 	onDestroy(() => {
 		clearInterval(memoryInterval);
 	});
+
+	let rightClickId = null;
+	function onRightClick(e, id) {
+		$isMenuVisible = false  // close previous menu
+		setTimeout(() => {
+			rightClickId = id;
+			setMenuVisible(e)
+		}, 0);
+	}
+
+	$: if (!$isMenuVisible) {
+		rightClickId = null
+	}
 </script>
 
 
@@ -38,7 +56,7 @@
 <div id="guild-layout" class={$searched ? 'with-search' : ''}>
 	<div id="channels">
 		<div class="guild-name">{data.guilds[data.guildId].name}</div>
-		{#if "usedJSHeapSize" in memoryUsage}
+		{#if $developerMode && "usedJSHeapSize" in memoryUsage}
 		<div>
 			Memory used:<br>
 			{Math.round(memoryUsage.usedJSHeapSize / 1024 / 1024)} MB / {Math.round(memoryUsage.jsHeapSizeLimit / 1024 / 1024)} MB ({Math.round(memoryUsage.usedJSHeapSize / memoryUsage.jsHeapSizeLimit * 100)}%)<br>
@@ -51,7 +69,7 @@
 				<div class="channel">
 					<a
 						href="/channels/{data.guildId}/{channel.id}"
-						class={data.channelId == channel.id ? 'selected' : ''}># {channel.name}</a
+						class={data.channelId == channel.id ? 'selected' : ''} on:contextmenu|preventDefault={e=>onRightClick(e, channel.id)}># {channel.name}</a
 					>
 					{#if channel.threads}
 						{#each channel.threads as thread}
@@ -61,7 +79,7 @@
 									<a
 										href="/channels/{data.guildId}/{thread.id}"
 										class={data.channelId == thread.id ? 'selected' : ''}
-									>
+										on:contextmenu|preventDefault={e=>onRightClick(e, thread.id)} >
 										<!-- svg -->
 										<svg
 											class="thread-svg-icon"
@@ -106,10 +124,17 @@
 			{#key $filters}
 				<SearchResults guild={data.guild} />
 			{/key}
-			
 		</div>
 	{/if}
 </div>
+
+{#if rightClickId}
+<ContextMenu let:visible>
+	<MenuOption
+			on:click={() => copyTextToClipboard(BigInt(rightClickId))}
+			text="Copy channel ID" {visible} />
+</ContextMenu>
+{/if}
 
 <style>
 	#guild-layout {

@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, timestampFormat } from './settingsStore';
+	import { nameRenderer, timestampFormat, developerMode } from './settingsStore';
 	import { timestampRenderers } from './time';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
@@ -36,6 +36,20 @@
 			<span>{renderer(testDate)}</span>
 		</label>
 	{/each}
+</div>
+
+<p>Show memory usage</p>
+<div class="radios">
+	{#key $nameRenderer}
+	<label>
+		<input type="radio" name="developerMode" value={true} bind:group={$developerMode} />
+		<span>Enabled</span>
+	</label>
+	<label>
+		<input type="radio" name="developerMode" value={false} bind:group={$developerMode} />
+		<span>Disabled</span>
+	</label>
+	{/key}
 </div>
 
 <style>

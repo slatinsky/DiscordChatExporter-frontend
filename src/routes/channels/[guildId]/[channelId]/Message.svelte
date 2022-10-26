@@ -3,6 +3,10 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import MessageMarkdown from './MessageMarkdown.svelte';
+	import ContextMenu from '../../../../components/menu/ContextMenu.svelte';
+	import MenuOption from '../../../../components/menu/MenuOption.svelte';
+	import { setMenuVisible, isMenuVisible } from '../../../../components/menu/menuStore';
+	import { copyTextToClipboard } from '../../../../helpers';
 	import { renderTimestamp } from '../../../time';
 
 	export let message;
@@ -109,6 +113,18 @@
 			// console.log(message.reference, message.referencedMessage, messages.length, Object.keys(messages)[0]);
 		}
 	}
+
+	let rightClickMessage = null;
+	function onRightClick(e, message) {
+		$isMenuVisible = false  // close previous menu
+		setTimeout(() => {
+			rightClickMessage = message;
+			setMenuVisible(e)
+		}, 0);
+	}
+	$: if (!$isMenuVisible) {
+		rightClickMessage = null
+	}
 </script>
 
 <!-- Rewritten https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/Html/MessageGroupTemplate.cshtml to svelte -->
@@ -117,7 +133,7 @@
 		{#if search&& message.searchPrevMessageChannelId && message.searchPrevMessageChannelId !== message.channelId}
 			<div class="channel-name"><a href="/channels/{guild.id}/{message.channelId}/"># {guild.channels[message.channelId]?.name}</a></div>
 		{/if}
-		<div class="chatlog__message-group" transition:fade={{ duration: 125 }}>
+		<div class="chatlog__message-group" transition:fade={{ duration: 125 }} on:contextmenu|preventDefault={e=>onRightClick(e, message)}>
 			<!-- <button on:click={()=>copyTextToClipboard(message.id)}>Copy ID</button> -->
 			<div
 				id="{search ? 'search-id-' : ''}{message.id}"
@@ -457,6 +473,26 @@
 		<div class="not-loaded" id={message.id} />
 	{/if}
 </div>
+
+{#if rightClickMessage}
+	<ContextMenu let:visible>
+		<MenuOption
+				on:click={() => copyTextToClipboard(BigInt(message.author.id))}
+				text="Copy author ID" {visible} />
+		<MenuOption
+				on:click={() => copyTextToClipboard(BigInt(message.id))}
+				text="Copy message ID" {visible} />
+		<MenuOption
+				on:click={() => copyTextToClipboard(`https://discord.com/channels/${BigInt(guild.id)}/${BigInt(message.channelId)}/${BigInt(message.id)}`)}
+				text="Copy message link" {visible} />
+		<MenuOption
+				on:click={() => window.open(`https://discord.com/channels/${BigInt(guild.id)}/${BigInt(message.channelId)}/${BigInt(message.id)}`,'_blank')}
+				text="Open in discord" {visible} />
+		<MenuOption
+			on:click={() => console.log(JSON.stringify(message, null, 2))}
+			text="Print message object to console" {visible} />
+	</ContextMenu>
+{/if}
 
 <style>
 	.not-loaded {
