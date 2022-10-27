@@ -239,7 +239,7 @@
 							</div>
 							<div class="chatlog__content chatlog__markdown">
 								<span class="chatlog__markdown-preserve"
-									><MessageMarkdown content={message.content} /></span
+									><MessageMarkdown content={message.content} {guild} /></span
 								>
 								{#if message.timestampEdited != null}
 									<span class="chatlog__edited-timestamp" title={message.timestampEdited}
@@ -351,10 +351,10 @@
 													<div class="chatlog__embed-title">
 														{#if embed.url}
 															<a class="chatlog__embed-title-link" href="@embed.Url">
-																<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} /></div>
+																<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} {guild} /></div>
 															</a>
 														{:else}
-															<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} /></div>
+															<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} {guild} /></div>
 														{/if}
 													</div>
 												{/if}
@@ -362,7 +362,7 @@
 												<!-- @{/* Embed description */} -->
 												{#if embed.description}
 													<div class="chatlog__embed-description">
-														<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.description} /></div>
+														<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.description} {guild} /></div>
 													</div>
 												{/if}
 
@@ -373,13 +373,13 @@
 															<div class="chatlog__embed-field">
 																{#if field.name}
 																	<div class="chatlog__embed-field-name">
-																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.name} /></div>
+																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.name} {guild} /></div>
 																	</div>
 																{/if}
 
 																{#if field.value}
 																	<div class="chatlog__embed-field-value">
-																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.value} /></div>
+																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.value} {guild} /></div>
 																	</div>
 																{/if}
 															</div>

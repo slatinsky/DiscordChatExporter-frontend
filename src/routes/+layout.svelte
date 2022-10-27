@@ -49,20 +49,7 @@
 	</div>
 {/if}
 
-
-<!-- <div id="intersecton">
-
-</div> -->
-
 <style>
-	/* #intersecton {
-		position: absolute;
-		top: 25%;
-		left: 0;
-		width: 100%;
-		height: 50%;
-		background-color: #0000ff55;
-	} */
 
     .error {
         display: flex;
@@ -71,6 +58,7 @@
         justify-content: center;
         height: 100vh;
         text-align: center;
+		padding: 2rem;
     }
 	.app {
 		display: grid;
