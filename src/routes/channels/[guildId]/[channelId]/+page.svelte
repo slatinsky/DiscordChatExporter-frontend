@@ -18,10 +18,11 @@
 </script>
 
 <svelte:head>
-    <title>{data.guild.channels[data.channelId].name} | DiscordChatExporter frontend</title>
+    <title>{data.guild.channels[data.channelId]?.name ?? "Unknown channel"} | DiscordChatExporter frontend</title>
     <meta name="description" content="Svelte demo app"/>
 </svelte:head>
 
+{#if data.messages}
 <WatchHash messages={data.messages} />
 <section>
     <!-- {#if messages} -->
@@ -57,8 +58,22 @@
 
     <!-- {/if} -->
 </section>
+{:else}
+<div class="error">
+    <p>Channel ID {BigInt(data.channelId)} was not exported</p>
+</div>
+{/if}
 
 <style>
+    .error {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+        padding: 2rem;
+    }
  section {
      background-color: #36393F;
      /*height: 100vh;*/
