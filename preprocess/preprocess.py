@@ -253,7 +253,7 @@ class GuildPreprocess:
             # base, extension = os.path.splitext(filename)
             filename = filename_without_ext[:42] + "-" + hash_sha256 + filename_ext
         else:  # filename already contains hash
-            pass
+            filename = url.replace('\\', '/').split('/')[-1]
         return filename
 
     def _find_filepath(self, filename):

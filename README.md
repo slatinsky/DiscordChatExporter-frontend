@@ -2,19 +2,26 @@
 
 
 # DiscordChatExporter-frontend
-View your JSON [DiscordChatExporter](Tyrrrz/DiscordChatExporter) exports as if you were using Discord interface
+View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports as if you were using Discord interface
 
 ## Features
 - View JSON exports using web interface
 - Message deduplication - merge multiple JSON exports and view them as if they were one
 - Advanced message lazy loading and grouping (infinite scroll without pagination) - even channels with 100k+ messages are loaded almost instantly
 - Threads support (go to thread, go back to channel where thread was created)
-- Guild search with autocomplete
+- Guild search with autocomplete and filters
 - View media files locally
 - Browse guild or direct messages
 - Discord Markdown rendering support
 - Command generator to extend your export with more messages (backup helper)
 - Right click message and select "Open in discord" to jump to message in Discord
+
+
+### System requirements (per guild)
+- You will need ~1 GB of RAM to process 100k messages. So if your guild export contains 1 million messages, you will need ~10 GB of RAM.
+- The viewer can handle at least ~2-4 million messages (4 GB of ram) in the browser
+
+Note: Discord servers are known internally as guilds
 
 
 
@@ -38,19 +45,50 @@ This tool uses Sveltekit and Python3 as main dependencies. You won't be able to 
 
 <a name="supported-exports"></a>
 # Which exports are supported?
-Supported are JSON exports exported with media. (The main disadvantage of this export type is that URLs in JSON point to local files - original URLs are not archived)
+The main requirement is that media files (`--media True --reuse-media True`) are exported and JSON export format (`--format Json`) is used There are some examples:
+
+Export all accessible channels from guild:
+```
+DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g GUILD_ID--media True --reuse-media True --format Json --output OUTPUT_FOLDER_PATH
+```
+Export all dms (sadly, exporting dms can't be done without selfboting):
+```
+DiscordChatExporter.Cli.exe exportdm --token DISCORD_TOKEN --media True --reuse-media True --format Json --output OUTPUT_FOLDER_PATH
+```
+Export channel:
 ```
 DiscordChatExporter.Cli export --token DISCORD_TOKEN  --media True --reuse-media True --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID
 ```
+- disadvantage of export with media files is, that original URLs are not archived
 
-Or exported without media, but coupled with another html export with media
+<details><summary>I want to export HTML</summary>
+<p>
+You do not need HTML exports (you can view JSON exports in this viewer), but if you need them, they are supported too:
+
 ```
 DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID
 
 DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media True --reuse-media True --format HtmlDark --channel CHANNEL_OR_THREAD_ID
 ```
 
-The main requirement is that media files (`--media True --reuse-media True`) are exported and JSON export format (`--format Json`) is used.
+- disadvantage is, that thumbnails for embeds will not be working in this viewer if you export this way (workaround by html parsing is made, but it doesn't work for all embeds)
+
+**another method**
+
+```
+DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media True --reuse-media True --format Json --channel CHANNEL_OR_THREAD_ID
+
+[replace in folder name `.json_Files` to `.html_Files`]
+
+DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media True --reuse-media True --format HtmlDark --channel CHANNEL_OR_THREAD_ID
+```
+- original URLs are not archived, but embeds will work in this viewer
+
+
+</p>
+</details>
+
+
 
 
 
@@ -197,7 +235,6 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 
 ## Roadmap / planned features:
 - Better handling of edge cases (if something is missing in the backup)
-- Better GUI
 - make readme easy to understand
 - Linux support (docker?)
 - Improve code readability
