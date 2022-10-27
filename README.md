@@ -9,6 +9,7 @@ View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExport
 - Message deduplication - merge multiple JSON exports and view them as if they were one
 - Advanced message lazy loading and grouping (infinite scroll without pagination) - even channels with 100k+ messages are loaded almost instantly
 - Threads support (go to thread, go back to channel where thread was created)
+- Forums support (view forum posts as if they were threads)
 - Guild search with autocomplete and filters
 - View media files locally
 - Browse guild or direct messages
@@ -98,6 +99,57 @@ DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH
 Don't know how to get THREAD_IDs? Handy backup helper is included to extend your backup and to find missing threads. You can find it at the end of channel list.
 
 ![](docs/backup_helper.png)
+
+## How to view forums
+Viewing forums is supported by this viewer, but exporting them with DiscordChatExporter is harder than with other channel types, because export of main forum channel is not supported.
+
+Workaround is to export individual forum threads. I made a script to get forum IDs automatically:
+
+### Steps
+1. Open discord in browser
+2. Navigate to channel with forum post list
+3. press F12 and paste this script to the console:
+
+```js
+len = 0
+ids = []
+previouseScrollTop = 0
+
+function scrollToPosition(offset) {
+    scrollDiv = document.querySelector('div[class*="chat-"] > div > div > div[class*="scrollerBase-"]')
+    scrollDiv.scroll(0, offset)
+}
+
+function captureIds() {
+    document.querySelectorAll('div[data-item-id]').forEach((e) => ids.push(e.dataset.itemId))
+    ids = [...new Set(ids)]  //deduplicate
+    if (ids.length > len) {
+        len = ids.length
+        console.log('Found', len, 'IDs')
+    }
+}
+
+function printIds() {
+    // print all ids, comma separated
+    console.log('found IDs:',ids.join(','))
+}
+
+scrollToPosition(0)
+interval = setInterval(() => {
+    scrollToPosition(scrollDiv.scrollTop + window.innerHeight / 3)
+    setTimeout(() => {
+        captureIds()
+        if (previouseScrollTop === scrollDiv.scrollTop) {
+            clearInterval(interval)
+            printIds()
+        }
+        previouseScrollTop = scrollDiv.scrollTop
+    }, 1000)
+}, 1542)
+```
+
+4. script will scroll the page. At the the end, it will print all IDs to the console
+5. download each id with DiscordChatExporter as if you would download channel (--channel FORUM_POST_ID)
 
 # Development
 You don't need to follow development steps if you don't need to modify the code.
@@ -239,7 +291,6 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 - Linux support (docker?)
 - Improve code readability
 - online mode - view media files directly from Discord servers
-- Discord forums support - waiting for DiscordChatExporter export support
 
 ## Why this tool was made
 [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) is a well made tool to export Discord chats. But to actually view them, you had to download them in HTML format, which more inconvenient to parse than JSON. And If you wanted to extend your backup, it would be broken into multiple files, which is not very convenient.

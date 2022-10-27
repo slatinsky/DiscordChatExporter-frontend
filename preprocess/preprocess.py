@@ -125,6 +125,68 @@ class GuildPreprocess:
                     messages[message['id']] = message
         return channels, messages
 
+    def simulate_thread_creation(self, channels, messages):
+        """
+        Sometimes threads are exported, but original channel is not
+        Because forum exports are not supported by DiscordChatExported, this is always the case
+        Internally forum posts are Threads
+        """
+
+        thread_ids = []  # list of exported thread ids
+        for channel in channels.values():
+            if channel['type'] == "GuildPublicThread":
+                thread_ids.append(channel['id'])
+
+        not_found_thread_ids = thread_ids  # list of thread ids without corresponding message with type 'ThreadCreated' 
+
+        for message in messages.values():
+            if message['type'] == "ThreadCreated":
+                if message['reference']['channelId'] in not_found_thread_ids:
+                    not_found_thread_ids.remove(message['reference']['channelId'])
+
+        first_messages_in_channels = {}
+        channel_msg_count = {}
+        for message in messages.values():
+            if message['channelId'] not in first_messages_in_channels or message['timestamp'] < first_messages_in_channels[message['channelId']]['timestamp']:
+                first_messages_in_channels[message['channelId']] = message
+
+            if message['channelId'] not in channel_msg_count:
+                channel_msg_count[message['channelId']] = 0
+            channel_msg_count[message['channelId']] += 1
+
+
+        # insert fake "ThreadCreated" message for each thread that does not have one
+        for thread_id in not_found_thread_ids:
+            thread = channels[thread_id]
+
+            first_message_in_thread = first_messages_in_channels[thread_id]
+            fake_thread_created_message = {
+                'id': thread_id,
+                'type': "ThreadCreated",
+                'timestamp': first_message_in_thread['timestamp'],
+                'timestampEdited': None,
+                'callEndedTimestamp': None,
+                'isPinned': False,
+                'content': "Started a thread.",
+                'reference': {
+                    'messageId': None,
+                    'channelId': thread_id,
+                    'guildId': self.guild_id,
+                },
+                'channelId': thread['categoryId'],
+                'author': first_message_in_thread['author'],
+                'threadName': thread['name'],
+                'threadMsgCount': channel_msg_count[thread_id],
+                'reactions': [],
+                'attachments': [],
+                'embeds': [],
+                'stickers': [],
+                'mentions': [],
+            }
+            messages[thread['id']] = fake_thread_created_message
+
+        return channels, messages
+
     def cleanup_empty_fields(self, messages):
         for message in messages.values():
             # cleanup unused fields
@@ -409,7 +471,7 @@ class GuildPreprocess:
         threads = {}
         normal_channels = {}  # non thread channels
         for channel in channels.values():
-            if channel['type'] == "GuildTextChat" or channel['type'] == "DirectTextChat" or channel['type'] == "DirectGroupTextChat":
+            if channel['type'] == "GuildTextChat" or channel['type'] == "DirectTextChat" or channel['type'] == "DirectGroupTextChat" or channel['type'] == "GuildVoiceChat":
                 normal_channels[channel['id']] = channel
             elif channel['type'] == "GuildPublicThread":
                 threads[channel['id']] = channel
@@ -424,35 +486,29 @@ class GuildPreprocess:
         # handle threads without exported channel (FORUMS)
         for channel in threads.values():
             if channel['categoryId'] not in normal_channels:
-                print(f"Found thread '{channel['name']}' without exported channel '{channel['category']}'")
+                print(f"   Found thread '{channel['name']}' without exported channel '{channel['category']}'")
 
                 # add channel to normal channels
                 channel_info = {
                     'id': channel['categoryId'],
                     'name': channel['category'],
                     'type': "GuildTextChat",
-                    'messageCount': 0,
+                    'messageCount': len(messages_by_channel[channel['categoryId']].values()),
                     'categoryId': "-1",
-                    'category': "lost threads",
+                    'category': "forums/lost threads",
                     'threads': []
                 }
                 normal_channels[channel['categoryId']] = channel_info
                 channels[channel['categoryId']] = channel_info
 
-                print("xxxxxxxxx")
-                pprint(channels)
-
-                # messages_by_channel
-                messages_by_channel[channel['categoryId']] = {}
-
-                # # add thread to channel
+                # add thread to channel
                 normal_channels[channel['categoryId']]['threads'].append(channel)
 
 
         for channel in normal_channels.values():
             # if channel['type'] == 4:
             #     continue
-            print(channel['name'])
+            # print(channel['name'])
             if channel['categoryId'] not in categories:
                 if 'threads' not in channel:
                     channel['threads'] = []
@@ -471,11 +527,6 @@ class GuildPreprocess:
                 'name': channel['name'],
                 'type': "text",
             })
-
-
-        print('----------------')
-
-        
 
 
         # pprint(threads)
@@ -531,8 +582,11 @@ class GuildPreprocess:
         return thread_id_to_message_id
 
     def process(self):
-        print("Step 1 - Reading data from json files...")
+        print("Step 0 - Reading data from json files...")
         channels, messages = self.read_channels_messages_from_files()
+
+        print("Step 1 - Recreating forums and missing channels from threads...")
+        channels, messages = self.simulate_thread_creation(channels, messages)
 
         print("Step 2 - Sorting messages and channels...")
         # sort messages dict by key
@@ -541,7 +595,8 @@ class GuildPreprocess:
         channels = dict(sorted(channels.items()))
 
         # print message count
-        print("Message count: " + str(len(messages)))
+        print("   Message count: " + str(len(messages)))
+        print("   Channel+Thread count: " + str(len(channels)))  # includes forum threads
 
         print("Step 3 - Deduplicating authors...")
         messages, authors = self.extract_authors(messages)
@@ -570,7 +625,7 @@ class GuildPreprocess:
         # get message ids
         message_ids = list(messages.keys())
 
-        print("Step 9 - Creating lookup thread ids -> to message ids...")
+        print("Step 10 - Creating lookup thread ids -> to message ids...")
         thread_id_to_message_id = self.get_thread_id_to_message_id(messages, messages_by_channel, threads)
 
         # group channels and others attributes to single dict
@@ -587,7 +642,7 @@ class GuildPreprocess:
             'messages': messages_by_channel,
         }
 
-        print("Step 10 - Writing guild JSON...")
+        print("Step 11 - Writing guild JSON...")
         self.write_json(guild, output_dir + 'guild.json')
 
 
