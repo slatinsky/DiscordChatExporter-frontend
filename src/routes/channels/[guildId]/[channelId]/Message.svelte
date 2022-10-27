@@ -21,6 +21,7 @@
 	// processMessage();
 	let loaded = false;
 	let root;
+	let isVisible = false;
 
 	let observer = new IntersectionObserver(
 		(entries) => {
@@ -28,9 +29,13 @@
 				if (entry.isIntersecting) {
 					processMessage();
 
-					observer.disconnect();
+					// observer.disconnect();
 
 					loaded = true;
+					isVisible = true;
+				}
+				else {
+					isVisible = false;
 				}
 			});
 		},
@@ -129,7 +134,7 @@
 
 <!-- Rewritten https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/Html/MessageGroupTemplate.cshtml to svelte -->
 <div bind:this={root} class="msg-root">
-	{#if loaded}
+	{#if loaded && isVisible}
 		{#if search&& message.searchPrevMessageChannelId && message.searchPrevMessageChannelId !== message.channelId}
 			<div class="channel-name"><a href="/channels/{guild.id}/{message.channelId}/"># {guild.channels[message.channelId]?.name}</a></div>
 		{/if}

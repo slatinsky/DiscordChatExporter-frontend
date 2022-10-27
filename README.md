@@ -50,7 +50,7 @@ The main requirement is that media files (`--media True --reuse-media True`) are
 
 Export all accessible channels from guild:
 ```
-DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g GUILD_ID--media True --reuse-media True --format Json --output OUTPUT_FOLDER_PATH
+DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g GUILD_ID --media True --reuse-media True --format Json --output OUTPUT_FOLDER_PATH
 ```
 Export all dms (sadly, exporting dms can't be done without selfboting):
 ```
