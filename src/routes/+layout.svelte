@@ -6,13 +6,15 @@
 
 
 
-{#if data.failed}
+{#if Object.values(data.guilds).length === 0}
 	<div class="error">
 		<h1>No chat exports found</h1>
 		<p>
-			Please move your DiscordChatExporter JSON+media exports to "/static/input/" folder and rerun
+			Please close this app and "http-server" terminal, move your DiscordChatExporter JSON+media exports to "/static/input/" folder and rerun
 			"START_VIEWER.bat"
 		</p>
+
+		<small>If your exports are in the correct place and you still see this error, please open an issue on <a href="https://github.com/slatinsky/DiscordChatExporter-frontend/issues" target="_blank">GitHub</a>. Please check out command line window if you see any errors / crashes there</small>
 	</div>
 {:else}
 	<div class="app">
