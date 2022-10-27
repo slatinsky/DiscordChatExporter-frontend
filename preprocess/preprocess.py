@@ -107,7 +107,7 @@ class GuildPreprocess:
     def read_channels_messages_from_files(self):
         channels = {}
         messages = {}
-        
+
         for path in self.json_filepaths:
             with open(path, 'r', encoding="utf8") as f:
                 # print("Reading file: " + path)
@@ -390,6 +390,7 @@ class GuildPreprocess:
 
         # messages by channel
         messages_by_channel = {}
+
         for message in messages.values():
             channel_id = message['channelId']
             if channel_id not in messages_by_channel:
@@ -419,9 +420,39 @@ class GuildPreprocess:
         # group channels by categories
         categories = {}
 
+
+        # handle threads without exported channel (FORUMS)
+        for channel in threads.values():
+            if channel['categoryId'] not in normal_channels:
+                print(f"Found thread '{channel['name']}' without exported channel '{channel['category']}'")
+
+                # add channel to normal channels
+                channel_info = {
+                    'id': channel['categoryId'],
+                    'name': channel['category'],
+                    'type': "GuildTextChat",
+                    'messageCount': 0,
+                    'categoryId': "-1",
+                    'category': "lost threads",
+                    'threads': []
+                }
+                normal_channels[channel['categoryId']] = channel_info
+                channels[channel['categoryId']] = channel_info
+
+                print("xxxxxxxxx")
+                pprint(channels)
+
+                # messages_by_channel
+                messages_by_channel[channel['categoryId']] = {}
+
+                # # add thread to channel
+                normal_channels[channel['categoryId']]['threads'].append(channel)
+
+
         for channel in normal_channels.values():
             # if channel['type'] == 4:
             #     continue
+            print(channel['name'])
             if channel['categoryId'] not in categories:
                 if 'threads' not in channel:
                     channel['threads'] = []
@@ -441,6 +472,12 @@ class GuildPreprocess:
                 'type': "text",
             })
 
+
+        print('----------------')
+
+        
+
+
         # pprint(threads)
         for category in categories.values():
             # loop category['channelIds']
@@ -457,7 +494,7 @@ class GuildPreprocess:
                             'type': "thread",
                         })
 
-        return messages_by_channel, categories, threads
+        return messages_by_channel, categories, threads, channels
 
     def cleanup_out_directory(self, output_dir):
         if os.path.exists(output_dir):
@@ -527,7 +564,7 @@ class GuildPreprocess:
 
         # group messages by channels
         print("Step 9 - Grouping messages by channel...")
-        messages_by_channel, categories, threads = self.group_messages_and_channels(
+        messages_by_channel, categories, threads, channels = self.group_messages_and_channels(
             messages, channels)
 
         # get message ids
