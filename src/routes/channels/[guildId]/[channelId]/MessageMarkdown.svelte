@@ -20,7 +20,7 @@
                 })
             }
             catch (e) {
-                console.log(e)
+                console.warn("emojis not found", processedContent.match(regex));
             }
         }
 
@@ -30,7 +30,6 @@
             processedContent = processedContent.replace(regex, (match, guildId, channelId, messageId) => {
                 return `href="/channels/${guildId.toString().padStart(24, '0')}/${channelId.toString().padStart(24, '0')}#${messageId.toString().padStart(24, '0')}"`
             })
-            console.log(processedContent);
         }
 
         // channel links
@@ -39,7 +38,6 @@
             processedContent = processedContent.replace(regex, (match, guildId, channelId) => {
                 return `href="/channels/${guildId.toString().padStart(24, '0')}/${channelId.toString().padStart(24, '0')}"`
             })
-            console.log(processedContent);
         }
 
         if (message.mentions && message.mentions.length > 0) {
@@ -65,5 +63,12 @@
         color: #D4E0FC;
         background-color: #414675;
         font-weight: 500;
+    }
+    :global(blockquote) {
+        border-left: 5px solid #4F545C;
+        margin: 1.5em 0px;
+        padding: 0.5em 10px;
+        width: 100%;
+        border-radius: 4px;
     }
 </style>
