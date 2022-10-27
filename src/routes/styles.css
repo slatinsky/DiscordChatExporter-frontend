@@ -493,13 +493,6 @@ img {
 	font-weight: 500
 }
 
-.chatlog__embed-thumbnail {
-	flex: 0;
-	max-width: 80px;
-	max-height: 80px;
-	margin-left: 1.2rem;
-	border-radius: 3px
-}
 
 .chatlog__embed-images {
 	display: grid;

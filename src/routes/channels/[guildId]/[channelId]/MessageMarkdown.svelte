@@ -1,7 +1,14 @@
 <script>
     export let content
     export let guild
+    export let message
     let processedContent
+
+    function escapeHTML(unsafeText) {  // source https://stackoverflow.com/a/48054293
+        let div = document.createElement('div');
+        div.innerText = unsafeText;
+        return div.innerHTML;
+    }
     function process(content) {
         processedContent = window.discordMarkdown.toHTML(content);
         let regex = /:\w+:/g;
@@ -34,6 +41,12 @@
             })
             console.log(processedContent);
         }
+
+        if (message.mentions && message.mentions.length > 0) {
+            message.mentions.forEach(mention => {
+                processedContent = processedContent.replace(`@${mention.name}`, `<span class="message-mention">@${escapeHTML(mention.name)}#${escapeHTML(mention.discriminator)}</span>`)
+            })
+        }
     }
 
     $: process(content)
@@ -47,5 +60,10 @@
         width: 22px;
         height: 22px;
         transform: translate(0px, 2px);
+    }
+    :global(.message-mention) {
+        color: #D4E0FC;
+        background-color: #414675;
+        font-weight: 500;
     }
 </style>

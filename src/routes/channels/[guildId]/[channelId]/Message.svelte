@@ -239,7 +239,7 @@
 							</div>
 							<div class="chatlog__content chatlog__markdown">
 								<span class="chatlog__markdown-preserve"
-									><MessageMarkdown content={message.content} {guild} /></span
+									><MessageMarkdown content={message.content} {guild} {message} /></span
 								>
 								{#if message.timestampEdited != null}
 									<span class="chatlog__edited-timestamp" title={message.timestampEdited}
@@ -351,10 +351,10 @@
 													<div class="chatlog__embed-title">
 														{#if embed.url}
 															<a class="chatlog__embed-title-link" href="@embed.Url">
-																<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} {guild} /></div>
+																<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} {guild} {message} /></div>
 															</a>
 														{:else}
-															<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} {guild} /></div>
+															<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} {guild} {message} /></div>
 														{/if}
 													</div>
 												{/if}
@@ -362,7 +362,7 @@
 												<!-- @{/* Embed description */} -->
 												{#if embed.description}
 													<div class="chatlog__embed-description">
-														<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.description} {guild} /></div>
+														<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.description} {guild} {message} /></div>
 													</div>
 												{/if}
 
@@ -373,13 +373,13 @@
 															<div class="chatlog__embed-field">
 																{#if field.name}
 																	<div class="chatlog__embed-field-name">
-																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.name} {guild} /></div>
+																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.name} {guild} {message} /></div>
 																	</div>
 																{/if}
 
 																{#if field.value}
 																	<div class="chatlog__embed-field-value">
-																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.value} {guild} /></div>
+																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.value} {guild} {message}/></div>
 																	</div>
 																{/if}
 															</div>
@@ -540,6 +540,17 @@
 	.chatlog__attachment-media {
 		max-width: calc(100% - 10px);
 		object-position:left
+	}
+
+	.chatlog__embed-thumbnail {
+		flex: 0;
+		max-width: calc(100% - 40px);
+		max-height: 100%;
+		max-height: auto;
+		height: auto;
+		margin-top: 1rem;
+		margin-left: 1.2rem;
+		border-radius: 3px
 	}
 
 	.chatlog__embed-thumbnail-video {
