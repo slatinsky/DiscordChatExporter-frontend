@@ -8,6 +8,7 @@ node_modules
 !.env.example
 .vercel
 .output
+__pycache__
 
 /static/in
 /static/input
@@ -20,3 +21,4 @@ node_modules
 /_temp_input/
 /_temp_data/
 /preprocess/export_helpers
+/preprocess/*.spec

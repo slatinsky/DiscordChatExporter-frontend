@@ -6,14 +6,15 @@ move "static/data" "_temp_data"
 @REM Relete old build
 rmdir "releases/static/" /s /q
 del releases\bin\preprocess.exe
+del releases\bin\http-server.exe
 
 @REM Build pyinstaller
 cd preprocess
-pyinstaller preprocess.py -F
+pyinstaller main.py -F
 cd ..
+move "preprocess\dist\main.exe" "releases\bin\preprocess.exe"
 call pkg server/node_modules/http-server/bin/http-server --target node16-win-x64
 @REM Move build to releases
-move "preprocess\dist\preprocess.exe" "releases\bin\preprocess.exe"
 move "http-server.exe" "releases\bin\http-server.exe"
 
 @REM Build sveltekit frontend
@@ -30,6 +31,6 @@ move "_temp_input" "static/input"
 move "_temp_data" "static/data"
 
 @REM Remove not needed files and folders
-del preprocess\preprocess.spec
+del preprocess\main.spec
 rmdir "preprocess/dist/" /s /q
 rmdir "preprocess/build/" /s /q
