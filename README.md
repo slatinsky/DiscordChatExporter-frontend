@@ -21,6 +21,7 @@ View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExport
 ### System requirements (per guild)
 - You will need ~1 GB of RAM to process 100k messages. So if your guild export contains 1 million messages, you will need ~10 GB of RAM.
 - The viewer can handle at least ~2-4 million messages (4 GB of ram) in the browser
+- Chromium based browsers are recommended (Chrome, Edge, Opera, Brave, Vivaldi, etc.)
 
 Note: Discord servers are known internally as guilds
 

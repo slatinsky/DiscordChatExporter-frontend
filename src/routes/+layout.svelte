@@ -1,5 +1,6 @@
 <script>
-	import './styles.css';
+	import MemoryUsage from './channels/[guildId]/MemoryUsage.svelte';
+import './styles.css';
 
 	export let data;
 </script>
@@ -49,6 +50,7 @@
 			</main>
 		</div>
 	</div>
+	<MemoryUsage />
 {/if}
 
 <style>

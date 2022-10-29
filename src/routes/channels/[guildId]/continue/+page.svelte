@@ -15,7 +15,7 @@
 	let token = 'TOKEN_HERE';
 	let customArguments = '';
     let explainCommands = true;
-    let exportHtml = true;
+    let exportHtml = false;
 
     function cleanTimestamp(timestamp) {
         return moment(timestamp).utcOffset(0).add(1, 'seconds').format()  // add one second, so the last message won't be included in the next backup
@@ -164,7 +164,7 @@
         <div>
             <!-- checkbox -->
             <input type="checkbox" id="html" bind:checked={exportHtml} />
-            <label for="html"> Export HTML </label>
+            <label for="html"> Export HTML (not recomended)</label>
         </div>
     </div>
 

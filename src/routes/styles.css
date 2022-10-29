@@ -28,6 +28,31 @@
 	font-weight: 700
 }
 
+/*Variables*/
+:root {
+	--color-discord-blue: #5865F2;
+	--color-discord-green: #3BA55D;
+
+	--channel-text-read: #8E9297;
+	--channel-text-read-hover: #DCDDDE;
+	--channel-text-unread: white;
+	--channel-bg-hover: #3C3F45;
+
+	--header-icon: #B9BBBE;
+	--header-icon-hover: #DCDDDE;
+
+	--panel-guilds-bg: #202225;
+	--panel-channels-bg: #2F3136;
+	--panel-messages-bg: #36393F;
+
+	--ping-bg: #414675;
+	--ping-bg-hover: #5865F2;
+	--ping-text: #DEE0FC;
+	--ping-text-hover: white;
+
+	--msg-link: #00AFF4
+}
+
 html,
 body {
 	margin: 0;
