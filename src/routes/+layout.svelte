@@ -120,7 +120,7 @@ import './styles.css';
 	.guild-selected {
 		width: 10px;
 		height: 40px;
-		background-color: #ffffff;
+		background-color: var(--color-contrast);
 		border-radius: 5px;
 		position: absolute;
 		left: -6px;

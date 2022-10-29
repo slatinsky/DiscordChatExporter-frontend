@@ -62,7 +62,7 @@
 	</label>
 	<label>
 		<input type="radio" name="theme" value={"black"} bind:group={$theme} />
-		<span>Black</span>
+		<span>Black [Work in progress]</span>
 	</label>
 	<label>
 		<input type="radio" name="theme" value={"white"} bind:group={$theme} />

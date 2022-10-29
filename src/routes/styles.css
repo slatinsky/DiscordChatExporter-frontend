@@ -1,3 +1,103 @@
+
+:root[data-theme="dark"] {
+	--color-discord-blue: #5865F2;
+	--color-discord-green: #3BA55D;
+
+	--color-text: #DCDDDE;
+	--color-contrast: white;
+	--color-bg: #36393F;
+
+	--channel-text-read: #8E9297;
+	--channel-text-read-hover: #DCDDDE;
+	--channel-text-unread: white;
+	--channel-bg-hover: #3C3F45;
+
+	--header-icon: #B9BBBE;
+	--header-icon-hover: #DCDDDE;
+
+	--panel-guilds-bg: #202225;
+	--panel-channels-bg: #2F3136;
+	--panel-messages-bg: #36393F;
+
+	--ping-bg: #414675;
+	--ping-bg-hover: #5865F2;
+	--ping-text: #DEE0FC;
+	--ping-text-hover: white;
+
+	--msg-link: #00AFF4;
+
+	--message-hover-bg: #32353b;
+
+	--borders: rgba(255, 255, 255, 0.1);
+	--borders2: #4f545c;
+}
+
+:root[data-theme="black"] {
+	--color-discord-blue: #5865F2;
+	--color-discord-green: #3BA55D;
+
+	--color-text: #DCDDDE;
+	--color-contrast: white;
+	--color-bg: black;
+
+	--channel-text-read: #8E9297;
+	--channel-text-read-hover: #DCDDDE;
+	--channel-text-unread: white;
+	--channel-bg-hover: #3C3F45;
+
+	--header-icon: #B9BBBE;
+	--header-icon-hover: #DCDDDE;
+
+	--panel-guilds-bg: rgb(8, 8, 8);
+	--panel-channels-bg: rgb(8, 8, 8);
+	--panel-messages-bg: black;
+
+	--ping-bg: #414675;
+	--ping-bg-hover: #5865F2;
+	--ping-text: #DEE0FC;
+	--ping-text-hover: white;
+
+	--msg-link: #00AFF4;
+
+	--message-hover-bg: #131313;
+
+	--borders: rgba(255, 255, 255, 0.1);
+	--borders2: #4f545c;
+}
+:root[data-theme="white"] {
+	--color-discord-blue: #5865F2;
+	--color-discord-green: #3BA55D;
+
+	--color-text: #2e3338;
+	--color-contrast: black;
+	--color-bg: white;
+
+	--channel-text-read: #5E6772;
+	--channel-text-read-hover: #2E3338;
+	--channel-text-unread: black;
+	--channel-bg-hover: #DCDFE3;
+
+	--header-icon: #B9BBBE;
+	--header-icon-hover: #DCDDDE;
+
+	--panel-guilds-bg: #E3E5E8;
+	--panel-channels-bg: #F2F3F5;
+	--panel-messages-bg: white;
+
+	--message-hover-bg: #dddddd;
+
+
+	--ping-bg: #414675;
+	--ping-bg-hover: #5865F2;
+	--ping-text: #DEE0FC;
+	--ping-text-hover: white;
+
+	--msg-link: #0068e0;
+
+	--borders: #eceeef;
+	--borders2: #c7ccd1;
+}
+
 @font-face {
 	src: url(/fonts/whitney-300-1FE35.woff);
 	font-family: Whitney;
@@ -28,83 +128,7 @@
 	font-weight: 700
 }
 
-:root[data-theme="dark"] {
-	--color-discord-blue: #5865F2;
-	--color-discord-green: #3BA55D;
 
-	--channel-text-read: #8E9297;
-	--channel-text-read-hover: #DCDDDE;
-	--channel-text-unread: white;
-	--channel-bg-hover: #3C3F45;
-
-	--header-icon: #B9BBBE;
-	--header-icon-hover: #DCDDDE;
-
-	--panel-guilds-bg: #202225;
-	--panel-channels-bg: #2F3136;
-	--panel-messages-bg: #36393F;
-
-	--ping-bg: #414675;
-	--ping-bg-hover: #5865F2;
-	--ping-text: #DEE0FC;
-	--ping-text-hover: white;
-
-	--msg-link: #00AFF4;
-
-	--message-hover-bg: #32353b;
-}
-:root[data-theme="white"] {
-	--color-discord-blue: #5865F2;
-	--color-discord-green: #3BA55D;
-
-	--channel-text-read: #5E6772;
-	--channel-text-read-hover: #2E3338;
-	--channel-text-unread: black;
-	--channel-bg-hover: #DCDFE3;
-
-	--header-icon: #B9BBBE;
-	--header-icon-hover: #DCDDDE;
-
-	--panel-guilds-bg: #E3E5E8;
-	--panel-channels-bg: #F2F3F5;
-	--panel-messages-bg: white;
-
-	--message-hover-bg: #dddddd;
-
-
-	--ping-bg: #414675;
-	--ping-bg-hover: #5865F2;
-	--ping-text: #DEE0FC;
-	--ping-text-hover: white;
-
-	--msg-link: #00AFF4;
-}
-
-:root[data-theme="black"] {
-	--color-discord-blue: #5865F2;
-	--color-discord-green: #3BA55D;
-
-	--channel-text-read: #8E9297;
-	--channel-text-read-hover: #DCDDDE;
-	--channel-text-unread: white;
-	--channel-bg-hover: #3C3F45;
-
-	--header-icon: #B9BBBE;
-	--header-icon-hover: #DCDDDE;
-
-	--panel-guilds-bg: black;
-	--panel-channels-bg: black;
-	--panel-messages-bg: black;
-
-	--ping-bg: #414675;
-	--ping-bg-hover: #5865F2;
-	--ping-text: #DEE0FC;
-	--ping-text-hover: white;
-
-	--msg-link: #00AFF4;
-
-	--message-hover-bg: #131313;
-}
 
 
 
@@ -112,8 +136,8 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	background-color: #36393e;
-	color: #dcddde;
+	background-color: var(--color-bg);
+	color: var(--color-text);
 	font-family: Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 17px;
 	font-weight: 400;
@@ -121,7 +145,7 @@ body {
 }
 
 a {
-	color: #00aff4;
+	color: var(--msg-link);
 	text-decoration: none
 }
 
@@ -135,42 +159,11 @@ img {
 	image-rendering: -webkit-optimize-contrast
 }
 
-.preamble {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	max-width: 100%;
-	padding: 1rem
-}
-
-.preamble__guild-icon-container {
-	grid-column: 1
-}
-
-.preamble__guild-icon {
-	max-width: 88px;
-	max-height: 88px
-}
-
-.preamble__entries-container {
-	grid-column: 2;
-	margin-left: 1rem
-}
-
-.preamble__entry {
-	margin-bottom: 0.15rem;
-	color: #ffffff;
-	font-size: 1.4rem
-}
-
-.preamble__entry--small {
-	font-size: 1rem
-}
-
 .chatlog {
 	padding: 1rem 0;
 	width: 100%;
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+	border-top: 1px solid var(--borders);
+	border-bottom: 1px solid var(--borders)
 }
 
 .chatlog__message-group {
@@ -216,8 +209,8 @@ img {
 .chatlog__reference-symbol {
 	height: 10px;
 	margin: 6px 4px 4px 36px;
-	border-left: 2px solid #4f545c;
-	border-top: 2px solid #4f545c;
+	border-left: 2px solid var(--borders2);
+	border-top: 2px solid var(--borders2);
 	border-radius: 8px 0 0 0
 }
 
@@ -341,7 +334,7 @@ img {
 
 .chatlog__author {
 	font-weight: 500;
-	color: #ffffff
+	color: var(--color-contrast)
 }
 
 .chatlog__bot-label {
@@ -442,7 +435,7 @@ img {
 	padding: 10px;
 	border: 1px solid #292b2f;
 	border-radius: 3px;
-	background-color: #2f3136;
+	background-color: var(--panel-channels-bg);
 	overflow: hidden
 }
 
@@ -661,7 +654,7 @@ img {
 	padding: 0.125rem 0.375rem;
 	border: 1px solid transparent;
 	border-radius: 8px;
-	background-color: #2f3136;
+	background-color: var(--panel-channels-bg);
 	align-items: center
 }
 
@@ -717,12 +710,12 @@ img {
 
 .chatlog__markdown-quote-border {
 	margin-right: 0.5rem;
-	border: 2px solid #4f545c;
+	border: 2px solid var(--borders2);
 	border-radius: 3px
 }
 
 .chatlog__markdown-pre {
-	background-color: #2f3136;
+	background-color: var(--panel-channels-bg);
 	font-family: "Consolas", "Courier New", Courier, monospace;
 	font-size: 0.85rem
 }
@@ -737,7 +730,7 @@ img {
 }
 
 .chatlog__markdown-pre--multiline.hljs {
-	background-color: #2f3136;
+	background-color: var(--panel-channels-bg);
 	color: #b9bbbe
 }
 
@@ -807,7 +800,7 @@ img {
 
 /* thin dark scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 3px;}
-::-webkit-scrollbar-track {  background-color: #2F3136;}
+::-webkit-scrollbar-track {  background-color: var(--panel-channels-bg);}
 ::-webkit-scrollbar-track-piece { background-color: #2F3136;}
 ::-webkit-scrollbar-thumb { height: 50px; background-color: #202225; border-radius: 3px;}
 ::-webkit-scrollbar-corner { background-color: #646464;}
