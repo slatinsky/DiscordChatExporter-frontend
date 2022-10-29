@@ -11,7 +11,7 @@ View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExport
 - Threads support (go to thread, go back to channel where thread was created)
 - Forums support (view forum posts as if they were threads)
 - Guild search with autocomplete and filters
-- View media files locally
+- View assets files locally or from remote servers
 - Browse guild or direct messages
 - Discord Markdown rendering support
 - Command generator to extend your export with more messages (backup helper)
@@ -47,7 +47,7 @@ This tool uses Sveltekit and Python3 as main dependencies. You won't be able to 
 
 <a name="supported-exports"></a>
 # Which exports are supported?
-The main requirement is that media files (`--media True --reuse-media True`) are exported and JSON export format (`--format Json`) is used There are some examples:
+The main requirement is that JSON export format (`--format Json`) is used. Archiving assets is recomended (`--media True --reuse-media True`), but not required. There are some examples:
 
 Export all accessible channels from guild:
 ```
@@ -291,7 +291,6 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 - make readme easy to understand
 - Linux support (docker?)
 - Improve code readability
-- online mode - view media files directly from Discord servers
 
 ## Why this tool was made
 [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) is a well made tool to export Discord chats. But to actually view them, you had to download them in HTML format, which more inconvenient to parse than JSON. And If you wanted to extend your backup, it would be broken into multiple files, which is not very convenient.

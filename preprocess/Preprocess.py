@@ -13,7 +13,6 @@ import helpers
 class Preprocess:
     def __init__(self, input_directory):
         self.input_directory = input_directory
-        self.files = self._find_json_files(self.input_directory)
         self.guilds = {}  # guild id is key
         self.channels = {}  # channel id is key
         self.messages = {}  # message id is key
@@ -45,7 +44,7 @@ class Preprocess:
         for path in glob.glob(directory + '**/*', recursive=True):
             if regex_pattern.match(path):
                 filename = os.path.basename(path)
-                all_files[filename] = path
+                all_files[filename] = path.replace('\\', '/')
 
         return all_files
 
@@ -75,6 +74,7 @@ class Preprocess:
                 'main.py',
                 'Preprocess.py',
                 'Progress.py',
+                'Assets.py',
             ]
             all_content = b''
             for filename in filenames:
@@ -136,9 +136,6 @@ class Preprocess:
 
         print("   Found " + str(len(ids_from_html)) +
               " message ids in HTML files")
-        # save to file
-        # with open('../static/data/ids_from_html.json', 'w') as f:
-        #     json.dump(ids_from_html, f, indent=4)
         return ids_from_html
 
     def process(self):
@@ -184,7 +181,7 @@ class Preprocess:
             print("\nProcessing guild '" + guilds[guild_id]['name'] + "'")
             gp = GuildPreprocess(guild_id, self.input_directory,
                                  json_filepaths, media_filepaths, ids_from_html)
-            guilds[guild_id] = gp.calculateGuildFilename(guilds[guild_id])
+            guilds[guild_id] = gp.calculate_guild_filename(guilds[guild_id])
             gp.process()
 
         print("\nWriting guild list JSON")
@@ -196,6 +193,3 @@ class Preprocess:
             json.dump(guilds, f)
 
         print("PREPROCESS DONE")
-
-    def get_files(self):
-        return self.files

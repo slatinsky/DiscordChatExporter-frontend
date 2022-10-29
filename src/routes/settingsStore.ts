@@ -5,6 +5,7 @@ export const nameRenderer = writable("nickname");
 export const timestampFormat = writable(0);
 export const developerMode = writable(false);
 export const theme = writable("dark");
+export const online = writable(false);
 
 function withLocalStorage(store, localstorageKey: string, type = "string") {
     const restoredValue = localStorage.getItem(localstorageKey);
@@ -30,4 +31,5 @@ withLocalStorage(nameRenderer, "nameRenderer", "string");
 withLocalStorage(timestampFormat, "timestampFormat", "int");
 withLocalStorage(developerMode, "developerMode", "bool");
 withLocalStorage(theme, "theme", "string");
+withLocalStorage(online, "online", "bool");
 

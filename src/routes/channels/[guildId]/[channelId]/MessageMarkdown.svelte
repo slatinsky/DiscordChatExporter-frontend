@@ -1,4 +1,6 @@
 <script>
+    import {checkUrl } from '../../../../helpers';
+
     export let content
     export let guild
     export let message
@@ -16,7 +18,7 @@
         if (regex.test(processedContent)) {
             try {
                 processedContent = processedContent.replace(regex, (match) => {
-                    return `<img src="${Object.values(guild.emojis).find(emoji => emoji.name === match.slice(1, -1)).localFilePath}" alt="${match}" title="${match}" class="message-emoji">`
+                    return `<img src="${checkUrl(Object.values(guild.emojis).find(emoji => emoji.name === match.slice(1, -1)).imageUrl?.url)}" alt="${match}" title="${match}" class="message-emoji">`
                 })
             }
             catch (e) {

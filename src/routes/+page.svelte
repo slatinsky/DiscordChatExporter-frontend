@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, timestampFormat, developerMode, theme } from './settingsStore';
+	import { nameRenderer, timestampFormat, developerMode, theme, online } from './settingsStore';
 	import { timestampRenderers } from './time';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
@@ -52,6 +52,19 @@
 	{/key}
 </div>
 
+<p>Fetch assets from remote servers</p>
+<div class="radios">
+	{#key $nameRenderer}
+	<label>
+		<input type="radio" name="online" value={false} bind:group={$online} />
+		<span>Never - view assets offline only</span>
+	</label>
+	<label>
+		<input type="radio" name="online" value={true} bind:group={$online} />
+		<span>If local media doesn't exist</span>
+	</label>
+	{/key}
+</div>
 
 <p>Theme</p>
 <div class="radios">

@@ -1,12 +1,12 @@
 <script>
-	import { nameRenderer } from '../../../settingsStore';
+	import { nameRenderer, online } from '../../../settingsStore';
 	import { onMount, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import MessageMarkdown from './MessageMarkdown.svelte';
 	import ContextMenu from '../../../../components/menu/ContextMenu.svelte';
 	import MenuOption from '../../../../components/menu/MenuOption.svelte';
 	import { setMenuVisible, isMenuVisible } from '../../../../components/menu/menuStore';
-	import { copyTextToClipboard } from '../../../../helpers';
+	import { copyTextToClipboard, checkUrl } from '../../../../helpers';
 	import { renderTimestamp } from '../../../time';
 
 	export let message;
@@ -53,6 +53,7 @@
 	onDestroy(() => {
 		observer.disconnect();
 	});
+
 
 	function processMessage() {
 		console.log();
@@ -119,6 +120,8 @@
 		}
 	}
 
+
+
 	let rightClickMessage = null;
 	function onRightClick(e, message) {
 		$isMenuVisible = false  // close previous menu
@@ -158,7 +161,7 @@
 						{#if message.type != 'ThreadCreated'}
 							<img
 								class="chatlog__avatar"
-								src={message.author?.localFilePath}
+								src={checkUrl(message.author?.avatarUrl?.url)}
 								alt="Avatar"
 								loading="lazy"
 								width="{message.author?.width ?? 40}"
@@ -201,7 +204,7 @@
 									<div class="chatlog__reference">
 										<img
 											class="chatlog__reference-avatar"
-											src={message.referencedMessage.author?.localFilePath}
+											src={checkUrl(message.referencedMessage.author?.avatarUrl?.url)}
 											alt="Avatar"
 											loading="lazy"
 											width="{message.referencedMessage.author?.width ?? 16}"
@@ -249,29 +252,29 @@
 							</div>
 							{#if message.attachments}
 								{#each message.attachments as attachment}
-									{#if attachment.type == 'image'}
+									{#if attachment.url.type == 'image'}
 										<div class="chatlog__attachment">
-											<a href={attachment?.localFilePath} target="_blank">
+											<a href={checkUrl(attachment?.url?.url)} target="_blank">
 												<img
 													class="chatlog__attachment-media"
-													src={attachment?.localFilePath}
+													src={checkUrl(attachment?.url?.url)}
 													alt="Attachment"
 													title="Image: {attachment.fileName} ({attachment.fileSizeBytes} B)"
 													loading="lazy"
 													
-													width="{attachment?.width ?? 16}"
-													height="{attachment?.height ?? 16}"
+													width="{attachment?.url.width ?? undefined}"
+													height="{attachment?.url.height ?? undefined}"
 													onerror="this.style.visibility='hidden'"
 												/>
 											</a>
 										</div>
-									{:else if attachment.type == 'video'}
+									{:else if attachment.url.type == 'video'}
 										<video class="chatlog__attachment-media" controls preload="metadata">
-											<source src="{attachment?.localFilePath}" alt="{attachment?.Description ?? 'Video attachment'}" title="Video: {attachment.fileName} ({attachment.fileSizeBytes} B)">
+											<source src="{checkUrl(attachment?.url?.url)}" alt="{attachment?.Description ?? 'Video attachment'}" title="Video: {attachment.fileName} ({attachment.fileSizeBytes} B)">
 										</video>
 									{:else}
 										<div class="chatlog__attachment">
-											<a href={attachment?.localFilePath} target="_blank">
+											<a href={checkUrl(attachment?.url?.url)} target="_blank">
 												<div class="chatlog__attachment-generic">
 													<svg class="chatlog__attachment-generic-icon">
 														<svg
@@ -296,7 +299,7 @@
 														</svg>
 													</svg>
 													<div class="chatlog__attachment-generic-name">
-														<a href={attachment?.localFilePath} target="_blank">
+														<a href={checkUrl(attachment?.url?.url)} target="_blank">
 															{attachment.fileName}
 														</a>
 													</div>
@@ -327,9 +330,9 @@
 												<!-- @{/* Embed author */} -->
 												{#if embed.author}
 													<div class="chatlog__embed-author-container">
-														<!-- embed.author.iconUrl -->
-														{#if embed.author.localFilePath}
-															<img class="chatlog__embed-author-icon" src="{embed.author.localFilePath}" alt="Author icon" loading="lazy" onerror="this.style.visibility='hidden'"
+														<!-- TODO: check url -->
+														{#if embed.author?.iconUrl?.url}
+															<img class="chatlog__embed-author-icon" src="{checkUrl(embed.author?.iconUrl?.url)}" alt="Author icon" loading="lazy" onerror="this.style.visibility='hidden'"
 													width="{embed.author?.width ?? 16}"
 													height="{embed.author?.height ?? 16}"
 													>
@@ -391,14 +394,14 @@
 											<!-- @{/* Embed content */} -->
 												{#if embed.thumbnail}
 													<div class="chatlog__embed-thumbnail-container">
-														<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.localFilePath}" target="_blank">
+														<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.url?.url}" target="_blank">
 															<!-- {console.warn(embed.thumbnail.type)} -->
-															{#if embed.thumbnail.type === 'video'}
-																<video class="chatlog__embed-thumbnail-video" src="{embed.thumbnail?.localFilePath}" autoplay loop muted playsinline
+															{#if embed.thumbnail?.url?.type === 'video'}
+																<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.thumbnail?.url?.url)}" autoplay loop muted playsinline
 																width="{embed.thumbnail?.width ?? 16}"
 																height="{embed.thumbnail?.height ?? 16}"/>
-															{:else}
-																<img class="chatlog__embed-thumbnail" src="{embed.thumbnail?.localFilePath}" alt="Thumbnail" loading="lazy"
+															{:else if embed.thumbnail?.url?.url}
+																<img class="chatlog__embed-thumbnail" src="{checkUrl(embed.thumbnail?.url?.url)}" alt="Thumbnail" loading="lazy"
 																width="{embed.thumbnail?.width ?? 16}"
 																height="{embed.thumbnail?.height ?? 16}"
 																onerror="this.style.visibility='hidden'"
@@ -413,10 +416,10 @@
 													{#each embed.images as image}
 														<div class="chatlog__embed-images">
 															<div class="chatlog__embed-image-container">
-																<a class="chatlog__embed-image-link" href="{image.localFilePath}" target="_blank">
-																	<img class="chatlog__embed-image" src="{image.localFilePath}" alt="Image" loading="lazy"
-																	width="{image?.width ?? 16}"
-																	height="{image?.height ?? 16}"
+																<a class="chatlog__embed-image-link" href="{checkUrl(image.url?.url)}" target="_blank">
+																	<img class="chatlog__embed-image" src="{checkUrl(image.url?.url)}" alt="Image" loading="lazy"
+																	width="{image?.url?.width ?? 16}"
+																	height="{image?.url?.height ?? 16}"
 																	onerror="this.style.visibility='hidden'"
 																	>
 																</a>
@@ -428,8 +431,8 @@
 												<!-- @{/* Embed footer & icon */} -->
 												{#if embed.footer}
 													<div class="chatlog__embed-footer">
-														{#if embed.footer.localFilePath}
-															<img class="chatlog__embed-footer-icon" src="{embed.footer.localFilePath}" alt="Footer icon" loading="lazy" onerror="this.style.visibility='hidden'">
+														{#if embed.footer.url}
+															<img class="chatlog__embed-footer-icon" src="{checkUrl(embed.footer.url?.url)}" alt="Footer icon" loading="lazy" onerror="this.style.visibility='hidden'">
 														{/if}
 
 														<span class="chatlog__embed-footer-text">
@@ -457,10 +460,10 @@
 										<img
 											class="chatlog__emoji chatlog__emoji--small"
 											alt="{reaction.emoji.name}"
-											src={reaction.emoji?.localFilePath}
+											src={checkUrl(reaction.emoji?.imageUrl.url)}
 											loading="lazy"
-											width="{reaction.emoji?.width ?? 17}"
-											height="{reaction.emoji?.height ?? 17}"
+											width="{reaction.emoji?.imageUrl?.width ?? 17}"
+											height="{reaction.emoji?.imageUrl?.height ?? 17}"
 											onerror="this.style.visibility='hidden'"
 										/> <span class="chatlog__reaction-count">{reaction.count}</span>
 									</div>
