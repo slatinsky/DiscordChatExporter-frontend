@@ -13,7 +13,7 @@
 
 <style>
 	.container {
-		background-color: #36393f;
+		background-color: var(--panel-messages-bg);
 		height: 100vh;
 	}
 

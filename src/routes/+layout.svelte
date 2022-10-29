@@ -1,8 +1,14 @@
 <script>
 	import MemoryUsage from './channels/[guildId]/MemoryUsage.svelte';
+	import { theme } from './settingsStore';
 import './styles.css';
 
 	export let data;
+
+	
+	theme.subscribe(value => {
+		document.documentElement.setAttribute('data-theme', value);
+	});
 </script>
 
 
@@ -70,7 +76,7 @@ import './styles.css';
 		height: 100vh;
 	}
 	.guilds {
-		background-color: #202225;
+		background-color: var(--panel-guilds-bg);
 		height: 100%;
 		overflow-y: auto;
 	}
@@ -89,7 +95,7 @@ import './styles.css';
 		width: 48px;
 		height: 48px;
 		margin: 5px;
-		background-color: #202225;
+		background-color: #00000099;
 		border-radius: 50%;
 		display: flex;
 		justify-content: center;

@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, timestampFormat, developerMode } from './settingsStore';
+	import { nameRenderer, timestampFormat, developerMode, theme } from './settingsStore';
 	import { timestampRenderers } from './time';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
@@ -48,6 +48,25 @@
 	<label>
 		<input type="radio" name="developerMode" value={false} bind:group={$developerMode} />
 		<span>Disabled</span>
+	</label>
+	{/key}
+</div>
+
+
+<p>Theme</p>
+<div class="radios">
+	{#key $nameRenderer}
+	<label>
+		<input type="radio" name="theme" value={"dark"} bind:group={$theme} />
+		<span>Dark</span>
+	</label>
+	<label>
+		<input type="radio" name="theme" value={"black"} bind:group={$theme} />
+		<span>Black</span>
+	</label>
+	<label>
+		<input type="radio" name="theme" value={"white"} bind:group={$theme} />
+		<span>White [Work in progress]</span>
 	</label>
 	{/key}
 </div>

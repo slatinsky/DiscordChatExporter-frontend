@@ -25,11 +25,6 @@
 {#if data.messages}
 <WatchHash messages={data.messages} />
 <section>
-    <!-- {#if messages} -->
-
-        <!-- {#each data.messages as message} -->
-            <!-- <Message message={message}/> -->
-        <!-- {/each} -->
     <div class="chatlog" id="main-chatlog" bind:this={mainChatlog}>
         <div class=chatlog__message-group>
             <div id="top" />
@@ -46,17 +41,6 @@
             <div id="bottom" />
         </div>
     </div>
-
-<!--        <Postamble messageCount="{messages.length}"/>-->
-<!--        <pre>{JSON.stringify(json, null, 2)}</pre>-->
-    <!-- {:else}
-        {#if isError}
-            <p>ERROR</p>
-        {:else}
-            <p>Loading...</p>
-        {/if} -->
-
-    <!-- {/if} -->
 </section>
 {:else}
 <div class="error">
@@ -73,9 +57,10 @@
         height: 100vh;
         text-align: center;
         padding: 2rem;
+        background-color: var(--panel-messages-bg);
     }
  section {
-     background-color: #36393F;
+     background-color: var(--panel-messages-bg);
      /*height: 100vh;*/
  }
 

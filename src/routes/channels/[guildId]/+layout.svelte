@@ -82,7 +82,7 @@
 	#guild-layout {
 		display: grid;
 		/* flex-direction: row; */
-		background-color: #2f3136;
+		background-color: var(--panel-channels-bg);
 		height: 100vh;
 
 		grid-template-areas:
@@ -115,8 +115,8 @@
 		font-weight: 600;
 		position: sticky;
 		top: 0;
-		background-color: #2f3136;
-		border-bottom: 2px solid #202225;
+		background-color: var(--panel-channels-bg);
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 		margin-bottom: 10px;
 	}
 

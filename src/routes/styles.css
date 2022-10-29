@@ -28,8 +28,7 @@
 	font-weight: 700
 }
 
-/*Variables*/
-:root {
+:root[data-theme="dark"] {
 	--color-discord-blue: #5865F2;
 	--color-discord-green: #3BA55D;
 
@@ -50,8 +49,64 @@
 	--ping-text: #DEE0FC;
 	--ping-text-hover: white;
 
-	--msg-link: #00AFF4
+	--msg-link: #00AFF4;
+
+	--message-hover-bg: #32353b;
 }
+:root[data-theme="white"] {
+	--color-discord-blue: #5865F2;
+	--color-discord-green: #3BA55D;
+
+	--channel-text-read: #5E6772;
+	--channel-text-read-hover: #2E3338;
+	--channel-text-unread: black;
+	--channel-bg-hover: #DCDFE3;
+
+	--header-icon: #B9BBBE;
+	--header-icon-hover: #DCDDDE;
+
+	--panel-guilds-bg: #E3E5E8;
+	--panel-channels-bg: #F2F3F5;
+	--panel-messages-bg: white;
+
+	--message-hover-bg: #dddddd;
+
+
+	--ping-bg: #414675;
+	--ping-bg-hover: #5865F2;
+	--ping-text: #DEE0FC;
+	--ping-text-hover: white;
+
+	--msg-link: #00AFF4;
+}
+
+:root[data-theme="black"] {
+	--color-discord-blue: #5865F2;
+	--color-discord-green: #3BA55D;
+
+	--channel-text-read: #8E9297;
+	--channel-text-read-hover: #DCDDDE;
+	--channel-text-unread: white;
+	--channel-bg-hover: #3C3F45;
+
+	--header-icon: #B9BBBE;
+	--header-icon-hover: #DCDDDE;
+
+	--panel-guilds-bg: black;
+	--panel-channels-bg: black;
+	--panel-messages-bg: black;
+
+	--ping-bg: #414675;
+	--ping-bg-hover: #5865F2;
+	--ping-text: #DEE0FC;
+	--ping-text-hover: white;
+
+	--msg-link: #00AFF4;
+
+	--message-hover-bg: #131313;
+}
+
+
 
 html,
 body {
@@ -144,7 +199,7 @@ img {
 }
 
 .chatlog__message:hover {
-	background-color: #32353b
+	background-color: var(--message-hover-bg)
 }
 
 .chatlog__message:hover .chatlog__short-timestamp {
