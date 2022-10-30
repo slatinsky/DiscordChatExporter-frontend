@@ -23,6 +23,10 @@
 	let root;
 	let isVisible = false;
 
+	let sheduledToBeHidden = false;
+
+	let placeholderHeight = 75;
+
 	let observer = new IntersectionObserver(
 		(entries) => {
 			entries.forEach((entry) => {
@@ -33,9 +37,8 @@
 
 					loaded = true;
 					isVisible = true;
-				}
-				else {
-					isVisible = false;
+					sheduledToBeHidden = false;
+					// console.log("message loaded", message.id);
 				}
 			});
 		},
@@ -46,12 +49,42 @@
 		}
 	);
 
+	let unloadObserver = new IntersectionObserver(
+		(entries) => {
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting) {
+					sheduledToBeHidden = true;
+					setTimeout(() => {
+						if (sheduledToBeHidden) {
+							// get height of element
+							placeholderHeight = root.offsetHeight;
+							isVisible = false;
+							sheduledToBeHidden = false;
+							// console.log("message unloaded", message.id);
+
+						}
+						else {
+							// console.log("message not unloaded", message.id);
+						}
+					}, 10000);
+				}
+			});
+		},
+		{
+			root: rootId,
+			rootMargin: '1000% 0px',
+			threshold: 0
+		}
+	);
+
 	onMount(() => {
 		observer.observe(root);
+		unloadObserver.observe(root);
 	});
 
 	onDestroy(() => {
 		observer.disconnect();
+		unloadObserver.disconnect();
 	});
 
 
@@ -478,7 +511,7 @@
 			{/if}
 		</div>
 	{:else}
-		<div class="not-loaded" id={message.id} />
+		<div class="not-loaded" id={message.id} style="height: {placeholderHeight}px;"/>
 	{/if}
 </div>
 
@@ -504,7 +537,7 @@
 
 <style>
 	.not-loaded {
-		height: 75px;
+		/* height: 75px; */
 		width: 100%;
 	}
 
