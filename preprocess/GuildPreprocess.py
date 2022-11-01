@@ -56,6 +56,36 @@ class GuildPreprocess:
                     message['reference']['guildId'] = helpers.pad_id(message['reference']['guildId'])
         return data
 
+    def _merge_messages(self, message1, message2):
+        """
+        smart merge of two messages
+        Keeps most recent data
+        Tries to use local URLs if available
+        Prefers undeleted author from older message
+        """
+        # set the latest timestamp as base_message
+        if message1['timestamp'] > message2['timestamp']:
+            newer_message = message1
+            older_message = message2
+        else:
+            newer_message = message2
+            older_message = message1
+
+        # Prefer local media over remote media even if that means that we are working with older data
+        # TODO: copy over only URLs, not the whole objects
+        if newer_message['author']['avatarUrl'].startswith('http') and not older_message['author']['avatarUrl'].startswith('http'):
+            newer_message['author']['avatarUrl'] = older_message['author']['avatarUrl']
+            newer_message['attachments'] = older_message['attachments']
+            newer_message['embeds'] = older_message['embeds']
+            newer_message['stickers'] = older_message['stickers']
+            newer_message['reactions'] = older_message['reactions']
+            newer_message['mentions'] = older_message['mentions']
+
+        # try to save the author name if deleted in newer backups
+        if newer_message['author']['name'] == 'Deleted User' and newer_message['author']['discriminator'] == '0000':
+            newer_message['author'] = older_message['author']
+
+        return newer_message
 
     def read_channels_messages_from_files(self):
         channels = {}
@@ -75,7 +105,10 @@ class GuildPreprocess:
                 for message in data['messages']:
                     # temporary marker for channel id
                     message['channelId'] = channel['id']
-                    messages[message['id']] = message
+                    if message['id'] not in messages:
+                        messages[message['id']] = message
+                    else:
+                        messages[message['id']] = self._merge_messages(messages[message['id']], message)
         return channels, messages
 
     def simulate_thread_creation(self, channels, messages):
