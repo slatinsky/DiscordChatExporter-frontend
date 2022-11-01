@@ -25,6 +25,10 @@
 		<input type="radio" name="nameRenderer" value={"handle"} bind:group={$nameRenderer} />
 		<span>Name with handle (Deleted_User#0000)</span>
 	</label>
+	<label>
+		<input type="radio" name="nameRenderer" value={"both"} bind:group={$nameRenderer} />
+		<span>Both (Deleted User (Deleted_User#0000))</span>
+	</label>
 	{/key}
 </div>
 

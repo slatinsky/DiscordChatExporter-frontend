@@ -102,7 +102,11 @@
 	function nickname(author) {
 		if ($nameRenderer === 'nickname') {
 			return author?.nickname ?? full_name(author);
-		} else {
+		}
+		else if ($nameRenderer === 'both') {
+			return author?.nickname + ' (' + full_name(author) + ')';
+		}
+		else {
 			return full_name(author);
 		}
 	}
