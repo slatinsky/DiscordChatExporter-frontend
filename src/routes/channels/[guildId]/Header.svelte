@@ -1,5 +1,6 @@
 <script>
-	import SearchFilter from './SearchFilter.svelte';
+	import IconChannel from '../../../components/icons/IconChannel.svelte';
+import SearchFilter from './SearchFilter.svelte';
 
 	export let channel;
 	// export let messages;
@@ -10,9 +11,11 @@
 	<div class="channel-header">
 		<div class="channel-header__left">
 			{#if channel}
-				<div class="channel-name elipsis"># {channel.name}</div>
+				<IconChannel />
+				<div class="channel-name elipsis"> {channel.name}</div>
 				{#if channel.topic}
-					<div class="topic elipsis">| {channel.topic}</div>
+					<div class="divider">|</div>
+					<div class="topic elipsis">{channel.topic}</div>
 				{/if}
 			{/if}
 			<div class="spacer" />
@@ -31,7 +34,7 @@
 		flex-direction: row;
 		align-items: center;
 
-		gap: 15px;
+		gap: 10px;
 
 		padding: 10px 20px;
 
@@ -41,12 +44,23 @@
 	}
 
 	.channel-name {
-		font-size: 1.5rem;
+		font-size: 17px;
 		font-weight: 700;
+		color: var(--color-contrast);
+	}
+
+	:global(.channel-name svg) {
+		margin-top: 5px;
 	}
 
 	.topic {
-		font-size: 1rem;
+		font-size: 14px;
+		font-weight: 400;
+		color: var(--header-icon);
+	}
+
+	.divider {
+		font-size: 24px;
 		font-weight: 400;
 		color: gray;
 	}

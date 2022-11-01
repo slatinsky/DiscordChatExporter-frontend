@@ -45,7 +45,9 @@
 			<MenuCategory {category} guildId={data.guildId} selectedChannelId={data.channelId} {onRightClick}/>
 		{/each}
 		{#if data.guildId != '0'}
+		<div id="backup-helper">
 			<a href="/channels/{data.guildId}/continue">Backup helper</a>
+		</div>
 		{/if}
 
 	</div>
@@ -144,5 +146,16 @@
 	}
 	#search:empty {
 		display: none;
+	}
+
+	#backup-helper {
+		margin-top: auto;
+		padding: 10px 0 10px 14px;
+		font-size: 14px;
+		font-weight: 600;
+		position: sticky;
+		bottom: 0;
+		background-color: var(--panel-channels-bg);
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 	}
 </style>

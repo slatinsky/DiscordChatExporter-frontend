@@ -42,7 +42,7 @@
 	border-radius: 5px;
 	color: var(--text-secondary);
 
-	font-size: smaller;
+	font-size: 12px;
 	pointer-events: none;
 }
 </style>
