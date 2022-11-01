@@ -1,6 +1,8 @@
 <script>
 	import SearchResults from './SearchResults.svelte';
 	import { searched, found_messages } from './searchStores';
+	import { checkUrl } from '../../../helpers';
+
 	// import Messages from './[channelId]/Messages.svelte';
 
 	export let guild;
@@ -165,6 +167,21 @@
 			extension.toLowerCase().includes(parsedCursorHere.value.toLowerCase())
 		);
 	}
+
+	function filterKeys(needle, parsedCursorHere) {
+		if (value.includes(needle))
+			return false;
+		if (parsedCursorHere.content === "") {
+			return true
+		}
+		else if (!parsedCursorHere.content) {
+			return false
+		}
+		else {
+			return needle.toLowerCase().includes(parsedCursorHere.content.toLowerCase())
+		}
+	}
+
 	function findMessages() {
 		console.log('searching for messages');
 		let found_messages_temp = [];
@@ -238,21 +255,28 @@
 					channelMessages = channelMessages.filter((message) => {
 						return (
 							message.attachments &&
-							message.attachments.some((attachment) => attachment.type === 'image')
+							message.attachments.some((attachment) => attachment.url.type === 'image')
 						);
 					});
 				} else if (filter.key === 'has' && filter.value === 'video') {
 					channelMessages = channelMessages.filter((message) => {
 						return (
 							message.attachments &&
-							message.attachments.some((attachment) => attachment.type === 'video')
+							message.attachments.some((attachment) => attachment.url.type === 'video')
+						);
+					});
+				} else if (filter.key === 'has' && filter.value === 'sound') {
+					channelMessages = channelMessages.filter((message) => {
+						return (
+							message.attachments &&
+							message.attachments.some((attachment) => attachment.url.type === 'audio')
 						);
 					});
 				} else if (filter.key === 'filetype') {
 					channelMessages = channelMessages.filter((message) => {
 						return (
 							message.attachments &&
-							message.attachments.some((attachment) => attachment.extension === filter.value)
+							message.attachments.some((attachment) => attachment.url.extension === filter.value)
 						);
 					});
 				} else if (filter.key === 'reaction') {
@@ -389,7 +413,7 @@
 							on:click={() =>
 								selectOptionValue(author.name.replaceAll(' ', '_') + '#' + author.discriminator)}
 						>
-							<img class="avatar" src={author?.localFilePath} alt="Avatar" loading="lazy" />
+							<img class="avatar" src={checkUrl(author?.avatarUrl?.url)} alt="Avatar" loading="lazy" />
 							<div>{author.nickname} ({author.name}#{author.discriminator})</div>
 							<div class="spacer"></div>
 							<div>{author.messagesCount}x</div>
@@ -416,7 +440,7 @@
 							class="emoji search-option"
 							on:click={() => selectOptionValue(emoji.name)}
 						>
-							<img class="emoji" src={emoji?.localFilePath} alt="Emoji" loading="lazy" width="30" height="30" title={emoji.name+" (" + emoji.usedCount + "x)"} />
+							<img class="emoji" src={checkUrl(emoji?.imageUrl?.url)} alt={":" + emoji.name + ":"} loading="lazy" width="30" height="30" title={emoji.name+" (" + emoji.usedCount + "x)"} />
 						</div>
 					{/key}
 				{/each}
@@ -436,77 +460,82 @@
 				</div>
 			{:else}
 				<div>
-					{#if !value.includes('from:')}
+					{#if filterKeys('from:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('from')}>
 							<b>from: </b>user
 						</div>
 					{/if}
-					{#if !value.includes('mentions:')}
+					{#if filterKeys('mentions:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('mentions')}>
 							<b>mentions: </b>user
 						</div>
 					{/if}
-					{#if !value.includes('has:link')}
+					{#if filterKeys('has:link', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectFullOption('has', 'link')}>
 							<b>has: </b>link
 						</div>
 					{/if}
-					{#if !value.includes('has:embed')}
+					{#if filterKeys('has:embed', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectFullOption('has', 'embed')}>
 							<b>has: </b>embed
 						</div>
 					{/if}
-					{#if !value.includes('has:file')}
+					{#if filterKeys('has:file', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectFullOption('has', 'file')}>
 							<b>has: </b>file
 						</div>
 					{/if}
-					{#if !value.includes('has:image')}
+					{#if filterKeys('has:image', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectFullOption('has', 'image')}>
 							<b>has: </b>image
 						</div>
 					{/if}
-					{#if !value.includes('has:video')}
+					{#if filterKeys('has:video', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectFullOption('has', 'video')}>
 							<b>has: </b>video
 						</div>
 					{/if}
-					{#if !value.includes('before:')}
+					{#if filterKeys('has:sound', parsedCursorHere)}
+						<div class="search-option" on:click={() => selectFullOption('has', 'sound')}>
+							<b>has: </b>sound
+						</div>
+					{/if}
+					{#if filterKeys('before:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('before')}>
 							<b>before: </b>specific date
 						</div>
 					{/if}
-					{#if !value.includes('reaction:')}
+					{#if filterKeys('reaction:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('reaction')}>
 							<b>reaction: </b>emoji
 						</div>
 					{/if}
-					{#if !value.includes('filetype:')}
+					{#if filterKeys('filetype:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('filetype')}>
 							<b>filetype: </b>extension
 						</div>
 					{/if}
-					<!-- {#if !value.includes('during:')}
+					<!-- {#if filterKeys('during:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('during')}>
 							<b>[WIP] during: </b>specific date
 						</div>
 					{/if} -->
-					{#if !value.includes('after:')}
+					{#if filterKeys('after:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('after')}>
 							<b>after: </b>specific date
 						</div>
 					{/if}
-					{#if !value.includes('in:')}
+					{#if filterKeys('in:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('in')}>
 							<b>in: </b>channel
 						</div>
 					{/if}
-					{#if !value.includes('pinned:')}
+					{#if filterKeys('pinned:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectFullOption('pinned', 'true')}>
 							<b>pinned: </b>true
 						</div>
 					{/if}
-					{#if !value.includes('pinned:')}
+					{#if filterKeys('pinned:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectFullOption('pinned', 'false')}>
 							<b>pinned: </b>false
 						</div>

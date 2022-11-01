@@ -31,7 +31,7 @@ Note: Discord servers are known internally as guilds
 Using prebuilt binaries is the easiest way to use this tool on Windows.
 1. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
 2. Extract the archive
-3. Move your JSON+media [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/static/input/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs.
+3. Move your JSON+assets [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/static/input/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs.
 4. Run `START_VIEWER.bat` - DiscordChatExporter-frontend will open in your default browser
 
 ## Upgrade guide
@@ -47,19 +47,19 @@ This tool uses Sveltekit and Python3 as main dependencies. You won't be able to 
 
 <a name="supported-exports"></a>
 # Which exports are supported?
-The main requirement is that JSON export format (`--format Json`) is used. Archiving assets is recomended (`--media True --reuse-media True`), but not required. There are some examples:
+The main requirement is that JSON export format (`--format Json`) is used. Archiving assets is recomended (`--media --reuse-media`), but not required. There are some examples:
 
 Export all accessible channels from guild:
 ```
-DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g GUILD_ID --media True --reuse-media True --format Json --output OUTPUT_FOLDER_PATH
+DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g GUILD_ID --media --reuse-media --format Json --output OUTPUT_FOLDER_PATH
 ```
 Export all dms (sadly, exporting dms can't be done without selfboting):
 ```
-DiscordChatExporter.Cli.exe exportdm --token DISCORD_TOKEN --media True --reuse-media True --format Json --output OUTPUT_FOLDER_PATH
+DiscordChatExporter.Cli.exe exportdm --token DISCORD_TOKEN --media --reuse-media --format Json --output OUTPUT_FOLDER_PATH
 ```
 Export channel:
 ```
-DiscordChatExporter.Cli export --token DISCORD_TOKEN  --media True --reuse-media True --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID
+DiscordChatExporter.Cli export --token DISCORD_TOKEN  --media --reuse-media --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID
 ```
 - disadvantage of export with media files is, that original URLs are not archived
 
@@ -70,7 +70,7 @@ You do not need HTML exports (you can view JSON exports in this viewer), but if 
 ```
 DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID
 
-DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media True --reuse-media True --format HtmlDark --channel CHANNEL_OR_THREAD_ID
+DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media --reuse-media --format HtmlDark --channel CHANNEL_OR_THREAD_ID
 ```
 
 - disadvantage is, that thumbnails for embeds will not be working in this viewer if you export this way (workaround by html parsing is made, but it doesn't work for all embeds)
@@ -78,11 +78,11 @@ DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH
 **another method**
 
 ```
-DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media True --reuse-media True --format Json --channel CHANNEL_OR_THREAD_ID
+DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media --reuse-media --format Json --channel CHANNEL_OR_THREAD_ID
 
 [replace in folder name `.json_Files` to `.html_Files`]
 
-DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media True --reuse-media True --format HtmlDark --channel CHANNEL_OR_THREAD_ID
+DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH --media --reuse-media --format HtmlDark --channel CHANNEL_OR_THREAD_ID
 ```
 - original URLs are not archived, but embeds will work in this viewer
 
@@ -181,7 +181,7 @@ WATCH_DEV.bat
 preprocess script will:
 - merge JSON files by guilds
 - deduplicate messages, authors and reactions to reduce used memory footprint
-- pair messages with their media files
+- pair messages with their assets
 - save processed data to `/static/data/` folder. You can delete this folder at any time, original JSON files in `/static/input/` will never be changed.
 
 After running preprocess script, don't remove `/static/input/` folder - it's needed to serve media files.

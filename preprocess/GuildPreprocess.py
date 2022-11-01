@@ -225,10 +225,10 @@ class GuildPreprocess:
         extensions = set()
         for message in messages.values():
             for attachment in message['attachments']:
-                if 'extension' in attachment:
+                if 'url' in attachment and 'extension' in attachment['url']:
                     # extensions.add(attachment['extension'])
                     # extensions.add(os.path.splitext(attachment['localFileName'])[-1].replace('.', '').lower())
-                    extensions.add(os.path.splitext(attachment['extension'])[0])
+                    extensions.add(os.path.splitext(attachment['url']['extension'])[0])
         exten_list = list(extensions)
         exten_list.sort()
         return exten_list

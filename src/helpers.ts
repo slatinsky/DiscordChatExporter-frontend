@@ -44,12 +44,11 @@ export function copyTextToClipboard(text) {
 export function checkUrl(url) {
     if (!url)
         return "";
-    if (!get(online)){
-        console.warn("url was not allowed to load, because offline mode is enforced", url);
-        return "";
-    }
-
     if (url.startsWith('https') || url.startsWith('http')) {
+        if (!get(online)){
+            console.warn("url was not allowed to load, because offline mode is enforced", url);
+            return "";
+        }
         console.warn('online url', url);
     }
     return url

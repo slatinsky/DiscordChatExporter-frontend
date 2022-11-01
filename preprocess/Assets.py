@@ -107,7 +107,6 @@ class Assets:
             if local_url is None:
                 local_url_from_html = self.find_in_html_ids(message_id, file_name_with_hash)
                 if local_url_from_html is None:
-                    print(".")
                     # print("Local asset not found, using remote asset: ", remote_url)
                     return remote_url
                 else:
@@ -145,13 +144,13 @@ class Assets:
         }
         file_name_with_hash = self.filename_from_url_or_path(url_or_path)
         resolved_url_or_path = self.resolve_url_or_path(url_or_path, message_id)
+        result['extension'] = os.path.splitext(file_name_with_hash)[-1].replace('.', '').lower()
+        result['type'] = self.get_file_type(result['extension'])
 
-        if resolved_url_or_path is None:
+        if resolved_url_or_path is None:  # file not found and url is local, file is lost
             return result
 
         result['url'] = resolved_url_or_path
-        result['extension'] = os.path.splitext(file_name_with_hash)[-1].replace('.', '').lower()
-        result['type'] = self.get_file_type(result['extension'])
 
         if result['type'] == 'image' and not self.is_remote_url(url_or_path):
             # calculate dimension

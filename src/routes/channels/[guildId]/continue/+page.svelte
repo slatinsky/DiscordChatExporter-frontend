@@ -29,11 +29,11 @@
             if (explainCommands)
                 commandsUpdate += `# ${channel.channel.name} (${channel.channel.category})\n`;
             if (exportHtml) {
-			    commandsUpdate += `DiscordChatExporter.Cli export --token ${token} --media True --reuse-media True --format HtmlDark --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
+			    commandsUpdate += `DiscordChatExporter.Cli export --token ${token} --media --reuse-media --format HtmlDark --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
                 commandsUpdate += `DiscordChatExporter.Cli export --token ${token} --format Json --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
             }
             else {
-                commandsUpdate += `DiscordChatExporter.Cli export --token ${token} --media True --reuse-media True --format Json --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
+                commandsUpdate += `DiscordChatExporter.Cli export --token ${token} --media --reuse-media --format Json --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
             }
 		}
 		// remove last new line
@@ -46,11 +46,11 @@
             if (explainCommands)
                 commandsUpdateT += `# ${channel.channel.name} (${channel.channel.category})\n`;
             if (exportHtml) {
-                commandsUpdateT += `DiscordChatExporter.Cli export --token ${token} --media True --reuse-media True --format HtmlDark --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
+                commandsUpdateT += `DiscordChatExporter.Cli export --token ${token} --media --reuse-media --format HtmlDark --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
                 commandsUpdateT += `DiscordChatExporter.Cli export --token ${token} --format Json --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
             }
             else {
-                commandsUpdateT += `DiscordChatExporter.Cli export --token ${token} --media True --reuse-media True --format Json --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
+                commandsUpdateT += `DiscordChatExporter.Cli export --token ${token} --media --reuse-media --format Json --after "${cleanTimestamp(channel.newestMessage.timestamp)}" --channel ${channelId} ${customArguments}\n`;
             }
 		}
 		// remove last new line
@@ -69,11 +69,11 @@
                 }
             }
             if (exportHtml) {
-                commandsThreads += `DiscordChatExporter.Cli export --token ${token} --media True --reuse-media True --format HtmlDark --channel ${channelId} ${customArguments}\n`;
+                commandsThreads += `DiscordChatExporter.Cli export --token ${token} --media --reuse-media --format HtmlDark --channel ${channelId} ${customArguments}\n`;
                 commandsThreads += `DiscordChatExporter.Cli export --token ${token} --format Json --channel ${channelId} ${customArguments}\n`;
             }
             else {
-                commandsThreads += `DiscordChatExporter.Cli export --token ${token} --media True --reuse-media True --format Json --channel ${channelId} ${customArguments}\n`;
+                commandsThreads += `DiscordChatExporter.Cli export --token ${token} --media --reuse-media --format Json --channel ${channelId} ${customArguments}\n`;
             }
 		}
 
