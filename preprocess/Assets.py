@@ -140,7 +140,7 @@ class Assets:
 
     def calculate_local_file_attributes(self, message_id, url_or_path):
         result = {
-            'original': url_or_path,  # for debug only, not useful in the viewer
+            # 'original': url_or_path,  # for debug only, not useful in the viewer
         }
         file_name_with_hash = self.filename_from_url_or_path(url_or_path)
         resolved_url_or_path = self.resolve_url_or_path(url_or_path, message_id)

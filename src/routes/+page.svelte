@@ -56,7 +56,7 @@
 	{/key}
 </div>
 
-<p>Open discord links</p>
+<p>Open discord links (right click message to open in Discord)</p>
 <div class="radios">
 	{#key $linkHandler}
 	<label>
@@ -80,7 +80,7 @@
 	</label>
 	<label>
 		<input type="radio" name="online" value={true} bind:group={$online} />
-		<span>If local media doesn't exist</span>
+		<span>If local assets doesn't exist</span>
 	</label>
 	{/key}
 </div>

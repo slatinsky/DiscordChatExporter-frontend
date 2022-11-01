@@ -192,7 +192,6 @@
 
 		for (const [channelId, channel] of Object.entries(all_messages)) {
 			let channelMessages = Object.values(channel);
-			console.log('channelMessages.length', channelMessages.length);
 
 			for (const filter of filters) {
 				
