@@ -80,7 +80,6 @@
 	onMount(() => {
 		observer.observe(root);
 		if ($unloadMessages) {
-			console.log("unloading messages");
 			unloadObserver.observe(root);
 		}
 	});

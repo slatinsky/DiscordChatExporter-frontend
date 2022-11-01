@@ -152,7 +152,7 @@ class Assets:
 
         result['url'] = resolved_url_or_path
 
-        if result['type'] == 'image' and not self.is_remote_url(url_or_path):
+        if result['type'] == 'image' and not self.is_remote_url(resolved_url_or_path):
             # calculate dimension
             if not SKIP_PREPROCESSING_IMAGES:
                 try:
