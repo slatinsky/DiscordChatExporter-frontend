@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, online, linkHandler } from '../../../settingsStore';
+	import { nameRenderer, linkHandler, unloadMessages } from '../../../settingsStore';
 	import { onMount, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import MessageMarkdown from './MessageMarkdown.svelte';
@@ -79,12 +79,17 @@
 
 	onMount(() => {
 		observer.observe(root);
-		unloadObserver.observe(root);
+		if ($unloadMessages) {
+			console.log("unloading messages");
+			unloadObserver.observe(root);
+		}
 	});
 
 	onDestroy(() => {
 		observer.disconnect();
-		unloadObserver.disconnect();
+		if ($unloadMessages) {
+			unloadObserver.disconnect();
+		}
 	});
 
 

@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler } from './settingsStore';
+	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, unloadMessages } from './settingsStore';
 	import { timestampRenderers } from './time';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
@@ -80,7 +80,7 @@
 	</label>
 	<label>
 		<input type="radio" name="online" value={true} bind:group={$online} />
-		<span>If local assets doesn't exist</span>
+		<span>If local assets don't exist</span>
 	</label>
 	{/key}
 </div>
@@ -99,6 +99,20 @@
 	<label>
 		<input type="radio" name="theme" value={"white"} bind:group={$theme} />
 		<span>White [Work in progress]</span>
+	</label>
+	{/key}
+</div>
+
+<p>Unload messages that are not visible?</p>
+<div class="radios">
+	{#key $unloadMessages}
+	<label>
+		<input type="radio" name="unloadMessages" value={true} bind:group={$unloadMessages} />
+		<span>Yes (uses less RAM)</span>
+	</label>
+	<label>
+		<input type="radio" name="unloadMessages" value={false} bind:group={$unloadMessages} />
+		<span>No (fixes messages going up and down in some browsers while scrolling, but browser may be laggy if you scroll long enough)</span>
 	</label>
 	{/key}
 </div>

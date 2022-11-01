@@ -7,6 +7,7 @@ export const developerMode = writable(false);
 export const theme = writable("dark");
 export const online = writable(false);
 export const linkHandler = writable("app");
+export const unloadMessages = writable(false);
 
 function withLocalStorage(store, localstorageKey: string, type = "string") {
     const restoredValue = localStorage.getItem(localstorageKey);
@@ -34,4 +35,5 @@ withLocalStorage(developerMode, "developerMode", "bool");
 withLocalStorage(theme, "theme", "string");
 withLocalStorage(online, "online", "bool");
 withLocalStorage(linkHandler, "linkHandler", "string");
+withLocalStorage(unloadMessages, "unloadMessages", "bool");
 
