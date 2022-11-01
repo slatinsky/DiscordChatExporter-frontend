@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, online } from '../../../settingsStore';
+	import { nameRenderer, online, linkHandler } from '../../../settingsStore';
 	import { onMount, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import MessageMarkdown from './MessageMarkdown.svelte';
@@ -527,7 +527,7 @@
 				on:click={() => copyTextToClipboard(`https://discord.com/channels/${BigInt(guild.id)}/${BigInt(message.channelId)}/${BigInt(message.id)}`)}
 				text="Copy message link" {visible} />
 		<MenuOption
-				on:click={() => window.open(`https://discord.com/channels/${BigInt(guild.id)}/${BigInt(message.channelId)}/${BigInt(message.id)}`,'_blank')}
+				on:click={() => window.open(($linkHandler === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(guild.id)}/${BigInt(message.channelId)}/${BigInt(message.id)}`,'_blank')}
 				text="Open in discord" {visible} />
 		<MenuOption
 			on:click={() => console.log(JSON.stringify(message, null, 2))}

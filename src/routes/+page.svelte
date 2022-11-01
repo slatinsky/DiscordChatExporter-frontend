@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, timestampFormat, developerMode, theme, online } from './settingsStore';
+	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler } from './settingsStore';
 	import { timestampRenderers } from './time';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
@@ -40,7 +40,7 @@
 
 <p>Show memory usage</p>
 <div class="radios">
-	{#key $nameRenderer}
+	{#key $developerMode}
 	<label>
 		<input type="radio" name="developerMode" value={true} bind:group={$developerMode} />
 		<span>Enabled</span>
@@ -52,9 +52,24 @@
 	{/key}
 </div>
 
+<p>Open discord links</p>
+<div class="radios">
+	{#key $linkHandler}
+	<label>
+		<input type="radio" name="linkHandler" value={"browser"} bind:group={$linkHandler} />
+		<span>In browser</span>
+	</label>
+	<label>
+		<input type="radio" name="linkHandler" value={"app"} bind:group={$linkHandler} />
+		<!-- "discord://" URL protocol for invoking application has to be registered -->
+		<span>In discord app</span>
+	</label>
+	{/key}
+</div>
+
 <p>Fetch assets from remote servers</p>
 <div class="radios">
-	{#key $nameRenderer}
+	{#key $online}
 	<label>
 		<input type="radio" name="online" value={false} bind:group={$online} />
 		<span>Never - view assets offline only</span>
@@ -68,7 +83,7 @@
 
 <p>Theme</p>
 <div class="radios">
-	{#key $nameRenderer}
+	{#key $theme}
 	<label>
 		<input type="radio" name="theme" value={"dark"} bind:group={$theme} />
 		<span>Dark</span>
