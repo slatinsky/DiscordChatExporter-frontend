@@ -22,3 +22,4 @@ __pycache__
 /_temp_data/
 /preprocess/export_helpers
 /preprocess/*.spec
+/TODO.md

@@ -146,8 +146,9 @@ class GuildPreprocess:
             thread = channels[thread_id]
 
             first_message_in_thread = first_messages_in_channels[thread_id]
+            thread_id_plus_one = helpers.pad_id(int(thread_id) + 1)  # if we don't increment, we would overwrite the first message before the thread was created
             fake_thread_created_message = {
-                'id': thread_id,
+                'id': thread_id_plus_one,
                 'type': "ThreadCreated",
                 'timestamp': first_message_in_thread['timestamp'],
                 'timestampEdited': None,
@@ -169,7 +170,7 @@ class GuildPreprocess:
                 'stickers': [],
                 'mentions': [],
             }
-            messages[thread['id']] = fake_thread_created_message
+            messages[thread_id_plus_one] = fake_thread_created_message
 
         return channels, messages
 

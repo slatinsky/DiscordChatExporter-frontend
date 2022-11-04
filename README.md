@@ -39,7 +39,7 @@ Want to upgrade from previous version? Follow these steps:
 
 1. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
 2. Extract the archive
-3. Move your `/static/input/` folder to the new release folder. DO NOT MOVE `/static/data/` folder, because the format is not compatible between releases.
+3. Move your `/static/input/` folder to the new release folder. `/static/data/` folder is no longer needed.
 4. Delete old release folder
 
 ## Linux
