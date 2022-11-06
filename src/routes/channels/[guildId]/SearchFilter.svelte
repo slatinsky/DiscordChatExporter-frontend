@@ -228,6 +228,14 @@
 					channelMessages = channelMessages.filter((message) => {
 						return !message.isPinned;
 					});
+				} else if (filter.key === 'deleted' && filter.value === 'true') {
+					channelMessages = channelMessages.filter((message) => {
+						return message.isDeleted;
+					});
+				} else if (filter.key === 'deleted' && filter.value === 'false') {
+					channelMessages = channelMessages.filter((message) => {
+						return !message.isDeleted;
+					});
 				} else if (filter.key === 'has' && filter.value === 'link') {
 					channelMessages = channelMessages.filter((message) => {
 						return message.content.includes('http');
@@ -276,6 +284,17 @@
 						return (
 							message.attachments &&
 							message.attachments.some((attachment) => attachment.url.extension === filter.value)
+						);
+					});
+
+					//filename
+				} else if (filter.key === 'filename') {
+					channelMessages = channelMessages.filter((message) => {
+						return (
+							message.attachments &&
+							message.attachments.some((attachment) => attachment.url.hashedFilename.includes(filter.value))  ||
+							message.embeds &&
+							message.embeds.some((embed) => embed.thumbnail?.url.hashedFilename.includes(filter.value))
 						);
 					});
 				} else if (filter.key === 'reaction') {
@@ -514,6 +533,11 @@
 							<b>filetype: </b>extension
 						</div>
 					{/if}
+					{#if filterKeys('filename:', parsedCursorHere)}
+						<div class="search-option" on:click={() => selectOptionKey('filename')}>
+							<b>filename: </b>name
+						</div>
+					{/if}
 					<!-- {#if filterKeys('during:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('during')}>
 							<b>[WIP] during: </b>specific date
@@ -537,6 +561,16 @@
 					{#if filterKeys('pinned:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectFullOption('pinned', 'false')}>
 							<b>pinned: </b>false
+						</div>
+					{/if}
+					{#if filterKeys('deleted:', parsedCursorHere)}
+						<div class="search-option" on:click={() => selectFullOption('deleted', 'true')}>
+							<b>deleted: </b>true
+						</div>
+					{/if}
+					{#if filterKeys('deleted:', parsedCursorHere)}
+						<div class="search-option" on:click={() => selectFullOption('deleted', 'false')}>
+							<b>deleted: </b>false
 						</div>
 					{/if}
 				</div>

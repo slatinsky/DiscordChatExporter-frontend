@@ -91,12 +91,22 @@ class GuildPreprocess:
         channels = {}
         messages = {}
 
+        message_ids_by_channel_by_files = {}  # key is channelId, value is list of files containing list of message ids
+
+        progress = Progress(self.json_filepaths)
         for path in self.json_filepaths:
             with open(path, 'r', encoding="utf8") as f:
                 # print("Reading file: " + path)
                 data = json.load(f)
+                # message_ids_by_files.append([int(message['id']) for message in data['messages']])
                 data = self.pad_ids(data)
                 channel = data['channel']
+
+                message_ids_in_file = [int(message['id']) for message in data['messages']]
+                if channel['id'] not in message_ids_by_channel_by_files:
+                    message_ids_by_channel_by_files[channel['id']] = []
+                message_ids_by_channel_by_files[channel['id']].append(message_ids_in_file)
+
 
                 if channel['id'] not in channels:
                     channels[channel['id']] = channel
@@ -109,7 +119,58 @@ class GuildPreprocess:
                         messages[message['id']] = message
                     else:
                         messages[message['id']] = self._merge_messages(messages[message['id']], message)
-        return channels, messages
+                progress.increment()
+
+        progress.finish()
+
+        return channels, messages, message_ids_by_channel_by_files
+
+    def find_deleted_messages_ids(self, messages, message_ids_by_channel_by_files):
+        """
+        Find deleted message ids in O(n) time
+        """
+
+        deleted_message_ids = set()
+
+        progress = Progress(message_ids_by_channel_by_files)
+        for channel_id in message_ids_by_channel_by_files:
+            lists = message_ids_by_channel_by_files[channel_id]
+
+            # convert lists to sets
+            sets = []
+            united_set = set()
+            for list_ in lists:
+                sets.append(set(list_))
+                united_set = united_set.union(set(list_))
+
+            united_list = list(united_set)
+            united_list.sort()
+
+            # optimize for slicing in a loop
+            united_list_value_lookup = {}
+            for i in range(len(united_list)):
+                united_list_value_lookup[united_list[i]] = i
+
+            # find missing ids
+            for set_ in sets:
+                set_min = min(set_)
+                set_max = max(set_)
+                # united_set_in_range = set([x for x in united_set if x >= set_min and x <= set_max])   # SLOW ALTERNATIVE
+                united_set_in_range = set(united_list[united_list_value_lookup[set_min]:united_list_value_lookup[set_max]+1])
+                deleted_message_ids = deleted_message_ids.union(united_set_in_range - set_)
+            progress.increment()
+        progress.finish(f"Found {len(deleted_message_ids)} deleted messages")
+
+        # convert to list
+        deleted_message_ids = list(deleted_message_ids)
+
+        # tag messages
+        for message_id in deleted_message_ids:
+            messages[helpers.pad_id(message_id)]['isDeleted'] = True
+        for message_id in messages:
+            if 'isDeleted' not in messages[message_id]:
+                messages[helpers.pad_id(message_id)]['isDeleted'] = False
+        return messages
 
     def simulate_thread_creation(self, channels, messages):
         """
@@ -432,12 +493,15 @@ class GuildPreprocess:
 
     def process(self):
         print("Step 0 - Reading data from json files...")
-        channels, messages = self.read_channels_messages_from_files()
+        channels, messages, message_ids_by_channel_by_files = self.read_channels_messages_from_files()
 
-        print("Step 1 - Recreating forums and missing channels from threads...")
+        print("Step 1 - Tagging deleted messages...")
+        messages = self.find_deleted_messages_ids(messages, message_ids_by_channel_by_files)
+
+        print("Step 2 - Recreating forums and missing channels from threads...")
         channels, messages = self.simulate_thread_creation(channels, messages)
 
-        print("Step 2 - Sorting messages and channels...")
+        print("Step 3 - Sorting messages and channels...")
         # sort messages dict by key
         messages = dict(sorted(messages.items()))
         # sort channels dict by key
@@ -447,27 +511,27 @@ class GuildPreprocess:
         print("   Message count: " + str(len(messages)))
         print("   Channel+Thread count: " + str(len(channels)))  # includes forum threads
 
-        print("Step 3 - Deduplicating authors...")
+        print("Step 4 - Deduplicating authors...")
         messages, authors = self.extract_authors(messages)
 
-        print("Step 4 - Deduplicating reactions...")
+        print("Step 5 - Deduplicating reactions...")
         messages, emojis = self.extract_emoji(messages)
 
-        print("Step 5 - Finding and preprocessing referenced local filenames...")
+        print("Step 6 - Finding and preprocessing referenced local filenames...")
         messages = self.calculate_local_filenames(messages, authors, emojis)
 
-        print("Step 6 - Getting file extensions...")
+        print("Step 7 - Getting file extensions...")
         extensions = self._get_extensions(messages)
 
-        print("Step 7 - Removing unused fields...")
+        print("Step 8 - Removing unused fields...")
         messages = self.cleanup_empty_fields(messages)
 
         output_dir = '../static/data/' + self.guild_id + '/'
-        print("Step 8 - Deleting cache directory '" + output_dir + "'...")
+        print("Step 9 - Deleting cache directory '" + output_dir + "'...")
         self.cleanup_out_directory(output_dir)
 
         # group messages by channels
-        print("Step 9 - Grouping messages by channel...")
+        print("Step 10 - Grouping messages by channel...")
         messages_by_channel, categories, threads, channels = self.group_messages_and_channels(
             messages, channels)
 

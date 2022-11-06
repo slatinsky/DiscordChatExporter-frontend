@@ -143,6 +143,7 @@ class Assets:
             # 'original': url_or_path,  # for debug only, not useful in the viewer
         }
         file_name_with_hash = self.filename_from_url_or_path(url_or_path)
+        result['hashedFilename'] = file_name_with_hash
         resolved_url_or_path = self.resolve_url_or_path(url_or_path, message_id)
         result['extension'] = os.path.splitext(file_name_with_hash)[-1].replace('.', '').lower()
         result['type'] = self.get_file_type(result['extension'])

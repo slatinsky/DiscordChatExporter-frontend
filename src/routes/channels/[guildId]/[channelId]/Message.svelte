@@ -188,7 +188,11 @@
 				id="{search ? 'search-id-' : ''}{message.id}"
 				class="chatlog__message-container {message.isPinned
 					? 'chatlog__message-container--pinned'
-					: ''}"
+					: ''}
+					{message.isDeleted
+						? 'chatlog__message-container--deleted'
+						: ''}
+					"
 				data-message-id={message.id}
 			>
 				<div class="chatlog__message">
@@ -278,7 +282,8 @@
 								<span class="chatlog__timestamp"
 									><a href="/channels/{guild.id}/{message.channelId}#{message.id}"
 										>{renderTimestamp(message.timestamp)}</a
-									></span
+									>
+									</span
 								>
 							</div>
 							<div class="chatlog__content chatlog__markdown">
@@ -289,6 +294,9 @@
 									<span class="chatlog__edited-timestamp" title={message.timestampEdited}
 										>(edited)</span
 									>
+								{/if}
+								{#if message.isDeleted}
+									<span class="chatlog__edited-timestamp">(deleted)</span>
 								{/if}
 							</div>
 							{#if message.attachments}
@@ -599,5 +607,9 @@
 
 	.chatlog__embed-thumbnail-video {
 		max-width: 100%;
+	}
+
+	.chatlog__message-container--deleted {
+		background-color: rgba(133, 0, 0, 0.10)
 	}
 </style>

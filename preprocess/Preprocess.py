@@ -115,6 +115,8 @@ class Preprocess:
         regex_pattern_message_id = re.compile(r'^(\d+)')
         regex_pattern_files = re.compile(
             r'chatlog__embed.*?html_Files\/([^ >]+)>? (?!alt=Avatar)')
+
+        progress = Progress(html_filepaths)
         for html_filepath in html_filepaths:
             with open(html_filepath, 'r', encoding='utf-8') as f:
                 html = f.read()
@@ -134,8 +136,8 @@ class Preprocess:
                         ids_from_html[padded_id] = list(
                             set(ids_from_html[padded_id]))  # deduplicate
 
-        print("   Found " + str(len(ids_from_html)) +
-              " message ids in HTML files")
+            progress.increment()
+        progress.finish("Found " + str(len(ids_from_html)) + " message ids in HTML files")
         return ids_from_html
 
     def process(self):

@@ -10,8 +10,10 @@ class Progress:
         if self.total > 0 and self.iteration % self.increments == 0:
             print("  ", self.name, self.iteration, "/", self.total, '(' + str(round(self.iteration / self.total * 100)) + '%)', end="\r") # print progress
 
-    def finish(self):
-        if self.name != '':
+    def finish(self, msg=None):
+        if msg:
+            print("  ", msg)
+        elif self.name != '':
             print("  ", self.name, "done                                     ")
         else:
             print("  ", "done                                     ")
