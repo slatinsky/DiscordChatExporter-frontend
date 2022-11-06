@@ -92,12 +92,20 @@ DiscordChatExporter.Cli export --token DISCORD_TOKEN --output OUTPUT_FOLDER_PATH
 
 
 
+## Viewing threads and forums
+It is not possible to batch export threads using Tyrrrz/DiscordChatExporter. That's why I created helper tool [DiscordChatExporter-incrementalBackup](https://github.com/slatinsky/DiscordChatExporter-incrementalBackup) to do it automatically for you. And it does backups incrementally, so you don't need to export everything again if you want to extend your export.
 
+Tool is in BETA for now. It will be better integrated into this viewer in the future.
+
+<details><summary>I want to export threads and forums manually</summary>
+<p>
 
 ## How to view threads
 - This viewer supports viewing threads, but they need to be exported by [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter). Export them the same way you export channels (`--channel`), but instead of CHANNEL_ID, use THREAD_ID. Because threads are channels.
 
 Don't know how to get THREAD_IDs? Handy backup helper is included to extend your backup and to find missing threads. You can find it at the end of channel list.
+
+**BACKUP HELPER IS DEPRECATED, BECAUSE IT IS NOT POSSIBLE TO GET ALL THREAD IDS USING THIS METHOD. YOU SHOULD USE [DiscordChatExporter-incrementalBackup](https://github.com/slatinsky/DiscordChatExporter-incrementalBackup) instead.**
 
 ![](docs/backup_helper.png)
 
@@ -151,6 +159,8 @@ interval = setInterval(() => {
 
 4. script will scroll the page. At the the end, it will print all IDs to the console
 5. download each id with DiscordChatExporter as if you would download channel (--channel FORUM_POST_ID)
+</p>
+</details>
 
 # Development
 You don't need to follow development steps if you don't need to modify the code.

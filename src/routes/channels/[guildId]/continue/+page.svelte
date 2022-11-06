@@ -142,7 +142,7 @@
 </script>
 
 <div class="container">
-	<h1>Backup helper</h1>
+	<h1>[DEPRECATED] Backup helper</h1>
     <h3>Generate commands to extend your server backup automatically.</h3>
     <p>This tool will generate commands to extend your server backup without downloading duplicate messages. Just run these commands, move your new backup to '/static/input' and run START_VIEWER.bat again to apply changes. This tool WON'T FIND NEW CHANNELS</p>
 

@@ -495,7 +495,7 @@ class GuildPreprocess:
         print("Step 0 - Reading data from json files...")
         channels, messages, message_ids_by_channel_by_files = self.read_channels_messages_from_files()
 
-        print("Step 1 - Tagging deleted messages...")
+        print("Step 1 - Finding deleted messages...")
         messages = self.find_deleted_messages_ids(messages, message_ids_by_channel_by_files)
 
         print("Step 2 - Recreating forums and missing channels from threads...")
@@ -538,7 +538,7 @@ class GuildPreprocess:
         # get message ids
         message_ids = list(messages.keys())
 
-        print("Step 10 - Creating lookup thread ids -> to message ids...")
+        print("Step 11 - Creating lookup thread ids -> to message ids...")
         thread_id_to_message_id = self.get_thread_id_to_message_id(messages, messages_by_channel, threads)
 
         # group channels and others attributes to single dict
@@ -555,6 +555,6 @@ class GuildPreprocess:
             'messages': messages_by_channel,
         }
 
-        print("Step 11 - Writing guild JSON...")
+        print("Step 12 - Writing guild JSON...")
         self.write_json(guild, output_dir + 'guild.json')
 
