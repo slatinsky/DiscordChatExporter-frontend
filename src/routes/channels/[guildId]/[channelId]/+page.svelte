@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from "svelte";
+	import { channelScrollPosition } from "../../../settingsStore";
 
     // import Preamble from "../../../components/Preamble.svelte";
 	import Messages from "./Messages.svelte";
@@ -10,10 +11,31 @@
 
 
     onMount(() => {
-
 	});
-
+    
+    function scrollToBottom(_, recursion_count = 0) {
+        if ($channelScrollPosition === "bottom") {
+            if (recursion_count === 0) {
+                console.log('scrollToBottom: recursion limit reached');
+                return;
+            }
+            if (mainChatlog) {
+                console.log('scrollToBottom', mainChatlog.scrollHeight);
+                mainChatlog.scrollTop = mainChatlog.scrollHeight;
+                // mainChatlog.scrollTop = 200
+                console.log('mainChatlog.scrollTop', mainChatlog.scrollTop);
+            }
+            else {
+                console.error('no mainChatlog');
+            }
+            setTimeout(() => {
+                scrollToBottom(_, recursion_count - 1);
+            }, 10);
+        }
+    }
     let mainChatlog
+    $: scrollToBottom(data.channelId, 50);
+
 
 </script>
 

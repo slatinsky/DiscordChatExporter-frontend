@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, unloadMessages } from './settingsStore';
+	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, unloadMessages, channelScrollPosition } from './settingsStore';
 	import { timestampRenderers } from './time';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
@@ -40,6 +40,20 @@
 			<span>{renderer(testDate)}</span>
 		</label>
 	{/each}
+</div>
+
+<p>Default scroll position (for channels/threads/forum posts)</p>
+<div class="radios">
+	{#key $channelScrollPosition}
+	<label>
+		<input type="radio" name="channelScrollPosition" value={"top"} bind:group={$channelScrollPosition} />
+		<span>Top</span>
+	</label>
+	<label>
+		<input type="radio" name="channelScrollPosition" value={"bottom"} bind:group={$channelScrollPosition} />
+		<span>Bottom</span>
+	</label>
+	{/key}
 </div>
 
 <p>Show memory usage</p>
