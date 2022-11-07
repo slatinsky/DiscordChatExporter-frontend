@@ -140,6 +140,52 @@ class Preprocess:
         progress.finish("Found " + str(len(ids_from_html)) + " message ids in HTML files")
         return ids_from_html
 
+    def get_channel_order(self, json_files):
+        """
+        get the order of channels in the guild
+        channel_info.json is not created by DiscordChatExporter, it is created by slatinsky/DiscordChatExporter-incrementalBackup
+        threat it as optional - it may not be Bratislava
+        """
+
+        number_of_files = 0
+
+        channel_infos = []
+        for filename in json_files:
+            if 'channel_info.json' not in filename:
+                continue
+            with open(filename, 'r', encoding='utf-8') as f:
+                try:
+                    data = json.load(f)
+                    data.pop('threads', None)  # less memory used
+                    channel_infos.append(data)
+                    number_of_files += 1
+                except:
+                    print("   (get_channel_order) Error parsing " + filename)
+                    continue
+
+        if number_of_files == 0:
+            print("   Could not find any channel_info.json, channels and categories won't be sorted")
+            return {}
+        else:
+            print("   Found " + str(number_of_files) + " channel_info.json files")
+
+        # sort by timestamp
+        channel_infos.sort(key=lambda x: x['timestamp'])
+
+        channel_order = {}  # key is channel_id, value is index
+        for channel_info in channel_infos:
+            for channel in channel_info['channels']:
+                position = channel['position']
+                if channel['type'] == 2:  # audio channel
+                    position += 2000  # penalize audio channels, they should be at the bottom
+                channel_order[helpers.pad_id(channel['id'])] = channel['position']
+
+        # add position for null category (TEXT CHANNELS)
+        channel_order[helpers.pad_id(0)] = -1
+        channel_order[-2] = 99999998  # channels with unknown category
+        channel_order[-1] = 99999999  # lost threads and forum channels
+        return channel_order
+
     def process(self):
         json_files = self._find_json_files(self.input_directory)
         html_files = self._find_html_files(self.input_directory)
@@ -175,6 +221,10 @@ class Preprocess:
             progress.increment()
         progress.finish()
 
+        print("\nGetting channels and categories sort...")
+        channel_order = self.get_channel_order(json_files)
+
+
         print("\nProcessing HTML...")
         ids_from_html = self.parse_html(html_files)
 
@@ -182,7 +232,7 @@ class Preprocess:
         for guild_id, json_filepaths in json_paths_by_guild.items():
             print("\nProcessing guild '" + guilds[guild_id]['name'] + "'")
             gp = GuildPreprocess(guild_id, self.input_directory,
-                                 json_filepaths, media_filepaths, ids_from_html)
+                                 json_filepaths, media_filepaths, ids_from_html, channel_order)
             guilds[guild_id] = gp.calculate_guild_filename(guilds[guild_id])
             gp.process()
 

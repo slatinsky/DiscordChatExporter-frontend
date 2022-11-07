@@ -13,11 +13,12 @@ from Assets import Assets
 
 
 class GuildPreprocess:
-    def __init__(self, guild_id, input_dir, json_filepaths, media_filepaths, ids_from_html):
+    def __init__(self, guild_id, input_dir, json_filepaths, media_filepaths, ids_from_html, channel_order):
         self.guild_id = guild_id
         self.assets = Assets(input_dir, media_filepaths, ids_from_html)
         self.json_filepaths = json_filepaths
         self.ids_from_html = ids_from_html
+        self.channel_order = channel_order
 
     ## if any field in data has key 'id', pad it with zeros for fast sorting
     def pad_ids(self, data):
@@ -106,6 +107,11 @@ class GuildPreprocess:
                 if channel['id'] not in message_ids_by_channel_by_files:
                     message_ids_by_channel_by_files[channel['id']] = []
                 message_ids_by_channel_by_files[channel['id']].append(message_ids_in_file)
+
+
+                if channel['category'] == '<unknown category>':
+                    channel['categoryId'] = '-2'
+                    channel['category'] = "lost channels"
 
 
                 if channel['id'] not in channels:
@@ -235,6 +241,19 @@ class GuildPreprocess:
 
         return channels, messages
 
+    def sort_messages_and_channels(self, messages, channels, channel_order):
+        # sort messages dict by key
+        messages = dict(sorted(messages.items()))
+
+        # add channel order to channels
+        for channel in channels.values():
+            channel['order'] = channel_order.get(channel['id'], 999999)
+
+        # self.channel_order key is channel id, value is the order
+        # channel's id is channel['id']
+        channels = dict(sorted(channels.items(), key=lambda item: item[1]['order']))
+        return messages, channels
+
     def cleanup_empty_fields(self, messages):
         for message in messages.values():
             # cleanup unused fields
@@ -358,7 +377,7 @@ class GuildPreprocess:
 
         return messages
 
-    def group_messages_and_channels(self, messages, channels):
+    def group_messages_and_channels(self, messages, channels, channel_order):
 
         # messages by channel
         messages_by_channel = {}
@@ -377,7 +396,7 @@ class GuildPreprocess:
             else:
                 channel['messageCount'] = 0
 
-        # spli channels into threads or normal channels
+        # split channels into threads or normal channels
         threads = {}
         normal_channels = {}  # non thread channels
         for channel in channels.values():
@@ -416,27 +435,33 @@ class GuildPreprocess:
 
 
         for channel in normal_channels.values():
-            # if channel['type'] == 4:
-            #     continue
-            # print(channel['name'])
             if channel['categoryId'] not in categories:
                 if 'threads' not in channel:
                     channel['threads'] = []
+
+                if channel['categoryId'] in channel_order:  # order may not exist
+                    order = channel_order[channel['categoryId']]
+                else:
+                    order = 99999999
 
                 categories[channel['categoryId']] = {
                     'id': channel['categoryId'],
                     'name': channel['category'],
                     'threads': channel['threads'],
-
-                    'channelIds': []
+                    'channelIds': [],
+                    'order': order,
                 }
 
 
+            # add channel id to category
             categories[channel['categoryId']]['channelIds'].append({
                 'id': channel['id'],
                 'name': channel['name'],
                 'type': "text",
             })
+
+        # order categories by order
+        categories = {k: v for k, v in sorted(categories.items(), key=lambda item: item[1]['order'])}
 
 
         # pprint(threads)
@@ -491,6 +516,8 @@ class GuildPreprocess:
 
         return thread_id_to_message_id
 
+
+
     def process(self):
         print("Step 0 - Reading data from json files...")
         channels, messages, message_ids_by_channel_by_files = self.read_channels_messages_from_files()
@@ -502,10 +529,7 @@ class GuildPreprocess:
         channels, messages = self.simulate_thread_creation(channels, messages)
 
         print("Step 3 - Sorting messages and channels...")
-        # sort messages dict by key
-        messages = dict(sorted(messages.items()))
-        # sort channels dict by key
-        channels = dict(sorted(channels.items()))
+        messages, channels = self.sort_messages_and_channels(messages, channels, self.channel_order)
 
         # print message count
         print("   Message count: " + str(len(messages)))
@@ -533,7 +557,7 @@ class GuildPreprocess:
         # group messages by channels
         print("Step 10 - Grouping messages by channel...")
         messages_by_channel, categories, threads, channels = self.group_messages_and_channels(
-            messages, channels)
+            messages, channels, self.channel_order)
 
         # get message ids
         message_ids = list(messages.keys())
