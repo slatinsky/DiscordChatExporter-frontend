@@ -314,6 +314,7 @@ class GuildPreprocess:
         emojis = {}
         for message in messages.values():
             for reaction in message['reactions']:
+                reaction['emoji']['name'] = helpers.get_emoji_code(reaction['emoji']['name'])
                 if reaction['emoji']['id'] == "":
                     emoji_id = reaction['emoji']['name']
                 else:

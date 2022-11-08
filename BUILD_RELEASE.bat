@@ -13,6 +13,7 @@ cd preprocess
 pyinstaller main.py -F
 cd ..
 move "preprocess\dist\main.exe" "releases\bin\preprocess.exe"
+copy "preprocess\emojiIndex.json" "releases\bin\emojiIndex.json"
 call pkg server/node_modules/http-server/bin/http-server --target node16-win-x64
 @REM Move build to releases
 move "http-server.exe" "releases\bin\http-server.exe"
