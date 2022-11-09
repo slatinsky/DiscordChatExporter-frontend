@@ -14,13 +14,13 @@
 	href="/channels/{guildId}/{id}"
 	on:contextmenu|preventDefault={(e) => onRightClick(e, id)}
 >
-	<div class="channel">
+	<div class="channel" class:selected={isSelected}>
 		{#if threadCount > 0}
 			<IconChannelWithThreads />
 		{:else}
 			<IconChannel />
 		{/if}
-		<div class="thread-name {isSelected ? 'selected' : ''}">
+		<div class="thread-name" class:selected={isSelected}>
 			{name}
 		</div>
 	</div>
@@ -33,8 +33,13 @@
 		border-radius: 4px;
 		width: calc(100% - 40x);
 		padding: 4px 8px;
-		margin: 0px 8px;
+		margin: 1px 8px;
         gap: 5px;
+	}
+
+	.channel:hover,
+	.channel.selected {
+		background-color: var(--channel-bg-hover);
 	}
 
 	a {

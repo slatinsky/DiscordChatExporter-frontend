@@ -1,12 +1,4 @@
 import { browser } from '$app/environment';
-import { get } from 'svelte/store';
-import { channels, guildId, guilds } from './stores';
-
-
-
-
-
-
 
 
 export async function fetchMessages(guildId, channelId) {

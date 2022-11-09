@@ -1,9 +1,8 @@
 <script>
 	import IconChannel from '../../../components/icons/IconChannel.svelte';
-import SearchFilter from './SearchFilter.svelte';
+	import SearchFilter from './SearchFilter.svelte';
 
 	export let channel;
-	// export let messages;
 	export let guild;
 </script>
 

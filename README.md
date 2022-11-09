@@ -309,24 +309,14 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 </details>
 
 
-
-
-
-
-
-## Roadmap / planned features:
-- Better handling of edge cases (if something is missing in the backup)
-- make readme easy to understand
-- Linux support (docker?)
-- Improve code readability
-
 ## Why this tool was made
-[DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) is a well made tool to export Discord chats. But to actually view them, you had to download them in HTML format, which more inconvenient to parse than JSON. And If you wanted to extend your backup, it would be broken into multiple files, which is not very convenient.
+[DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) is a well made tool to export Discord chats. But I felt that browsing viewing experience was not that great after threads and forums were introduced. Also you had to download them in HTML format, which made it impossible to parse like JSON format and with no ability to extend them without splitting them into multiple files - which makes it even more inconvenient to browse them.
 ## Thanks
-- [Tyrrrz/DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) - for a great tool. Many CSS definitions from this tool are used in our viewer.
+- [Tyrrrz/DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) - for a great tool. This project is based on some parts of it's code.
 - Discord - for a great chat app
-- pyinstaller - for python to binary converter
 - [brussell98/discord-markdown](https://github.com/brussell98/discord-markdown) - for discord markdown rendering
+
+And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pkg, pyinstaller, http-server.
 
 
 ## License

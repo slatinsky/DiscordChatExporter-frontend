@@ -8,7 +8,6 @@
 
 <svelte:head>
     <title>{data.guilds[data.guildId].name} | DiscordChatExporter frontend</title>
-    <meta name="description" content="Svelte demo app"/>
 </svelte:head>
 
 <style>

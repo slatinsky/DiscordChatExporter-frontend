@@ -180,7 +180,7 @@
         <textarea bind:value={commandsUpdateT} rows={commandsUpdateTLength} />
     {/key}
 
-	<h2>Download missing threads:</h2>
+	<h2>Download missing threads (NOTE: not all threads can be found in exports):</h2>
     <p>These commands will download missing threads. These threads were found in the backup, but weren't exported:</p>
     {#key commandsThreadsLength}
         {#if newThreads.length > 0}

@@ -19,7 +19,6 @@
 	let firstMessageId;
 	let lastMessageId;
 
-	// console.error('createGroup', document.querySelector('#' + rootId));
 	if (createGroup) {
 		firstMessageId = splitMessages[0].id;
 		lastMessageId = splitMessages[splitMessages.length - 1].id;
@@ -51,7 +50,6 @@
 	});
 
 	onDestroy(() => {
-		// console.log('onDestroy');
 		if (observer) {
 			observer.disconnect();
 		}

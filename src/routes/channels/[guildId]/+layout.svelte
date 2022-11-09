@@ -8,6 +8,12 @@
 	import { copyTextToClipboard } from '../../../helpers';
 	import MenuCategory from './MenuCategory.svelte';
 	export let data;
+	import { goto } from '$app/navigation';
+
+	// redirect to first channel if no channel in guild is selected
+	if (data.guildId !== undefined && data.channelId === undefined && Object.keys(data.guild.channels).length > 0) {  // data.guildId can be zero (DMs) so we need to check for undefined
+        goto(`/channels/${data.guildId}/${Object.keys(data.guild.channels)[0]}`);
+    }
 
 	let currentGuildId = data.guildId;
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time

@@ -1,23 +1,21 @@
 <script>
-	import { found_messages, searched, filters } from './searchStores';
+	import { found_messages, searched } from './searchStores';
     import Messages from './[channelId]/Messages.svelte';
     export let guild
 	let searchResults
 </script>
 
-<!-- {#key $found_messages} -->
-	{#if $searched}
-		<div class="search-found-count">
-			<div>{$found_messages.length} Results</div>
-			<button on:click={()=>$searched=false} class="search-dismiss-btn">×</button>
-		</div>
-	{/if}
-	<div id="search-results" bind:this={searchResults}>
-		{#if searchResults}
-			<Messages messages={$found_messages} {guild} channelId={$found_messages} search={true} rootId={searchResults}/>
-		{/if}
+{#if $searched}
+	<div class="search-found-count">
+		<div>{$found_messages.length} Results</div>
+		<button on:click={()=>$searched=false} class="search-dismiss-btn">×</button>
 	</div>
-<!-- {/key} -->
+{/if}
+<div id="search-results" bind:this={searchResults}>
+	{#if searchResults}
+		<Messages messages={$found_messages} {guild} channelId={$found_messages} search={true} rootId={searchResults}/>
+	{/if}
+</div>
 
 <style>
     #search-results {

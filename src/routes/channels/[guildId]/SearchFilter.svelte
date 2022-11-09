@@ -1,9 +1,6 @@
 <script>
-	import SearchResults from './SearchResults.svelte';
 	import { searched, found_messages } from './searchStores';
 	import { checkUrl } from '../../../helpers';
-
-	// import Messages from './[channelId]/Messages.svelte';
 
 	export let guild;
 	let authors;
@@ -155,7 +152,7 @@
 			return b.messageCount - a.messageCount;
 		});
 	}
-	
+
 	function filterEmojis(emojis, _) {
 		return Object.values(emojis).filter((emoji) =>
 			emoji.name.toLowerCase().includes(parsedCursorHere.value.toLowerCase())
@@ -194,7 +191,7 @@
 			let channelMessages = Object.values(channel);
 
 			for (const filter of filters) {
-				
+
 				if (filter.content) {
 					channelMessages = channelMessages.filter((message) => {
 						return normalizeSearchTerm(message.content).includes(
@@ -342,10 +339,6 @@
 					});
 				}
 			}
-			// order by timestamp - not working
-			// channelMessages = channelMessages.sort((a, b) => {
-			// 	return a.timestamp < b.timestamp;
-			// });
 
 			found_messages_temp.push(...channelMessages);
 			$searched = true;
@@ -355,14 +348,7 @@
 			return BigInt(a.id) > BigInt(b.id) ? -1 : 1;
 		});
 
-		// DEBUG loop through found messages and print channel name
-		// for (let i = 0; i < found_messages_temp.length; i++) {
-		// 	let message = found_messages_temp[i];
-		// 	let channel = guild.channels[message.channelId]?.name
-		// 	// console.log('channel', channel);
-		// 	console.log('id', message.id);
-		// }
-		// add searchPrevMessage and searchNextMessage to all messages
+		// add searchPrevMessage and searchNextMessage to all messages - so channel names can be displayed in search results
 		for (let i = 0; i < found_messages_temp.length; i++) {
 			let message = found_messages_temp[i];
 			let prevMessage = found_messages_temp[i - 1];
@@ -384,8 +370,6 @@
 		$found_messages = found_messages_temp;
 		$searched = true;
 	}
-
-	console.log('----', guild.channels);
 </script>
 
 <div class="search">
@@ -579,10 +563,7 @@
 	{/if}
 </div>
 
-<!-- <SearchResults {found_messages} {guild} /> -->
 <style>
-
-
 	.spacer {
 		width: 100%;
 	}

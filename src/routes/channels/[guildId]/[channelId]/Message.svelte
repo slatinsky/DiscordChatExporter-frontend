@@ -10,7 +10,6 @@
 	import { renderTimestamp } from '../../../time';
 
 	export let message;
-	// export let messages;
 	export let guild;
 	export let search = false;
 	export let rootId
@@ -118,7 +117,6 @@
 	function addAuthorToMessage() {
 		if (message.authorId) {
 			message.author = guild.authors[message.authorId];
-			// delete message.authorId;
 			message = message; // apply changes
 		}
 	}
@@ -132,13 +130,11 @@
 				// add emoji to reaction
 				if (reaction.emojiId) {
 					reaction.emoji = guild.emojis[reaction.emojiId];
-					// delete reaction.emojiId;
 					message = message; // apply changes
 				}
 
 				if (reaction.emojiName) {
 					reaction.emoji = guild.emojis[reaction.emojiName];
-					// delete reaction.reactionId;
 					message = message; // apply changes
 				}
 			}
@@ -147,7 +143,6 @@
 
 	function addReferencedMessage() {
 		if (message.reference) {
-			// console.log(message.reference);
 			try {
 				message.referencedMessage = guild.messages[message.reference.channelId][message.reference.messageId];
 			} catch (e) {
@@ -155,12 +150,9 @@
 			}
 			if (message.referencedMessage && message.referencedMessage?.authorId) {
 				message.referencedMessage.author = guild.authors[message.referencedMessage.authorId];
-				// delete message.referencedMessage.authorId;
 			}
-			// console.log(message.reference, message.referencedMessage, messages.length, Object.keys(messages)[0]);
 		}
 	}
-
 
 
 	let rightClickMessage = null;
@@ -183,7 +175,6 @@
 			<div class="channel-name"><a href="/channels/{guild.id}/{message.channelId}/"># {guild.channels[message.channelId]?.name}</a></div>
 		{/if}
 		<div class="chatlog__message-group" transition:fade={{ duration: 125 }} on:contextmenu|preventDefault={e=>onRightClick(e, message)}>
-			<!-- <button on:click={()=>copyTextToClipboard(message.id)}>Copy ID</button> -->
 			<div
 				id="{search ? 'search-id-' : ''}{message.id}"
 				class="chatlog__message-container {message.isPinned
@@ -310,7 +301,7 @@
 													alt="Attachment"
 													title="Image: {attachment.fileName} ({attachment.fileSizeBytes} B)"
 													loading="lazy"
-													
+
 													width="{attachment?.url.width ?? undefined}"
 													height="{attachment?.url.height ?? undefined}"
 													onerror="this.style.visibility='hidden'"
@@ -553,16 +544,7 @@
 
 <style>
 	.not-loaded {
-		/* height: 75px; */
 		width: 100%;
-	}
-
-	.msg-root {
-		/* background-color: #0faff4; */
-	}
-
-	.chatlog__message-group {
-		/* height: 5px !important; */
 	}
 
 	.thread-created {

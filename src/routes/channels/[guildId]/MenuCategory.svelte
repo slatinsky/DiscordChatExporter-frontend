@@ -49,15 +49,6 @@
 
         margin: 16px 0px 0px 0px;
         font-weight: 600;  /*Original 500*/
-
-		/* border-radius: 4px;
-		width: calc(100% - 40x);
-		padding: 4px 8px;
-		margin: 0px 8px;
-		gap: 5px;
-		font-weight: 500;
-		font-size: 12px;
-		color: var(--channel-text-unread); */
 	}
     .category:hover {
         color: var(--channel-text-read-hover);

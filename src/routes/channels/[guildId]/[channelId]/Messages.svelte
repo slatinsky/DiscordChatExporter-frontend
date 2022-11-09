@@ -5,12 +5,6 @@
 	export let channelId;
 	export let search = false
 	export let rootId
-
-	// }
-
-	// console.error('messages-----',  Object.keys(messages)[0]);
-
-
 </script>
 
 

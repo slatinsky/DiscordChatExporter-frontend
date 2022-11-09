@@ -2,19 +2,19 @@ import moment from 'moment/min/moment-with-locales';
 import { get } from 'svelte/store';
 import {timestampFormat } from './settingsStore';
 
-function renderTimestamp2(date) {
+function renderTimestamp1(date) {
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
 }
 
-function renderTimestamp4(date) {
+function renderTimestamp2(date) {
     return moment(date).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
 }
 
-function renderTimestamp0(date) {
+function renderTimestamp3(date) {
     return date;
 }
 
-function renderTimestamp1(date) {
+function renderTimestamp4(date) {
     return moment(date).format();
 }
 
@@ -23,7 +23,7 @@ function renderTimestamp5(date) {
 }
 
 
-function renderTimestamp3(date) {
+function renderTimestamp6(date) {
     return moment(date).format('MMMM Do YYYY, h:mm:ss a');
 }
 
@@ -40,12 +40,12 @@ function renderTimestampLang2(date, lang) {
 }
 
 const timestampRenderersDup = []
-timestampRenderersDup.push(renderTimestamp2);
-timestampRenderersDup.push(renderTimestamp4);
-timestampRenderersDup.push(renderTimestamp0);
 timestampRenderersDup.push(renderTimestamp1);
-timestampRenderersDup.push(renderTimestamp5);
+timestampRenderersDup.push(renderTimestamp2);
 timestampRenderersDup.push(renderTimestamp3);
+timestampRenderersDup.push(renderTimestamp4);
+timestampRenderersDup.push(renderTimestamp5);
+timestampRenderersDup.push(renderTimestamp6);
 navigator.languages.forEach(lang => {
     timestampRenderersDup.push((date) => renderTimestampLang1(date, lang));
 });

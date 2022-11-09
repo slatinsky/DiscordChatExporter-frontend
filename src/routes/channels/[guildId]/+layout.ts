@@ -20,15 +20,6 @@ export async function load({ params, parent }) {
         json = guild
     }
 
-    // console.log("eee", params.guildId);
-    // console.log("iii", guild);
-
-    // if (!params.channelId) {
-    //     // select first channel by browsing to localhost:3000/[guildId]/[channelId]
-    //     goto(`/${params.guildId}/${Object.keys(channels)[0]}`);
-    //     return
-    // }
-
     const { guilds } = await parent();
     return {
         guilds: guilds,

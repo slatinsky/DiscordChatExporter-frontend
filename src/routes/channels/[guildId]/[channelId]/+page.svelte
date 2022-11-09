@@ -117,7 +117,6 @@
 
 <svelte:head>
     <title>{data.guild.channels[data.channelId]?.name ?? "Unknown channel"} | DiscordChatExporter frontend</title>
-    <meta name="description" content="Svelte demo app"/>
 </svelte:head>
 
 {#if data.messages}
@@ -158,7 +157,6 @@
     }
  section {
      background-color: var(--panel-messages-bg);
-     /*height: 100vh;*/
  }
 
  .chatlog {

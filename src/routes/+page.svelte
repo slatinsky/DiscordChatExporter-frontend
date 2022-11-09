@@ -7,10 +7,8 @@
 
 <svelte:head>
     <title>DiscordChatExporter frontend</title>
-    <meta name="description" content="Svelte demo app"/>
+    <meta name="description" content="View your JSON DiscordChatExporter exports as if you were using Discord interface"/>
 </svelte:head>
-
-<!-- <div class="title">Select guild</div> -->
 
 <div class="title">Settings</div>
 

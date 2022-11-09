@@ -23,7 +23,7 @@
 		href="/channels/{guildId}/{id}"
 		on:contextmenu|preventDefault={(e) => onRightClick(e, id)}
 	>
-		<div class="thread-name {selectedChannelId == id ? 'selected' : ''}">
+		<div class="thread-name" class:selected={selectedChannelId == id}>
 			{name}
 		</div>
 	</a> <br />

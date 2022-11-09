@@ -1,6 +1,3 @@
-import { error } from "@sveltejs/kit";
-import { goto } from '$app/navigation';
-
 export const prerender = false;
 export const ssr = false;
 

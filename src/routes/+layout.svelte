@@ -5,7 +5,6 @@ import './styles.css';
 
 	export let data;
 
-	
 	theme.subscribe(value => {
 		document.documentElement.setAttribute('data-theme', value);
 	});
