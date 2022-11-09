@@ -11,6 +11,7 @@ else:
 def main():
     p = Preprocess('../static/input/')
     p.process()
+    print('Open http://127.0.0.1:21011/ in your browser to view GUI')
 
 
 if __name__ == '__main__':

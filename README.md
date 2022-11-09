@@ -34,6 +34,26 @@ Using prebuilt binaries is the easiest way to use this tool on Windows.
 3. Move your JSON+assets [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/static/input/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs.
 4. Run `START_VIEWER.bat` - DiscordChatExporter-frontend will open in your default browser
 
+## Docker version (Linux)
+You need docker and git installed. Tested on non-snap version of docker on Ubuntu 22.04.
+1. Build image
+```bash
+git clone https://github.com/slatinsky/DiscordChatExporter-frontend
+cd DiscordChatExporter-frontend
+docker build -t dce-f
+```
+2. Navigate to folder with your exports
+```bash
+cd [path to your exports]
+```
+
+3. Run container
+```bash
+docker run --volume $(pwd):/dce-f/static/input --volume dcef_data:/dce-f/static/data --rm -p 21011:21011 -it dce-f
+```
+
+4. Open `http://127.0.0.1:21011/` in your browser
+
 ## Upgrade guide
 Want to upgrade from previous version? Follow these steps:
 
@@ -42,8 +62,6 @@ Want to upgrade from previous version? Follow these steps:
 3. Move your `/static/input/` folder to the new release folder. `/static/data/` folder is no longer needed.
 4. Delete old release folder
 
-## Linux
-This tool uses Sveltekit and Python3 as main dependencies. You won't be able to run premade Windows batch scripts, but running this tool on Linux is possible. Linux support is WIP.
 
 <a name="supported-exports"></a>
 # Which exports are supported?
