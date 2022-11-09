@@ -40,7 +40,7 @@ You need docker and git installed. Tested on non-snap version of docker on Ubunt
 ```bash
 git clone https://github.com/slatinsky/DiscordChatExporter-frontend
 cd DiscordChatExporter-frontend
-docker build -t dce-f
+docker build -t dce-f .
 ```
 2. Navigate to folder with your exports
 ```bash
