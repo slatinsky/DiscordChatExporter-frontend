@@ -34,8 +34,8 @@ Using prebuilt binaries is the easiest way to use this tool on Windows.
 3. Move your JSON+assets [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/static/input/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs.
 4. Run `START_VIEWER.bat` - DiscordChatExporter-frontend will open in your default browser
 
-## Docker version (Linux)
-You need docker and git installed. Tested on non-snap version of docker on Ubuntu 22.04.
+## Docker version (Linux+Mac)
+You need docker and git installed. Tested on non-snap version of docker on Ubuntu 22.04. @levithomason tested it on M1 MacBook (Apple Silicon) in issue [#5](https://github.com/slatinsky/DiscordChatExporter-frontend/issues/5)
 1. Build image
 ```bash
 git clone https://github.com/slatinsky/DiscordChatExporter-frontend
@@ -49,7 +49,7 @@ cd [path to your exports]
 
 3. Run container
 ```bash
-docker run --volume $(pwd):/dce-f/static/input --volume dcef_data:/dce-f/static/data --rm -p 21011:21011 -it dce-f
+docker run --volume "$(pwd):/dce-f/static/input" --volume dcef_data:/dce-f/static/data --rm -p 21011:21011 -it dce-f
 ```
 
 4. Open `http://127.0.0.1:21011/` in your browser
