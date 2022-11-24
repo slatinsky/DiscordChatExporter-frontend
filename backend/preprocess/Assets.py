@@ -158,7 +158,7 @@ class Assets:
             if not SKIP_PREPROCESSING_IMAGES:
                 try:
                     # imagesize library reads the dimensions from header. It is much faster than by loading the image with PIL
-                    result['width'], result['height'] = imagesize.get("../static/" + result['url'])
+                    result['width'], result['height'] = imagesize.get(result['url'].replace('/input/', self.input_dir))
                 except:
                     # imagesize doesn't support this image format
                     print("   imagesize library doesn't support this image format (is the file corrupted?): ", result['url'])

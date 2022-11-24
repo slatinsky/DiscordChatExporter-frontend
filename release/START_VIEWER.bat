@@ -1,8 +1,8 @@
 pushd "%~dp0"
-cd dcef/bin
-preprocess.exe
+cd dcef/backend/preprocess
+preprocess.exe ../../../exports/ temp/
 
-cd nginx
+cd ../nginx
 start "nginx" nginx.exe -c .\conf\nginx-prod.conf
 
 timeout /t 1 /nobreak >nul

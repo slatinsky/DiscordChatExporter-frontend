@@ -55,12 +55,12 @@ class Preprocess:
         print("Found " + str(len(media_filepaths)) + " media files\n")
 
         # make directory if it doesn't exist
-        if not os.path.exists('../static/data'):
-            os.makedirs('../static/data')
+        if not os.path.exists(self.output_directory):
+            os.makedirs(self.output_directory)
 
         # if data/hash.txt does exists read the hash
-        if os.path.exists('../static/data/hash.txt'):
-            with open('../static/data/hash.txt', 'r') as f:
+        if os.path.exists(self.output_directory + '/hash.txt'):
+            with open(self.output_directory + '/hash.txt', 'r') as f:
                 hash_from_file = f.read()
                 print("Hash: " + hash_from_file)
         else:

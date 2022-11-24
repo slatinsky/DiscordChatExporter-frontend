@@ -10,35 +10,29 @@ __pycache__
 
 
 # releases (built files)
-releases/*.zip
+/release/*.zip
+/release/dcef/
 
 
-# Releases and nginx
-releases/dcef/frontend/
-releases/exports/*
-releases/dcef/cache/*
-releases/dcef/bin/preprocess.exe
-releases/dcef/bin/emojiIndex.json
-releases/dcef/bin/nginx/logs/*
-releases/dcef/bin/nginx/temp/*
-releases/dcef/bin/nginx/conf/*
-!releases/dcef/bin/nginx/conf/nginx-prod.conf
-!releases/dcef/bin/nginx/conf/nginx-dev.conf
-releases/dcef/bin/nginx/contrib/*
-releases/dcef/bin/nginx/docs/*
-releases/dcef/bin/nginx/nginx.exe
+# nginx
+/backend/nginx/logs
+/backend/nginx/temp
+/backend/nginx/nginx.exe
+
 
 # Preprocess
-preprocess/*.spec
+/backend/preprocess/*.spec
+/backend/preprocess/temp/*
 
 # Frontend
-frontend/build
-frontend/.svelte-kit
-
+/frontend/build
+/frontend/.svelte-kit
 
 # Files containing private information (use example files as a template)
 REDOWNLOAD.bat
 
-# not released files
-preprocess/export_helpers
-TODO.md
+# private files
+/exports/
+/release/exports/
+/backend/preprocess/temp/
+/TODO.md

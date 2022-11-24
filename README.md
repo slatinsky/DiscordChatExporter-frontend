@@ -37,7 +37,7 @@ You need docker and git installed. Tested on non-snap version of docker on Ubunt
 ```bash
 git clone https://github.com/slatinsky/DiscordChatExporter-frontend
 cd DiscordChatExporter-frontend
-docker build -t dce-f .
+docker build -t dcef .
 ```
 2. Navigate to folder with your exports
 ```bash
@@ -46,11 +46,20 @@ cd [path to your exports]
 
 3. Run container
 ```bash
-docker run --volume "$(pwd):/dce-f/static/input" --volume dcef_data:/dce-f/static/data --rm -p 21011:21011 -it dce-f
+docker run --volume "$(pwd):/dcef/exports" --volume dcef_cache:/dcef/backend/preprocess/temp --rm -p 21011:21011 -it dcef
 ```
 
 4. Open `http://127.0.0.1:21011/` in your browser
 
+<details><summary>Debugging containers</summary>
+<p>
+
+To debug new container instance, run `docker run -it dcef sh` to get shell inside container
+
+To get inside running container, run `docker exec -it $(docker ps | grep 'dcef' | awk '{ print $1 }') sh`
+
+</p>
+</details>
 ## Upgrade guide
 Want to upgrade from previous version? Follow these steps:
 
@@ -151,7 +160,7 @@ You don't need to follow development steps if you don't intend to modify the cod
 <details><summary>Show development steps</summary>
 <p>
 
-First download 	nginx/Windows-1.23.2 from [nginx.org](https://nginx.org/en/download.html) and extract it to `releases/bin/nginx` folder.
+First download	nginx/Windows-1.23.2 from [nginx.org](https://nginx.org/en/download.html) and put nginx.exe file to `backend/nginx/` folder.
 
 Then make sure you use node 16.16.0 and have nodemon installed globally (used for python3 hot reloading)
 ```bash
@@ -276,11 +285,10 @@ Docker release should work on Linux x64 and Mac M1 (arm64) computers.
 
 And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pkg, pyinstaller, http-server.
 
-This product contains software provided by NGINX and its contributors.
-
-
 ## License
 GNU GENERAL PUBLIC LICENSE
+
+This product contains software provided by NGINX and its contributors.
 
 ## Contributing
 Feel free to open issues and pull requests.
