@@ -1,15 +1,16 @@
 from Preprocess import Preprocess
 import helpers
 
-if helpers.is_compiled():
-    print('Running compiled version of preprocess.py')
 
-else:
-    print('Running uncompiled version of preprocess.py')
 
 
 def main():
-    p = Preprocess('../static/input/')
+    if helpers.is_compiled():
+        print('Running compiled version of preprocess.py')
+        p = Preprocess('../../exports/', '../cache/')
+    else:
+        print('Running uncompiled version of preprocess.py')
+        p = Preprocess('../releases/exports/', '../releases/dcef/cache/')
     p.process()
     print('Open http://127.0.0.1:21011/ in your browser to view GUI')
 

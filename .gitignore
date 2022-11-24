@@ -1,8 +1,6 @@
+# global blacklist
 .DS_Store
 node_modules
-/build
-/.svelte-kit
-/package
 .env
 .env.*
 !.env.example
@@ -10,16 +8,37 @@ node_modules
 .output
 __pycache__
 
-/static/in
-/static/input
-/static/data
-/releases/bin/preprocess.exe
-/releases/bin/http-server.exe
-/http-server.exe
-/releases/static/
-/releases/*.zip
-/_temp_input/
-/_temp_data/
-/preprocess/export_helpers
-/preprocess/*.spec
-/TODO.md
+
+# releases (built files)
+releases/*.zip
+
+
+# Releases and nginx
+releases/dcef/frontend/
+releases/exports/*
+releases/dcef/cache/*
+releases/dcef/bin/preprocess.exe
+releases/dcef/bin/emojiIndex.json
+releases/dcef/bin/nginx/logs/*
+releases/dcef/bin/nginx/temp/*
+releases/dcef/bin/nginx/conf/*
+!releases/dcef/bin/nginx/conf/nginx-prod.conf
+!releases/dcef/bin/nginx/conf/nginx-dev.conf
+releases/dcef/bin/nginx/contrib/*
+releases/dcef/bin/nginx/docs/*
+releases/dcef/bin/nginx/nginx.exe
+
+# Preprocess
+preprocess/*.spec
+
+# Frontend
+frontend/build
+frontend/.svelte-kit
+
+
+# Files containing private information (use example files as a template)
+REDOWNLOAD.bat
+
+# not released files
+preprocess/export_helpers
+TODO.md

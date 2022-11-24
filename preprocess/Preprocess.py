@@ -11,14 +11,15 @@ import helpers
 
 
 class Preprocess:
-    def __init__(self, input_directory):
+    def __init__(self, input_directory, output_directory):
         self.input_directory = input_directory
-        self.guilds = {}  # guild id is key
-        self.channels = {}  # channel id is key
-        self.messages = {}  # message id is key
-        self.authors = {}  # author id is key
-        self.emojis = {}  # emoji id is key
-        self.mentions = {}  # mention id is key
+        self.output_directory = output_directory
+        self.guilds = {}
+        self.channels = {}
+        self.messages = {}
+        self.authors = {}
+        self.emojis = {}
+        self.mentions = {}
 
     # recursively find all json files in the current directory
     # and print the thread ids to stdout
@@ -96,14 +97,14 @@ class Preprocess:
                           str(html_filepaths) + hash_of_script).encode('utf-8')).hexdigest()
 
         if hash_from_file == new_hash:
-            print("Hash is the same, /static/data is up to date")
+            print("Hash is the same, cache is up to date")
             return False
         else:
             # write new hash to file
-            with open('../static/data/hash.txt', 'w') as f:
+            with open(self.output_directory + '/hash.txt', 'w') as f:
                 f.write(new_hash)
 
-            print("Hash is different, /static/data is not up to date")
+            print("Hash is different, cache is not up to date")
             return True
 
     def parse_html(self, html_filepaths):
@@ -231,7 +232,7 @@ class Preprocess:
         # loop through each guild
         for guild_id, json_filepaths in json_paths_by_guild.items():
             print("\nProcessing guild '" + guilds[guild_id]['name'] + "'")
-            gp = GuildPreprocess(guild_id, self.input_directory,
+            gp = GuildPreprocess(guild_id, self.input_directory, self.output_directory,
                                  json_filepaths, media_filepaths, ids_from_html, channel_order)
             guilds[guild_id] = gp.calculate_guild_filename(guilds[guild_id])
             gp.process()
@@ -239,9 +240,9 @@ class Preprocess:
         print("\nWriting guild list JSON")
         # write guilds to json file
         if not helpers.is_compiled():
-            with open('../static/data/guilds.json', 'w', encoding="utf8") as f:
+            with open(self.output_directory + 'guilds.json', 'w', encoding="utf8") as f:
                 json.dump(guilds, f, indent=4)
-        with open('../static/data/guilds.min.json', 'w', encoding="utf8") as f:
+        with open(self.output_directory + '/guilds.min.json', 'w', encoding="utf8") as f:
             json.dump(guilds, f)
 
         print("PREPROCESS DONE")

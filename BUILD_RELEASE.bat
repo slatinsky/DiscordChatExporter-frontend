@@ -1,35 +1,27 @@
 pushd "%~dp0"
-@REM Move user files outside static directory to speed up build time
-move "static/input" "_temp_input"
-move "static/data" "_temp_data"
 
-@REM Relete old build
-rmdir "releases/static/" /s /q
-del releases\bin\preprocess.exe
-del releases\bin\http-server.exe
+del releases\dcef\bin\nginx\logs\access.log
+del releases\dcef\bin\nginx\logs\error.log
+
+@REM build static frontend
+rmdir "releases/dcef/frontend/" /s /q
+cd frontend
+call npm run build
+@echo on
+move "build" "../releases/dcef/frontend"
+cd ..
+
 
 @REM Build pyinstaller
 cd preprocess
 pyinstaller main.py -F
 cd ..
-move "preprocess\dist\main.exe" "releases\bin\preprocess.exe"
-copy "preprocess\emojiIndex.json" "releases\bin\emojiIndex.json"
-call pkg server/node_modules/http-server/bin/http-server --target node16-win-x64
-@REM Move build to releases
-move "http-server.exe" "releases\bin\http-server.exe"
-
-@REM Build sveltekit frontend
-call npm run build
-@echo on
-@REM Copy build to releases
-move "build" "releases/static"
+del releases\dcef\bin\preprocess.exe
+copy "preprocess\emojiIndex.json" "releases\dcef\bin\emojiIndex.json" /y
+move "preprocess\dist\main.exe" "releases\dcef\bin\preprocess.exe"
 
 @REM Create input directory for user files
-mkdir "releases\static\input"
-
-@REM Move user files back
-move "_temp_input" "static/input"
-move "_temp_data" "static/data"
+mkdir "releases\exports"
 
 @REM Remove not needed files and folders
 del preprocess\main.spec

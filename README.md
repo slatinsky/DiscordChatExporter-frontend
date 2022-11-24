@@ -1,5 +1,6 @@
 ![](docs/screenshot.png)
 
+TODO: update this readme
 
 # DiscordChatExporter-frontend
 View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports as if you were using Discord interface
@@ -317,6 +318,8 @@ But should work on any Windows 10 / Windows 11 x64 computer.
 - [brussell98/discord-markdown](https://github.com/brussell98/discord-markdown) - for discord markdown rendering
 
 And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pkg, pyinstaller, http-server.
+
+This product contains software provided by NGINX and its contributors.
 
 
 ## License

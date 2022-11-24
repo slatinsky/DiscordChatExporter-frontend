@@ -13,12 +13,13 @@ from Assets import Assets
 
 
 class GuildPreprocess:
-    def __init__(self, guild_id, input_dir, json_filepaths, media_filepaths, ids_from_html, channel_order):
+    def __init__(self, guild_id, input_dir, output_dir, json_filepaths, media_filepaths, ids_from_html, channel_order):
         self.guild_id = guild_id
         self.assets = Assets(input_dir, media_filepaths, ids_from_html)
         self.json_filepaths = json_filepaths
         self.ids_from_html = ids_from_html
         self.channel_order = channel_order
+        self.output_dir = output_dir
 
     ## if any field in data has key 'id', pad it with zeros for fast sorting
     def pad_ids(self, data):
@@ -551,7 +552,7 @@ class GuildPreprocess:
         print("Step 8 - Removing unused fields...")
         messages = self.cleanup_empty_fields(messages)
 
-        output_dir = '../static/data/' + self.guild_id + '/'
+        output_dir = self.output_dir + self.guild_id + '/'
         print("Step 9 - Deleting cache directory '" + output_dir + "'...")
         self.cleanup_out_directory(output_dir)
 
