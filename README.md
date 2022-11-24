@@ -8,8 +8,8 @@ View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExport
 - Message deduplication - merge multiple JSON exports and view them as one
 - Optimized infinite scroll - channels are loaded almost instantly
 - Forums and threads support (jump to thread and back)
-- Guild search with filters and autocomplete
-- Load assets locally or from discord servers
+- Search with filters and autocomplete
+- Load assets locally or from Discord servers
 - Private messages or guild exports are supported
 - Discord Markdown rendering
 - Right click message and select "Open in discord" to view message in Discord
@@ -60,6 +60,7 @@ To get inside running container, run `docker exec -it $(docker ps | grep 'dcef' 
 
 </p>
 </details>
+
 ## Upgrade guide
 Want to upgrade from previous version? Follow these steps:
 
@@ -292,5 +293,11 @@ This product contains software provided by NGINX and its contributors.
 
 ## Contributing
 Feel free to open issues and pull requests.
+### Short guide, how to contribute
+- Fork the repository
+- Create a new branch
+- Implement your changes
+- Commit and push the changes
+- Create a pull request
 
 The best way to support this project is to star it here on GitHub :).
