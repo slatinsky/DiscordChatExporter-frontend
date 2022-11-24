@@ -16,7 +16,7 @@ import './styles.css';
 	<div class="error">
 		<h1>No chat exports found</h1>
 		<p>
-			Please close this app and "http-server" terminal, move your DiscordChatExporter JSON+media exports to "/static/input/" folder and rerun
+			Please close this app and "http-server" terminal, move your DiscordChatExporter JSON+media exports to "/exports/" folder and rerun
 			"START_VIEWER.bat"
 		</p>
 

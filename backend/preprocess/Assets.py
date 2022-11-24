@@ -12,7 +12,7 @@ class Assets:
         self.input_dir = input_dir
 
         # key is filename with hash, value is filepath - example:
-        # 'unknown-39F95.png': '../static/input/.../unknown-39F95.png'
+        # 'unknown-39F95.png': '../exports/.../unknown-39F95.png'
         self.media_filepaths = media_filepaths
 
         # key is padded message id, value is list of filenames found in the message - example:
