@@ -13,8 +13,6 @@ import helpers
 def main(input_dir, output_dir):
     p = Preprocess(input_dir, output_dir)
     p.process()
-    if helpers.is_compiled():
-        print('Open http://127.0.0.1:21011/ in your browser to view GUI')
 
 
 
