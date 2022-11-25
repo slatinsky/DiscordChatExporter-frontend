@@ -6,7 +6,7 @@
 	import ContextMenu from '../../../../components/menu/ContextMenu.svelte';
 	import MenuOption from '../../../../components/menu/MenuOption.svelte';
 	import { setMenuVisible, isMenuVisible } from '../../../../components/menu/menuStore';
-	import { copyTextToClipboard, checkUrl } from '../../../../helpers';
+	import { copyTextToClipboard, checkUrl, getFileNameFromUrl } from '../../../../helpers';
 	import { renderTimestamp } from '../../../time';
 
 	export let message;
@@ -257,7 +257,7 @@
 										<div class="chatlog__reference-content">
 											<span
 												class="chatlog__reference-link"
-												>{message.referencedMessage.content}</span
+												><MessageMarkdown content={message.referencedMessage.content.replace("\n", " ")} {guild} {message} /></span
 											>
 										</div>
 									</div>
@@ -293,7 +293,7 @@
 							{#if message.attachments}
 								{#each message.attachments as attachment}
 									{#if attachment.url.type == 'image'}
-										<div class="chatlog__attachment">
+										<div class="chatlog__attachment" class:media-spoiler={getFileNameFromUrl(attachment?.url?.url).startsWith('SPOILER')}>
 											<a href={checkUrl(attachment?.url?.url)} target="_blank">
 												<img
 													class="chatlog__attachment-media"
@@ -309,9 +309,11 @@
 											</a>
 										</div>
 									{:else if attachment.url.type == 'video'}
+									<div class:media-spoiler={getFileNameFromUrl(attachment?.url?.url).startsWith('SPOILER')}>
 										<video class="chatlog__attachment-media" controls preload="metadata">
 											<source src="{checkUrl(attachment?.url?.url)}" alt="{attachment?.Description ?? 'Video attachment'}" title="Video: {attachment.fileName} ({attachment.fileSizeBytes} B)">
 										</video>
+									</div>
 									{:else}
 										<div class="chatlog__attachment">
 											<a href={checkUrl(attachment?.url?.url)} target="_blank">
@@ -593,5 +595,36 @@
 
 	.chatlog__message-container--deleted {
 		background-color: rgba(133, 0, 0, 0.10)
+	}
+
+	:global([data-hidespoilers="true"] .d-spoiler) {
+		background-color: rgba(0, 0, 0, 0.3);
+		color: transparent !important;
+		border-radius: 3px;
+		-webkit-backdrop-filter: blur(10px);
+		backdrop-filter: blur(10px);
+		cursor: pointer;
+	}
+	:global([data-hidespoilers="true"] .d-spoiler > *) {
+		pointer-events:none;
+	}
+	:global([data-hidespoilers="true"] .d-spoiler img) {
+		visibility: hidden;
+	}
+	:global([data-hidespoilers="true"] .d-spoiler a) {
+		color: transparent !important;
+	}
+
+	:global(.d-spoiler-revealed),
+	:global([data-hidespoilers="false"] .d-spoiler) {
+		background-color: rgba(0, 0, 0, 0.3);
+	}
+
+	:global([data-hidespoilers="true"]) .media-spoiler {
+		filter: blur(15px);
+		cursor: pointer;
+	}
+	:global([data-hidespoilers="true"]) .media-spoiler > * {
+		pointer-events:none;
 	}
 </style>

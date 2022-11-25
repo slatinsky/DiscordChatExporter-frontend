@@ -53,3 +53,9 @@ export function checkUrl(url) {
     }
     return url
 }
+
+export function getFileNameFromUrl(url) {
+    if (!url)
+        return "";
+    return url.split('/').pop();
+}

@@ -9,6 +9,7 @@ export const online = writable(false);
 export const linkHandler = writable("app");
 export const unloadMessages = writable(false);
 export const channelScrollPosition = writable("bottom");
+export const hideSpoilers = writable(true);
 
 function withLocalStorage(store, localstorageKey: string, type = "string") {
     const restoredValue = localStorage.getItem(localstorageKey);
@@ -38,4 +39,5 @@ withLocalStorage(online, "online", "bool");
 withLocalStorage(linkHandler, "linkHandler", "string");
 withLocalStorage(unloadMessages, "unloadMessages", "bool");
 withLocalStorage(channelScrollPosition, "channelScrollPosition", "string");
+withLocalStorage(hideSpoilers, "hideSpoilers", "bool");
 

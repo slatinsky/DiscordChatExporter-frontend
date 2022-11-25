@@ -1,12 +1,16 @@
 <script>
 	import MemoryUsage from './channels/[guildId]/MemoryUsage.svelte';
-	import { theme } from './settingsStore';
+	import { theme, hideSpoilers } from './settingsStore';
 import './styles.css';
 
 	export let data;
 
 	theme.subscribe(value => {
 		document.documentElement.setAttribute('data-theme', value);
+	});
+
+	hideSpoilers.subscribe(value => {
+		document.documentElement.setAttribute('data-hidespoilers', value);
 	});
 </script>
 

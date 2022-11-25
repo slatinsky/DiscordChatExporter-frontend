@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, unloadMessages, channelScrollPosition } from './settingsStore';
+	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, unloadMessages, channelScrollPosition, hideSpoilers } from './settingsStore';
 	import { timestampRenderers } from './time';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
@@ -93,6 +93,20 @@
 	<label>
 		<input type="radio" name="online" value={true} bind:group={$online} />
 		<span>If local assets don't exist</span>
+	</label>
+	{/key}
+</div>
+
+<p>Hide/blur spoilers</p>
+<div class="radios">
+	{#key $hideSpoilers}
+	<label>
+		<input type="radio" name="hideSpoilers" value={true} bind:group={$hideSpoilers} />
+		<span>Yes</span>
+	</label>
+	<label>
+		<input type="radio" name="hideSpoilers" value={false} bind:group={$hideSpoilers} />
+		<span>No</span>
 	</label>
 	{/key}
 </div>
