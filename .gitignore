@@ -15,6 +15,7 @@ __pycache__
 /release/dcef/
 /backend/preprocess/build/
 /backend/preprocess/dist/
+/build.zip
 
 
 # nginx
