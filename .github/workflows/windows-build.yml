@@ -12,13 +12,14 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.16.0
+          cache: 'npm'
+
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: '16.16.0'
 
       - name: Setup Python
         uses: actions/setup-python@v2.3.3
