@@ -1,0 +1,3 @@
+- Place your JSONs and assets exported by DiscordChatExporter in this folder
+- Folder structure is not important
+- you can delete this file

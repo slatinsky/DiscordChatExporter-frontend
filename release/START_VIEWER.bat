@@ -3,6 +3,8 @@ cd dcef/backend/preprocess
 preprocess.exe ../../../exports/ temp/
 
 cd ../nginx
+if not exist logs mkdir logs
+if not exist temp mkdir temp
 start "nginx" nginx.exe -c .\conf\nginx-prod.conf
 
 timeout /t 1 /nobreak >nul

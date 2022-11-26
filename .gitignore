@@ -36,6 +36,7 @@ REDOWNLOAD.bat
 
 # private files
 /exports/
-/release/exports/
+/release/exports/*
+!/release/exports/README.txt
 /backend/preprocess/temp/
 /TODO.md

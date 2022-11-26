@@ -59,13 +59,11 @@ jobs:
           cp backend\nginx\nginx.exe build\dcef\backend\nginx
           cp backend\nginx\conf\nginx-prod.conf build\dcef\backend\nginx\conf\nginx-prod.conf
           cp backend\nginx\conf\mime.types build\dcef\backend\nginx\conf\mime.types
+          cp release\exports\README.txt build\exports\README.txt
           cp release\START_VIEWER.bat build\START_VIEWER.bat
 
-      - name: Create zip file of build folder
-        run: 7z a -tzip build.zip build
-
-      - name: Upload build.zip
+      - name: Upload build folder
         uses: actions/upload-artifact@v2
         with:
-          name: windows-build.zip
-          path: build.zip
+          name: windows-build
+          path: build
