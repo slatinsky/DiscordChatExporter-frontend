@@ -161,8 +161,6 @@ You don't need to follow development steps if you don't intend to modify the cod
 <details><summary>Show development steps</summary>
 <p>
 
-First download	nginx/Windows-1.23.2 from [nginx.org](https://nginx.org/en/download.html) and put nginx.exe file to `backend/nginx/` folder.
-
 Then make sure you use node 16.16.0 and have nodemon installed globally (used for python3 hot reloading)
 ```bash
 nvm use 16.16.0
@@ -171,7 +169,7 @@ npm install -g nodemon
 
 Then install python3 dependencies
 ```bash
-cd preprocess
+cd backend/preprocess
 py -m pip install imagesize
 cd ..
 ```
@@ -198,10 +196,6 @@ If everything was done correctly, DiscordChatExporter-frontend will open in your
 - pyinstaller (installled globally)
 ```
 py -m pip install pyinstaller
-```
-pkg (installed globally)
-```
-npm install -g pkg
 ```
 
 ## Steps
@@ -259,8 +253,7 @@ v16.14.2
 >pyinstaller --version
 5.5
 
->pkg --version
-5.8.0
+nginx/Windows-1.23.2
 
 DiscordChatExporter version:
 v2.36.1
@@ -284,7 +277,7 @@ Docker release should work on Linux x64 and Mac M1 (arm64) computers.
 - Discord - for a great chat app
 - [brussell98/discord-markdown](https://github.com/brussell98/discord-markdown) - for discord markdown rendering
 
-And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pkg, pyinstaller, http-server.
+And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pyinstaller, http-server.
 
 ## License
 GNU GENERAL PUBLIC LICENSE

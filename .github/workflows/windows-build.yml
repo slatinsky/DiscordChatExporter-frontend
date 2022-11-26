@@ -1,0 +1,68 @@
+name: Build Windows binaries
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.16.0'
+
+      - name: Setup Python
+        uses: actions/setup-python@v2.3.3
+        with:
+          python-version: '3.11.0'
+
+      - name: Create directories
+        run: |
+          mkdir -p build\exports
+          mkdir -p build\dcef\backend\preprocess
+          mkdir -p build\dcef\backend\nginx\conf
+          mkdir -p build\dcef\backend\nginx\logs
+          mkdir -p build\dcef\backend\nginx\temp
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Install backend dependencies
+        working-directory: backend/preprocess
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller==5.5
+
+      - name: Build executable with pyinstaller
+        working-directory: backend/preprocess
+        run: pyinstaller --onefile --name preprocess main.py
+
+      - name: Move files to build folder
+        run: |
+          mv frontend\build build\dcef\frontend
+          mv backend\preprocess\dist\preprocess.exe build\dcef\backend\preprocess
+          cp backend\preprocess\emojiIndex.json build\dcef\backend\preprocess
+          cp backend\nginx\nginx.exe build\dcef\backend\nginx
+          cp backend\nginx\conf\nginx-prod.conf build\dcef\backend\nginx\conf\nginx-prod.conf
+          cp backend\nginx\conf\mime.types build\dcef\backend\nginx\conf\mime.types
+          cp release\START_VIEWER.bat build\START_VIEWER.bat
+
+      - name: Upload build folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-build
+          path: build

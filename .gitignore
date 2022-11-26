@@ -11,13 +11,15 @@ __pycache__
 
 # releases (built files)
 /release/*.zip
+/build/
 /release/dcef/
+/backend/preprocess/build/
+/backend/preprocess/dist/
 
 
 # nginx
 /backend/nginx/logs
 /backend/nginx/temp
-/backend/nginx/nginx.exe
 
 
 # Preprocess
