@@ -31,8 +31,11 @@ Using prebuilt binaries is the easiest way to use this tool on Windows.
 3. Move your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/exports/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs.
 4. Run `START_VIEWER.bat` - DiscordChatExporter-frontend will open in your default browser
 
+## Beta builds (Windows)
+If you want to try out the latest features, you can use [beta builds](https://github.com/slatinsky/DiscordChatExporter-frontend/actions/workflows/windows-build.yml). They are automatically built from the latest commit on `master` branch or from pull requests. They are quite stable, but no guarantees :)
+
 ## Docker version (Linux+Mac)
-You need docker and git installed. Tested on non-snap version of docker on Ubuntu 22.04. @levithomason tested it on M1 MacBook (Apple Silicon) in issue [#5](https://github.com/slatinsky/DiscordChatExporter-frontend/issues/5)
+You need docker and git installed. Tested on non-snap version of docker on Ubuntu 22.04. @levithomason [tested it](https://github.com/slatinsky/DiscordChatExporter-frontend/issues/5) on M1 MacBook (Apple Silicon)
 1. Build image
 ```bash
 git clone https://github.com/slatinsky/DiscordChatExporter-frontend
@@ -108,7 +111,7 @@ Viewing forums is supported by this viewer, but exporting them with DiscordChatE
 Workaround is to export individual forum threads. I made a script to get forum IDs automatically:
 
 ### Steps
-1. Open discord in browser
+1. Open discord in browser (browser needs to be Chromium based - Chrome, Edge, Opera, Brave, Vivaldi, etc., not working in Firefox)
 2. Navigate to channel with forum post list
 3. press F12 and paste this script to the console:
 
@@ -124,7 +127,7 @@ function scrollToPosition(offset) {
 
 function captureIds() {
     document.querySelectorAll('div[data-item-id]').forEach((e) => ids.push(e.dataset.itemId))
-    ids = [...new Set(ids)]  //deduplicate
+    ids = [...new Set(ids)]
     if (ids.length > len) {
         len = ids.length
         console.log('Found', len, 'IDs')
@@ -132,8 +135,7 @@ function captureIds() {
 }
 
 function printIds() {
-    // print all ids, comma separated
-    console.log('found IDs:',ids.join(','))
+    console.log('DiscordChatExporter.Cli.exe export --token TOKEN --output "exports/forums" --format Json --media --reuse-media --channel',ids.join(' '))
 }
 
 scrollToPosition(0)
@@ -150,8 +152,8 @@ interval = setInterval(() => {
 }, 1542)
 ```
 
-4. script will scroll the page. At the the end, it will print all IDs to the console
-5. download each id with DiscordChatExporter as if you would download channel (--channel FORUM_POST_ID)
+4. script will scroll the page. At the the end, it will print command to the console, which allows you to export all forum posts in the forum channel
+5. edit command printed in the console (--format, --output and --token) and export with CLI version of DiscordChatExporter
 </p>
 </details>
 
@@ -277,7 +279,7 @@ Docker release should work on Linux x64 and Mac M1 (arm64) computers.
 - Discord - for a great chat app
 - [brussell98/discord-markdown](https://github.com/brussell98/discord-markdown) - for discord markdown rendering
 
-And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pyinstaller, http-server.
+And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pyinstaller, nginx.
 
 ## License
 GNU GENERAL PUBLIC LICENSE
