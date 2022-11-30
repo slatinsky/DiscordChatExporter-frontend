@@ -94,16 +94,16 @@ Export all dms (sadly, exporting dms can't be done without selfboting):
 ```
 DiscordChatExporter.Cli.exe exportdm --token DISCORD_TOKEN --media --reuse-media --format Json --output OUTPUT_FOLDER_PATH
 ```
-Export channel/thread/forum post:
+Export channel/thread/forum posts:
 ```
-DiscordChatExporter.Cli export --token DISCORD_TOKEN  --media --reuse-media --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID
+DiscordChatExporter.Cli export --token DISCORD_TOKEN  --media --reuse-media --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_1 CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_2 CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_3 CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_4
 ```
 
-Viewer also suppports html export with assets + json export without assets - but it's not recommended, because most embeds will be missing.
+Viewer also supports html export with assets + json export without assets - but it's not recommended, because most embeds will be missing.
 </p>
 </details>
 
-<details><summary>Helper script to export threads in a channel</summary>
+<details><summary>Helper script to export archived threads in a channel</summary>
 <p>
 
 Viewing threads is supported by this viewer, but exporting them manually is time consuming. You can use this helper script to generate command to download all archived threads in a channel automatically:
@@ -189,7 +189,7 @@ function captureIds() {
 }
 
 function printIds() {
-    console.log('DiscordChatExporter.Cli.exe export --token TOKEN --output "exports/forums" --format Json --media --reuse-media --channel',ids.join(' '))
+    console.log('DiscordChatExporter.Cli.exe export --token TOKEN --output "exports/threads" --format Json --media --reuse-media --channel',ids.join(' '))
 }
 
 function mainFunc() {

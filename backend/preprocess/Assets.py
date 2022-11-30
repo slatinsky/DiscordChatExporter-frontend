@@ -192,3 +192,6 @@ class Assets:
     def fill_author_with_local_filenames(self, author):
         author["avatarUrl"] = self.calculate_local_file_attributes(None, author["avatarUrl"])
 
+    def fill_sticker_with_local_filenames(self, sticker):
+        sticker["url"] = self.calculate_local_file_attributes(None, sticker["sourceUrl"])
+

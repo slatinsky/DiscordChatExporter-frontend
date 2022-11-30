@@ -493,7 +493,15 @@
 								</div>
 							{/each}
 						{/if}
-						<!--                TODO: stickers-->
+						<!-- stickers -->
+						{#if message.stickers}
+							{#each message.stickers as sticker}
+								<div class="chatlog__sticker">
+									<img class="chatlog__sticker-image" src="{checkUrl(sticker.url?.url)}" alt="Sticker" loading="lazy" onerror="this.style.visibility='hidden'">
+								</div>
+							{/each}
+						{/if}
+
 						<!--                REACTIONS-->
 						<div class="chatlog__reactions">
 							{#if message.reactions}

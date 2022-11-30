@@ -356,7 +356,7 @@ class GuildPreprocess:
 
 
     def calculate_local_filenames(self, messages, authors, emojis):
-        progress = Progress(messages, 'step 1/3')
+        progress = Progress(messages, 'step 1/4')
         for message in messages.values():
             self.assets.fill_message_with_local_filenames(message)
             progress.increment()
@@ -364,16 +364,24 @@ class GuildPreprocess:
             # TODO: other embeds and stickers
 
 
-        progress = Progress(messages, 'step 2/3')
+        progress = Progress(emojis, 'step 2/4')
         for emoji in emojis.values():
             self.assets.fill_emoji_with_local_filenames(emoji)
 
             progress.increment()
         progress.finish()
 
-        progress = Progress(messages, 'step 3/3')
+        progress = Progress(authors, 'step 3/4')
         for author in authors.values():
             self.assets.fill_author_with_local_filenames(author)
+            progress.increment()
+        progress.finish()
+
+        progress = Progress(messages, 'step 4/4')
+        for message in messages.values():
+            if 'stickers' in message:
+                for sticker in message['stickers']:
+                    self.assets.fill_sticker_with_local_filenames(sticker)
             progress.increment()
         progress.finish()
 
@@ -518,7 +526,25 @@ class GuildPreprocess:
 
         return thread_id_to_message_id
 
-
+    def print_stats(self, messages, channels):
+        thread_count = 0
+        text_channel_count = 0
+        voice_channel_count = 0
+        other_channel_count = 0
+        for channel in channels.values():
+            if channel['type'] == "GuildPublicThread":
+                thread_count += 1
+            elif channel['type'] == "GuildTextChat" or channel['type'] == "DirectTextChat" or channel['type'] == "DirectGroupTextChat":
+                text_channel_count += 1
+            elif channel['type'] == "GuildVoiceChat":
+                voice_channel_count += 1
+            else:
+                other_channel_count += 1
+        print("  ", len(messages), "messages")
+        print("  ", text_channel_count, "text channels")
+        print("  ", voice_channel_count, "voice channels")
+        print("  ", thread_count, "threads or forum posts")
+        print("  ", other_channel_count, "other channels")
 
     def process(self):
         print("Step 0 - Reading data from json files...")
@@ -533,9 +559,7 @@ class GuildPreprocess:
         print("Step 3 - Sorting messages and channels...")
         messages, channels = self.sort_messages_and_channels(messages, channels, self.channel_order)
 
-        # print message count
-        print("   Message count: " + str(len(messages)))
-        print("   Channel+Thread count: " + str(len(channels)))  # includes forum threads
+        self.print_stats(messages, channels)
 
         print("Step 4 - Deduplicating authors...")
         messages, authors = self.extract_authors(messages)
