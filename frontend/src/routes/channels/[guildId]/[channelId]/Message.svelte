@@ -310,6 +310,16 @@
 										</div>
 									{:else if attachment.url.type == 'video'}
 									<div class:media-spoiler={getFileNameFromUrl(attachment?.url?.url).startsWith('SPOILER')}>
+										<!-- title -->
+										<div class="chatlog__attachment">
+											<a href={checkUrl(attachment?.url?.url)} target="_blank">
+												<div class="chatlog__attachment-media">
+													<div class="chatlog__attachment-media-title">
+														{attachment.fileName}
+													</div>
+												</div>
+											</a>
+										</div>
 										<video class="chatlog__attachment-media" controls preload="metadata">
 											<source src="{checkUrl(attachment?.url?.url)}" alt="{attachment?.Description ?? 'Video attachment'}" title="Video: {attachment.fileName} ({attachment.fileSizeBytes} B)">
 										</video>
@@ -351,6 +361,11 @@
 												</div>
 											</a>
 										</div>
+										{#if attachment.url.type == 'audio'}
+										<audio class="chatlog__attachment-media" controls preload="metadata">
+											<source src="{checkUrl(attachment?.url?.url)}" alt="{attachment?.Description ?? 'Audio attachment'}" title="Audio: {attachment.fileName} ({attachment.fileSizeBytes} B)">
+										</audio>
+										{/if}
 									{/if}
 								{/each}
 							{/if}
@@ -634,5 +649,10 @@
 	}
 	:global([data-hidespoilers="true"]) .media-spoiler > * {
 		pointer-events:none;
+	}
+
+	audio {
+		max-width: 80%;
+		width: 700px;
 	}
 </style>
