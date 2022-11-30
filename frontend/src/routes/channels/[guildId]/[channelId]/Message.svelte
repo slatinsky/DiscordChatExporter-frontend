@@ -418,13 +418,13 @@
 															<div class="chatlog__embed-field">
 																{#if field.name}
 																	<div class="chatlog__embed-field-name">
-																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.name} {guild} {message} /></div>
+																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.name} {guild} {message} embed={true}/></div>
 																	</div>
 																{/if}
 
 																{#if field.value}
 																	<div class="chatlog__embed-field-value">
-																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.value} {guild} {message}/></div>
+																		<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={field.value} {guild} {message} embed={true}/></div>
 																	</div>
 																{/if}
 															</div>

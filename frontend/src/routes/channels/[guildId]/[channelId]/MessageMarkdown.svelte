@@ -4,6 +4,7 @@
     export let content
     export let guild
     export let message
+    export let embed = false
     let processedContent
 
     function escapeHTML(unsafeText) {  // source https://stackoverflow.com/a/48054293
@@ -12,7 +13,7 @@
         return div.innerHTML;
     }
     function process(content) {
-        processedContent = window.discordMarkdown.toHTML(content);
+        processedContent = window.discordMarkdown.toHTML(content, {embed});
         let regex = /:\w+:/g;
         // if regex matches, replace with emoji
         if (regex.test(processedContent)) {
