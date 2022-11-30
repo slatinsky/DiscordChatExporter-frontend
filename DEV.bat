@@ -7,4 +7,4 @@ if not exist temp mkdir temp
 start "nginx" nginx.exe -c conf/nginx-dev.conf
 cd ../../frontend
 start "sveltekit" npm run dev
-start "browser" rundll32 url.dll,FileProtocolHandler http://localhost:7070/
+start "browser" rundll32 url.dll,FileProtocolHandler http://localhost:21012/
