@@ -8,6 +8,7 @@
 	import { setMenuVisible, isMenuVisible } from '../../../../components/menu/menuStore';
 	import { copyTextToClipboard, checkUrl, getFileNameFromUrl } from '../../../../helpers';
 	import { renderTimestamp } from '../../../time';
+	import ImageGallery from './ImageGallery.svelte';
 
 	export let message;
 	export let guild;
@@ -195,15 +196,7 @@
 						{/if}
 
 						{#if message.type != 'ThreadCreated'}
-							<img
-								class="chatlog__avatar"
-								src={checkUrl(message.author?.avatarUrl?.url)}
-								alt="Avatar"
-								loading="lazy"
-								width="{message.author?.width ?? 40}"
-								height="{message.author?.height ?? 40}"
-								onerror="this.style.visibility='hidden'"
-							/>
+							<ImageGallery url={message.author?.avatarUrl} imgclass={"chatlog__avatar"} />
 						{/if}
 					</div>
 
@@ -293,21 +286,10 @@
 							{#if message.attachments}
 								{#each message.attachments as attachment}
 									{#if attachment.url.type == 'image'}
-										<div class="chatlog__attachment" class:media-spoiler={getFileNameFromUrl(attachment?.url?.url).startsWith('SPOILER')}>
-											<a href={checkUrl(attachment?.url?.url)} target="_blank">
-												<img
-													class="chatlog__attachment-media"
-													src={checkUrl(attachment?.url?.url)}
-													alt="Attachment"
-													title="Image: {attachment.fileName} ({attachment.fileSizeBytes} B)"
-													loading="lazy"
-
-													width="{attachment?.url.width ?? undefined}"
-													height="{attachment?.url.height ?? undefined}"
-													onerror="this.style.visibility='hidden'"
-												/>
-											</a>
+										<div class="chatlog__attachment">
+											<ImageGallery url={attachment?.url} imgclass={"chatlog__attachment-media"} />
 										</div>
+
 									{:else if attachment.url.type == 'video'}
 									<div class:media-spoiler={getFileNameFromUrl(attachment?.url?.url).startsWith('SPOILER')}>
 										<!-- title -->
@@ -410,7 +392,7 @@
 												{#if embed.title}
 													<div class="chatlog__embed-title">
 														{#if embed.url}
-															<a class="chatlog__embed-title-link" href="@embed.Url">
+															<a class="chatlog__embed-title-link" href={embed?.url}>
 																<div class="chatlog__markdown chatlog__markdown-preserve"><MessageMarkdown content={embed.title} {guild} {message} /></div>
 															</a>
 														{:else}
@@ -451,20 +433,16 @@
 											<!-- @{/* Embed content */} -->
 												{#if embed.thumbnail}
 													<div class="chatlog__embed-thumbnail-container">
-														<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.url?.url}" target="_blank">
 															<!-- {console.warn(embed.thumbnail.type)} -->
 															{#if embed.thumbnail?.url?.type === 'video'}
-																<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.thumbnail?.url?.url)}" autoplay loop muted playsinline
-																width="{embed.thumbnail?.width ?? 16}"
-																height="{embed.thumbnail?.height ?? 16}"/>
+																<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.url?.url}" target="_blank">
+																	<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.thumbnail?.url?.url)}" autoplay loop muted playsinline
+																	width="{embed.thumbnail?.width ?? 16}"
+																	height="{embed.thumbnail?.height ?? 16}"/>
+																</a>
 															{:else if embed.thumbnail?.url?.url}
-																<img class="chatlog__embed-thumbnail" src="{checkUrl(embed.thumbnail?.url?.url)}" alt="Thumbnail" loading="lazy"
-																width="{embed.thumbnail?.width ?? 16}"
-																height="{embed.thumbnail?.height ?? 16}"
-																onerror="this.style.visibility='hidden'"
-																>
+																<ImageGallery url={embed.thumbnail?.url} imgclass={"chatlog__embed-thumbnail"} />
 															{/if}
-														</a>
 													</div>
 												{/if}
 
@@ -473,13 +451,7 @@
 													{#each embed.images as image}
 														<div class="chatlog__embed-images">
 															<div class="chatlog__embed-image-container">
-																<a class="chatlog__embed-image-link" href="{checkUrl(image.url?.url)}" target="_blank">
-																	<img class="chatlog__embed-image" src="{checkUrl(image.url?.url)}" alt="Image" loading="lazy"
-																	width="{image?.url?.width ?? 16}"
-																	height="{image?.url?.height ?? 16}"
-																	onerror="this.style.visibility='hidden'"
-																	>
-																</a>
+																<ImageGallery url={image.url} imgclass={"chatlog__embed-image"} />
 															</div>
 														</div>
 													{/each}
@@ -512,7 +484,7 @@
 						{#if message.stickers}
 							{#each message.stickers as sticker}
 								<div class="chatlog__sticker">
-									<img class="chatlog__sticker-image" src="{checkUrl(sticker.url?.url)}" alt="Sticker" loading="lazy" onerror="this.style.visibility='hidden'">
+									<ImageGallery url={sticker.url} imgclass={"chatlog__sticker-image"} />
 								</div>
 							{/each}
 						{/if}
@@ -596,12 +568,12 @@
 		margin: 15px 30px 5px 15px;
 	}
 
-	.chatlog__attachment-media {
+	:global(.chatlog__attachment-media) {
 		max-width: calc(100% - 10px);
 		object-position:left
 	}
 
-	.chatlog__embed-thumbnail {
+	:global(.chatlog__embed-thumbnail) {
 		flex: 0;
 		max-width: calc(100% - 40px);
 		max-height: 100%;
@@ -643,16 +615,21 @@
 		background-color: rgba(0, 0, 0, 0.3);
 	}
 
-	:global([data-hidespoilers="true"]) .media-spoiler {
+	:global([data-hidespoilers="true"] .media-spoiler) {
 		filter: blur(15px);
 		cursor: pointer;
 	}
-	:global([data-hidespoilers="true"]) .media-spoiler > * {
+	:global([data-hidespoilers="true"] .media-spoiler > *) {
 		pointer-events:none;
 	}
 
 	audio {
 		max-width: 80%;
 		width: 700px;
+	}
+
+	:global(.chatlog__sticker-image) {
+		max-width: 200px;
+		max-height: auto;
 	}
 </style>
