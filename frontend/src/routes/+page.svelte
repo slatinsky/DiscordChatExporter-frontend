@@ -1,5 +1,5 @@
 <script>
-	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, unloadMessages, channelScrollPosition, hideSpoilers } from './settingsStore';
+	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, unloadMessages, channelScrollPosition, hideSpoilers, font } from './settingsStore';
 	import { timestampRenderers } from './time';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
@@ -53,6 +53,33 @@
 	</label>
 	{/key}
 </div>
+
+<p>Discord font</p>
+<div class="radios">
+	{#key $font}
+	<label>
+		<input type="radio" name="font" value={"ggsans"} bind:group={$font} />
+		<span>gg sans (new discord font)</span>
+	</label>
+	<label>
+		<input type="radio" name="font" value={"whitney"} bind:group={$font} />
+		<span>Whitney (old discord font)</span>
+	</label>
+	<label>
+		<input type="radio" name="font" value={"arial"} bind:group={$font} />
+		<span>Arial</span>
+	</label>
+	<label>
+		<input type="radio" name="font" value={"timesnewroman"} bind:group={$font} />
+		<span>Times New Roman</span>
+	</label>
+	<label>
+		<input type="radio" name="font" value={"comicsans"} bind:group={$font} />
+		<span>Comic Sans</span>
+	</label>
+	{/key}
+</div>
+
 
 <p>Show memory usage</p>
 <div class="radios">

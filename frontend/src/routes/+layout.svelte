@@ -1,6 +1,6 @@
 <script>
 	import MemoryUsage from './channels/[guildId]/MemoryUsage.svelte';
-	import { theme, hideSpoilers } from './settingsStore';
+	import { theme, hideSpoilers, font } from './settingsStore';
 import './styles.css';
 
 	export let data;
@@ -11,6 +11,10 @@ import './styles.css';
 
 	hideSpoilers.subscribe(value => {
 		document.documentElement.setAttribute('data-hidespoilers', value);
+	});
+
+	font.subscribe(value => {
+		document.documentElement.setAttribute('data-font', value);
 	});
 </script>
 

@@ -10,6 +10,7 @@ export const linkHandler = writable("app");
 export const unloadMessages = writable(false);
 export const channelScrollPosition = writable("bottom");
 export const hideSpoilers = writable(true);
+export const font = writable("ggsans");
 
 function withLocalStorage(store, localstorageKey: string, type = "string") {
     const restoredValue = localStorage.getItem(localstorageKey);
@@ -40,4 +41,5 @@ withLocalStorage(linkHandler, "linkHandler", "string");
 withLocalStorage(unloadMessages, "unloadMessages", "bool");
 withLocalStorage(channelScrollPosition, "channelScrollPosition", "string");
 withLocalStorage(hideSpoilers, "hideSpoilers", "bool");
+withLocalStorage(font, "font", "string");
 

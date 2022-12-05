@@ -1,3 +1,22 @@
+:root {
+	--font: Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+:root[data-font="ggsans"] {
+	--font: "gg sans", Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+:root[data-font="arial"] {
+	--font: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+:root[data-font="timesnewroman"] {
+	--font: "Times New Roman", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+:root[data-font="comicsans"] {
+	--font: "Comic Sans MS", "Comic Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
 
 :root[data-theme="dark"] {
 	--color-discord-blue: #5865F2;
@@ -64,6 +83,7 @@
 	--borders: rgba(255, 255, 255, 0.1);
 	--borders2: #4f545c;
 }
+
 :root[data-theme="white"] {
 	--color-discord-blue: #5865F2;
 	--color-discord-green: #3BA55D;
@@ -99,36 +119,104 @@
 }
 
 @font-face {
-	src: url(/fonts/whitney-300-1FE35.woff);
+	src: url(/fonts/whitney-300.woff);
 	font-family: Whitney;
 	font-weight: 300
 }
 
 @font-face {
-	src: url(/fonts/whitney-400-83E7B.woff);
+	src: url(/fonts/whitney-400.woff);
 	font-family: Whitney;
 	font-weight: 400
 }
 
 @font-face {
-	src: url(/fonts/whitney-500-47E37.woff);
+	src: url(/fonts/whitney-500.woff);
 	font-family: Whitney;
 	font-weight: 500
 }
 
 @font-face {
-	src: url(/fonts/whitney-600-9EC09.woff);
+	src: url(/fonts/whitney-600.woff);
 	font-family: Whitney;
 	font-weight: 600
 }
 
 @font-face {
-	src: url(/fonts/whitney-700-A7A71.woff);
+	src: url(/fonts/whitney-700.woff);
 	font-family: Whitney;
 	font-weight: 700
 }
 
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 400;
+	src: url(/data/fonts/ggsans-normal-400.woff2) format("woff2")
+}
 
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 400;
+	src: url(/data/fonts/ggsans-italic-400.woff2) format("woff2")
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 500;
+	src: url(/data/fonts/ggsans-normal-500.woff2) format("woff2")
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 500;
+	src: url(/data/fonts/ggsans-italic-500.woff2) format("woff2")
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 600;
+	src: url(/data/fonts/ggsans-normal-600.woff2) format("woff2")
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 600;
+	src: url(/data/fonts/ggsans-italic-600.woff2) format("woff2")
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 700;
+	src: url(/data/fonts/ggsans-normal-700.woff2) format("woff2")
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 700;
+	src: url(/data/fonts/ggsans-italic-700.woff2) format("woff2")
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 800;
+	src: url(/data/fonts/ggsans-normal-800.woff2) format("woff2")
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 800;
+	src: url(/data/fonts/ggsans-italic-800.woff2) format("woff2")
+}
 
 
 
@@ -138,7 +226,7 @@ body {
 	padding: 0;
 	background-color: var(--color-bg);
 	color: var(--color-text);
-	font-family: Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-family: var(--font);
 	font-size: 17px;
 	font-weight: 400;
 	scroll-behavior: smooth
@@ -799,9 +887,29 @@ img {
 
 
 /* thin dark scrollbar */
-::-webkit-scrollbar { width: 10px; height: 3px;}
-::-webkit-scrollbar-track {  background-color: var(--panel-channels-bg);}
-::-webkit-scrollbar-track-piece { background-color: #2F3136;}
-::-webkit-scrollbar-thumb { height: 50px; background-color: #202225; border-radius: 3px;}
-::-webkit-scrollbar-corner { background-color: #646464;}
-::-webkit-resizer { background-color: #666;}
+::-webkit-scrollbar {
+	width: 10px;
+	height: 3px;
+}
+
+::-webkit-scrollbar-track {
+	background-color: var(--panel-channels-bg);
+}
+
+::-webkit-scrollbar-track-piece {
+	background-color: #2F3136;
+}
+
+::-webkit-scrollbar-thumb {
+	height: 50px;
+	background-color: #202225;
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-corner {
+	background-color: #646464;
+}
+
+::-webkit-resizer {
+	background-color: #666;
+}
