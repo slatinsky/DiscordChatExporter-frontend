@@ -3,6 +3,14 @@
 # DiscordChatExporter-frontend
 View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports as if you were using Discord interface
 
+## Why JSON exports are better than HTML exports?
+- better-suited for long-term preservation
+- contain more information than HTML exports
+- readable by third-party applications like this one or [chat-analytics](https://github.com/mlomb/chat-analytics), not just browsers
+- smaller in size
+
+This project aims to provide you with better experience than what you get by just opening HTML exports in your browser. In one place and with many more features, like search, message deduplication, etc. And it will get even better in the future :).
+
 ## Features
 - View JSON exports in Discord like interface
 - Message deduplication - merge multiple JSON exports and view them as one
@@ -13,6 +21,7 @@ View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExport
 - Private messages or guild exports are supported
 - Discord Markdown rendering
 - Right click message and select "Open in discord" to view message in Discord
+- Windows, Linux and Mac support (including M1 Macs)
 
 
 ### System requirements (per guild)
@@ -22,7 +31,8 @@ View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExport
 
 Note: Discord servers are known internally as guilds
 
-
+Planned feature:
+- Refactor to client-server architecture is planned to handle larger exports than 4 million messages per guild. And with added bonus of being able to run the viewer on your own server and view your exports from anywhere. But it will take some time to implement.
 
 ## Quick start (Windows)
 Using prebuilt binaries is the easiest way to use this tool on Windows.
@@ -31,7 +41,9 @@ Using prebuilt binaries is the easiest way to use this tool on Windows.
 3. Move your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/exports/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs.
 4. Run `START_VIEWER.bat` - DiscordChatExporter-frontend will open in your default browser
 
-## Beta builds (Windows)
+NOTE: command prompt window ("black rectangle") named "nginx" will open. It provides local web server for the viewer. After you are done with using the viewer, you can close it.
+
+### Beta builds (Windows)
 If you want to try out the latest features, you can use [beta builds](https://github.com/slatinsky/DiscordChatExporter-frontend/actions/workflows/windows-build.yml). They are automatically built from the latest commit on `master` branch or from pull requests. They are quite stable, but no guarantees :)
 
 ## Docker version (Linux+Mac)
@@ -57,9 +69,7 @@ docker run --volume "$(pwd):/dcef/exports" --volume dcef_cache:/dcef/cache --rm 
 <details><summary>Debugging containers</summary>
 <p>
 
-To debug new container instance, run `docker run -it dcef sh` to get shell inside container
-
-To get inside running container, run `docker exec -it $(docker ps | grep 'dcef' | awk '{ print $1 }') sh`
+To debug running container, run `docker exec -it $(docker ps | grep 'dcef' | awk '{ print $1 }') sh`. This will open a shell inside the container.
 
 </p>
 </details>
@@ -403,4 +413,4 @@ Feel free to open issues and pull requests.
 - Commit and push the changes
 - Create a pull request
 
-The best way to support this project is to star it here on GitHub :).
+If you find this project useful, please consider starring it here on GitHub :)
