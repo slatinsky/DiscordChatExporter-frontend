@@ -275,6 +275,13 @@ interval = setInterval(() => {
 </p>
 </details>
 
+### Settings for GUI version of DiscordChatExporter
+Make sure that export format is set to `JSON`. Optionally, you can enable `Download assets` option to download images, videos and other types of assets.
+
+![](docs/dce-export-more.png)
+
+**NOTE**: You can't export threads and forums using GUI version of DCE. You need to use CLI version for that.
+
 ## Development
 You don't need to follow development steps if you don't intend to modify the code.
 
