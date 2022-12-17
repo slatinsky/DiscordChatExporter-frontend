@@ -337,6 +337,17 @@
 					channelMessages = channelMessages.filter((message) => {
 						return message.channelId === channel.id;
 					});
+				} else if (filter.key === 'category') {
+					let channelIds = Object.values(guild.categories).filter((category) => {
+						return category.name.replaceAll(' ', '_') === filter.value;
+					}).map((category) => Object.values(category.channelIds).map((channel) => channel.id));
+
+					// flatten array
+					channelIds = [].concat.apply([], channelIds);
+
+					channelMessages = channelMessages.filter((message) => {
+						return channelIds.includes(message.channelId);
+					});
 				}
 			}
 
@@ -431,6 +442,17 @@
 						>
 							# {channel.name}
 							<div>({channel.messageCount}x)</div>
+						</div>
+					{/key}
+				{/each}
+			{:else if 'key' in parsedCursorHere && parsedCursorHere.key === 'category' && value.length > 0}
+				{#each filterChannels(guild.categories, value) as category, i}
+					{#key category.id}
+						<div
+							class="channel search-option"
+							on:click={() => selectOptionValue(category.name.replaceAll(' ', '_'))}
+						>
+							# {category.name}
 						</div>
 					{/key}
 				{/each}
@@ -535,6 +557,11 @@
 					{#if filterKeys('in:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectOptionKey('in')}>
 							<b>in: </b>channel
+						</div>
+					{/if}
+					{#if filterKeys('category:', parsedCursorHere)}
+						<div class="search-option" on:click={() => selectOptionKey('category')}>
+							<b>category: </b>category name
 						</div>
 					{/if}
 					{#if filterKeys('pinned:', parsedCursorHere)}
