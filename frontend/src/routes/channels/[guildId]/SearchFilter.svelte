@@ -346,7 +346,7 @@
 					channelIds = [].concat.apply([], channelIds);
 
 					channelMessages = channelMessages.filter((message) => {
-						return channelIds.includes(message.channelId);
+						return channelIds.includes(message.channelId) || channelIds.includes(message.categoryId);
 					});
 				}
 			}

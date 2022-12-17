@@ -122,6 +122,7 @@ class GuildPreprocess:
                 for message in data['messages']:
                     # temporary marker for channel id
                     message['channelId'] = channel['id']
+                    message['categoryId'] = channel['categoryId']
                     if message['id'] not in messages:
                         messages[message['id']] = message
                     else:
