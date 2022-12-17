@@ -130,7 +130,7 @@ class Assets:
             return None
         elif extension in ('png', 'jpg', 'jpeg', 'gif', 'webp'):
             return 'image'
-        elif extension in ('mp4', 'webm'):
+        elif extension in ('mp4', 'webm', 'mov'):
             return 'video'
         elif extension in('mp3', 'ogg', 'wav'):
             return 'audio'
