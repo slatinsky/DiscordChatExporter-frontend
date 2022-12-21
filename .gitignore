@@ -40,3 +40,7 @@ REDOWNLOAD.bat
 !/release/exports/README.txt
 /backend/preprocess/temp/
 /TODO.md
+database.sqlite3
+database.sqlite3-shm
+database.sqlite3-wal
+database.sqlite3-journal

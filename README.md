@@ -1,5 +1,7 @@
 ![](docs/screenshot.png)
 
+**WIP** | this is dev version that handles more than 4 million messages per guild.
+
 # DiscordChatExporter-frontend
 View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports as if you were using Discord interface
 
@@ -24,15 +26,7 @@ This project aims to provide you with better experience than what you get by jus
 - Windows, Linux and Mac support (including M1 Macs)
 
 
-### System requirements (per guild)
-- You will need ~1 GB of RAM to process 100k messages. So if your guild export contains 1 million messages, you will need ~10 GB of RAM.
-- The viewer can handle at least ~2-4 million messages (4 GB of ram) in the browser
-- Chromium based browsers are recommended (Chrome, Edge, Opera, Brave, Vivaldi, etc.)
-
 Note: Discord servers are known internally as guilds
-
-Planned feature:
-- Refactor to client-server architecture is planned to handle larger exports than 4 million messages per guild. And with added bonus of being able to run the viewer on your own server and view your exports from anywhere. But it will take some time to implement.
 
 ## Quick start (Windows)
 Using prebuilt binaries is the easiest way to use this tool on Windows.
