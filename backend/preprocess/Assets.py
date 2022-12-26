@@ -26,9 +26,13 @@ class Assets:
         if filename_with_hash in self.media_filepaths:
             filepath = self.media_filepaths[filename_with_hash].replace(self.input_dir, '/input/')
             # if file empty (file is invalid), don't return path
-            if os.stat(self.media_filepaths[filename_with_hash]).st_size == 0:
+            try:
+                if os.stat(self.media_filepaths[filename_with_hash]).st_size == 0:
+                    return None
+                return filepath
+            except FileNotFoundError:
+                print("   File not found: " + self.media_filepaths[filename_with_hash])
                 return None
-            return filepath
         else:
             return None
 
