@@ -10,6 +10,8 @@ RUN npm run build
 FROM nikolaik/python-nodejs:python3.11-nodejs16-alpine
 RUN apk add --no-cache nginx
 WORKDIR /dcef
+RUN mkdir -p /dcef/exports/
+COPY /release/exports/ /dcef/exports/
 COPY /backend/preprocess/requirements.txt /dcef/backend/preprocess/requirements.txt
 RUN python3 -m pip install -r ./backend/preprocess/requirements.txt
 RUN mkdir -p /dcef/backend/nginx/logs/
