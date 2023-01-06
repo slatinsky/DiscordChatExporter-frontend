@@ -38,5 +38,6 @@ REDOWNLOAD.bat
 /exports/
 /release/exports/*
 !/release/exports/README.txt
+!/release/exports/example_guild/
 /backend/preprocess/temp/
 /TODO.md

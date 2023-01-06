@@ -38,7 +38,7 @@ Planned feature:
 Using prebuilt binaries is the easiest way to use this tool on Windows.
 1. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
 2. Extract the archive
-3. Move your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/exports/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs.
+3. (optional) Move your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/exports/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs. **Skip this step if you** don't have any exports yet and **want to try out the viewer** - example exports are included in the release.
 4. Run `START_VIEWER.bat` - DiscordChatExporter-frontend will open in your default browser
 
 NOTE: command prompt window ("black rectangle") named "nginx" will open. It provides local web server for the viewer. After you are done with using the viewer, you can close it.
@@ -410,6 +410,8 @@ And for other technologies used in this project - sveltekit, docker, nodejs, nvm
 GNU GENERAL PUBLIC LICENSE
 
 This product contains software provided by NGINX and its contributors.
+
+DiscordChatExporter-frontend is not affiliated with Discord. Discord is a registered trademark of Discord Inc.
 
 ## Contributing
 Feel free to open issues and pull requests.

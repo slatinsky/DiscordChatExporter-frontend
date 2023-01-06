@@ -1,0 +1,990 @@
+{
+  "guild": {
+    "id": "748545324524575035",
+    "name": "Example guild",
+    "iconUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\0-EB806.png"
+  },
+  "channel": {
+    "id": "1012224565567721552",
+    "type": "GuildTextChat",
+    "categoryId": "748545324524575035",
+    "category": "Text Channels",
+    "name": "general",
+    "topic": "Welcome to the Example guild!"
+  },
+  "dateRange": {
+    "after": null,
+    "before": null
+  },
+  "messages": [
+    {
+      "id": "1045178587575242772",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:03:03.853+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Welcome to the **DiscordChatExporter-frontend** example!",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1045178587575242785",
+      "type": "GuildMemberJoin",
+      "timestamp": "2023-01-06T14:12:01.593+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Joined the server.",
+      "author": {
+        "id": "896568767994532880",
+        "name": "Thomas",
+        "discriminator": "0007",
+        "nickname": "Thomas",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\edbf2b88ff450491f793b1637e1620f4-E5912.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1045178587575242788",
+      "type": "GuildMemberJoin",
+      "timestamp": "2023-01-06T14:12:54.566+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Joined the server.",
+      "author": {
+        "id": "627848643557663699",
+        "name": "Patrick",
+        "discriminator": "0070",
+        "nickname": "Patrick",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\90eac3a7ee39906829377a0e43403f0-0E126.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1045179638760091709",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:18:55.573+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [
+        {
+          "id": "1045179611115421738",
+          "name": "pepecute",
+          "format": "Png",
+          "sourceUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\1045179611115421738-47841.png"
+        }
+      ],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926197556588725",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:21:56.666+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Hello \uD83D\uDC4F",
+      "author": {
+        "id": "896568767994532880",
+        "name": "Thomas",
+        "discriminator": "0007",
+        "nickname": "Thomas",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\edbf2b88ff450491f793b1637e1620f4-E5912.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926221136973825",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:22:02.175+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "everybody here?",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926239034064967",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:22:06.442+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Yes",
+      "author": {
+        "id": "896568767994532880",
+        "name": "Thomas",
+        "discriminator": "0007",
+        "nickname": "Thomas",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\edbf2b88ff450491f793b1637e1620f4-E5912.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926254683017306",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:22:10.173+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Good \uD83D\uDC4D",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926274924728411",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:22:14.999+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "I think we can start a fake conversation then",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926297053859890",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:22:20.275+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "**DiscordChatExporter-frontend** is your offline copy of Discord. A place for your memories!",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926317920538735",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:22:25.25+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "How so? We are chatting online now",
+      "author": {
+        "id": "896568767994532880",
+        "name": "Thomas",
+        "discriminator": "0007",
+        "nickname": "Thomas",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\edbf2b88ff450491f793b1637e1620f4-E5912.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926346089476176",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:22:31.966+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "You will understand it later :kekw:",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [
+        {
+          "emoji": {
+            "id": "",
+            "name": "\uD83D\uDC40",
+            "isAnimated": false,
+            "imageUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\1f440-1DC0B.svg"
+          },
+          "count": 1
+        }
+      ],
+      "mentions": [],
+      "reference": {
+        "messageId": "1060926317920538735",
+        "channelId": "1012224565567721552",
+        "guildId": "748545324524575035"
+      }
+    },
+    {
+      "id": "1060926395313827840",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:22:43.702+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "How do I get started?",
+      "author": {
+        "id": "627848643557663699",
+        "name": "Patrick",
+        "discriminator": "0070",
+        "nickname": "Patrick",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\90eac3a7ee39906829377a0e43403f0-0E126.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": [],
+      "reference": {
+        "messageId": "1060926346089476176",
+        "channelId": "1012224565567721552",
+        "guildId": "748545324524575035"
+      }
+    },
+    {
+      "id": "1060926487911485582",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:23:05.779+00:00",
+      "timestampEdited": "2023-01-06T14:23:25.845+00:00",
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "1. Use DiscordChatExporter to export Discord chat. Don't forget to choose ~~HTML~~ **JSON** format. I also highly recommend to also export assets if you want the true __offline__ experience :thisisfine:",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926845832409158",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:24:31.114+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [
+        {
+          "id": "1060926845513650298",
+          "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\dce-export-more-662EF.png",
+          "fileName": "dce-export-more.png",
+          "fileSizeBytes": 42900
+        }
+      ],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926895719460986",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:24:43.008+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "read more about DiscordChatExporter in the wiki https://github.com/Tyrrrz/DiscordChatExporter/wiki",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [
+        {
+          "title": "Home · Tyrrrz/DiscordChatExporter Wiki",
+          "url": "https://github.com/Tyrrrz/DiscordChatExporter/wiki",
+          "timestamp": null,
+          "description": "Exports Discord chat logs to a file. Contribute to Tyrrrz/DiscordChatExporter development by creating an account on GitHub.",
+          "color": "#1E2327",
+          "thumbnail": {
+            "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\DiscordChatExporter-263B5",
+            "width": 1200,
+            "height": 600
+          },
+          "images": [],
+          "fields": []
+        }
+      ],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060926971418251355",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:25:01.056+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "2. Then move your exports to the exports folder",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [
+        {
+          "id": "1060926971070140496",
+          "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\tutorial_move_to_exports_folder-74E3F.png",
+          "fileName": "tutorial_move_to_exports_folder.png",
+          "fileSizeBytes": 22047
+        }
+      ],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060927032445370408",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:25:15.606+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "3. close all \"black boxes\" named nginx if they are opened",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [
+        {
+          "id": "1060927032135004230",
+          "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\tutorial_close_nginx-8F439.png",
+          "fileName": "tutorial_close_nginx.png",
+          "fileSizeBytes": 4824
+        }
+      ],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060927084425392240",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:25:27.999+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "4. And run `START_VIEWER` again",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [
+        {
+          "emoji": {
+            "id": "909107614120566886",
+            "name": "pepeheart",
+            "isAnimated": false,
+            "imageUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\957847614120566886-60C74.png"
+          },
+          "count": 1
+        }
+      ],
+      "mentions": []
+    },
+    {
+      "id": "1060927108362289223",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:25:33.706+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "",
+      "author": {
+        "id": "896568767994532880",
+        "name": "Thomas",
+        "discriminator": "0007",
+        "nickname": "Thomas",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\edbf2b88ff450491f793b1637e1620f4-E5912.png"
+      },
+      "attachments": [
+        {
+          "id": "1060927107997380668",
+          "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\wat_gif_upload-13948.gif",
+          "fileName": "wat_gif_upload.gif",
+          "fileSizeBytes": 173165
+        }
+      ],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060927140842983534",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:25:41.45+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "https://tenor.com/view/magic-gif-26166638",
+      "author": {
+        "id": "627848643557663699",
+        "name": "Patrick",
+        "discriminator": "0070",
+        "nickname": "Patrick",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\90eac3a7ee39906829377a0e43403f0-0E126.png"
+      },
+      "attachments": [],
+      "embeds": [
+        {
+          "title": "",
+          "url": "https://tenor.com/view/magic-gif-26166638",
+          "timestamp": null,
+          "description": "",
+          "thumbnail": {
+            "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\magic-1ED77.jpg",
+            "width": 640,
+            "height": 594
+          },
+          "images": [],
+          "fields": []
+        }
+      ],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060927205481402388",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:25:56.861+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Have you seen this impressive book scanner?",
+      "author": {
+        "id": "896568767994532880",
+        "name": "Thomas",
+        "discriminator": "0007",
+        "nickname": "Thomas",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\edbf2b88ff450491f793b1637e1620f4-E5912.png"
+      },
+      "attachments": [
+        {
+          "id": "1060927205267476581",
+          "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\book_scanner-A1380.mp4",
+          "fileName": "book_scanner.mp4",
+          "fileSizeBytes": 324598
+        }
+      ],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060927254248558702",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:26:08.488+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "My computer right now",
+      "author": {
+        "id": "896568767994532880",
+        "name": "Thomas",
+        "discriminator": "0007",
+        "nickname": "Thomas",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\edbf2b88ff450491f793b1637e1620f4-E5912.png"
+      },
+      "attachments": [
+        {
+          "id": "1060927253845921802",
+          "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\funny_noises-55354.mp3",
+          "fileName": "funny_noises.mp3",
+          "fileSizeBytes": 172422
+        }
+      ],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [
+        {
+          "emoji": {
+            "id": "782589696621805568",
+            "name": "kekw",
+            "isAnimated": false,
+            "imageUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\831489696621805568-3D82D.png"
+          },
+          "count": 2
+        }
+      ],
+      "mentions": []
+    },
+    {
+      "id": "1060927310439657532",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:26:21.885+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "@Thomas that is a little bit off topic, let me create a thread for you \uD83D\uDE42",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": [
+        {
+          "id": "896568767994532880",
+          "name": "Thomas",
+          "discriminator": "0007",
+          "nickname": "Thomas",
+          "isBot": false
+        }
+      ]
+    },
+    {
+      "id": "1060927310439657577",
+      "type": "ThreadCreated",
+      "timestamp": "2023-01-06T14:26:57.204+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Started a thread.",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": [],
+      "reference": {
+        "messageId": null,
+        "channelId": "1060927310439657577",
+        "guildId": "748545324524575035"
+      }
+    },
+    {
+      "id": "1060927794248425564",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:28:17.234+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "I see, _DiscordChatExporter-frontend_ supports all kinds of asset types like pictures, stickers, emojis, videos, audio, gifs, website embeds and attachments",
+      "author": {
+        "id": "627848643557663699",
+        "name": "Patrick",
+        "discriminator": "0070",
+        "nickname": "Patrick",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\90eac3a7ee39906829377a0e43403f0-0E126.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060927841149132840",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:28:28.416+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "And the guild chat is organised neatly to categories, channels and threads without the need to open multiple export files!",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060927916252332082",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:28:46.322+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "me right now",
+      "author": {
+        "id": "627848643557663699",
+        "name": "Patrick",
+        "discriminator": "0070",
+        "nickname": "Patrick",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\90eac3a7ee39906829377a0e43403f0-0E126.png"
+      },
+      "attachments": [
+        {
+          "id": "1060927915900018738",
+          "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\SPOILER_memes_traffic-5ADA6.png",
+          "fileName": "SPOILER_memes_traffic.png",
+          "fileSizeBytes": 88075
+        }
+      ],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060927977254293595",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:29:00.866+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Impressive stuff. One day I will learn how to code",
+      "author": {
+        "id": "896568767994532880",
+        "name": "Thomas",
+        "discriminator": "0007",
+        "nickname": "Thomas",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\edbf2b88ff450491f793b1637e1620f4-E5912.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060928036398174332",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:29:14.967+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "You can start learning Python 3 as your first language. This is how you would write \"Hello World!\". \n```python\ndef main():\n    print(\"Hello World!\")\n\nif __name__ == \"__main__\":\n    main()\n```",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060928071600975873",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:29:23.36+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "||EZ||, thanks :pepeheart:",
+      "author": {
+        "id": "896568767994532880",
+        "name": "Thomas",
+        "discriminator": "0007",
+        "nickname": "Thomas",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\edbf2b88ff450491f793b1637e1620f4-E5912.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060928105851658280",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:29:31.526+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "My old exports are in HTML :pepefloorcry:",
+      "author": {
+        "id": "627848643557663699",
+        "name": "Patrick",
+        "discriminator": "0070",
+        "nickname": "Patrick",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\90eac3a7ee39906829377a0e43403f0-0E126.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [
+        {
+          "emoji": {
+            "id": "921503115159691286",
+            "name": "pepefloorcry",
+            "isAnimated": false,
+            "imageUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\561215115159691286-7100E.png"
+          },
+          "count": 1
+        }
+      ],
+      "mentions": []
+    },
+    {
+      "id": "1060928127137747084",
+      "type": "Default",
+      "timestamp": "2023-01-06T14:29:36.601+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "I feel your loss.",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060928127137747087",
+      "type": "GuildMemberJoin",
+      "timestamp": "2023-01-06T16:02:35.86+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Joined the server.",
+      "author": {
+        "id": "521486476985321458",
+        "name": "aLittleSpammyBot",
+        "discriminator": "9001",
+        "nickname": "RICK NITRO",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\41ffe1a8ee39906828367a0e42541e1-0F999.png"
+      },
+      "attachments": [],
+      "embeds": [],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    },
+    {
+      "id": "1060928127137747099",
+      "type": "Default",
+      "timestamp": "2023-01-06T16:05:35.86+00:00",
+      "timestampEdited": null,
+      "callEndedTimestamp": null,
+      "isPinned": false,
+      "content": "Anyway that's all. If you find this project useful, please consider starring ⭐ it on GitHub.\n\nAnd if you have any issues, please report them to issue tracker: https://github.com/slatinsky/DiscordChatExporter-frontend/issues\n\nTo remove this example guild, simply delete the folder `exports/example_guild`.\n\nThanks for using DiscordChatExporter-frontend!",
+      "author": {
+        "id": "521486476985155645",
+        "name": "Adam",
+        "discriminator": "7077",
+        "nickname": "Adam",
+        "color": null,
+        "isBot": false,
+        "avatarUrl": "Example guild - Text Channels - general [1012224565567721552].json_Files\\468d47ade5d888a482e227a04c54eabe-8B00F.png"
+      },
+      "attachments": [],
+      "embeds": [
+        {
+          "title": "Issues · slatinsky/DiscordChatExporter-frontend",
+          "url": "https://github.com/slatinsky/DiscordChatExporter-frontend/issues",
+          "timestamp": null,
+          "description": "Browse json files exported by Tyrrrz/DiscordChatExporter in familiar discord like user interface - Issues · slatinsky/DiscordChatExporter-frontend",
+          "color": "#1E2327",
+          "thumbnail": {
+            "url": "Example guild - Text Channels - general [1012224565567721552].json_Files\\DiscordChatExporter-frontend-7F220",
+            "width": 1200,
+            "height": 600
+          },
+          "images": [],
+          "fields": []
+        }
+      ],
+      "stickers": [],
+      "reactions": [],
+      "mentions": []
+    }
+  ],
+  "messageCount": 35
+}

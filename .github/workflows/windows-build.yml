@@ -61,7 +61,7 @@ jobs:
           cp backend\nginx\nginx.exe build\dcef\backend\nginx
           cp backend\nginx\conf\nginx-prod.conf build\dcef\backend\nginx\conf\nginx-prod.conf
           cp backend\nginx\conf\mime.types build\dcef\backend\nginx\conf\mime.types
-          cp release\exports\README.txt build\exports\README.txt
+          Copy-Item -Path release\exports\* -Destination build\exports -Recurse
           cp release\START_VIEWER.bat build\START_VIEWER.bat
 
       - name: Upload build folder
