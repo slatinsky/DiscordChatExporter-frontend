@@ -348,6 +348,12 @@
 					channelMessages = channelMessages.filter((message) => {
 						return channelIds.includes(message.channelId) || channelIds.includes(message.categoryId);
 					});
+				} else if (filter.key === 'id' && filter.value) {
+					let paddedId = filter.value.padStart(24, '0');
+					// search based on message id
+					channelMessages = channelMessages.filter((message) => {
+						return message.id === paddedId;
+					});
 				}
 			}
 
@@ -582,6 +588,11 @@
 					{#if filterKeys('deleted:', parsedCursorHere)}
 						<div class="search-option" on:click={() => selectFullOption('deleted', 'false')}>
 							<b>deleted: </b>false
+						</div>
+					{/if}
+					{#if filterKeys('id:', parsedCursorHere)}
+						<div class="search-option" on:click={() => selectOptionKey('id')}>
+							<b>id: </b>message id
 						</div>
 					{/if}
 				</div>
