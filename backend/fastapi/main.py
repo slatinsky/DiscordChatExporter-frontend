@@ -6,17 +6,31 @@ client = MongoClient(URI)
 db = client["dcef"]
 collection_messages = db["messages"]
 collection_channels = db["channels"]
+collection_guilds = db["guilds"]
 
-app = FastAPI()
+app = FastAPI(
+	title="DCEF backend api",
+	description="This is the backend api for the DCEF viewer.",
+	version="0.1.0",
+	root_path="/api"
+)
 
 
 @app.get("/")
-async def get_root():
+async def api_status():
 	"""
 	Returns a message to indicate that the api is running.
 	"""
 	return {"message": "DCEF api backend is online"}
 
+
+@app.get("/guilds")
+async def get_all_guilds():
+	"""
+	Returns a list of all guilds.
+	"""
+	cursor = collection_guilds.find({})
+	return list(cursor)
 
 @app.get("/channels")
 async def get_all_channels():
@@ -25,6 +39,14 @@ async def get_all_channels():
 	That includes channels, threads and forum posts.
 	"""
 	cursor = collection_channels.find({})
+	return list(cursor)
+
+@app.get("/channels/{guild_id}")
+async def get_channels_by_guild_id(guild_id):
+	"""
+	Returns a list of channels for a given guild id.
+	"""
+	cursor = collection_channels.find({"guildId": guild_id})
 	return list(cursor)
 
 @app.get("/channel/{channel_id}")

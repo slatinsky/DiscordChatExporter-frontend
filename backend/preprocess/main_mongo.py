@@ -8,6 +8,7 @@ client = MongoClient(URI)
 db = client["dcef"]
 collection_messages = db["messages"]
 collection_channels = db["channels"]
+collection_guild = db["guilds"]
 
 # def read_data():
 # 	data = collection_messages.find_one({"name": "test"})
@@ -134,6 +135,20 @@ def insert_channel(guild, channel):
 
 	collection_channels.insert_one(channel)
 
+def insert_guild(guild):
+	database_document = collection_guild.find_one({"_id": guild["id"]})
+
+	if database_document != None:
+		# guild already exists
+		return
+
+	# set mongo object id to discord id
+	object_id = guild["id"]
+	guild["_id"] = object_id
+	del guild["id"]
+
+	collection_guild.insert_one(guild)
+
 
 def process_json_file(json_path, messages_count):
 	json_data = read_json_file(json_path)
@@ -152,6 +167,7 @@ def process_json_file(json_path, messages_count):
 	# print(json_path)
 
 	insert_channel(guild, channel.copy())
+	insert_guild(guild.copy())
 
 	for message in messages:
 		insert_message(message, guild, channel)
