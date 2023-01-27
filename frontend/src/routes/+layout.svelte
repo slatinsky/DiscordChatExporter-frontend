@@ -45,9 +45,9 @@ import './styles.css';
 			<!--        guild list-->
 			{#if data.guilds}
 				{#each Object.values(data.guilds) as guild}
-					<a href="/channels/{guild.id}">
+					<a href="/channels/{guild._id}">
 						<div class="guild">
-							{#if data.guildId === guild.id}
+							{#if data.guildId === guild._id}
 								<div class="guild-selected" />
 							{/if}
 							<img src={guild.localFilePath} alt={guild.name} />

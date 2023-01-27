@@ -1,7 +1,9 @@
 <script>
 	import { onDestroy, onMount } from "svelte";
+	import { messages } from "../../../../stores";
 	import { channelScrollPosition } from "../../../settingsStore";
 	import Messages from "./Messages.svelte";
+	import NewMessage from "./NewMessage.svelte";
     export let data;
 
     /** --- start JUMP TO HASH */
@@ -119,7 +121,12 @@
     <title>{data.guild.channels[data.channelId]?.name ?? "Unknown channel"} | DiscordChatExporter frontend</title>
 </svelte:head>
 
-{#if data.messages}
+
+{#each data.messages as message}
+	<NewMessage messageId={message._id} />
+	<!-- <p>{message._id}</p> -->
+{/each}
+<!-- {#if data.messages}
 <section>
     <div class="chatlog" id="main-chatlog" bind:this={mainChatlog}>
         <div class=chatlog__message-group>
@@ -142,7 +149,7 @@
 <div class="error">
     <p>Channel ID {BigInt(data.channelId)} was not exported</p>
 </div>
-{/if}
+{/if} -->
 
 <style>
     .error {

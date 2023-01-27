@@ -5,7 +5,7 @@ export const ssr = false;
 
 export async function load({ params, parent }) {
     const { guilds, guild } = await parent();
-    let messages = guild.messages[params.channelId]
+
 
     // calculate thread exit message
     let mainChannelMessage = null
@@ -21,6 +21,25 @@ export async function load({ params, parent }) {
                 break
             }
         }
+    }
+
+	let messages
+	try {
+        let response = await fetch('/api/channel/' + params.channelId + '/messages')
+        let messageIds = await response.json()
+		console.log("messageIds", messageIds);
+
+		messages = messageIds.map(messageId => {
+			return {
+				_id: messageId,
+				loaded: false,
+			}
+		})
+
+        // guildId = params.guildId
+    }
+    catch (e) {
+        // failed = true
     }
 
 

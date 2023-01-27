@@ -7,7 +7,7 @@
 </div>
 
 <svelte:head>
-    <title>{data.guilds[data.guildId].name} | DiscordChatExporter frontend</title>
+    <title>{data.guildInfo.name} | DiscordChatExporter frontend</title>
 </svelte:head>
 
 <style>

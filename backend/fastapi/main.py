@@ -49,7 +49,7 @@ async def get_channels_by_guild_id(guild_id):
 	cursor = collection_channels.find({"guildId": guild_id})
 	return list(cursor)
 
-@app.get("/channel/{channel_id}")
+@app.get("/channel/{channel_id}/messages")
 async def get_message_ids_by_channel_id(channel_id):
 	"""
 	Returns a list of message ids for a given channel id.
@@ -58,7 +58,7 @@ async def get_message_ids_by_channel_id(channel_id):
 	ids = [str(id["_id"]) for id in ids]
 	return ids
 
-@app.get("/message/{message_id}")
+@app.get("/messages/{message_id}")
 async def get_message_content_by_id(message_id):
 	"""
 	Returns the content of a message by its id.

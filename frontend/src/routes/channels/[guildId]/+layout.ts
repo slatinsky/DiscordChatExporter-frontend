@@ -21,8 +21,10 @@ export async function load({ params, parent }) {
     }
 
     const { guilds } = await parent();
+	let guildInfo = guilds.find(g => g._id === guildId);
+	console.log("guildInfo", guildInfo);
     return {
-        guilds: guilds,
+		guildInfo: guildInfo,
         guildId: params.guildId,
         channelId: params.channelId,
         guild: guild

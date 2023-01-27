@@ -7,8 +7,10 @@ export async function load({ fetch, params }) {
     let guildId
     let failed = false
     try {
-        response = await fetch('/data/guilds.min.json')
+        response = await fetch('/api/guilds')
         guilds = await response.json()
+		console.log("guilds", guilds);
+
         guildId = params.guildId
     }
     catch (e) {

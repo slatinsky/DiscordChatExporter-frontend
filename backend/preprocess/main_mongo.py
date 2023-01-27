@@ -10,6 +10,11 @@ collection_messages = db["messages"]
 collection_channels = db["channels"]
 collection_guild = db["guilds"]
 
+def pad_id(id):
+	if id == None:
+		return None
+	return str(id).zfill(24)
+
 # def read_data():
 # 	data = collection_messages.find_one({"name": "test"})
 # 	return data
@@ -27,6 +32,7 @@ collection_guild = db["guilds"]
 def clear_database():
 	collection_messages.delete_many({})
 	collection_channels.delete_many({})
+	collection_guild.delete_many({})
 
 def read_json_file(file_path):
 	with open(file_path, "r", encoding='utf-8') as f:
@@ -161,6 +167,28 @@ def process_json_file(json_path, messages_count):
 	guild = json_data["guild"]
 	channel = json_data["channel"]
 	messages = json_data["messages"]
+
+	# pad ids with zeros, so they are easier to sort
+	guild["id"] = pad_id(guild["id"])
+	channel["id"] = pad_id(channel["id"])
+	channel["categoryId"] = pad_id(channel["categoryId"])
+
+	for message in messages:
+		message["id"] = pad_id(message["id"])
+		if "author" in message:
+			message["author"]["id"] = pad_id(message["author"]["id"])
+		if "stickers" in message:
+			for sticker in message["stickers"]:
+				sticker["id"] = pad_id(sticker["id"])
+		if "mentions" in message:
+			for mention in message["mentions"]:
+				mention["id"] = pad_id(mention["id"])
+		if "reference" in message:
+			message["reference"]["messageId"] = pad_id(message["reference"]["messageId"])
+			message["reference"]["channelId"] = pad_id(message["reference"]["channelId"])
+			message["reference"]["guildId"] = pad_id(message["reference"]["guildId"])
+
+
 
 	messages_count += len(messages)
 	print("processing messages " + str(len(messages)).rjust(5, ' ') + ", total " +  str(messages_count).rjust(9, ' ') + " - " + json_path)
