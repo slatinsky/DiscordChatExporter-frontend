@@ -1,21 +1,16 @@
 <script>
+	import { onDestroy, onMount } from "svelte";
+	import { cancelMessageContentRequest, getMessageContent } from "../../../../js/messageMiddleware";
 	import NewMessage from "./NewMessage.svelte";
 	export let messageId = null;
 	export let selectedGuildId = null;
 
 	// fetch message from api
-	async function fetchMessage(messageId) {
-		try {
-			let res = await fetch(`/api/message?message_id=${messageId}`)
-			let json = await res.json();
-			console.log(json);
-			return json;
-		}
-		catch (err) {
-			console.error(err);
-		}
-	}
-	let messagePromise = fetchMessage(messageId);
+	let messagePromise = getMessageContent(messageId);
+
+	onDestroy(() => {
+		cancelMessageContentRequest(messageId);
+	});
 
 </script>
 
@@ -27,6 +22,8 @@
 			<NewMessage {message} {selectedGuildId}/>
 		{/key}
 		<!-- <p>{message.content[0].content}</p> -->
+	{:catch error}
+		<p style="color: red" class="loading">{error}</p>
 	{/await}
 {/if}
 

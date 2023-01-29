@@ -93,6 +93,14 @@ async def get_message_content(message_id:str):
 		return {"message": "Not found"}
 	return message
 
+@app.post("/messages")
+async def get_multiple_message_content(message_ids:list):
+	"""
+	Returns the content of multiple messages by their ids.
+	"""
+	messages = collection_messages.find({"_id": {"$in": message_ids}})
+	return list(messages)
+
 
 @app.get("/search")
 async def search_messages(prompt:str = None, guild_id:str = None, only_ids:bool = True, order_by: str = Query("newest", enum=["newest", "oldest"])):

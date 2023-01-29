@@ -15,7 +15,6 @@ export const load: Load = async({ fetch, params, parent }) => {
 	try {
         let response = await fetch('/api/message-ids?channel_id=' + params.channelId)
         let messageIds = await response.json()
-		console.log("messageIds", messageIds);
 
 		messages = messageIds.map((messageId: string) => {
 			return {

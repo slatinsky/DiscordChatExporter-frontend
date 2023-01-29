@@ -2,8 +2,7 @@
 	import type { Asset } from 'src/js/interfaces';
 	import { checkUrl } from '../../../../js/helpers';
     export let asset: Asset
-	console.log(asset);
-	
+
     export let imgclass
 
     function viewGallery() {
