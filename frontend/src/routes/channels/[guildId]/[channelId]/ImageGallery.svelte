@@ -1,6 +1,9 @@
-<script>
-	import { checkUrl, getFileNameFromUrl } from '../../../../helpers';
-    export let url
+<script lang="ts">
+	import type { Asset } from 'src/js/interfaces';
+	import { checkUrl } from '../../../../js/helpers';
+    export let asset: Asset
+	console.log(asset);
+	
     export let imgclass
 
     function viewGallery() {
@@ -10,15 +13,15 @@
     let showGallery = false;
 </script>
 
-<div class:media-spoiler={getFileNameFromUrl(url?.url).startsWith('SPOILER')}>
+<div class:media-spoiler={asset?.filenameWithoutHash.startsWith('SPOILER')}>
     <img
         on:click={viewGallery}
         class={imgclass}
-        src={checkUrl(url?.url)}
+        src={checkUrl(asset)}
         alt="Attachment"
         loading="lazy"
-        width="{url.width ?? undefined}"
-        height="{url.height ?? undefined}"
+        width="{asset?.width ?? undefined}"
+        height="{asset?.height ?? undefined}"
         onerror="this.style.visibility='hidden'"
     />
 </div>
@@ -27,9 +30,9 @@
     <div class="gallery-wrapper" on:click={()=>showGallery=false}>
         <div class="gallery-closebtn" on:click={()=>showGallery=false}>&times;</div>
         <div class="imgbox" on:click|stopPropagation>
-            <img class="center-fit" src={checkUrl(url?.url)}>
+            <img class="center-fit" src={checkUrl(asset)}>
             <div class="open-original">
-                <a href={checkUrl(url?.url)} target="_blank">Open original</a>
+                <a href={checkUrl(asset)} target="_blank">Open original</a>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
-	import { developerMode } from '../../settingsStore';
+	import { developerMode } from '../../routes/settingsStore';
 
 	let memoryInterval;
 	let objectsCount = 0;

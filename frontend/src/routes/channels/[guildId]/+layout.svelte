@@ -1,19 +1,18 @@
-<script>
+<script lang="ts">
 	import ContextMenu from '../../../components/menu/ContextMenu.svelte';
 	import MenuOption from '../../../components/menu/MenuOption.svelte';
 	import { isMenuVisible, setMenuVisible } from '../../../components/menu/menuStore';
 	import Header from './Header.svelte';
 	import SearchResults from './SearchResults.svelte';
 	import { searched, found_messages, filters } from './searchStores';
-	import { copyTextToClipboard } from '../../../helpers';
+	import { copyTextToClipboard } from '../../../js/helpers';
 	import MenuCategory from './MenuCategory.svelte';
-	export let data;
-	import { goto } from '$app/navigation';
 
-	// redirect to first channel if no channel in guild is selected
-	// if (data.guildId !== undefined && data.channelId === undefined && Object.keys(data.guild.channels).length > 0) {  // data.guildId can be zero (DMs) so we need to check for undefined
-    //     goto(`/channels/${data.guildId}/${Object.keys(data.guild.channels)[0]}`);
-    // }
+	import type { PageServerData } from './$types';
+	export let data: PageServerData;
+
+	import MenuChannel from './MenuChannel.svelte';
+	import ChannelsMenu from './ChannelsMenu.svelte';
 
 	let currentGuildId = data.guildId;
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time
@@ -43,40 +42,33 @@
 </script>
 
 
-
-<div id="guild-layout" class={$searched ? 'with-search' : ''}>
-	<div id="channels">
-		<div class="guild-name">{data.guildInfo.name}</div>
-		{#each Object.values(data.guild.categories) as category}
-			<MenuCategory {category} guildId={data.guildId} selectedChannelId={data.channelId} {onRightClick}/>
-		{/each}
-		{#if data.guildId != '0'}
-		<div id="backup-helper">
-			<a href="/channels/{data.guildId}/continue">Backup helper</a>
+{#key currentGuildId}
+	<div id="guild-layout" class={$searched ? 'with-search' : ''}>
+		<div id="channels">
+			<div class="guild-name">{data.guild.name}</div>
+			<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} {onRightClick} />
 		</div>
+		<div id="header">
+			<!-- {#key data.channelId}
+				<Header
+					guild={data.guild}
+					channel={data.guild.channels[data.channelId]}
+					messages={data.messages}
+				/>
+			{/key} -->
+		</div>
+		<div id="messages">
+			<slot />
+		</div>
+		{#if $searched}
+			<div id="search">
+				{#key $filters}
+					<SearchResults guild={data.guild} />
+				{/key}
+			</div>
 		{/if}
-
 	</div>
-	<div id="header">
-		{#key data.channelId}
-			<Header
-				guild={data.guild}
-				channel={data.guild.channels[data.channelId]}
-				messages={data.messages}
-			/>
-		{/key}
-	</div>
-	<div id="messages">
-		<slot />
-	</div>
-	{#if $searched}
-		<div id="search">
-			{#key $filters}
-				<SearchResults guild={data.guild} />
-			{/key}
-		</div>
-	{/if}
-</div>
+{/key}
 
 {#if rightClickId}
 <ContextMenu let:visible>

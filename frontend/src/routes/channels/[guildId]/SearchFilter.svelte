@@ -1,6 +1,6 @@
 <script>
 	import { searched, found_messages } from './searchStores';
-	import { checkUrl } from '../../../helpers';
+	import { checkUrl } from '../../../js/helpers';
 
 	export let guild;
 	let authors;

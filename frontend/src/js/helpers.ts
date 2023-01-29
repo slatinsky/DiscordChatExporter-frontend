@@ -1,7 +1,8 @@
 // https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
 
 import { get } from "svelte/store";
-import { online } from "./routes/settingsStore";
+import type { Asset } from "./interfaces";
+import { online } from "../routes/settingsStore";
 
 function fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement("textarea");
@@ -41,7 +42,10 @@ export function copyTextToClipboard(text) {
 // usage
 // copyTextToClipboard("text to copy");
 
-export function checkUrl(url) {
+export function checkUrl(asset: Asset) {
+	if (!asset)
+		return "";
+	const url = asset.path;
     if (!url)
         return "";
     if (url.startsWith('https') || url.startsWith('http')) {
@@ -51,7 +55,7 @@ export function checkUrl(url) {
         }
         console.warn('online url', url);
     }
-    return url
+    return "/input/" + url
 }
 
 export function getFileNameFromUrl(url) {

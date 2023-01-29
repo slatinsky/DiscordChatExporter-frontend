@@ -305,11 +305,20 @@ class AssetProcessor:
 		filename_without_hash = self.strip_hash_from_filename(filename_with_hash)
 		dominant_color, palette = self.get_colors(local_path, local_path_exists, filetype)
 
+		local_path_without_base = self.file_finder.remove_base_directory(local_path)
+		if local_path_without_base is not None:
+			path = local_path_without_base
+		elif remote_url is not None:
+			path = remote_url
+		else:
+			path = None
+
 		asset = {
 			"_id": filename_with_hash,
 			"originalPath": original_filepath,
-			"localPath": self.file_finder.remove_base_directory(local_path),
+			"localPath": local_path_without_base,
 			"remotePath": remote_url,
+			"path": path,
 			"extension": extension,
 			"type": filetype,
 			"width": width,
@@ -590,7 +599,7 @@ def main():
 	print("found " + str(len(jsons)) + " json channel exports")
 
 	# DEBUG get only first n files
-	jsons = jsons[:300]
+	jsons = jsons[:245]
 
 	asset_processor = AssetProcessor(file_finder, database)
 	asset_processor.set_fast_mode(True)  # don't process slow actions

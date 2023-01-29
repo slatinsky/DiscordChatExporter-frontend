@@ -1,6 +1,6 @@
 import moment from 'moment/min/moment-with-locales';
 import { get } from 'svelte/store';
-import {timestampFormat } from './settingsStore';
+import {timestampFormat } from '../routes/settingsStore';
 
 function renderTimestamp1(date) {
     return moment(date).format('YYYY-MM-DD HH:mm:ss');

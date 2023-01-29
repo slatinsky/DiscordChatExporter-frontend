@@ -1,0 +1,83 @@
+<!-- GUILDS MENU -->
+
+<script lang="ts">
+	import { checkUrl } from "src/js/helpers";
+	import type { Guild } from "../js/interfaces";
+	export let guilds: Guild[] = [];
+	let selectedGuildId: string | null = null;
+</script>
+
+<div class="guilds">
+	<a href="/">
+		<div class="guild">
+			<!-- if root path -->
+			{#if !selectedGuildId}
+				<div class="guild-selected" />
+			{/if}
+			<div class="home-guild">HOME</div>
+		</div>
+	</a>
+	<!--        guild list-->
+	{#if guilds}
+		{#each guilds as guild}
+			<a href="/channels/{guild._id}">
+				<div class="guild">
+					{#if selectedGuildId === guild._id}
+						<div class="guild-selected" />
+					{/if}
+					<img src={checkUrl(guild.icon)} alt={guild.name} />
+				</div>
+			</a>
+		{/each}
+	{/if}
+</div>
+
+<style>
+	.guilds {
+		background-color: var(--panel-guilds-bg);
+		height: 100%;
+		overflow-y: auto;
+	}
+
+	img {
+		width: 48px;
+		height: 48px;
+		margin: 5px 5px 5px 0px;
+	}
+
+	.home-guild {
+		width: 48px;
+		height: 48px;
+		margin: 5px;
+		background-color: #00000099;
+		border-radius: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		/* Border white circle */
+		border-width: 1px;
+		border-style: solid;
+		border-color: #ffffff;
+
+		font-size: small;
+	}
+
+	.guild {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+	}
+
+	.guild-selected {
+		width: 10px;
+		height: 40px;
+		background-color: var(--color-contrast);
+		border-radius: 5px;
+		position: absolute;
+		left: -6px;
+		z-index: 100;
+	}
+</style>

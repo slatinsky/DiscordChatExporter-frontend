@@ -1,8 +1,8 @@
-from pymongo import MongoClient
-from fastapi import FastAPI
+import pymongo
+from fastapi import FastAPI, Query
 
 URI = "mongodb://127.0.0.1:27017"
-client = MongoClient(URI)
+client = pymongo.MongoClient(URI)
 db = client["dcef"]
 collection_messages = db["messages"]
 collection_channels = db["channels"]
@@ -95,7 +95,7 @@ async def get_message_content(message_id:str):
 
 
 @app.get("/search")
-async def search_messages(prompt:str = None, guild_id:str = None, only_ids:bool = True):
+async def search_messages(prompt:str = None, guild_id:str = None, only_ids:bool = True, order_by: str = Query("newest", enum=["newest", "oldest"])):
 	"""
 	Searches for messages that contain the prompt.
 	"""
@@ -113,6 +113,12 @@ async def search_messages(prompt:str = None, guild_id:str = None, only_ids:bool 
 		limited_fields["_id"] = 1
 
 	cursor = collection_messages.find(query, limited_fields)
+
+	if order_by == "newest":
+		cursor.sort([("timestamp", pymongo.DESCENDING)])
+	else:
+		cursor.sort([("timestamp", pymongo.ASCENDING)])
+
 	if only_ids:
 		ids = [str(id["_id"]) for id in cursor]
 		return ids

@@ -7,13 +7,13 @@
 </div>
 
 <svelte:head>
-    <title>{data.guildInfo.name} | DiscordChatExporter frontend</title>
+    <title>{data.guild.name} | DiscordChatExporter frontend</title>
 </svelte:head>
 
 <style>
 	.container {
 		background-color: var(--panel-messages-bg);
-		height: 100vh;
+		height: 100%;
 	}
 
 	.txt {

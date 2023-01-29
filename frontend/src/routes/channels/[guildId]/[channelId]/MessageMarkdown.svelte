@@ -1,5 +1,5 @@
 <script>
-    import {checkUrl } from '../../../../helpers';
+    import {checkUrl } from '../../../../js/helpers';
 
     export let content
     export let guild

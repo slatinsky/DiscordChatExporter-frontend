@@ -1,33 +1,34 @@
-import { error } from "@sveltejs/kit";
+import { error, type Load } from "@sveltejs/kit";
 import { goto } from '$app/navigation';
+import type { Channel, Guild } from "src/js/interfaces";
 
 
 export const prerender = false;
 export const ssr = false;
 
-let guildIdFetched = null;
-let json = null;
+let guildIdFetched: string | null = null;
+let json: Channel | null = null;
 
-export async function load({ params, parent }) {
-    let guild
+export const load: Load = async({ fetch, params, parent }) => {
+	let selectedGuildId = params.guildId;
+	let selectedChannelId = params.channelId;
+	let guilds: Guild[] = (await parent()).guilds;
+	let guild: Guild | undefined = guilds.find(g => g._id === selectedGuildId);
+
+    let channels
     let guildId = params.guildId
     if (guildIdFetched === guildId) {  // prevent fetching the same guild multiple times in a row
-        guild = json
+        channels = json
     } else {
-        let response = await fetch('/data/' + guildId + '/guild.min.json')
-        guild = await response.json()
-        guildIdFetched = guildId
-        json = guild
+        let response = await fetch('/api/channels?guild_id=' + guildId)
+        channels = await response.json()
     }
 
-    const { guilds } = await parent();
-	let guildInfo = guilds.find(g => g._id === guildId);
-	console.log("guildInfo", guildInfo);
     return {
-		guildInfo: guildInfo,
-        guildId: params.guildId,
-        channelId: params.channelId,
-        guild: guild
+        guildId: selectedGuildId,
+        channelId: selectedChannelId,
+		guild: guild,
+        channels: channels
     };
     throw error(404, 'Not found');
 }

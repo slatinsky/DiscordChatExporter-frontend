@@ -6,8 +6,8 @@
 	import ContextMenu from '../../../../components/menu/ContextMenu.svelte';
 	import MenuOption from '../../../../components/menu/MenuOption.svelte';
 	import { setMenuVisible, isMenuVisible } from '../../../../components/menu/menuStore';
-	import { copyTextToClipboard, checkUrl, getFileNameFromUrl } from '../../../../helpers';
-	import { renderTimestamp } from '../../../time';
+	import { copyTextToClipboard, checkUrl, getFileNameFromUrl } from '../../../../js/helpers';
+	import { renderTimestamp } from '../../../../js/time';
 	import ImageGallery from './ImageGallery.svelte';
 
 	export let message;
