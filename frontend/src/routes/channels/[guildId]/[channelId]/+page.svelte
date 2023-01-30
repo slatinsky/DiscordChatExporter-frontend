@@ -4,7 +4,7 @@
 	import type { PageServerData } from "../$types";
     export let data: PageServerData
 
-	import Scroller from "src/components/Scroller2.svelte";
+	import Scroller from "src/components/containers/Scroller2.svelte";
 	import MesssageSpoilerHandler from "src/components/messages/MesssageSpoilerHandler.svelte";
 </script>
 

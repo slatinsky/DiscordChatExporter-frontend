@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
 	import IconChannel from '../../../components/icons/IconChannel.svelte';
-	import SearchFilter from './SearchFilter.svelte';
+	import SearchFilter from '../../../components/search/SearchFilter.svelte';
 
 	export let channelName = '';
 	export let channelTopic = '';
-	export let guild;
+	export let guildId: string;
 </script>
 
 <section class="header-container">
@@ -19,7 +19,7 @@
 				{/if}
 			{/if}
 			<div class="spacer" />
-			<!-- <SearchFilter {guild} /> -->
+			<SearchFilter {guildId} />
 		</div>
 	</div>
 </section>

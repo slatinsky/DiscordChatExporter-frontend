@@ -26,28 +26,18 @@
 
 
 
-{#if Object.values(data.guilds).length === 0}
-	<ContainerCenter>
-		<h1>No chat exports found</h1>
-		<p>
-			Please close this app and "nginx" window, move your DiscordChatExporter JSON+media exports to "/exports/" folder and rerun
-			"START_VIEWER.bat"
-		</p>
 
-		<small>If your exports are in the correct place and you still see this error, please open an issue on <a href="https://github.com/slatinsky/DiscordChatExporter-frontend/issues" target="_blank">GitHub</a>. Please check out command line window if you see any errors / crashes there</small>
-	</ContainerCenter>
-{:else}
-	<div class="app">
-		<GuildsMenu guilds={data.guilds}/>
-		<div class="right">
-			<!-- page content on the right -->
-			<main>
-				<slot />
-			</main>
-		</div>
+<div class="app">
+	<GuildsMenu guilds={data.guilds}/>
+	<div class="right">
+		<!-- page content on the right -->
+		<main>
+			<slot />
+		</main>
 	</div>
-	<MemoryUsage />
-{/if}
+</div>
+<MemoryUsage />
+
 
 <style>
 	.app {

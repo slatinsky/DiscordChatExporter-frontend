@@ -3,8 +3,8 @@
 	import MenuOption from '../../../components/menu/MenuOption.svelte';
 	import { isMenuVisible, setMenuVisible } from '../../../components/menu/menuStore';
 	import Header from './Header.svelte';
-	import SearchResults from './SearchResults.svelte';
-	import { searched, found_messages, filters } from './searchStores';
+	import SearchResults from '../../../components/search/SearchResults.svelte';
+	import { searchShown, searchResultsMessageIds } from '../../../components/search/searchStores';
 	import { copyTextToClipboard } from '../../../js/helpers';
 	import MenuCategory from './MenuCategory.svelte';
 
@@ -18,8 +18,8 @@
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time
 		if (currentGuildId !== data.guildId) {
 			currentGuildId = data.guildId;
-			$found_messages = [];
-			$searched = false;
+			$searchResultsMessageIds = [];
+			$searchShown = false;
 		}
 		console.log('current guild', data.guild);
 	}
@@ -43,24 +43,22 @@
 
 
 {#key currentGuildId}
-	<div id="guild-layout" class={$searched ? 'with-search' : ''}>
+	<div id="guild-layout" class={$searchShown ? 'with-search' : ''}>
 		<div id="channels">
 			<div class="guild-name">{data.guild.name}</div>
 			<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} {onRightClick} />
 		</div>
 		<div id="header">
 			{#key data.channelId}
-				<Header channelName={data.channel?.name} channelTopic={data.channel?.topic} />
+				<Header channelName={data.channel?.name} channelTopic={data.channel?.topic} guildId={data.guildId} />
 			{/key}
 		</div>
 		<div id="messages">
 			<slot />
 		</div>
-		{#if $searched}
+		{#if $searchShown}
 			<div id="search">
-				{#key $filters}
-					<SearchResults guild={data.guild} />
-				{/key}
+				<SearchResults guildId={data.guildId} />
 			</div>
 		{/if}
 	</div>

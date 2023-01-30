@@ -33,7 +33,7 @@
 #memory-usage {
 	position: fixed;
 	bottom: 0;
-	right: 0;
+	right: 10px;
 	background-color: #00000088;
 	padding: 5px 10px;
 	border-radius: 5px;
