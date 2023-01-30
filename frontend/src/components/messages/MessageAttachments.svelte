@@ -24,7 +24,7 @@
 			</a>
 		</div>
 		<video class="chatlog__attachment-media" controls preload="metadata">
-			<source src={checkUrl(attachment)} alt="{attachment.filenameWithoutHash}" title="Video: {attachment.filenameWithoutHash} ({attachment.sizeBytes} B)">
+			<source src={checkUrl(attachment)} alt="{attachment.filenameWithoutHash}" title="Video: {attachment.filenameWithoutHash} ({Math.round(attachment.sizeBytes / 1024)} KB)">
 		</video>
 	</div>
 	{:else}
@@ -55,18 +55,18 @@
 					</svg>
 					<div class="chatlog__attachment-generic-name">
 						<a href={checkUrl(attachment)} target="_blank">
-							{attachment.fileName}
+							{attachment.filenameWithoutHash}
 						</a>
 					</div>
 					<div class="chatlog__attachment-generic-size">
-						{Math.round(attachment.fileSizeBytes / 1024)} KB
+						{Math.round(attachment.sizeBytes / 1024)} KB
 					</div>
 				</div>
 			</a>
 		</div>
 		{#if attachment.type == 'audio'}
 		<audio class="chatlog__attachment-media" controls preload="metadata">
-			<source src="{checkUrl(attachment?.url?.url)}" alt="{attachment?.Description ?? 'Audio attachment'}" title="Audio: {attachment.fileName} ({attachment.fileSizeBytes} B)">
+			<source src="{checkUrl(attachment?.url?.url)}" alt="{attachment?.Description ?? 'Audio attachment'}" title="Audio: {attachment.fileName} ({Math.round(attachment.sizeBytes / 1024)} KB)">
 		</audio>
 		{/if}
 	{/if}

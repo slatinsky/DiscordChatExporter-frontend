@@ -49,13 +49,9 @@
 			<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} {onRightClick} />
 		</div>
 		<div id="header">
-			<!-- {#key data.channelId}
-				<Header
-					guild={data.guild}
-					channel={data.guild.channels[data.channelId]}
-					messages={data.messages}
-				/>
-			{/key} -->
+			{#key data.channelId}
+				<Header channelName={data.channel?.name} channelTopic={data.channel?.topic} />
+			{/key}
 		</div>
 		<div id="messages">
 			<slot />

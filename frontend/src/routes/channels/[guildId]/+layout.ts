@@ -1,5 +1,4 @@
 import { error, type Load } from "@sveltejs/kit";
-import { goto } from '$app/navigation';
 import type { Channel, Guild } from "src/js/interfaces";
 
 
@@ -24,9 +23,12 @@ export const load: Load = async({ fetch, params, parent }) => {
         channels = await response.json()
     }
 
+	let channel = channels.find((c: Channel) => c._id === selectedChannelId);
+
     return {
         guildId: selectedGuildId,
         channelId: selectedChannelId,
+		channel: channel,
 		guild: guild,
         channels: channels
     };
