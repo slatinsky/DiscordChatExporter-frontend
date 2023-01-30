@@ -37,7 +37,7 @@
 
 
 	// imports
-	import MessageLoader from "src/routes/channels/[guildId]/[channelId]/MessageLoader.svelte";
+	import MessageLoader from "src/components/messages/MessageLoader.svelte";
 	import { onDestroy, onMount } from "svelte";
 
 

@@ -54,7 +54,7 @@ export interface Reaction {
 		name: string;
 		isAnimated: boolean;
 		image: Asset;
-	}[];
+	};
 	count: number;
 }
 
@@ -66,6 +66,30 @@ export interface Mention {
 	_id: string;
 }
 
+export interface Embed {
+	title: string;
+	url: string;
+	timestamp: string | null;
+	description: string;
+	thumbnail: Asset;
+	images: Asset[];
+	image?: Asset;
+	fields: {
+		name: string;
+		value: string;
+		isInline: boolean;
+	}[];
+	color?: string;
+	author?: {
+		name: string;
+		url: string;
+		icon?: Asset;
+	};
+	footer?: {
+		text: string;
+		icon: Asset;
+	};
+}
 
 export interface Message {
 	_id: string;
@@ -83,6 +107,7 @@ export interface Message {
 	reactions: Reaction[] | null;
 	mentions: Mention[] | null;
 	attachments: Asset[] | null;
+	embeds: NewType[] | null;
 	reference: {
 		messageId: string;
 		channelId: string;

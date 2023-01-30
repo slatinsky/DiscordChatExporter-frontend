@@ -445,6 +445,40 @@ class JsonProcessor:
 							embed["thumbnail"]["width"] = original_width
 							embed["thumbnail"]["height"] = original_height
 
+					if "images" in embed:
+						new_images = []
+						for image in embed["images"]:
+							if "width" in image and "height" in image:
+								original_width = image["width"]
+								original_height = image["height"]
+							image = self.asset_processor.process(image["url"])  # does this work?
+
+							# restore some fields, because we are losing them in the asset preprocess if url is remote
+							if "originalWidth" in locals():
+								image["width"] = original_width
+								image["height"] = original_height
+
+							new_images.append(image)
+
+						embed["images"] = new_images
+
+					if "image" in embed:
+						if "width" in embed["image"] and "height" in embed["image"]:
+							original_width = embed["image"]["width"]
+							original_height = embed["image"]["height"]
+						embed["image"] = self.asset_processor.process(embed["image"]["url"])
+
+						# restore some fields, because we are losing them in the asset preprocess if url is remote
+						if "originalWidth" in locals():
+							embed["image"]["width"] = original_width
+							embed["image"]["height"] = original_height
+
+					if "footer" in embed and "iconUrl" in embed["footer"]:
+						embed["footer"]["icon"] = self.asset_processor.process(embed["footer"].pop("iconUrl"))
+
+					if "author" in embed and "iconUrl" in embed["author"]:
+						embed["author"]["icon"] = self.asset_processor.process(embed["author"].pop("iconUrl"))
+
 			if "reactions" in message:
 				for reaction in message["reactions"]:
 					if "emoji" in reaction:
