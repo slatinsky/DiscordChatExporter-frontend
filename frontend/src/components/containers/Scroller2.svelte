@@ -43,6 +43,7 @@
 
 	// props
 	export let itemCount: number;          // items count to render
+	export let negativeHeight: number = 50;         // negative height of the 100vh container
 
 
 	// "autofilled" variables after mount
@@ -263,6 +264,9 @@
 	}
 
 	function setOffsets(): void {
+		if (interval === null) {      // don't fire listener if we are unmounting now
+			return
+		}
 		const itemDoms = getItemDoms()
 		let offset = centerItemTopOffset
 		for (let i = 0; i < itemDoms.length; i++) {  // DOWN
@@ -334,6 +338,10 @@
 	}
 
 	function scrollListener() {
+		if (interval === null) {  // don't fire listener if we are unmounting now
+			return
+		}
+
 		let ScreenPositions = getScreenPositions()
 		let itemDoms = getItemDoms()
 		let firstDom = getFirstDom(itemDoms)
@@ -378,9 +386,7 @@
 			loadItemDown()
 
 			setTimeout(() => {  // wait for timeout at the bottom
-				if (interval !== null) {  // don't fire listener if we are unmounting now
-					scrollListener()      // rerun, maybe we need to add more items
-				}
+				scrollListener()      // rerun, maybe we need to add more items
 			}, 1);
 		}
 
@@ -389,28 +395,43 @@
 			loadItemUp()
 
 			setTimeout(() => {  // wait for timeout at the top
-				if (interval !== null) {  // don't fire listener if we are unmounting now
-					scrollListener()      // rerun, maybe we need to add more items
-				}
+				scrollListener()      // rerun, maybe we need to add more items
 			}, 1);
 		}
 
 		// recalculate absolute positions
 		setTimeout(() => {                // wait for items to be rendered
-			if (interval !== null) {      // don't fire listener if we are unmounting now
-				setOffsets()
-			}
+			setOffsets()
 		}, 0);
 	}
 
-	let interval: NodeJS.Timeout | null = null;
-	onMount(() => {
-		setTimeout(() => {
+	function calculateRenderedItemCount() {
 			// large screens need more items to be rendered
 			// TODO: recalculate maxItemsLoaded on window resize
-			maxItemsLoaded = Math.max(Math.round(windowHeight * 4 / itemEstimatedHeight), 50)
-			console.log("maxItemsLoaded set to", maxItemsLoaded);
+			let newMaxItemsLoaded = Math.max(Math.round(windowHeight * 4 / itemEstimatedHeight), 50)
+			if (isNaN(newMaxItemsLoaded)) {
+				newMaxItemsLoaded = 50
+			}
+			if (newMaxItemsLoaded === maxItemsLoaded) {
+				return
+			}
 
+			maxItemsLoaded = newMaxItemsLoaded
+			console.log("maxItemsLoaded set to", maxItemsLoaded);
+	}
+
+	$: windowHeight, calculateRenderedItemCount()
+
+	let interval: NodeJS.Timeout | null = null;
+	onMount(() => {
+		if (itemCount === 0) {
+			console.log("no items to render");
+
+			return
+		}
+
+		setTimeout(() => {
+			calculateRenderedItemCount()
 			domWindow.addEventListener("scroll", scrollListener);
 			scrollListener()              // call to init without scrolling
 		}, 0);
@@ -430,7 +451,7 @@
 	});
 </script>
 
-<div class="scroll-window" bind:clientHeight={windowHeight} bind:clientWidth={windowWidth} bind:this={domWindow}>
+<div class="scroll-window" bind:clientHeight={windowHeight} bind:clientWidth={windowWidth} bind:this={domWindow} style={"height:calc(100vh - " + negativeHeight + "px)"}>
 	<div class="scroll-container" style="height: {containerHeight}px;" bind:this={domContainer}>
 		{#each indexesToRender as messageIndex (messageIndex)}
 			<div class="scroll-absolute-element" data-index={messageIndex} style={"position: absolute; left: 0px;top:0px; width: " + windowWidth + "px;"}>
@@ -443,7 +464,6 @@
 
 <style>
 .scroll-window {
-	height: calc(100vh - 51px);  /* Header height is 50px */
 	overflow-y: scroll;
 	overflow-x: hidden;
 	position: relative;
