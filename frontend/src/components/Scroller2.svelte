@@ -15,7 +15,7 @@
 	and height offset is saved (centerItemTopOffset)
 
 	because we don't know the height of all items, the scrollbar position cannot be accurately calculated.
-	we just estimate it by the height of one item (itemEstimatedHeight) and the number of items rendered (messages.length).
+	we just estimate it by the height of one item (itemEstimatedHeight) and the number of items rendered (itemCount).
 
 	As the user scrolls, the scollbar position (centerItemTopOffset) is more and more misaligned with the actual position (itemEstimatedHeight * centerItemIndex).
 	We fix the misalignent if the user scrolls to the start of the scroll container or to the end of the scroll container.
@@ -42,8 +42,7 @@
 
 
 	// props
-	export let messages: MessageIdLoad[];        // items to render
-	export let selectedGuildId: string;
+	export let itemCount: number;          // items count to render
 
 
 	// "autofilled" variables after mount
@@ -55,7 +54,7 @@
 
 	// values that never change
 	let itemEstimatedHeight = 100;                                          // estimated height of each item
-	let containerEstimatedHeight = itemEstimatedHeight * messages.length;   // first estimation of the container height
+	let containerEstimatedHeight = itemEstimatedHeight * itemCount;   // first estimation of the container height
 
 
 	let maxItemsLoaded = 50;                                                // max items loaded at once. After that, items at the edges are removed. This value is changed at runtime for large screens
@@ -146,7 +145,7 @@
 
 	function loadItemDown(): void {
 		const lastItemIndex = indexesToRender[indexesToRender.length - 1]
-		if (lastItemIndex === messages.length - 1) {
+		if (lastItemIndex === itemCount - 1) {
 			return
 		}
 
@@ -286,7 +285,7 @@
 				if (i === itemDoms.length - 1) {  // run for the last rendered item only
 					// if this is the last item, perfectly align the bottom
 					// 10 is just to avoid rounding errors
-					if (index === messages.length - 1) {
+					if (index === itemCount - 1) {
 						// console.log("setting container height =", offset, offset + itemHeight, containerHeight);
 						if (containerHeight !== offset) {
 							containerHeight = offset
@@ -295,8 +294,8 @@
 					}
 					// else we estimate the height of the remaining items
 					else if (offset + itemHeight > containerHeight) {
-						containerHeight += (messages.length - 1 - index) * itemEstimatedHeight
-						console.log("estimating new container height +", (messages.length - 1 - index) * itemEstimatedHeight);
+						containerHeight += (itemCount - 1 - index) * itemEstimatedHeight
+						console.log("estimating new container height +", (itemCount - 1 - index) * itemEstimatedHeight);
 					}
 				}
 			}
@@ -353,10 +352,10 @@
 			if (lastDomPositions.top + 5000 < ScreenPositions.middle || firstDomPositions.top - 5000 > ScreenPositions.middle) {
 				let newCenterItemIndex = Math.floor(ScreenPositions.middle / itemEstimatedHeight)
 
-				if (newCenterItemIndex > messages.length - 1) {  // don't scroll past the end (it can happen, because we estimate the height)
+				if (newCenterItemIndex > itemCount - 1) {  // don't scroll past the end (it can happen, because we estimate the height)
 					console.warn("too ambitious scroll, fixing scroll to the bottom");
 
-					newCenterItemIndex = messages.length - 1
+					newCenterItemIndex = itemCount - 1
 				}
 
 				const newCenterItemTopOffset = newCenterItemIndex * itemEstimatedHeight
@@ -435,7 +434,7 @@
 	<div class="scroll-container" style="height: {containerHeight}px;" bind:this={domContainer}>
 		{#each indexesToRender as messageIndex (messageIndex)}
 			<div class="scroll-absolute-element" data-index={messageIndex} style={"position: absolute; left: 0px;top:0px; width: " + windowWidth + "px;"}>
-				<MessageLoader messageId={messages[messageIndex]._id} selectedGuildId={selectedGuildId} />
+				<slot name="item" index={messageIndex} />
 			</div>
 		{/each}
 	</div>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { nameRenderer, linkHandler, unloadMessages } from '../../../settingsStore';
 	import { onMount, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -9,9 +9,22 @@
 	import { copyTextToClipboard, checkUrl, getFileNameFromUrl } from '../../../../js/helpers';
 	import { renderTimestamp } from '../../../../js/time';
 	import ImageGallery from './ImageGallery.svelte';
+	import type { Message } from 'src/js/interfaces';
 
-	export let message;
-	export let selectedGuildId
+	export let message: Message;
+	export let previousMessage: Message | null = null;
+	export let selectedGuildId: string
+
+	let isSameAuthor = false;
+
+	console.log('NewMessage n', message);
+	console.log('NewMessage p', previousMessage);
+	
+	
+
+	if (previousMessage && previousMessage.author?._id === message.author._id) {
+		isSameAuthor = true;
+	}
 
 	function full_name(author) {
 		return author.name + '#' + author.discriminator;
@@ -132,20 +145,22 @@
 								</div>
 							</a>
 						{/if}
-						<div class="chatlog__header">
-							<span
-								class="chatlog__author"
-								title={nickname(message.author)}
-								style="color:{message.author.color}"
-								data-user-id={message.author.id}>{nickname(message.author)}</span
-							>
-							<span class="chatlog__timestamp"
-								><a href="/channels/{selectedGuildId}/{message.channelId}#{message.id}"
-									>{renderTimestamp(message.timestamp)}</a
+						{#if !isSameAuthor}
+							<div class="chatlog__header">
+								<span
+									class="chatlog__author"
+									title={nickname(message.author)}
+									style="color:{message.author.color}"
+									data-user-id={message.author.id}>{nickname(message.author)}</span
 								>
-								</span
-							>
-						</div>
+								<span class="chatlog__timestamp"
+									><a href="/channels/{selectedGuildId}/{message.channelId}#{message.id}"
+										>{renderTimestamp(message.timestamp)}</a
+									>
+									</span
+								>
+							</div>
+						{/if}
 						<div class="chatlog__content chatlog__markdown">
 							<span class="chatlog__markdown-preserve"
 								>
