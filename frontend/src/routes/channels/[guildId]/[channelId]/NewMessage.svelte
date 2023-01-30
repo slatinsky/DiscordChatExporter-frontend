@@ -17,11 +17,6 @@
 
 	let isSameAuthor = false;
 
-	console.log('NewMessage n', message);
-	console.log('NewMessage p', previousMessage);
-	
-	
-
 	if (previousMessage && previousMessage.author?._id === message.author._id) {
 		isSameAuthor = true;
 	}
@@ -62,7 +57,10 @@
 		<div class="channel-name"><a href="/channels/{selectedGuildId}/{message.channelId}/"># {guild.channels[message.channelId]?.name}</a></div>
 	{/if} -->
 	<!-- transition:fade={{ duration: 125 }} -->
-	<div class="chatlog__message-group"  on:contextmenu|preventDefault={e=>onRightClick(e, message)}>
+	{#if !isSameAuthor}
+		<div class="padder"></div>
+	{/if}
+	<div on:contextmenu|preventDefault={e=>onRightClick(e, message)}>
 		<div
 			id="{message.id}"
 			class="chatlog__message-container {message.isPinned
@@ -82,8 +80,10 @@
 						<div class="chatlog__reference-symbol" />
 					{/if}
 
-					{#if message.type != 'ThreadCreated'}
-						<ImageGallery asset={message.author?.avatar} imgclass={"chatlog__avatar"} />
+					{#if !isSameAuthor}
+						{#if message.type != 'ThreadCreated'}
+							<ImageGallery asset={message.author?.avatar} imgclass={"chatlog__avatar"} />
+						{/if}
 					{/if}
 				</div>
 
@@ -421,16 +421,16 @@
 {#if rightClickMessage}
 	<ContextMenu let:visible>
 		<MenuOption
-				on:click={() => copyTextToClipboard(BigInt(message.author.id))}
+				on:click={() => copyTextToClipboard(BigInt(message.author._id))}
 				text="Copy author ID" {visible} />
 		<MenuOption
-				on:click={() => copyTextToClipboard(BigInt(message.id))}
+				on:click={() => copyTextToClipboard(BigInt(message._id))}
 				text="Copy message ID" {visible} />
 		<MenuOption
-				on:click={() => copyTextToClipboard(`https://discord.com/channels/${BigInt(selectedGuildId)}/${BigInt(message.channelId)}/${BigInt(message.id)}`)}
+				on:click={() => copyTextToClipboard(`https://discord.com/channels/${BigInt(selectedGuildId)}/${BigInt(message.channelId)}/${BigInt(message._id)}`)}
 				text="Copy message link" {visible} />
 		<MenuOption
-				on:click={() => window.open(($linkHandler === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(selectedGuildId)}/${BigInt(message.channelId)}/${BigInt(message.id)}`,'_blank')}
+				on:click={() => window.open(($linkHandler === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(selectedGuildId)}/${BigInt(message.channelId)}/${BigInt(message._id)}`,'_blank')}
 				text="Open in discord" {visible} />
 		<MenuOption
 			on:click={() => console.log(JSON.stringify(message, null, 2))}
@@ -439,6 +439,11 @@
 {/if}
 
 <style>
+
+	.padder {
+		height: 15px;
+		width: 100%;
+	}
 	.not-loaded {
 		width: 100%;
 	}

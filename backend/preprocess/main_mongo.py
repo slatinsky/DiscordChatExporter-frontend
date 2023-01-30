@@ -488,14 +488,20 @@ class JsonProcessor:
 						authors[author["_id"]]["nicknames"].append(message["author"]["nickname"])
 					continue
 
-				author["nicknames"] = [author.pop("nickname")]
 				author["avatar"] = self.asset_processor.process(author.pop("avatarUrl"))
+				author["nicknames"] = [author.pop("nickname")]
 				authors[author["_id"]] = author  # new author
 
 		authors_list = []
 		for author_id in authors:
 			author = authors[author_id]
 			authors_list.append(author)
+
+		# add authors back to messages
+		for message in messages:
+			if "author" in message:
+				message["author"] = authors[message["author"]["_id"]]
+
 		return authors_list
 
 
@@ -599,7 +605,7 @@ def main():
 	print("found " + str(len(jsons)) + " json channel exports")
 
 	# DEBUG get only first n files
-	jsons = jsons[:245]
+	jsons = jsons[:2450]
 
 	asset_processor = AssetProcessor(file_finder, database)
 	asset_processor.set_fast_mode(True)  # don't process slow actions
