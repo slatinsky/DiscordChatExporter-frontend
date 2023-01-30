@@ -117,7 +117,7 @@
     // }
     // $: scrollToBottom(data.channelId, 50);
     // /** --- end SCROLL TO CHANNEL BOTTOM ON LOAD */
-	import Scroller from "src/components/Scroller.svelte";
+	import Scroller from "src/components/Scroller2.svelte";
 </script>
 
 <svelte:head>

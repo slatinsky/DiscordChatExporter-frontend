@@ -92,3 +92,7 @@ export interface Message {
 	channelId: string;
 }
 
+export interface MessageIdLoad {
+	_id: string;
+	loaded: boolean;
+}

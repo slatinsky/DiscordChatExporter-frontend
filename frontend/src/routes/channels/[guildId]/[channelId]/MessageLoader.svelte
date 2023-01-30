@@ -29,7 +29,7 @@
 
 <style>
 	.loading {
-		height: 50px;
+		height: 100px;
 		color: gray;
 	}
 </style>
