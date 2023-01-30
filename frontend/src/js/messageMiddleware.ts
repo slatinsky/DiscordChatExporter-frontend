@@ -2,10 +2,15 @@
 
 // collect message ids from multiple sources, aggregate them and fetch them in batches every 250ms
 
+import { writable } from "svelte/store";
 import type { Message } from "./interfaces"
 
 const messages: Record<string, Message> = {}
 const messageIdsToFetch: string[] = []
+const MESSAGE_LIMIT_PER_FETCH = 250
+
+// observer pattern using svelte store
+export const justFetchedMessageIds: any = writable([])
 
 
 async function fetchMessages(messageIds: string[]) {
@@ -28,35 +33,17 @@ async function fetchMessages(messageIds: string[]) {
 	for (const message of messages_resp) {
 		messages[message._id] = message
 	}
+
+	justFetchedMessageIds.set(messageIds)
 }
 
 setInterval(() => {
 	if (messageIdsToFetch.length === 0) {
 		return
 	}
-	const messageIds = messageIdsToFetch.splice(0, 50)
+	const messageIds = messageIdsToFetch.splice(0, MESSAGE_LIMIT_PER_FETCH)
 	fetchMessages(messageIds)
 }, 250)
-
-
-// fetch messages in the background every 250ms
-// wait for fetch to finish before continuing
-// #### this approach may be faster, but BROWSER CAN'T KEEP UP RENDERING THEM AT THIS SPEED ####
-// async function fetchLoop() {
-// 	console.log("fetch loop started");
-// 	while (true) {
-// 		if (messageIdsToFetch.length === 0) {
-// 			await new Promise((resolve) => setTimeout(resolve, 250))
-// 			continue
-// 		}
-// 		const messageIds = messageIdsToFetch.splice(0, 50)
-// 		await fetchMessages(messageIds)
-// 		await new Promise((resolve) => setTimeout(resolve, 25))
-// 	}
-// }
-
-// fetchLoop()
-
 
 
 // if we switch channel sooner than the messages are fetched, we no longer need it
@@ -84,17 +71,17 @@ export async function getMessageContent(messageId: string): Promise<Message> {
 
 	// wait for message to be loaded asynchronously
 	return new Promise((resolve, reject) => {
-		let counter = 0
-		const interval = setInterval(() => {
-			if (messages[messageId]) {
-				clearInterval(interval)
+		// timeout after 10 seconds
+		const timeout = setTimeout(() => {
+			unsubscribe()
+			reject("Error loading message_id " + messageId)
+		}, 10000)
+		const unsubscribe = justFetchedMessageIds.subscribe((messageIds: string[]) => {
+			if (messageIds.includes(messageId)) {
+				unsubscribe()
+				clearTimeout(timeout)
 				resolve(messages[messageId])
 			}
-			counter++
-			if (counter > 100) {
-				clearInterval(interval)
-				reject("Error loading message_id " + messageId)
-			}
-		}, 100)
+		})
 	})
 }
