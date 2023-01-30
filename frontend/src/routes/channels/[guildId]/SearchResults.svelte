@@ -1,6 +1,5 @@
 <script>
 	import { found_messages, searched } from './searchStores';
-    import Messages from './[channelId]/Messages.svelte';
     export let guild
 	let searchResults
 </script>
@@ -13,7 +12,8 @@
 {/if}
 <div id="search-results" bind:this={searchResults}>
 	{#if searchResults}
-		<Messages messages={$found_messages} {guild} channelId={$found_messages} search={true} rootId={searchResults}/>
+		<!-- TODO: migrate to new messages -->
+		<!-- <Messages messages={$found_messages} {guild} channelId={$found_messages} search={true} rootId={searchResults}/> -->
 	{/if}
 </div>
 
