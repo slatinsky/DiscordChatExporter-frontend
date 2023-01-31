@@ -36,6 +36,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-static": "^1.0.0-next.44",
 		"axios": "^1.1.2",
+		"lodash": "^4.17.21",
 		"moment": "^2.29.4",
 		"vite-tsconfig-paths": "^4.0.5"
 	}

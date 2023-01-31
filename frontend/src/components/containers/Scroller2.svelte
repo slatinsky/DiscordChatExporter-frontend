@@ -39,6 +39,7 @@
 	// imports
 	import MessageLoader from "src/components/messages/MessageLoader.svelte";
 	import { onDestroy, onMount } from "svelte";
+	import throttle from 'lodash';
 
 
 	// props
@@ -78,23 +79,13 @@
 	function getCachedHeight(index: number): number {
 		// if not cached, return estimated height
 		if (heightsCache[index] === undefined) {
-
-			// // try to cache manually
-			// // get bt data-index attribute
-			// let domItem = domContainer.querySelector(`[data-index="${index}"]`) as HTMLElement
-			// if (domItem) {
-			// 	let height = domItem.offsetHeight
-			// 	heightsCache[index] = height
-			// 	console.warn("height found manually", index);
-			// 	return height
-			// }
-			// else {
+			if (heights[index] === undefined) {
 				console.warn("height not cached");
 				return itemEstimatedHeight
-			// }
-
+			}
+			return heights[index]
 		}
-		return heightsCache[index] ?? itemEstimatedHeight
+		return heightsCache[index]
 	}
 
 	function addIndexToRender(index: number): void {
@@ -109,21 +100,15 @@
 	function clearIndexRender(): void {
 		indexesToRender = []
 	}
-	function removeIndexToRender(index: number): void {
-		indexesToRender = indexesToRender.filter((i) => i.index !== index)
-	}
 
 	function refreshCenterItem(): void {
 		let oldIndex = centerItemIndex
 		let newIndex = findCenterItemIndex()  // get middle index of the screen
 
-
-
-		// if the difference is less than 3, then ignore
-		// this prevents infinite "feedback" loops
-		// if (Math.abs(newIndex - oldIndex) <= 2) {
-		// 	return
-		// }
+		if (newIndex === null) {
+			console.warn("newIndex is null");
+			return
+		}
 
 		// DOWN
 		if (newIndex > oldIndex) {
@@ -181,6 +166,7 @@
 		centerItemTopOffset -= offsetToFix;
 		domWindow.scrollTop -= offsetToFix;
 		console.log("fixScrollOutOfBounds", offsetToFix);
+		heightsChanged(heights, true)
 	}
 
 
@@ -192,14 +178,6 @@
 		}
 	}
 
-	function getDomPositions(itemDom: ItemDom): ScreenPositions {
-		return {
-			top: itemDom.element.offsetTop,
-			middle: itemDom.element.offsetTop + itemDom.element.clientHeight / 2,
-			bottom: itemDom.element.offsetTop + itemDom.element.clientHeight
-		}
-	}
-
 
 	interface ItemDom {
 		index: number;
@@ -208,61 +186,52 @@
 
 
 	function findCenterItemIndex(): number | null {
-		const itemDoms = getItemDoms()
 		const screenPositions = getScreenPositions()
 
-		let closestItem: ItemDom | null = null
-		let closestDistance = Infinity
+		let closestIndex: number = centerItemIndex
+		let closestOffset: number = centerItemTopOffset + heights[centerItemIndex] / 2
+		let closestDistance = Math.abs(closestOffset - screenPositions.middle)
 
-		for (let i = 0; i < itemDoms.length; i++) {
-			const itemDom = itemDoms[i]
-			const domPositions = getDomPositions(itemDom)
+		while(true) {
+			let nextItemOffset
+			let nextItemIndex
+			let nextItemDistance
 
-			let distance = Math.abs(domPositions.middle - screenPositions.middle)
-			if (distance < closestDistance) {
-				closestDistance = distance
-				closestItem = itemDom
+			if (centerItemTopOffset < screenPositions.middle) {  // centerItem is above the screen middle position
+				if (heights[closestIndex] === undefined || heights[closestIndex + 1] === undefined) {  // infinite loop protection
+					console.warn("undefined height v1", heights[closestIndex], heights[closestIndex + 1])
+					return closestIndex
+				}
+				nextItemOffset = closestOffset + heights[closestIndex] / 2 + heights[closestIndex + 1] / 2
+				nextItemIndex = closestIndex + 1
+				nextItemDistance = Math.abs(nextItemOffset - screenPositions.middle)
 			}
+			else if (centerItemTopOffset > screenPositions.middle) {  // centerItem is below the screen middle position
+				if (heights[closestIndex] === undefined || heights[closestIndex - 1] === undefined) {  // infinite loop protection
+					console.warn("undefined height v2", heights[closestIndex], heights[closestIndex - 1])
+					return closestIndex
+				}
+				nextItemOffset = closestOffset - heights[closestIndex] / 2 - heights[closestIndex - 1] / 2
+				nextItemIndex = closestIndex - 1
+				nextItemDistance = Math.abs(nextItemOffset - screenPositions.middle)
+			}
+			else {
+				break
+			}
+
+			// if the distance is worse, then stop
+			if (nextItemDistance > closestDistance) {
+				break
+			}
+			// if the distance is better, then update
+			closestIndex = nextItemIndex
+			closestOffset = nextItemOffset
+			closestDistance = nextItemDistance
 		}
-
-		let newIndex = closestItem?.index ?? null
-
-		if (newIndex === null) {
-			console.warn("newIndex is null, using fallback (middle index of loaded items)");
-			newIndex = indexesToRender[Math.floor(indexesToRender.length / 2)]  // get middle index of loaded items
-		}
-
-		return newIndex
+		return closestIndex
 	}
 
-	function getItemDoms(): ItemDom[] {
-		let elements = []
-		for (let i = 0; i < domContainer.children.length; i++) {
-			const element = domContainer.children[i] as HTMLElement;
-			const index = parseInt(element.getAttribute("data-index") || "0")
-			elements.push({
-				index,
-				element
-			})
-		}
-		return elements
-	}
-
-	function getFirstDom(itemDoms:ItemDom[]): ItemDom | null {
-		if (itemDoms.length === 0) {
-			return null
-		}
-		return itemDoms[0]
-	}
-
-	function getLastDom(itemDoms:ItemDom[]): ItemDom | null {
-		if (itemDoms.length === 0) {
-			return null
-		}
-		return itemDoms[itemDoms.length - 1]
-	}
-
-	function heightsChanged(updatedHeights: Record<string, number>): void {
+	function heightsChanged(updatedHeights: Record<string, number>, forceUpdate: boolean = false): void {
 		if (heightsCache === null) {
 			console.warn("heightsChanged - heightsCache is null, this function should not be called before mount");
 			return
@@ -310,6 +279,13 @@
 			}
 		}
 
+		// in some cases repositionin is not caused by changed height
+		// for example when we scroll to the start of the container and the first item is misaligned
+		if (forceUpdate) {
+			upIndexToUpdate = centerItemIndex
+			downIndexToUpdate = centerItemIndex
+		}
+
 		let offset = centerItemTopOffset
 		if (downIndexToUpdate !== null) { // down
 			// update all indexes below downIndexToUpdate
@@ -345,7 +321,7 @@
 		offset = centerItemTopOffset + heightsCache[centerItemIndex]
 		if (upIndexToUpdate !== null) { // up
 			// console.log("upIndexToUpdate", upIndexToUpdate);
-			
+
 			// update all indexes above upIndexToUpdate
 			for (let i = centerItemIndex; i >= renderedIndexesMin; i--) {
 				const index = i
@@ -373,27 +349,33 @@
 		}
 	}
 
-	function scrollListener() {
+	async function scrollListener() {
 		if (interval === null) {  // don't fire listener if we are unmounting now
 			return
 		}
 
 		let ScreenPositions = getScreenPositions()
-		let itemDoms = getItemDoms()
-		let firstDom = getFirstDom(itemDoms)
-		let lastDom = getLastDom(itemDoms)
+		let renderedIndexes = indexesToRender
+		let renderedIndexesMin = renderedIndexes[0]
+		let renderedIndexesMax = renderedIndexes[renderedIndexes.length - 1]
 
-		let firstDomPositions = getDomPositions(firstDom as ItemDom)
-		let lastDomPositions = getDomPositions(lastDom as ItemDom)
+		// calculate first position (up)
+		let firstDomTopOffset = centerItemTopOffset + heightsCache[centerItemIndex]
+		for (let i = centerItemIndex; i >= renderedIndexesMin; i--) {
+			firstDomTopOffset -= heightsCache[i]
+		}
 
-		// center item may be misaligned from the scroll position
+		// calculate last position (down)
+		let lastDomTopOffset = centerItemTopOffset - heightsCache[centerItemIndex]
+		for (let i = centerItemIndex; i <= renderedIndexesMax; i++) {
+			lastDomTopOffset += heightsCache[i]
+		}
 
-		// TODO: correct the misalignment
-		// let centerItemMisalignment = centerItemIndex * itemEstimatedHeight - centerItemTopOffset  // in px
+		let firstDomBottomOffset = firstDomTopOffset + heightsCache[renderedIndexesMin]
 
 		// if we scrolled too far, just start over with new center item
-		if (lastDomPositions.top !== 0 && firstDomPositions.top !== 0) {   // new items are placed at the offset 0, ignore new items
-			if (lastDomPositions.top + 5000 < ScreenPositions.middle || firstDomPositions.top - 5000 > ScreenPositions.middle) {
+		if (lastDomTopOffset !== 0 && firstDomTopOffset !== 0) {   // new items are placed at the offset 0, ignore new items
+			if (lastDomTopOffset + 5000 < ScreenPositions.middle || firstDomTopOffset - 5000 > ScreenPositions.middle) {
 				let newCenterItemIndex = Math.floor(ScreenPositions.middle / itemEstimatedHeight)
 
 				if (newCenterItemIndex > itemCount - 1) {  // don't scroll past the end (it can happen, because we estimate the height)
@@ -418,7 +400,7 @@
 
 		// if the center item is (relatively) near, load more items to the ScreenPosition
 		// this is triggered after we scroll DOWN
-		if (lastDomPositions.top < ScreenPositions.bottom + 1 * windowHeight) {
+		if (lastDomTopOffset < ScreenPositions.bottom + 1 * windowHeight) {
 			loadItemDown()
 
 			setTimeout(() => {  // wait for timeout at the bottom
@@ -427,7 +409,7 @@
 		}
 
 		// same as above, but for scroll UP
-		if (firstDomPositions.bottom > ScreenPositions.top - 1 * windowHeight) {
+		if (firstDomBottomOffset > ScreenPositions.top - 1 * windowHeight) {
 			loadItemUp()
 
 			setTimeout(() => {  // wait for timeout at the top
@@ -454,6 +436,7 @@
 	$: windowHeight, calculateRenderedItemCount()
 
 	let interval: NodeJS.Timeout | null = null;
+	let scrollThrottle = throttle(scrollListener, 100, { leading: false, trailing: true });
 	onMount(() => {
 		if (itemCount === 0) {
 			console.log("no items to render");
@@ -463,7 +446,7 @@
 
 		setTimeout(() => {
 			calculateRenderedItemCount()
-			domWindow.addEventListener("scroll", scrollListener);
+			domWindow.addEventListener("scroll", scrollThrottle, { passive: true });
 			scrollListener()              // call to init without scrolling
 		}, 0);
 
@@ -478,7 +461,7 @@
 		// cleanup
 		clearInterval(interval);
 		interval = null;
-		domWindow.removeEventListener("scroll", scrollListener);
+		domWindow.removeEventListener("scroll", scrollThrottle, { passive: true });
 	});
 
 	let heights: Record<number, number> = {}
