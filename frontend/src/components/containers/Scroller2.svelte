@@ -79,19 +79,19 @@
 		// if not cached, return estimated height
 		if (heightsCache[index] === undefined) {
 
-			// try to cache manually
-			// get bt data-index attribute
-			let domItem = domContainer.querySelector(`[data-index="${index}"]`) as HTMLElement
-			if (domItem) {
-				let height = domItem.offsetHeight
-				heightsCache[index] = height
-				console.warn("height found manually", index);
-				return height
-			}
-			else {
+			// // try to cache manually
+			// // get bt data-index attribute
+			// let domItem = domContainer.querySelector(`[data-index="${index}"]`) as HTMLElement
+			// if (domItem) {
+			// 	let height = domItem.offsetHeight
+			// 	heightsCache[index] = height
+			// 	console.warn("height found manually", index);
+			// 	return height
+			// }
+			// else {
 				console.warn("height not cached");
 				return itemEstimatedHeight
-			}
+			// }
 
 		}
 		return heightsCache[index] ?? itemEstimatedHeight
@@ -171,7 +171,6 @@
 		if (newIndexesToRender.length > maxItemsLoaded) {
 			refreshCenterItem()
 			newIndexesToRender.pop()  // remove last item
-			setOffsets()
 			console.log("unloaded one item up");
 		}
 
@@ -263,32 +262,70 @@
 		return itemDoms[itemDoms.length - 1]
 	}
 
-	function setOffsets(): void {
-		if (interval === null) {      // don't fire listener if we are unmounting now
+	function heightsChanged(updatedHeights: Record<string, number>): void {
+		if (heightsCache === null) {
+			console.warn("heightsChanged - heightsCache is null, this function should not be called before mount");
 			return
 		}
-		const itemDoms = getItemDoms()
-		let offset = centerItemTopOffset
-		for (let i = 0; i < itemDoms.length; i++) {  // DOWN
-			const index = itemDoms[i].index
-			const element = itemDoms[i].element
-			const height = element.clientHeight
-			let itemHeight = height
-			if (isNaN(itemHeight)) {
-				console.log("NaN height", index, element);
-				itemHeight = itemEstimatedHeight
-			}
-			heightsCache[index] = itemHeight
 
-			if (index >= centerItemIndex) {
-				// console.log("set offset1", index, offset);
-				element.style.top = offset + "px"
+		let renderedIndexes = indexesToRender
+		let renderedIndexesMin = renderedIndexes[0]
+		let renderedIndexesMax = renderedIndexes[renderedIndexes.length - 1]
+
+		let upIndexToUpdate: number | null = null     // indexes above this index (including) need to be repositioned updated. Null means no update needed
+		let downIndexToUpdate: number | null = null   // indexes below this index (including) need to be repositioned updated. Null means no update needed
+
+		// updatedHeights contains all heights, but we only need to update the ones that were updated
+
+		// loop all values in renderedIds
+		for (let i = 0; i < renderedIndexes.length; i++) {
+			const index = renderedIndexes[i]
+			const oldHeight: number | undefined = heightsCache[index]
+			const newHeight: number = updatedHeights[index]
+
+			if (newHeight === 0) {
+				console.warn("heightsChanged - newHeight is 0, probably the component is not mounted yet");
+				return
+			}
+
+			if (isNaN(newHeight)) {
+				console.warn("heightsChanged - newHeight is NaN, probably the component is not mounted yet");
+				return
+			}
+
+			if (domItems[index] === undefined) {
+				console.warn("heightsChanged - domItems[index] is undefined, probably the component is not mounted yet");
+				return
+			}
+
+			if (newHeight !== oldHeight) {
+				heightsCache[index] = newHeight
+				// save item positions we need to relocate
+				if (centerItemIndex <= index) {  // down
+					downIndexToUpdate = Math.min(downIndexToUpdate ?? Infinity, index)  // closest index to centerItem
+				}
+				if (centerItemIndex > index) {   // up
+					upIndexToUpdate = Math.max(upIndexToUpdate ?? -Infinity, index)  // closest index to centerItem
+				}
+			}
+		}
+
+		let offset = centerItemTopOffset
+		if (downIndexToUpdate !== null) { // down
+			// update all indexes below downIndexToUpdate
+			for (let i = centerItemIndex; i <= renderedIndexesMax; i++) {  // we need to loop everything from centerItemIndex to renderedIndexesMax, because we need to calculate the offset
+				const index = i
+
+				const itemHeight = heightsCache[index]
+
+				if (downIndexToUpdate <= index) {  // actually update only items below changed index)
+					domItems[index].style.top = offset + "px"
+				}
 				offset += itemHeight
 
 				// if the the last item comes out of bounds, we need to increase the container height:
-				if (i === itemDoms.length - 1) {  // run for the last rendered item only
+				if (i === renderedIndexesMax) {  // run for the last rendered item only
 					// if this is the last item, perfectly align the bottom
-					// 10 is just to avoid rounding errors
 					if (index === itemCount - 1) {
 						// console.log("setting container height =", offset, offset + itemHeight, containerHeight);
 						if (containerHeight !== offset) {
@@ -305,21 +342,20 @@
 			}
 		}
 
-		offset = centerItemTopOffset
-		for (let i = itemDoms.length - 1; i >= 0; i--) {  // UP
-			const index = itemDoms[i].index
-			const element = itemDoms[i].element
-			const height = element.clientHeight
-			let itemHeight = height
-			if (isNaN(itemHeight)) {
-				itemHeight = itemEstimatedHeight
-			}
-			heightsCache[index] = itemHeight
+		offset = centerItemTopOffset + heightsCache[centerItemIndex]
+		if (upIndexToUpdate !== null) { // up
+			// console.log("upIndexToUpdate", upIndexToUpdate);
+			
+			// update all indexes above upIndexToUpdate
+			for (let i = centerItemIndex; i >= renderedIndexesMin; i--) {
+				const index = i
+				const itemHeight = heightsCache[index]
 
-			if (index < centerItemIndex) {
-				// console.log("set offset2", index, offset);
 				offset -= itemHeight
-				element.style.top = offset + "px"
+
+				if (upIndexToUpdate >= index) {  // actually update only items above changed index)
+					domItems[index].style.top = offset + "px"
+				}
 
 				if (i === 0) {  // run for the first rendered item only
 					// because we sometimes assume the height for non-rendered items (itemEstimatedHeight), the start will almost never line up perfectly
@@ -382,7 +418,7 @@
 
 		// if the center item is (relatively) near, load more items to the ScreenPosition
 		// this is triggered after we scroll DOWN
-		if (lastDomPositions.top < ScreenPositions.bottom + 0.5 * windowHeight) {
+		if (lastDomPositions.top < ScreenPositions.bottom + 1 * windowHeight) {
 			loadItemDown()
 
 			setTimeout(() => {  // wait for timeout at the bottom
@@ -391,18 +427,13 @@
 		}
 
 		// same as above, but for scroll UP
-		if (firstDomPositions.bottom > ScreenPositions.top - 0.5 * windowHeight) {
+		if (firstDomPositions.bottom > ScreenPositions.top - 1 * windowHeight) {
 			loadItemUp()
 
 			setTimeout(() => {  // wait for timeout at the top
 				scrollListener()      // rerun, maybe we need to add more items
 			}, 1);
 		}
-
-		// recalculate absolute positions
-		setTimeout(() => {                // wait for items to be rendered
-			setOffsets()
-		}, 0);
 	}
 
 	function calculateRenderedItemCount() {
@@ -449,12 +480,17 @@
 		interval = null;
 		domWindow.removeEventListener("scroll", scrollListener);
 	});
+
+	let heights: Record<number, number> = {}
+	let domItems: Record<number, HTMLElement> = {}
+
+	$: heightsChanged(heights)
 </script>
 
 <div class="scroll-window" bind:clientHeight={windowHeight} bind:clientWidth={windowWidth} bind:this={domWindow} style={"height:calc(100vh - " + negativeHeight + "px)"}>
-	<div class="scroll-container" style="height: {containerHeight}px;" bind:this={domContainer}>
+	<div class="scroll-container" style="height: {containerHeight}px;position:relative;" bind:this={domContainer}>
 		{#each indexesToRender as messageIndex (messageIndex)}
-			<div class="scroll-absolute-element" data-index={messageIndex} style={"position: absolute; left: 0px;top:0px; width: " + windowWidth + "px;"}>
+			<div class="scroll-absolute-element" data-index={messageIndex} style={"position: absolute; left: 0px; width:100%;"} bind:this={domItems[messageIndex]} bind:clientHeight={heights[messageIndex]} >
 				<slot name="item" index={messageIndex} />
 			</div>
 		{/each}
