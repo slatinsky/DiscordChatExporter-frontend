@@ -24,7 +24,7 @@
 						<div class="chatlog__embed-author-container">
 							<!-- TODO: check url -->
 							{#if embed.author?.iconUrl?.url}
-								<img class="chatlog__embed-author-icon" src="{checkUrl(embed.author?.iconUrl?.url)}" alt="Author icon" loading="lazy" onerror="this.style.visibility='hidden'"
+								<img class="chatlog__embed-author-icon" src="{checkUrl(embed.author?.iconUrl?.url)}" alt="Author icon" onerror="this.style.visibility='hidden'"
 						width="{embed.author?.width ?? 16}"
 						height="{embed.author?.height ?? 16}"
 						>
@@ -124,7 +124,7 @@
 					{#if embed.footer}
 						<div class="chatlog__embed-footer">
 							{#if embed.footer.icon}
-								<ImageGallery imgclass="chatlog__embed-footer-icon" inline={true} asset={embed.footer.icon} alt="Footer icon" loading="lazy" onerror="this.style.visibility='hidden'" />
+								<ImageGallery imgclass="chatlog__embed-footer-icon" inline={true} asset={embed.footer.icon} alt="Footer icon" onerror="this.style.visibility='hidden'" />
 							{/if}
 
 							<span class="chatlog__embed-footer-text">

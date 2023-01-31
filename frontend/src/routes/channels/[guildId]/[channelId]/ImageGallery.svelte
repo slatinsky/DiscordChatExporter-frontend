@@ -33,7 +33,6 @@
 	class={imgclass}
 	src={checkUrl(asset)}
 	alt="Attachment"
-	loading="lazy"
 	width="{asset?.width ?? undefined}"
 	height="{asset?.height ?? undefined}"
 	onerror="this.style.visibility='hidden'"
