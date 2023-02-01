@@ -37,9 +37,9 @@
 
 
 	// imports
-	import MessageLoader from "src/components/messages/MessageLoader.svelte";
 	import { onDestroy, onMount } from "svelte";
 	import {throttle, debounce} from 'lodash-es';
+	import {resizeObserver} from "src/js/resizeObserver";
 
 
 	// props
@@ -515,10 +515,13 @@
 	$: heightsChanged(heights)
 </script>
 
-<div class="scroll-window" bind:clientHeight={windowHeight} bind:clientWidth={windowWidth} bind:this={domWindow} style={"height:calc(100vh - " + negativeHeight + "px)"}>
+<div class="scroll-window" use:resizeObserver={element => {
+		windowHeight = element.clientHeight
+		windowWidth = element.clientWidth
+	}} bind:this={domWindow} style={"height:calc(100vh - " + negativeHeight + "px)"}>
 	<div class="scroll-container" style="height: {containerHeight}px;position:relative;" bind:this={domContainer}>
 		{#each indexesToRender as messageIndex (messageIndex)}
-			<div class="scroll-absolute-element" data-index={messageIndex} style={"position: absolute; left: 0px; width:100%;"} bind:this={domItems[messageIndex]} bind:clientHeight={heights[messageIndex]} >
+			<div class="scroll-absolute-element" data-index={messageIndex} style={"position: absolute; left: 0px; width:100%;"} bind:this={domItems[messageIndex]} use:resizeObserver={element => heights[messageIndex] = element.clientHeight} >
 				<slot name="item" index={messageIndex} />
 			</div>
 		{/each}
