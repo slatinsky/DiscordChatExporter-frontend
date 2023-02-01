@@ -25,7 +25,7 @@
 				isSelected={selectedChannelId == channel._id}
 				threadCount={channel?.threads?.length ?? 0}
 			/>
-			{#if channel._id == "0" || [channel._id, ...(channel.threads ? channel.threads.map(thread => thread._id) : [])].includes(selectedChannelId)}
+			{#if [channel._id, ...(channel.threads ? channel.threads.map(thread => thread._id) : [])].includes(selectedChannelId)}
 				{#if channel.threads}
 					{#each channel.threads as thread, i}
 						<MenuThread name={thread.name} id={thread._id} {guildId} {selectedChannelId} isLast={i+1 === channel.threads.length}/>
