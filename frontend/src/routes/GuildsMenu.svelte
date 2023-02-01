@@ -25,7 +25,7 @@
 					{#if selectedGuildId === guild._id}
 						<div class="guild-selected" />
 					{/if}
-					<img src={checkUrl(guild.icon)} alt={guild.name} />
+					<img src={checkUrl(guild.icon)} alt={guild.name} on:error={e => (e.target.src = "/favicon.png")} />
 				</div>
 			</a>
 		{/each}
