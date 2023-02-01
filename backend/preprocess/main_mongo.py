@@ -1,5 +1,6 @@
 import glob
 from hashlib import sha256
+import hashlib
 import os
 import re
 
@@ -38,19 +39,30 @@ class MongoDatabase():
 			"guilds": self.database["guilds"],
 			"authors": self.database["authors"],
 			"jsons": self.database["jsons"],
-			"assets": self.database["assets"]
+			"assets": self.database["assets"],
+			"jsons": self.database["jsons"]
 		}
 
+		self.create_indexes()
 
-	def clear_database(self):
+	def create_indexes(self):
+		# create case insensitive text indexes
+		self.col["messages"].create_index("content.content", default_language="none")
+
+
+	def clear_database_except_assets(self):
 		"""
 		Clears the database
 		Useful for debugging
+		Assets are not cleared, because they are expensive to recompute
 		"""
 		for collection_name in self.col:
 			if collection_name == "assets": # assets are expensive to recompute
 				continue
 			self.col[collection_name].delete_many({})
+
+	def clear_assets(self):
+		self.col["assets"].delete_many({})
 
 	def get_collection(self, collection_name):
 		return self.col[collection_name]
@@ -342,6 +354,7 @@ class JsonProcessor:
 		self.collection_messages = self.database.get_collection("messages")
 		self.collection_authors = self.database.get_collection("authors")
 		self.collection_assets = self.database.get_collection("assets")
+		self.collection_jsons = self.database.get_collection("jsons")
 		self.file_finder = file_finder
 		self.asset_processor = asset_processor
 
@@ -598,13 +611,76 @@ class JsonProcessor:
 				})
 				print(database_document["content"])
 				# update database
-				self.collection_messages.update_one({"_id": message["id"]}, {"$set": database_document})
+				self.collection_messages.update_one({"_id": message["_id"]}, {"$set": database_document})
 			return
 
 		self.collection_messages.insert_one(message)
 
+	def check_if_processed(self, json_path):
+		"""
+		Checks if a file has already been processed
+		"""
+
+		json_path_with_base_dir = self.file_finder.add_base_directory(json_path)
+
+		# read from database
+		json = self.collection_jsons.find_one({"_id": json_path})
+
+		if json == None:
+			return False
+
+		# check if file size is the same
+		file_size = os.path.getsize(json_path_with_base_dir)
+		if json["size"] != file_size:
+			# delete from database
+			self.collection_jsons.delete_one({"_id": json_path})
+			return False
+
+		# check if file hash is the same
+		file_hash = hashlib.sha256()
+		with open(json_path_with_base_dir, "rb") as f:
+			for byte_block in iter(lambda: f.read(4096), b""):
+				file_hash.update(byte_block)
+		hex_hash = file_hash.hexdigest()
+
+		if json["sha256_hash"] != hex_hash:
+			# delete from database
+			self.collection_jsons.delete_one({"_id": json_path})
+			return False
+
+		return True
+
+	def mark_as_processed(self, json_path):
+		"""
+		Marks a file as processed by adding it to the jsons collection
+		"""
+
+		json_path_with_base_dir = self.file_finder.add_base_directory(json_path)
+
+		# get file size
+		file_size = os.path.getsize(json_path_with_base_dir)
+
+		# get file hash of file content
+		file_hash = hashlib.sha256()
+		with open(json_path_with_base_dir, "rb") as f:
+			for byte_block in iter(lambda: f.read(4096), b""):
+				file_hash.update(byte_block)
+
+		hex_hash = file_hash.hexdigest()
+
+		self.collection_jsons.insert_one({
+			"_id": json_path,
+			"size": file_size,
+			"sha256_hash": hex_hash
+		})
 
 	def process(self):
+		if self.check_if_processed(self.json_path):
+			print("already processed " + self.json_path)
+			return
+
+		print("processing " + self.json_path)
+
 		json_data = self.read_json_file(self.json_path)
 
 		if json_data == None:
@@ -624,6 +700,8 @@ class JsonProcessor:
 		for author in authors:
 			self.insert_author(author)
 
+		self.mark_as_processed(self.json_path)
+
 
 
 
@@ -631,7 +709,8 @@ def main():
 	print("main_mongo loaded")
 
 	database = MongoDatabase()
-	database.clear_database()
+	# DEBUG clear database
+	# database.clear_database_except_assets()
 
 	file_finder = FileFinder("../../exports/")
 
@@ -639,13 +718,12 @@ def main():
 	print("found " + str(len(jsons)) + " json channel exports")
 
 	# DEBUG get only first n files
-	jsons = jsons[:2450]
+	# jsons = jsons[:2450]
 
 	asset_processor = AssetProcessor(file_finder, database)
 	asset_processor.set_fast_mode(True)  # don't process slow actions
 
 	for json_path in jsons:
-		print("processing " + json_path)
 		p = JsonProcessor(database, file_finder, json_path, asset_processor)
 		p.process()
 
