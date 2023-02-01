@@ -44,6 +44,11 @@
 			channel.threads.push(thread)
 		})
 
+		// sort threads by _id
+		channels.forEach(channel => {
+			channel.threads.sort((a, b) => a._id.localeCompare(b._id))
+		})
+
 
 		// categorise channels by category
 		let channelsByCategoryId: Record<string, ChannelTree[]> = {}
