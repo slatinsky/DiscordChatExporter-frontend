@@ -1,13 +1,12 @@
 <script>
-	import IconThread from '../../../components/icons/IconThread.svelte';
-	import IconThreadMiddle from '../../../components/icons/IconThreadMiddle.svelte';
+	import IconThread from 'src/components/icons/IconThread.svelte';
+	import IconThreadMiddle from 'src/components/icons/IconThreadMiddle.svelte';
 
 	export let name;
 	export let id;
 	export let guildId;
 	export let selectedChannelId;
 	export let isLast;
-	export let onRightClick
 </script>
 
 <div class="thread" title={name}>

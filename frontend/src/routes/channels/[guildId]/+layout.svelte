@@ -6,13 +6,11 @@
 	import SearchResults from '../../../components/search/SearchResults.svelte';
 	import { searchShown, searchResultsMessageIds } from '../../../components/search/searchStores';
 	import { copyTextToClipboard } from '../../../js/helpers';
-	import MenuCategory from './MenuCategory.svelte';
 
 	import type { PageServerData } from './$types';
 	export let data: PageServerData;
 
-	import MenuChannel from './MenuChannel.svelte';
-	import ChannelsMenu from './ChannelsMenu.svelte';
+	import ChannelsMenu from '../../../components/channels/MenuCategories.svelte';
 
 	let currentGuildId = data.guildId;
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time

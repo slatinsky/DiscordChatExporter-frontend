@@ -1,35 +1,34 @@
-<script>
+<script lang="ts">
 	import MenuChannel from './MenuChannel.svelte';
-	import IconDropdown from '../../../components/icons/IconDropdown.svelte';
+	import IconDropdown from '../icons/IconDropdown.svelte';
 	import MenuThread from './MenuThread.svelte';
 
-	export let category;
-	export let guildId;
-	export let selectedChannelId;
-	export let onRightClick
+	export let channels: any;
+	export let guildId: string;
+	export let selectedChannelId: string | null
+	// export let onRightClick
 
 	let isOpen = true;
 </script>
 
 <div class="category" on:click={() => (isOpen = !isOpen)}>
 	<div class="icon-dropdown {isOpen? '' : 'rotate'}"><IconDropdown size={16}/></div>
-	{category.name}
+	{channels[0].category}
 </div>
 {#if isOpen}
-	{#each category.channelIds as channel}
+	{#each channels as channel}
 		<div class="channel">
 			<MenuChannel
 				name={channel.name}
-				id={channel.id}
+				id={channel._id}
 				{guildId}
-				isSelected={selectedChannelId == channel.id}
+				isSelected={selectedChannelId == channel._id}
 				threadCount={channel?.threads?.length ?? 0}
-				{onRightClick}
 			/>
-			{#if [channel.id, ...(channel.threads ? channel.threads.map(thread => thread.id) : [])].includes(selectedChannelId)}
+			{#if channel._id == "0" || [channel._id, ...(channel.threads ? channel.threads.map(thread => thread._id) : [])].includes(selectedChannelId)}
 				{#if channel.threads}
 					{#each channel.threads as thread, i}
-						<MenuThread name={thread.name} id={thread.id} {guildId} {selectedChannelId} isLast={i+1 === channel.threads.length} {onRightClick} />
+						<MenuThread name={thread.name} id={thread._id} {guildId} {selectedChannelId} isLast={i+1 === channel.threads.length}/>
 					{/each}
 				{/if}
 			{/if}
@@ -59,8 +58,4 @@
 	.icon-dropdown.rotate {
 		transform: rotate(-90deg);
 	}
-
-
-
-
 </style>

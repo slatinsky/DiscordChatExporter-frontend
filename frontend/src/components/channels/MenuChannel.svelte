@@ -1,13 +1,11 @@
 <script>
-	import IconChannel from '../../../components/icons/IconChannel.svelte';
-	import IconChannelWithThreads from '../../../components/icons/IconChannelWithThreads.svelte';
+	import IconChannel from 'src/components/icons/IconChannel.svelte';
+	import IconChannelWithThreads from 'src/components/icons/IconChannelWithThreads.svelte';
 	export let guildId;
 	export let id;
 	export let name;
 	export let isSelected = false;
 	export let threadCount = 0;
-	export let onRightClick
-
 </script>
 
 <a

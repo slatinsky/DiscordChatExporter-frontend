@@ -23,7 +23,7 @@ export interface Asset {
 
 export interface Channel {
 	_id: string;
-	type: "GuildTextChat" | "GuildVoiceChat" | "GuildCategory";
+	type: "GuildTextChat" | "DirectTextChat" | "GuildVoiceChat" | "DirectGroupTextChat" | "GuildCategory" | "GuildNews" | "GuildNewsThread" | "GuildPublicThread" | "GuildPrivateThread" | "GuildStageVoice" | "GuildDirectory" | "GuildForum";
 	categoryId: string;
 	category: string;
 	name: string;
