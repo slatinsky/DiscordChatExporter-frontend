@@ -8,12 +8,45 @@
 	export let selectedChannelId: string | null
 	// export let onRightClick
 
-	let isOpen = true;
+	let categoryName = channels[0].category;
+	let categoryId = channels[0].categoryId;
+
+	function localStorageIsOpen(categoryId: string) {
+		// read json from local storage
+		let json = localStorage.getItem('closedCategoryIds') ?? '[]';
+		let closedCategoryIds = JSON.parse(json);
+
+		// return true if category is not closed
+		return !closedCategoryIds.includes(categoryId);
+	}
+
+	function saveToLocalStorage(isOpen: boolean, categoryId: string) {
+		// read json from local storage
+		let json = localStorage.getItem('closedCategoryIds') ?? '[]';
+		let closedCategoryIds = JSON.parse(json);
+
+		// update json
+		if (isOpen) {
+			closedCategoryIds = closedCategoryIds.filter((id: string) => id != categoryId);
+		} else {
+			if (!closedCategoryIds.includes(categoryId)) {
+				closedCategoryIds.push(categoryId);
+			}
+		}
+
+		// write json to local storage
+		json = JSON.stringify(closedCategoryIds);
+		localStorage.setItem('closedCategoryIds', json);
+	}
+
+	let isOpen = localStorageIsOpen(categoryId);
+
+	$: saveToLocalStorage(isOpen, categoryId);
 </script>
 
 <div class="category" on:click={() => (isOpen = !isOpen)}>
 	<div class="icon-dropdown {isOpen? '' : 'rotate'}"><IconDropdown size={16}/></div>
-	{channels[0].category}
+	{categoryName}
 </div>
 {#if isOpen}
 	{#each channels as channel}
