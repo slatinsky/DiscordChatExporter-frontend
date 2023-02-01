@@ -39,7 +39,7 @@
 	// imports
 	import MessageLoader from "src/components/messages/MessageLoader.svelte";
 	import { onDestroy, onMount } from "svelte";
-	import throttle from 'lodash';
+	import {throttle, debounce} from 'lodash-es';
 
 
 	// props
@@ -129,37 +129,69 @@
 		console.log("refreshed center item", oldIndex, "-->", newIndex);
 	}
 
+	function loadNItemsDown(n: number): void {
+		let newIndexesToRender = [...indexesToRender]
+		for (let i = 0; i < n; i++) {
+			const lastItemIndex = newIndexesToRender[newIndexesToRender.length - 1]
+			if (lastItemIndex === itemCount - 1) {
+				break
+			}
+			newIndexesToRender = [...newIndexesToRender, lastItemIndex + 1]
+		}
+
+		if (newIndexesToRender.length === indexesToRender.length) {
+			return  // no change
+		}
+
+		console.log("loaded", newIndexesToRender.length - indexesToRender.length, "items down");
+
+		while (true) {
+			if (newIndexesToRender.length > maxItemsLoaded) {
+				newIndexesToRender.shift()  // remove first item
+				console.log("unloaded one item down");
+			}
+			else {
+				break
+			}
+		}
+		indexesToRender = newIndexesToRender
+		refreshCenterItem()
+	}
+
+	function loadNItemsUp(n: number): void {
+		let newIndexesToRender = [...indexesToRender]
+		for (let i = 0; i < n; i++) {
+			const firstItemIndex = newIndexesToRender[0]
+			if (firstItemIndex === 0) {
+				break
+			}
+			newIndexesToRender = [firstItemIndex - 1, ...newIndexesToRender]
+		}
+
+		if (newIndexesToRender.length === indexesToRender.length) {
+			return  // no change
+		}
+
+		console.log("loaded", newIndexesToRender.length - indexesToRender.length, "items up");
+
+		while (true) {
+			if (newIndexesToRender.length > maxItemsLoaded) {
+				newIndexesToRender.pop()  // remove last item
+				console.log("unloaded one item up");
+			}
+			else {
+				break
+			}
+		}
+		indexesToRender = newIndexesToRender
+		refreshCenterItem()
+	}
+
 	function loadItemDown(): void {
-		const lastItemIndex = indexesToRender[indexesToRender.length - 1]
-		if (lastItemIndex === itemCount - 1) {
-			return
-		}
-
-		let newIndexesToRender = [...indexesToRender, lastItemIndex + 1]
-
-		if (newIndexesToRender.length > maxItemsLoaded) {
-			refreshCenterItem()
-			newIndexesToRender.shift()  // remove first item
-			console.log("unloaded one item down");
-		}
-
-		indexesToRender = newIndexesToRender  // apply
+		loadNItemsDown(5)
 	}
 	function loadItemUp(): void {
-		const firstItemIndex = indexesToRender[0]
-		if (firstItemIndex === 0) {
-			return
-		}
-
-		let newIndexesToRender = [firstItemIndex - 1, ...indexesToRender]
-
-		if (newIndexesToRender.length > maxItemsLoaded) {
-			refreshCenterItem()
-			newIndexesToRender.pop()  // remove last item
-			console.log("unloaded one item up");
-		}
-
-		indexesToRender = newIndexesToRender  // apply
+		loadNItemsUp(5)
 	}
 
 	function fixTopScrollOutOfBounds(offsetToFix: number) {
@@ -176,12 +208,6 @@
 			middle: domWindow.scrollTop + domWindow.clientHeight / 2,
 			bottom: domWindow.scrollTop + domWindow.clientHeight
 		}
-	}
-
-
-	interface ItemDom {
-		index: number;
-		element: HTMLElement;
 	}
 
 
@@ -254,11 +280,13 @@
 
 			if (newHeight === 0) {
 				console.warn("heightsChanged - newHeight is 0, probably the component is not mounted yet");
+				startOver(centerItemIndex)
 				return
 			}
 
 			if (isNaN(newHeight)) {
 				console.warn("heightsChanged - newHeight is NaN, probably the component is not mounted yet");
+				startOver(centerItemIndex)
 				return
 			}
 
@@ -292,10 +320,16 @@
 			for (let i = centerItemIndex; i <= renderedIndexesMax; i++) {  // we need to loop everything from centerItemIndex to renderedIndexesMax, because we need to calculate the offset
 				const index = i
 
-				const itemHeight = heightsCache[index]
+				const itemHeight = heights[index] ?? itemEstimatedHeight
 
 				if (downIndexToUpdate <= index) {  // actually update only items below changed index)
-					domItems[index].style.top = offset + "px"
+					try {
+						domItems[index].style.top = offset + "px"
+					}
+					catch (e) {
+						console.warn("heightsChanged - changing height failed, component was probably unmounted");
+						return
+					}
 				}
 				offset += itemHeight
 
@@ -325,12 +359,18 @@
 			// update all indexes above upIndexToUpdate
 			for (let i = centerItemIndex; i >= renderedIndexesMin; i--) {
 				const index = i
-				const itemHeight = heightsCache[index]
+				const itemHeight = heights[index] ?? itemEstimatedHeight
 
 				offset -= itemHeight
 
 				if (upIndexToUpdate >= index) {  // actually update only items above changed index)
-					domItems[index].style.top = offset + "px"
+					try {
+						domItems[index].style.top = offset + "px"
+					}
+					catch (e) {
+						console.warn("heightsChanged - changing height failed, component was probably unmounted");
+						return
+					}
 				}
 
 				if (i === 0) {  // run for the first rendered item only
@@ -347,6 +387,15 @@
 				}
 			}
 		}
+	}
+
+	function startOver(newCenterItemIndex: number) {
+		// try to recover from error
+		centerItemIndex = newCenterItemIndex
+		centerItemTopOffset = newCenterItemIndex * itemEstimatedHeight
+		heightsCache = {}
+		clearIndexRender()
+		addIndexToRender(centerItemIndex)
 	}
 
 	async function scrollListener() {
@@ -388,11 +437,7 @@
 				// it may take a while to the new item to render
 				// ignore all subsequent attemts to retry rendering
 				if (indexesToRender.indexOf(newCenterItemIndex) === -1) {
-					centerItemTopOffset = newCenterItemTopOffset
-					centerItemIndex = newCenterItemIndex
-					heightsCache = {}
-					clearIndexRender()
-					addIndexToRender(centerItemIndex)
+					startOver(newCenterItemIndex)
 					console.warn("scrolled too far, re-rendering everything - new center index =", centerItemIndex, centerItemTopOffset);
 				}
 			}
@@ -400,7 +445,7 @@
 
 		// if the center item is (relatively) near, load more items to the ScreenPosition
 		// this is triggered after we scroll DOWN
-		if (lastDomTopOffset < ScreenPositions.bottom + 1 * windowHeight) {
+		if (lastDomTopOffset < ScreenPositions.bottom + .5 * windowHeight) {
 			loadItemDown()
 
 			setTimeout(() => {  // wait for timeout at the bottom
@@ -409,7 +454,7 @@
 		}
 
 		// same as above, but for scroll UP
-		if (firstDomBottomOffset > ScreenPositions.top - 1 * windowHeight) {
+		if (firstDomBottomOffset > ScreenPositions.top - .5 * windowHeight) {
 			loadItemUp()
 
 			setTimeout(() => {  // wait for timeout at the top
