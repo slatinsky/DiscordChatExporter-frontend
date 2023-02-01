@@ -3,7 +3,6 @@
 <script lang="ts">
 	import MemoryUsage from '../components/standalone/MemoryUsage.svelte';
 	import GuildsMenu from './GuildsMenu.svelte';
-	import ContainerCenter from 'src/components/containers/ContainerCenter.svelte';
 
 	import { theme, hideSpoilers, font } from './settingsStore';
 	import './styles.css';
@@ -28,7 +27,7 @@
 
 
 <div class="app">
-	<GuildsMenu guilds={data.guilds}/>
+	<GuildsMenu guilds={data.guilds} selectedGuildId={data.selectedGuildId}/>
 	<div class="right">
 		<!-- page content on the right -->
 		<main>

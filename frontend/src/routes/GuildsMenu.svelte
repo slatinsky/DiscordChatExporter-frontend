@@ -4,7 +4,7 @@
 	import { checkUrl } from "src/js/helpers";
 	import type { Guild } from "../js/interfaces";
 	export let guilds: Guild[] = [];
-	let selectedGuildId: string | null = null;
+	export let selectedGuildId: string | null = null;
 </script>
 
 <div class="guilds">
