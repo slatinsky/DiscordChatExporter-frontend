@@ -1,6 +1,6 @@
 <script lang="ts">
 	import MesssageSpoilerHandler from '../messages/MesssageSpoilerHandler.svelte';
-	import Scroller2 from '../containers/Scroller2.svelte';
+	import Scroller from '../containers/Scroller3.svelte';
 	import { searchResultsMessageIds, searchShown } from './searchStores';
 	import MessageLoader from '../messages/MessageLoader.svelte';
 	let searchResults
@@ -17,14 +17,14 @@
 	{#if searchResults}
 	<MesssageSpoilerHandler>
 		{#key $searchResultsMessageIds}
-		<Scroller2
+		<Scroller
 			itemCount={$searchResultsMessageIds.length}
 			negativeHeight={110}
 			>
 			<div slot="item" let:index>
 				<MessageLoader messageId={$searchResultsMessageIds[index]} previousMessageId={$searchResultsMessageIds[index - 1]} selectedGuildId={guildId}/>
 			</div>
-		</Scroller2>
+		</Scroller>
 		{/key}
 	</MesssageSpoilerHandler>
 	{/if}
