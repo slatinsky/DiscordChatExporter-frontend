@@ -386,7 +386,7 @@ class JsonProcessor:
 		channel["guildId"] = guild_id
 		return channel
 
-	def process_messages(self, messages, guild_id, channel_id):
+	def process_messages(self, messages, guild_id, channel_id, category_id):
 		"""
 		rename id to mongo _id
 		pad ids to 24 digits
@@ -433,6 +433,7 @@ class JsonProcessor:
 			# reference to guild and channel
 			message["guildId"] = guild_id
 			message["channelId"] = channel_id
+			message["categoryId"] = category_id
 
 			# because content may be edited, we need to change content field to an array
 			latest_timestamp = message["timestampEdited"] if message["timestampEdited"] != None else message["timestamp"]
@@ -495,6 +496,7 @@ class JsonProcessor:
 			if "reactions" in message:
 				for reaction in message["reactions"]:
 					if "emoji" in reaction:
+						reaction["emoji"]["_id"] = pad_id(reaction["emoji"].pop("id"))
 						reaction["emoji"]["image"] = self.asset_processor.process(reaction["emoji"].pop("imageUrl"))
 
 			new_attachments = []
@@ -689,7 +691,7 @@ class JsonProcessor:
 
 		guild = self.process_guild(json_data["guild"])
 		channel = self.process_channel(json_data["channel"], guild["_id"])
-		messages = self.process_messages(json_data["messages"], guild["_id"], channel["_id"])
+		messages = self.process_messages(json_data["messages"], guild["_id"], channel["_id"], channel["categoryId"])
 		authors = self.process_authors(json_data["messages"])
 
 		self.insert_guild(guild)
@@ -710,7 +712,7 @@ def main():
 
 	database = MongoDatabase()
 	# DEBUG clear database
-	# database.clear_database_except_assets()
+	database.clear_database_except_assets()
 
 	file_finder = FileFinder("../../exports/")
 
@@ -718,7 +720,7 @@ def main():
 	print("found " + str(len(jsons)) + " json channel exports")
 
 	# DEBUG get only first n files
-	# jsons = jsons[:2450]
+	jsons = jsons[:400]
 
 	asset_processor = AssetProcessor(file_finder, database)
 	asset_processor.set_fast_mode(True)  # don't process slow actions

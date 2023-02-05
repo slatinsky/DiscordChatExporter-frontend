@@ -1,3 +1,4 @@
+from pprint import pprint
 import pymongo
 from fastapi import FastAPI, Query
 
@@ -7,6 +8,7 @@ db = client["dcef"]
 collection_messages = db["messages"]
 collection_channels = db["channels"]
 collection_guilds = db["guilds"]
+collection_authors = db["authors"]
 
 app = FastAPI(
 	title="DCEF backend api",
@@ -14,6 +16,12 @@ app = FastAPI(
 	version="0.1.0",
 	root_path="/api"
 )
+
+
+def pad_id(id):
+	if id == None:
+		return None
+	return str(id).zfill(24)
 
 
 @app.get("/")
@@ -32,7 +40,7 @@ async def api_status():
 
 
 @app.get("/guilds")
-async def get_guilds(guild_id:str = None):
+async def get_guilds(guild_id: str = None):
 	"""
 	Returns a list of guilds
 	or a single guild if a guild_id query parameter is provided.
@@ -46,8 +54,9 @@ async def get_guilds(guild_id:str = None):
 	cursor = collection_guilds.find({})
 	return list(cursor)
 
+
 @app.get("/channels")
-async def get_channels(guild_id:str = None, channel_id:str = None):
+async def get_channels(guild_id: str = None, channel_id: str = None):
 	"""
 	Returns a list of all channels.
 	That includes channels, threads and forum posts.
@@ -65,12 +74,12 @@ async def get_channels(guild_id:str = None, channel_id:str = None):
 			return {"message": "Not found"}
 		return channel
 
-
 	cursor = collection_channels.find({})
 	return list(cursor)
 
+
 @app.get("/message-ids")
-async def get_message_ids(channel_id:str = None):
+async def get_message_ids(channel_id: str = None):
 	"""
 	Returns a list of message ids.
 	Optionally, a channel_id query parameter can be provided to filter by channel.
@@ -83,8 +92,9 @@ async def get_message_ids(channel_id:str = None):
 	new_ids = [str(id["_id"]) for id in ids]
 	return new_ids
 
+
 @app.get("/message")
-async def get_message_content(message_id:str):
+async def get_message_content(message_id: str):
 	"""
 	Returns the content of a message by its id.
 	"""
@@ -93,8 +103,9 @@ async def get_message_content(message_id:str):
 		return {"message": "Not found"}
 	return message
 
+
 @app.post("/messages")
-async def get_multiple_message_content(message_ids:list):
+async def get_multiple_message_content(message_ids: list):
 	"""
 	Returns the content of multiple messages by their ids.
 	"""
@@ -102,25 +113,222 @@ async def get_multiple_message_content(message_ids:list):
 	return list(messages)
 
 
+def extend_channels(channels: list):
+	"""
+	Extend a list of channels with thread ids and forum post ids.
+
+	Can be also used to extend a list of categories with channel ids.
+	In this case, we will not clean category ids from the list, but it causes no problems except for a little bit of performance loss.
+	"""
+	if len(channels) == 0:
+		return channels
+
+	channels = channels.copy()
+	new_channels_cursor = collection_channels.find(
+	    {"categoryId": {"$in": channels}})
+	channels.extend([channel["_id"] for channel in new_channels_cursor])
+	channels = list(set(channels))  # remove duplicates
+	return channels
+
+def extend_users(user_ids: list, usernames: list):
+	"""
+	Find new user ids by user names.
+	"""
+	if len(usernames) == 0:
+		return usernames
+
+	user_ids = user_ids.copy()
+	# partial match
+
+	or_ = []
+	for username in usernames:
+		or_.append({"name": {"$regex": username, "$options": "i"}})
+
+	query = {"$or": or_}
+
+	new_user_ids_cursor = collection_authors.find(query, {"_id": 1})
+	new_user_ids = [user["_id"] for user in new_user_ids_cursor]
+	user_ids.extend(new_user_ids)
+	user_ids = list(set(user_ids))  # remove duplicates
+	return user_ids
+
+
+
 @app.get("/search")
-async def search_messages(prompt:str = None, guild_id:str = None, only_ids:bool = True, order_by: str = Query("newest", enum=["newest", "oldest"])):
+async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bool = True, order_by: str = Query("newest", enum=["newest", "oldest"])):
 	"""
 	Searches for messages that contain the prompt.
 	"""
-	# if no prompt, return all messages
+
+	# todo: parse prompt
+
+	# default empty values - implemented
+	message_contains = []         # words that must be in the message content (and)
+	message_ids = []              # message ids (strings) (or)
+	from_user_ids = []            # user ids (strings) (or)
+	from_users = []               # user names (or)
+	mentions_user_ids = []        # user ids (strings) (or)
+	mentions_users = []           # user names (or)
+	reaction_ids = []             # emoji ids (strings) (or)
+	extensions = []               # file extensions like "pdf", "java" (or)
+	filenames = []                # file names (or)
+	in_channel_ids = []           # channel ids (strings) (or)
+	in_category_ids = []          # category ids (strings) (or)
+	is_pinned = None              # boolean (None means both)
+	attachment_is_audio = None    # boolean (None means both) (or in group attachment_is)
+	attachment_is_image = None    # boolean (None means both) (or in group attachment_is)
+	attachment_is_video = None    # boolean (None means both) (or in group attachment_is)
+	attachment_is_other = None    # boolean (None means both) (or in group attachment_is)
+	containing_links = None       # boolean (None means both)
+	is_edited = None              # boolean (None means both)
+	limit = 1000                  # max number of messages to return (int)
+
+
+	# clean up
+	message_contains = [word.lower() for word in message_contains]
+	message_ids = [pad_id(id) for id in message_ids]
+	from_user_ids = [pad_id(id) for id in from_user_ids]
+	from_users = [user.lower() for user in from_users]
+	from_user_ids = extend_users(from_user_ids, from_users)
+	mentions_user_ids = [pad_id(id) for id in mentions_user_ids]
+	mentions_users = [user.lower() for user in mentions_users]
+	mentions_user_ids = extend_users(mentions_user_ids, mentions_users)
+	reaction_ids = [pad_id(id) for id in reaction_ids]
+	extensions = [ext.lower() for ext in extensions]
+	in_channel_ids = [pad_id(id) for id in in_channel_ids]
+	in_channel_ids = extend_channels(in_channel_ids)      # extend channels with threads and forum posts
+	in_category_ids = [pad_id(id) for id in in_category_ids]
+	in_category_ids = extend_channels(in_category_ids)  # extend categories with channels
+	in_category_ids = extend_channels(in_category_ids)  # extend channels with threads and forum posts
+
+
+
+	# query builder
 	query = {}
 	limited_fields = {}
 
-	if prompt:
-		query["content.content"] = {"$regex": prompt}
+	query["$and"] = []
+
+	if len(message_ids) > 0:
+		query["_id"] = {"$in": message_ids}
+
+	if len(from_user_ids) > 0:
+		query["author._id"] = {"$in": from_user_ids}
+
+	if len(mentions_user_ids) > 0:
+		query["mentions._id"] = {"$in": mentions_user_ids}
+
+	if len(reaction_ids) > 0:
+		query["reactions.emoji._id"] = {"$in": reaction_ids}
+
+	if len(extensions) > 0:
+		# extension can be in attachments or embeds
+		query["$and"].append(
+			{
+				"$or":
+				[
+					{"attachments.extension": {"$in": extensions}},
+					{"embeds.thumbnail.extension": {"$in": extensions}}
+				]
+			}
+		)
+
+	if len(filenames) > 0:
+		# filename can be in attachments or embeds
+		# case insensitive search
+		# match partial filenames
+		or_ = []
+		for filename in filenames:
+			or_.append({"attachments.filenameWithoutHash": {"$regex": filename, "$options": "i"}})
+			or_.append({"embeds.thumbnail.filenameWithoutHash": {"$regex": filename, "$options": "i"}})
+
+		query["$and"].append({"$or": or_})
+
+
+	if len(in_channel_ids) > 0:
+		query["channelId"] = {"$in": in_channel_ids}
+
+	if len(in_category_ids) > 0:
+		query["channelId"] = {"$in": in_category_ids}
+
+	if is_pinned is not None:
+		query["isPinned"] = is_pinned
+
+	if attachment_is_audio is not None or attachment_is_image is not None or attachment_is_video is not None or attachment_is_other is not None:
+		or_ = []
+		if attachment_is_audio is not None:
+			or_.append({
+				"$or": [
+					{"attachments.type": "audio"},
+					{"embeds.thumbnail.type": "audio"}
+				]
+			})
+
+		if attachment_is_image is not None:
+			or_.append({
+				"$or": [
+					{"attachments.type": "image"},
+					{"embeds.thumbnail.type": "image"}
+				]
+			})
+
+		if attachment_is_video is not None:
+			or_.append({
+				"$or": [
+					{"attachments.type": "video"},
+					{"embeds.thumbnail.type": "video"}
+				]
+			})
+
+		if attachment_is_other is not None:
+			or_.append({
+				"$or": [
+					{"attachments.type": {"$nin": ["audio", "image", "video"]}},
+					{"embeds.thumbnail.type": {"$nin": ["audio", "image", "video"]}}
+				]
+			})
+
+		query["$and"].append({"$or": or_})
+
+	if containing_links is not None:
+		# todo: check if we can really use ^ for faster search without removing valid results
+		if containing_links:
+			query["content.content"] = {"$regex": "^http|^www"}
+		else:
+			query["content.content"] = {"$not": {"$regex": "^http|^www"}}
+
+	if is_edited is not None:
+		# if message is edited, timestampEdited is not null
+		if is_edited:
+			query["timestampEdited"] = {"$ne": None}
+		else:
+			query["timestampEdited"] = None
+
+
+	if len(message_contains) > 0:
+		and_ = []
+		for message_should_contain in message_contains:
+			and_.append({"content.content": {"$regex": message_should_contain, "$options": "i"}})
+
+		query["$and"].append({"$and": and_})
+
+
 
 	if guild_id:
-		query["guildId"] = guild_id
+		query["guildId"]=guild_id
 
 	if only_ids:
-		limited_fields["_id"] = 1
+		limited_fields["_id"]=1
 
-	cursor = collection_messages.find(query, limited_fields)
+	if query["$and"] == []:
+		del query["$and"]
+
+	print(query)
+
+	cursor=collection_messages.find(query, limited_fields)
+
+	if limit > 0:
+		cursor.limit(limit)
 
 	if order_by == "newest":
 		cursor.sort([("timestamp", pymongo.DESCENDING)])
@@ -128,6 +336,7 @@ async def search_messages(prompt:str = None, guild_id:str = None, only_ids:bool 
 		cursor.sort([("timestamp", pymongo.ASCENDING)])
 
 	if only_ids:
-		ids = [str(id["_id"]) for id in cursor]
+		ids=[str(id["_id"]) for id in cursor]
 		return ids
+
 	return list(cursor)
