@@ -153,6 +153,124 @@ def extend_users(user_ids: list, usernames: list):
 	return user_ids
 
 
+def parse_prompt(prompt: str):
+	"""
+	Parses a prompt into categories.
+	"""
+	search = {
+		"message_contains": [],          # words that must be in the message content (and)
+		"message_ids": [],               # message ids (strings) (or)
+		"from_user_ids": [],             # user ids (strings) (or)
+		"from_users": [],                # user names (or)
+		"mentions_user_ids": [],         # user ids (strings) (or)
+		"mentions_users": [],            # user names (or)
+		"reaction_ids": [],              # emoji ids (strings) (or)
+		"extensions": [],                # file extensions like "pdf", "java" (or)
+		"filenames": [],                 # file names (or)
+		"in_channel_ids": [],            # channel ids (strings) (or)
+		"in_category_ids": [],           # category ids (strings) (or)
+		"is_pinned": None,               # boolean (None means both)
+		"attachment_is_audio": None,     # boolean (None means both) (or in group attachment_is)
+		"attachment_is_image": None,     # boolean (None means both) (or in group attachment_is)
+		"attachment_is_video": None,     # boolean (None means both) (or in group attachment_is)
+		"attachment_is_other": None,     # boolean (None means both) (or in group attachment_is)
+		"containing_links": None,        # boolean (None means both)
+		"is_edited": None,               # boolean (None means both)
+		"limit": 100000                  # max number of messages to return (int)
+	}
+
+	# loop throught all characters
+	inside_quotes = False
+	word = ""
+	valid_search_keys = ["message_id", "user_id", "user", "mentions_user_id", "mentions_user", "reaction_id", "extension", "filename", "in_channel_id", "in_category_id",
+	"is_pinned", "has_audio", "has_image", "has_video", "has_other", "has_link", "is_edited", "limit"]
+	current_key = None
+
+	for i, char in enumerate(prompt.strip() + " "):
+		if char == '"':
+			inside_quotes = not inside_quotes
+			continue
+
+		if char == ":" and not inside_quotes and word in valid_search_keys:
+			current_key = word
+			word = ""
+			continue
+
+		if char == ' ' and not inside_quotes:
+			if (current_key == "message_id"):
+				search["message_ids"].append(word)
+			elif (current_key == "user_id"):
+				search["from_user_ids"].append(word)
+			elif (current_key == "user"):
+				search["from_users"].append(word)
+			elif (current_key == "mentions_user_id"):
+				search["mentions_user_ids"].append(word)
+			elif (current_key == "mentions_user"):
+				search["mentions_users"].append(word)
+			elif (current_key == "reaction_id"):
+				search["reaction_ids"].append(word)
+			elif (current_key == "extension"):
+				search["extensions"].append(word)
+			elif (current_key == "filename"):
+				search["filenames"].append(word)
+			elif (current_key == "in_channel_id"):
+				search["in_channel_ids"].append(word)
+			elif (current_key == "in_category_id"):
+				search["in_category_ids"].append(word)
+			elif (current_key == "is_pinned"):
+				if word == "true":
+					search["is_pinned"] = True
+				elif word == "false":
+					search["is_pinned"] = False
+			elif (current_key == "has_audio"):
+				if word == "true":
+					search["attachment_is_audio"] = True
+				elif word == "false":
+					search["attachment_is_audio"] = False
+			elif (current_key == "has_image"):
+				if word == "true":
+					search["attachment_is_image"] = True
+				elif word == "false":
+					search["attachment_is_image"] = False
+			elif (current_key == "has_video"):
+				if word == "true":
+					search["attachment_is_video"] = True
+				elif word == "false":
+					search["attachment_is_video"] = False
+			elif (current_key == "has_other"):
+				if word == "true":
+					search["attachment_is_other"] = True
+				elif word == "false":
+					search["attachment_is_other"] = False
+			elif (current_key == "has_link"):
+				if word == "true":
+					search["containing_links"] = True
+				elif word == "false":
+					search["containing_links"] = False
+			elif (current_key == "is_edited"):
+				if word == "true":
+					search["is_edited"] = True
+				elif word == "false":
+					search["is_edited"] = False
+			elif (current_key == "limit"):
+				search["limit"] = int(word)
+			else:
+				search["message_contains"].append(word)
+
+			if current_key in valid_search_keys:
+				current_key = None
+
+			word = ""
+			continue
+
+		word += char
+
+	print(search)
+	return search
+
+
+
+
 
 @app.get("/search")
 async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bool = True, order_by: str = Query("newest", enum=["newest", "oldest"])):
@@ -161,28 +279,26 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 	"""
 
 	# todo: parse prompt
-
-	# default empty values - implemented
-	message_contains = []         # words that must be in the message content (and)
-	message_ids = []              # message ids (strings) (or)
-	from_user_ids = []            # user ids (strings) (or)
-	from_users = []               # user names (or)
-	mentions_user_ids = []        # user ids (strings) (or)
-	mentions_users = []           # user names (or)
-	reaction_ids = []             # emoji ids (strings) (or)
-	extensions = []               # file extensions like "pdf", "java" (or)
-	filenames = []                # file names (or)
-	in_channel_ids = []           # channel ids (strings) (or)
-	in_category_ids = []          # category ids (strings) (or)
-	is_pinned = None              # boolean (None means both)
-	attachment_is_audio = None    # boolean (None means both) (or in group attachment_is)
-	attachment_is_image = None    # boolean (None means both) (or in group attachment_is)
-	attachment_is_video = None    # boolean (None means both) (or in group attachment_is)
-	attachment_is_other = None    # boolean (None means both) (or in group attachment_is)
-	containing_links = None       # boolean (None means both)
-	is_edited = None              # boolean (None means both)
-	limit = 1000                  # max number of messages to return (int)
-
+	search = parse_prompt(prompt)
+	message_contains = search["message_contains"]
+	message_ids = search["message_ids"]
+	from_user_ids = search["from_user_ids"]
+	from_users = search["from_users"]
+	mentions_user_ids = search["mentions_user_ids"]
+	mentions_users = search["mentions_users"]
+	reaction_ids = search["reaction_ids"]
+	extensions = search["extensions"]
+	filenames = search["filenames"]
+	in_channel_ids = search["in_channel_ids"]
+	in_category_ids = search["in_category_ids"]
+	is_pinned = search["is_pinned"]
+	attachment_is_audio = search["attachment_is_audio"]
+	attachment_is_image = search["attachment_is_image"]
+	attachment_is_video = search["attachment_is_video"]
+	attachment_is_other = search["attachment_is_other"]
+	containing_links = search["containing_links"]
+	is_edited = search["is_edited"]
+	limit = search["limit"]
 
 	# clean up
 	message_contains = [word.lower() for word in message_contains]
