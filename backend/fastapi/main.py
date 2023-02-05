@@ -255,7 +255,8 @@ def parse_prompt(prompt: str):
 			elif (current_key == "limit"):
 				search["limit"] = int(word)
 			else:
-				search["message_contains"].append(word)
+				if word != "":
+					search["message_contains"].append(word)
 
 			if current_key in valid_search_keys:
 				current_key = None
