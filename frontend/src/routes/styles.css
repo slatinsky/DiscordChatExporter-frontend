@@ -913,3 +913,10 @@ img {
 ::-webkit-resizer {
 	background-color: #666;
 }
+
+
+.txt {
+	font-size: 32px;
+	padding-top: 20px;
+	padding-left: 20px;
+}

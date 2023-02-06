@@ -7,6 +7,7 @@
 	export let data: PageServerData;
 
 	import ChannelsMenu from '../../../components/channels/MenuCategories.svelte';
+	import Container from 'src/components/containers/Container.svelte';
 
 	let currentGuildId: string = data.guildId;
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time
@@ -22,25 +23,32 @@
 
 
 {#key currentGuildId}
-	<div id="guild-layout" class={$searchShown ? 'with-search' : ''}>
-		<div id="channels">
-			<div class="guild-name">{data.guild.name}</div>
-			<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} />
-		</div>
-		<div id="header">
-			{#key data.channelId}
-				<Header channelName={data.channel?.name} channelTopic={data.channel?.topic} guildId={data.guildId} />
-			{/key}
-		</div>
-		<div id="messages">
-			<slot />
-		</div>
-		{#if $searchShown}
-			<div id="search">
-				<SearchResults guildId={currentGuildId} />
+	{#if !data.guild}
+		<Container>
+			<div class="txt">Guild ID {currentGuildId} not found</div>
+		</Container>
+	{:else}
+		<div id="guild-layout" class={$searchShown ? 'with-search' : ''}>
+			<div id="channels">
+				<div class="guild-name">{data.guild.name}</div>
+				<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} />
 			</div>
-		{/if}
-	</div>
+			<div id="header">
+				{#key data.channelId}
+					<Header channelName={data.channel?.name} channelTopic={data.channel?.topic} guildId={data.guildId} />
+				{/key}
+			</div>
+			<div id="messages">
+				<slot />
+			</div>
+			{#if $searchShown}
+				<div id="search">
+					<SearchResults guildId={currentGuildId} />
+				</div>
+			{/if}
+		</div>
+	{/if}
+	
 {/key}
 
 <style>

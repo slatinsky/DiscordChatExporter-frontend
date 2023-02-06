@@ -40,7 +40,11 @@
 {#key data.channelId}
 	{#if data.messages.length === 0}
 		<Container>
-			<div class="txt">Channel ID {data.channelId} not found</div>
+			{#if data.channelId == 0}
+				<div class="txt">Select thread / forum post</div>
+			{:else}
+				<div class="txt">Channel ID {data.channelId} not found</div>
+			{/if}
 		</Container>
 	{:else}
 		<MesssageSpoilerHandler>
@@ -57,12 +61,3 @@
 		</MesssageSpoilerHandler>
 	{/if}
 {/key}
-
-
-<style>
-	.txt {
-		font-size: 32px;
-		padding-top: 20px;
-		padding-left: 20px;
-	}
-</style>
