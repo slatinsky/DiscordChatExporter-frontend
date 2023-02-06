@@ -12,7 +12,6 @@
 	// observed heights and widths of divs
 	let windowHeight: number | undefined
 	let windowWidth: number | undefined
-	let containerHeight: number | undefined
 	let itemHeights:  Record<number, number>  = {}
 	let itemOffsets:  Record<number, number>  = {}
 
@@ -28,7 +27,7 @@
 	let containerHeightEstimated = itemEstimatedHeight * itemCount
 
 	function scrollListener() {
-		console.log("scrollListener", centerItemIndex, centerItemOffset);
+		// console.log("scrollListener");
 		renderMoreItems()
 	}
 
@@ -94,6 +93,49 @@
 			offset += getItemHeight(index)
 			index++
 		}
+
+		// fix top items out of bounds
+		const lowestOffset = Math.min(...Object.values(itemOffsets))
+		if (lowestOffset < 0) {
+			// move all items up
+			for (const index in itemOffsets) {
+				itemOffsets[index] -= lowestOffset
+			}
+			console.warn("fix top items out of bounds by offset", lowestOffset);
+		}
+
+		// fix top items too far down
+		if (indexesToRender.includes(0)) {
+			const zeroOffset = itemOffsets[0] || 0
+			if (zeroOffset > 0) {
+				// move all items down
+				for (const index in itemOffsets) {
+					itemOffsets[index] -= zeroOffset
+				}
+				console.warn("fix top items too far down by offset", zeroOffset);
+			}
+		}
+
+		if (containerHeightEstimated === undefined) {
+			console.warn("containerHeightEstimated is undefined");
+			return
+		}
+
+		const highestIndex = Math.max(...indexesToRender)
+		const highestBottomOffset = itemOffsets[highestIndex] || itemEstimatedHeight * highestIndex + getItemHeight(highestIndex)
+		if (highestIndex === itemCount - 1) {
+			// resize container to exactly match the last item
+			console.warn("fix bottom items to match last item by offset", containerHeightEstimated - highestBottomOffset);
+			containerHeightEstimated = highestBottomOffset
+		}
+		else if (highestBottomOffset > containerHeightEstimated) {
+			let estimatedOffsetDiff = (itemCount - 1 - highestIndex) * itemEstimatedHeight
+			containerHeightEstimated = highestBottomOffset + estimatedOffsetDiff
+			console.warn("fix bottom items out of bounds by offset", estimatedOffsetDiff);
+		}
+
+
+
 	}
 
 	function findNewCenterItem() {
@@ -122,7 +164,7 @@
 
 		// update center item
 		if (closestItemIndex !== centerItemIndex) {
-			console.log("new center index", centerItemIndex, "=>", closestItemIndex);
+			// console.log("new center index", centerItemIndex, "=>", closestItemIndex);
 			centerItemIndex = closestItemIndex
 			centerItemOffset = closestItemOffset
 		}
@@ -139,7 +181,7 @@
 		itemHeights = {}
 		domItems = {}
 		itemOffsets[centerItemIndex] = centerItemOffset
-		
+
 		updateIndexesToRender([estimatedCenterItemIndex])
 	}
 
@@ -166,7 +208,7 @@
 
 
 		if (topItemOffset === undefined) {
-			console.warn("topItemOffset is undefined");
+			// console.warn("topItemOffset is undefined");
 			return
 		}
 
@@ -183,7 +225,7 @@
 		}
 
 		if (isNaN(bottomItemOffset)) {
-			console.warn("bottomItemOffset is NaN");
+			// console.warn("bottomItemOffset is NaN");
 			return
 		}
 
@@ -203,7 +245,7 @@
 			const indexToRemove = indexesToRender[0]
 			if (newIndex < itemCount && indexToRemove !== centerItemIndex) {
 				updateIndexesToRender(indexesToRender.slice(1))
-				console.log("unload top", newIndex);
+				// console.log("unload top", newIndex);
 			}
 		}
 		if (bottomItemOffset > scrollBottomPosition + unloadPadding) {
@@ -211,7 +253,7 @@
 			const indexToRemove = indexesToRender[indexesToRender.length - 1]
 			if (newIndex >= 0 && indexToRemove !== centerItemIndex) {
 				updateIndexesToRender(indexesToRender.slice(0, -1))
-				console.log("unload bottom", newIndex);
+				// console.log("unload bottom", newIndex);
 			}
 		}
 
