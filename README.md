@@ -14,25 +14,22 @@ This project aims to provide you with better experience than what you get by jus
 ## Features
 - View JSON exports in Discord like interface
 - Message deduplication - merge multiple JSON exports and view them as one
-- Optimized infinite scroll - channels are loaded almost instantly
-- Forums and threads support (jump to thread and back)
+- Lazy loaded virtual list - load only messages you need to see
+- Forums and threads support
 - Search with filters and autocomplete
 - Load assets locally or from Discord servers
 - Private messages or guild exports are supported
 - Discord Markdown rendering
 - Right click message and select "Open in discord" to view message in Discord
-- Windows, Linux and Mac support (including M1 Macs)
+- Windows and Linux support
 
 
 ### System requirements (per guild)
-- You will need ~1 GB of RAM to process 100k messages. So if your guild export contains 1 million messages, you will need ~10 GB of RAM.
-- The viewer can handle at least ~2-4 million messages (4 GB of ram) in the browser
-- Chromium based browsers are recommended (Chrome, Edge, Opera, Brave, Vivaldi, etc.)
+- You need 1.5+ GB of free RAM for the mongodb database to work correctly
+- The browser viewer has almost no requirements, but it's recommended to have at least 1 GB of free RAM
+- Chromium based browsers and Firefox are supported, but most of the testing was done on Chromium.
 
 Note: Discord servers are known internally as guilds
-
-Planned feature:
-- Refactor to client-server architecture is planned to handle larger exports than 4 million messages per guild. And with added bonus of being able to run the viewer on your own server and view your exports from anywhere. But it will take some time to implement.
 
 ## Quick start (Windows)
 Using prebuilt binaries is the easiest way to use this tool on Windows.
@@ -44,10 +41,13 @@ Using prebuilt binaries is the easiest way to use this tool on Windows.
 NOTE: command prompt window ("black rectangle") named "nginx" will open. It provides local web server for the viewer. After you are done with using the viewer, you can close it.
 
 ### Beta builds (Windows)
-If you want to try out the latest features, you can use [beta builds](https://github.com/slatinsky/DiscordChatExporter-frontend/actions/workflows/windows-build.yml). They are automatically built from the latest commit on `master` branch or from pull requests. They are quite stable, but no guarantees :)
+If you want to try out the latest features, you can use [beta builds](https://github.com/slatinsky/DiscordChatExporter-frontend/actions/workflows/windows-build.yml). They are automatically built from the latest commit on `master` branch or from pull requests.
 
-## Docker version (Linux+Mac)
-You need docker and git installed. Tested on non-snap version of docker on Ubuntu 22.04. @levithomason [tested it](https://github.com/slatinsky/DiscordChatExporter-frontend/issues/5) on M1 MacBook (Apple Silicon)
+## Docker version (Linux)
+
+This verion is the best way to host the viewer on a server for others to use.
+
+You need docker and git installed. Tested on non-snap version of docker on Ubuntu 22.04.
 1. Build image
 ```bash
 git clone https://github.com/slatinsky/DiscordChatExporter-frontend
@@ -76,7 +76,12 @@ To remove volume `dcef_cache` with temporary files, run `docker volume rm dcef_c
 </p>
 </details>
 
-## Upgrade guide
+## Docker version (Mac)
+
+Use the instructions for linux.
+
+I don't use Mac, so it relies on community support in case of issues.
+## Upgrade guide (Windows)
 Want to upgrade from previous version? Follow these steps:
 
 1. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
@@ -85,6 +90,12 @@ Want to upgrade from previous version? Follow these steps:
 4. Delete old release folder
 
 Info: since release 1.10.0, exports folder was changed from `/static/input/` to `/exports/`.
+
+
+## Upgrade guide (Docker)
+
+Stop the container and clear the cache volume by running `docker volume rm dcef_cache`. Then pull the latest version from git (`git pull`) and build the image again using linux instructions.
+
 
 <a name="supported-exports"></a>
 ## Which exports are supported?
@@ -290,27 +301,7 @@ You don't need to follow development steps if you don't intend to modify the cod
 <details><summary>Show development steps</summary>
 <p>
 
-Then make sure you use node 16.16.0 and have nodemon installed globally (used for python3 hot reloading)
-```bash
-nvm use 16.16.0
-npm install -g nodemon
-```
-
-Then install python3 dependencies
-```bash
-cd backend/preprocess
-py -m pip install imagesize
-cd ..
-```
-
-Now you just need to run the development helper script to start all needed processes
-```bash
-DEV.bat
-```
-
-If everything was done correctly, DiscordChatExporter-frontend will open in your browser with working hot reloading.
-
-(There is no dev version for Linux. You have to use docker version)
+TODO (the previous steps were outdated). Checkout `DEV.bat` file for now.
 
 </p>
 </details>
@@ -319,9 +310,10 @@ If everything was done correctly, DiscordChatExporter-frontend will open in your
 <details><summary>Show steps to build release binaries from source (Windows)</summary>
 <p>
 
+WARNING: Outdated. Checkout `BUILD_RELEASE.bat` file for now.
+
 ## Requirements
-- Node.js 16
-- Python 3.9+
+- Python 3.11+
 - pyinstaller (installled globally)
 ```
 py -m pip install pyinstaller
@@ -396,7 +388,7 @@ AMD Ryzen™ 7 5800H
 
 But binary release should work on any Windows 10 / Windows 11 x64 computer.
 
-Docker release should work on Linux x64 and Mac M1 (arm64) computers.
+Docker release should work on Linux x64 and (hopefully) Mac M1 (arm64) computers.
 
 </p>
 </details>
@@ -406,7 +398,7 @@ Docker release should work on Linux x64 and Mac M1 (arm64) computers.
 - Discord - for a great chat app
 - [brussell98/discord-markdown](https://github.com/brussell98/discord-markdown) - for discord markdown rendering
 
-And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pyinstaller, nginx.
+And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pyinstaller, nginx, mongodb
 
 ## License
 GNU GENERAL PUBLIC LICENSE
