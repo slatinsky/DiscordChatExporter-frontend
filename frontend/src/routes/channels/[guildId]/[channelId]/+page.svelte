@@ -8,13 +8,34 @@
 	import MesssageSpoilerHandler from "src/components/messages/MesssageSpoilerHandler.svelte";
 	import Container from "src/components/containers/Container.svelte";
 	import { channelScrollPosition } from "src/routes/settingsStore";
+
+	let startPosition = 0;
+
+	// hashchange event listener
+	function updateStartPosition() {
+		const hash = window.location.hash;
+		console.log("hashchange", hash);
+
+		// try to find message with given ID
+		const index = data.messages.findIndex(m => m._id === hash.slice(1));
+		if (index !== -1) {
+			startPosition = index;
+			console.log("hash message found at index", index);
+		}
+		else {
+			console.log("hash message not found");
+			startPosition = $channelScrollPosition === "bottom" ? data.messages.length - 1 : 0
+		}
+	}
+
+	$: data.messages, updateStartPosition()
 </script>
 
 <svelte:head>
     <title>{data.channel?.name ?? "Unknown channel"} | DiscordChatExporter frontend</title>
 </svelte:head>
 
-
+<svelte:window on:hashchange={()=>updateStartPosition()}/>
 
 {#key data.channelId}
 	{#if data.messages.length === 0}
@@ -23,14 +44,16 @@
 		</Container>
 	{:else}
 		<MesssageSpoilerHandler>
-			<Scroller
-				itemCount={data.messages.length}
-				startPosition={$channelScrollPosition === "bottom" ? data.messages.length - 1 : 0}
-				>
-				<div slot="item" let:index>
-					<MessageLoader messageId={data.messages[index]._id} previousMessageId={data.messages[index - 1]?._id} selectedGuildId={data.guildId} />
-				</div>
-			</Scroller>
+			<!-- {#key startPosition} -->
+				<Scroller
+					itemCount={data.messages.length}
+					startPosition={startPosition}
+					>
+					<div slot="item" let:index>
+						<MessageLoader messageId={data.messages[index]._id} previousMessageId={data.messages[index - 1]?._id} selectedGuildId={data.guildId} />
+					</div>
+				</Scroller>
+			<!-- {/key} -->
 		</MesssageSpoilerHandler>
 	{/if}
 {/key}

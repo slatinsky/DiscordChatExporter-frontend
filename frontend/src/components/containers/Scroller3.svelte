@@ -6,7 +6,7 @@
 	export let negativeHeight: number = 50   // negative height of the 100vh container
 	export let itemCount: number;            // items count to render
 
-	export let startPosition: number = 0     // index of the item to start rendering from. The value is ignored after the first render
+	export let startPosition: number = 0     // index of the item to start rendering from. Is reactive
 
 	let centerItemIndex: number = 0          // index of the item in the center of the window
 	let centerItemOffset: number = 0         // offset of the item in the center of the window
@@ -135,9 +135,6 @@
 			containerHeightEstimated = highestBottomOffset + estimatedOffsetDiff
 			console.warn("fix bottom items out of bounds by offset", estimatedOffsetDiff);
 		}
-
-
-
 	}
 
 	function findNewCenterItem() {
@@ -283,6 +280,21 @@
 		windowWidth = newWidth
 		windowHeight = newHeight
 	}
+
+	function startPositionChanged(newStartPosition: number) {
+		if (domWindow) {
+			domWindow.scrollTop = itemOffsets[newStartPosition] || startPosition * itemEstimatedHeight
+		}
+		else {  // not mounted yet
+			setTimeout(() => {
+			if (domWindow) {
+				domWindow.scrollTop = itemOffsets[newStartPosition] || startPosition * itemEstimatedHeight
+			}
+			}, 500)
+		}
+	}
+
+	$: startPositionChanged(startPosition)
 
 
 	onMount(() => {

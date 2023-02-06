@@ -10,19 +10,22 @@
 	import MessageMarkdown from './MessageMarkdown.svelte';
 	import MessageReactions from './MessageReactions.svelte';
 	import MessageStickers from './MessageStickers.svelte';
+	import { goto } from '$app/navigation';
 
 	export let message: Message;
 	export let previousMessage: Message | null = null;
 	export let selectedGuildId: string
 
 	let isSameAuthor = false;
-	if (previousMessage && previousMessage.author?._id === message.author._id) {
-		isSameAuthor = true;
-	}
+
 
 	let previousMessageFromDifferentChannel = true;
 	if (previousMessage && previousMessage.channelId === message.channelId) {
 		previousMessageFromDifferentChannel = false;
+	}
+
+	if (previousMessage && previousMessage.author?._id === message.author._id && !previousMessageFromDifferentChannel) {
+		isSameAuthor = true;
 	}
 
 	function full_name(author) {
@@ -187,7 +190,7 @@
 									data-user-id={message.author.id}>{nickname(message.author)}</span
 								>
 								<span class="chatlog__timestamp"
-									><a href="/channels/{selectedGuildId}/{message.channelId}#{message.id}"
+									><a href="/channels/{selectedGuildId}/{message.channelId}#{message._id}"
 										>{renderTimestamp(message.timestamp)}</a
 									>
 									</span
