@@ -7,6 +7,7 @@
 	import Scroller from "src/components/containers/Scroller3.svelte";
 	import MesssageSpoilerHandler from "src/components/messages/MesssageSpoilerHandler.svelte";
 	import Container from "src/components/containers/Container.svelte";
+	import { channelScrollPosition } from "src/routes/settingsStore";
 </script>
 
 <svelte:head>
@@ -24,6 +25,7 @@
 		<MesssageSpoilerHandler>
 			<Scroller
 				itemCount={data.messages.length}
+				startPosition={$channelScrollPosition === "bottom" ? data.messages.length - 1 : 0}
 				>
 				<div slot="item" let:index>
 					<MessageLoader messageId={data.messages[index]._id} previousMessageId={data.messages[index - 1]?._id} selectedGuildId={data.guildId} />

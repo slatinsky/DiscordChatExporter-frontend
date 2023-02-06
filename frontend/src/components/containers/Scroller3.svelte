@@ -6,6 +6,8 @@
 	export let negativeHeight: number = 50   // negative height of the 100vh container
 	export let itemCount: number;            // items count to render
 
+	export let startPosition: number = 0     // index of the item to start rendering from. The value is ignored after the first render
+
 	let centerItemIndex: number = 0          // index of the item in the center of the window
 	let centerItemOffset: number = 0         // offset of the item in the center of the window
 
@@ -290,6 +292,13 @@
 		}
 
 		setTimeout(() => {
+			if (domWindow) {
+				domWindow.scrollTop = startPosition * itemEstimatedHeight
+			}
+			else {
+				console.error("domWindow is undefined - scroll to startPosition");
+			}
+
 			console.log({windowHeight, windowWidth, containerHeightEstimated, itemHeights, domWindow, domContainer, domItems, indexesToRender});
 			if (domWindow) {
 				domWindow.addEventListener("scroll", scrollThrottledListener, { passive: true });
@@ -300,10 +309,6 @@
 		}, 0);
 
 		giveUp()
-
-		// updateIndexesToRender([0])
-
-		// refreshCenterItem()
 	})
 
 	onDestroy(() => {
@@ -335,7 +340,8 @@
 	width: 100%;
 }
 
-.center {
+/*DEBUG ONLY - highlight center item*/
+/* .center {
 	background-color: #1d6774 !important;
-}
+} */
 </style>
