@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {throttle, debounce} from 'lodash-es';
+	import { clamp } from 'src/js/helpers';
 	import {resizeObserver} from "src/js/resizeObserver";
 	import { onMount, onDestroy } from "svelte";
 	export let negativeHeight: number = 50   // negative height of the 100vh container
@@ -27,7 +28,7 @@
 	let containerHeightEstimated = itemEstimatedHeight * itemCount
 
 	function scrollListener() {
-		console.log("scrollListener");
+		console.log("scrollListener", centerItemIndex, centerItemOffset);
 		renderMoreItems()
 	}
 
@@ -127,6 +128,21 @@
 		}
 	}
 
+	function giveUp() {
+		// start rendering from the beginning
+		// happens at the start or when the user scrolled too far and it is not worth it to render all the items between
+		const scrollTopPosition = domWindow?.scrollTop || 0
+		const estimatedCenterItemIndex = Math.floor(scrollTopPosition / itemEstimatedHeight)
+		centerItemIndex = clamp(0, estimatedCenterItemIndex, itemCount - 1)
+		centerItemOffset = centerItemIndex * itemEstimatedHeight
+		itemOffsets = {}
+		itemHeights = {}
+		domItems = {}
+		itemOffsets[centerItemIndex] = centerItemOffset
+		
+		updateIndexesToRender([estimatedCenterItemIndex])
+	}
+
 	function renderMoreItems() {
 		if (windowHeight === undefined) {
 			console.error("windowHeight is undefined");
@@ -146,10 +162,17 @@
 		// top item offset
 		let topItemOffset = itemOffsets[firstItemIndex]
 		// bottom item offset
-		let bottomItemOffset = itemOffsets[lastItemIndex] + getItemHeight(lastItemIndex)
+		let bottomItemOffset = itemOffsets[lastItemIndex] + getItemHeight(lastItemIndex)  // + getItemHeight() makes from undefined NaN
+
+
+		if (topItemOffset === undefined) {
+			console.warn("topItemOffset is undefined");
+			return
+		}
 
 		let loadPadding = Math.max(windowHeight, 1000)
 		let unloadPadding = Math.max(windowHeight, 1000) * 4
+		let giveUpPadding = Math.max(windowHeight, 1000) * 10
 
 		// render more items if needed
 		if (topItemOffset > scrollTopPosition - loadPadding) {
@@ -158,6 +181,12 @@
 				updateIndexesToRender([newIndex, ...indexesToRender])
 			}
 		}
+
+		if (isNaN(bottomItemOffset)) {
+			console.warn("bottomItemOffset is NaN");
+			return
+		}
+
 		if (bottomItemOffset < scrollBottomPosition + loadPadding) {
 			const newIndex = lastItemIndex + 1
 			if (newIndex < itemCount) {
@@ -165,43 +194,45 @@
 			}
 		}
 
+		// we need to reloacate center item, before we unload items. Else the center item would be stuck at the edge and no item would be unloaded
+		findNewCenterItem()
+
 		// unload items if needed
 		if (topItemOffset < scrollTopPosition - unloadPadding) {
 			const newIndex = firstItemIndex + 1
-			if (newIndex < itemCount) {
+			const indexToRemove = indexesToRender[0]
+			if (newIndex < itemCount && indexToRemove !== centerItemIndex) {
 				updateIndexesToRender(indexesToRender.slice(1))
 				console.log("unload top", newIndex);
 			}
 		}
-
 		if (bottomItemOffset > scrollBottomPosition + unloadPadding) {
 			const newIndex = lastItemIndex - 1
-			if (newIndex >= 0) {
+			const indexToRemove = indexesToRender[indexesToRender.length - 1]
+			if (newIndex >= 0 && indexToRemove !== centerItemIndex) {
 				updateIndexesToRender(indexesToRender.slice(0, -1))
 				console.log("unload bottom", newIndex);
 			}
 		}
 
-		findNewCenterItem()
+
+		// // give up if we are too far from the center
+		if (topItemOffset < scrollTopPosition - giveUpPadding) {
+			console.warn("give up top", topItemOffset,"<", scrollTopPosition - giveUpPadding);
+			giveUp()
+		}
+		if (bottomItemOffset > scrollBottomPosition + giveUpPadding) {
+			console.warn("give up bottom", bottomItemOffset,">", scrollBottomPosition + giveUpPadding);
+			giveUp()
+		}
 	}
 
 	function updatedItemHeight(index: number, newHeight: number) {
 		const oldItemHeight = itemHeights[index] || itemEstimatedHeight
 		itemHeights[index] = newHeight
-		console.log("updatedItemHeight", index," ", oldItemHeight, "=>", newHeight);
-
-		// itemOffsets[index] = itemEstimatedHeight * index
-
-
-		// update offsets of all rendered items (indexesToRender)
-		// for (const index of indexesToRender) {
-			// 	itemOffsets[index] = calculateItemOffset(index)
-			// }
+		// console.log("updatedItemHeight", index," ", oldItemHeight, "=>", newHeight);
 		updateItemOffsets()
-
 		renderMoreItems()
-
-		// console.log("updatedItemHeight", index, newHeight, itemHeights, itemOffsets);
 	}
 
 	function updatedWindowWidthHeight(newWidth: number, newHeight: number) {
@@ -226,7 +257,9 @@
 			}
 		}, 0);
 
-		updateIndexesToRender([0,1,2,3,4,5])
+		giveUp()
+
+		// updateIndexesToRender([0])
 
 		// refreshCenterItem()
 	})
