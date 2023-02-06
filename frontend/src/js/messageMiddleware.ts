@@ -64,18 +64,11 @@ export async function getMessageContent(messageId: string): Promise<Message> {
 		})
 	}
 
-	// add message id to queue if it's not already there
-	if (!messageIdsToFetch.includes(messageId)) {
-		messageIdsToFetch.push(messageId)
-	}
+
 
 	// wait for message to be loaded asynchronously
 	return new Promise((resolve, reject) => {
 		// timeout after 10 seconds
-		const timeout = setTimeout(() => {
-			unsubscribe()
-			reject("Error loading message_id " + messageId)
-		}, 10000)
 		const unsubscribe = justFetchedMessageIds.subscribe((messageIds: string[]) => {
 			if (messageIds.includes(messageId)) {
 				unsubscribe()
@@ -83,5 +76,15 @@ export async function getMessageContent(messageId: string): Promise<Message> {
 				resolve(messages[messageId])
 			}
 		})
+
+		const timeout = setTimeout(() => {
+			unsubscribe()
+			reject("Error loading message_id " + messageId)
+		}, 10000)
+
+		// add message id to queue if it's not already there
+		if (!messageIdsToFetch.includes(messageId)) {
+			messageIdsToFetch.push(messageId)
+		}
 	})
 }

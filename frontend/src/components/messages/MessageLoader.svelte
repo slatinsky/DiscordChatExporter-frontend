@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount } from "svelte";
-	import { cancelMessageContentRequest, getMessageContent } from "../../js/messageMiddleware";
+	import { getMessageContent } from "../../js/messageMiddleware";
 	import NewMessage from "./NewMessage.svelte";
 	export let messageId: string;
 	export let previousMessageId: string | null  = null;
