@@ -17,7 +17,7 @@
 	{#key $nameRenderer}
 	<label>
 		<input type="radio" name="nameRenderer" value={"nickname"} bind:group={$nameRenderer} />
-		<span>Nickname (Deleted User)</span>
+		<span>Nickname (Deleted User) [Work in progress]</span>
 	</label>
 	<label>
 		<input type="radio" name="nameRenderer" value={"handle"} bind:group={$nameRenderer} />
@@ -25,7 +25,7 @@
 	</label>
 	<label>
 		<input type="radio" name="nameRenderer" value={"both"} bind:group={$nameRenderer} />
-		<span>Both (Deleted User (Deleted_User#0000))</span>
+		<span>Both (Deleted User (Deleted_User#0000)) [Work in progress]</span>
 	</label>
 	{/key}
 </div>

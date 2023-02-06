@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 
 
-export const nameRenderer = writable("nickname");
+export const nameRenderer = writable("handle");
 export const timestampFormat = writable(0);
 export const developerMode = writable(false);
 export const theme = writable("dark");
