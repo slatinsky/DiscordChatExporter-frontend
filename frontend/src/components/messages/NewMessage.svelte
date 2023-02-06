@@ -14,6 +14,7 @@
 
 	export let message: Message;
 	export let previousMessage: Message | null = null;
+	export let referencedMessage: Message | null = null;
 	export let selectedGuildId: string
 
 	let isSameAuthor = false;
@@ -112,7 +113,7 @@
 				<!--            TODO: system notification-->
 				<!--            Regular message-->
 				<div class="chatlog__message-aside">
-					{#if message.referencedMessage}
+					{#if referencedMessage}
 						<div class="chatlog__reference-symbol" />
 					{/if}
 
@@ -151,30 +152,30 @@
 							</div>
 						</a>
 					{:else}
-						{#if message?.referencedMessage}
-							<a href="#{message.referencedMessage.id}">
+						{#if referencedMessage}
+							<a href="#{referencedMessage._id}">
 								<div class="chatlog__reference">
 									<img
 										class="chatlog__reference-avatar"
-										src={checkUrl(message.referencedMessage.author?.avatarUrl?.url)}
+										src={checkUrl(referencedMessage.author?.avatar)}
 										alt="Avatar"
 										loading="lazy"
-										width="{message.referencedMessage.author?.width ?? 16}"
-										height="{message.referencedMessage.author?.height ?? 16}"
+										width="{referencedMessage.author?.avatar?.width ?? 16}"
+										height="{referencedMessage.author?.avatar?.height ?? 16}"
 										onerror="this.style.visibility='hidden'"
 									/>
 									<div
 										class="chatlog__reference-author"
-										style="color: {message.referencedMessage.author.color}"
-										title={full_name(message.referencedMessage.author)}
+										style="color: {referencedMessage.author.color}"
+										title={referencedMessage.author.name}
 									>
-										{message.referencedMessage.author.name}
+										{referencedMessage.author.name}
 									</div>
 									<div class="chatlog__reference-content">
 										<span
 											class="chatlog__reference-link"
 											>
-											<!-- <MessageMarkdown content={message.referencedMessage.content.replace("\n", " ")} {guild} {message} /> -->
+											<MessageMarkdown content={referencedMessage.content[0].content.replace("\n", " ")} />
 											</span
 										>
 									</div>

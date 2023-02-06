@@ -2,39 +2,52 @@
 	import { onDestroy, onMount } from "svelte";
 	import { cancelMessageContentRequest, getMessageContent } from "../../js/messageMiddleware";
 	import NewMessage from "./NewMessage.svelte";
-	export let messageId = null;
-	export let previousMessageId = null;
+	export let messageId: string;
+	export let previousMessageId: string | null  = null;
 	export let selectedGuildId: string;
 
 	// fetch message from api
-	let messagePromise = getMessageContent(messageId);
-	let previousMessagePromise
-	let fullMessagePromise
+	async function fetchMessages(messageId: string, previousMessageId: string | null) {
+		const messagePromise = getMessageContent(messageId);
+		let previousMessage
+		if (previousMessageId !== null) {
+			previousMessage = await getMessageContent(previousMessageId);
+		}
+		else {
+			previousMessage = null;
+		}
 
-	if (previousMessageId !== null) {
-		previousMessagePromise = getMessageContent(previousMessageId);
-		fullMessagePromise = Promise.all([messagePromise, previousMessagePromise]);
-	} else {
-		fullMessagePromise = Promise.all([messagePromise]);
+		const message = await messagePromise;
+
+		let referencedMessage
+
+		if (message.reference) {
+			referencedMessage = await getMessageContent(message.reference.messageId);
+		}
+		else {
+			referencedMessage = null;
+		}
+
+		return {
+			message: message,
+			previousMessage: previousMessage,
+			referencedMessage: referencedMessage
+		}
 	}
 
-
-	onDestroy(() => {
-		cancelMessageContentRequest(messageId);
-	});
-
+	// promise
+	let fullMessagesPromise = fetchMessages(messageId, previousMessageId);
 </script>
 
 {#if messageId}
-	{#await fullMessagePromise}
+	{#await fullMessagesPromise}
 		<div class="loading">Loading... {messageId}</div>
 	{:then messages}
-		{#key message._id}
-			<NewMessage message={messages[0]} previousMessage={messages[1]} {selectedGuildId}/>
+		{#key messages}
+			<NewMessage message={messages.message} previousMessage={messages.previousMessage} referencedMessage={messages.referencedMessage} {selectedGuildId}/>
 		{/key}
-		<!-- <p>{message.content[0].content}</p> -->
 	{:catch error}
-		<div style="color: red" class="loading">{error} <span class="retry-btn" on:click={() => messagePromise = getMessageContent(messageId)}>retry</span></div>
+		<div style="color: red" class="loading">{error} <span class="retry-btn" on:click={() => fullMessagesPromise = fetchMessages(messageId, previousMessageId)}>retry</span></div>
 	{/await}
 {/if}
 
