@@ -11,6 +11,7 @@
 	import MessageEmbeds from './MessageEmbeds.svelte';
 	import MessageMarkdown from './MessageMarkdown.svelte';
 	import MessageReactions from './MessageReactions.svelte';
+	import MessageStickers from './MessageStickers.svelte';
 
 	export let message: Message;
 	export let previousMessage: Message | null = null;
@@ -185,13 +186,10 @@
 					{#if message.embeds}
 						<MessageEmbeds embeds={message.embeds} />
 					{/if}
+
 					<!-- stickers -->
 					{#if message.stickers}
-						{#each message.stickers as sticker}
-							<div class="chatlog__sticker">
-								<ImageGallery asset={sticker.url} imgclass={"chatlog__sticker-image"} />
-							</div>
-						{/each}
+						<MessageStickers stickers={message.stickers} />
 					{/if}
 
 					<!--                REACTIONS-->
@@ -285,10 +283,5 @@
 	audio {
 		max-width: 80%;
 		width: 700px;
-	}
-
-	:global(.chatlog__sticker-image) {
-		max-width: 200px;
-		max-height: auto;
 	}
 </style>
