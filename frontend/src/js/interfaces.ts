@@ -54,6 +54,8 @@ export interface Reaction {
 		name: string;
 		isAnimated: boolean;
 		image: Asset;
+		source: "default" | "custom";
+		guildId: string | null;
 	};
 	count: number;
 }

@@ -18,8 +18,16 @@ def pad_id(id):
 	return str(id).zfill(24)
 
 
+with open('emojiIndex.json', 'r', encoding='utf8') as f:
+    emoji_index = json.load(f)
 
-
+# read emojiIndex.json
+# emojiIndex from https://github.com/Tyrrrz/DiscordChatExporter/blob/5b1b7205037662bb28dc5e541f0950586d4b8a22/DiscordChatExporter.Core/Utils/EmojiIndex.cs
+def get_emoji_code(name):
+    if name in emoji_index:
+        return emoji_index[name]
+    else:
+        return name
 
 
 class MongoDatabase():
@@ -38,6 +46,7 @@ class MongoDatabase():
 			"channels": self.database["channels"],
 			"guilds": self.database["guilds"],
 			"authors": self.database["authors"],
+			"emojis": self.database["emojis"],
 			"jsons": self.database["jsons"],
 			"assets": self.database["assets"],
 			"jsons": self.database["jsons"]
@@ -353,6 +362,7 @@ class JsonProcessor:
 		self.collection_channels = self.database.get_collection("channels")
 		self.collection_messages = self.database.get_collection("messages")
 		self.collection_authors = self.database.get_collection("authors")
+		self.collection_emojis = self.database.get_collection("emojis")
 		self.collection_assets = self.database.get_collection("assets")
 		self.collection_jsons = self.database.get_collection("jsons")
 		self.file_finder = file_finder
@@ -496,7 +506,15 @@ class JsonProcessor:
 			if "reactions" in message:
 				for reaction in message["reactions"]:
 					if "emoji" in reaction:
+						reaction["emoji"]["guildId"] = guild_id
+						reaction["emoji"]["source"] = "custom"
 						reaction["emoji"]["_id"] = pad_id(reaction["emoji"].pop("id"))
+						if reaction["emoji"]["_id"] == pad_id(0):
+							reaction["emoji"]["name"] = get_emoji_code(reaction["emoji"]["name"]).replace(":", "")
+							reaction["emoji"]["_id"] = reaction["emoji"]["name"]
+							del reaction["emoji"]["guildId"]
+							reaction["emoji"]["source"] = "default"
+
 						reaction["emoji"]["image"] = self.asset_processor.process(reaction["emoji"].pop("imageUrl"))
 
 			new_attachments = []
@@ -553,6 +571,28 @@ class JsonProcessor:
 
 		return authors_list
 
+	def process_emojis(self, messages: list, guild_id) -> list:
+		"""
+		extracts all emojis from messages and returns a list of emojis
+		"""
+		emojis = {}
+		for message in messages:
+			if "reactions" in message:
+				for reaction in message["reactions"]:
+					emoji = reaction["emoji"]
+
+					if emoji["_id"] in emojis:
+						# emoji already exists, ignore
+						continue
+
+					emojis[emoji["_id"]] = emoji
+
+		emojis_list = []
+		for emoji_id in emojis:
+			emojis_list.append(emojis[emoji_id])
+
+		return emojis_list
+
 
 	def insert_guild(self, guild):
 		database_document = self.collection_guilds.find_one({"_id": guild["_id"]})
@@ -580,6 +620,15 @@ class JsonProcessor:
 			return
 
 		self.collection_authors.insert_one(author)
+
+	def insert_emoji(self, emoji):
+		database_document = self.collection_emojis.find_one({"_id": emoji["_id"]})
+
+		if database_document != None:
+			# emoji already exists
+			return
+
+		self.collection_emojis.insert_one(emoji)
 
 	def insert_message(self, message):
 		"""
@@ -693,6 +742,7 @@ class JsonProcessor:
 		channel = self.process_channel(json_data["channel"], guild["_id"])
 		messages = self.process_messages(json_data["messages"], guild["_id"], channel["_id"], channel["name"])
 		authors = self.process_authors(json_data["messages"])
+		emojis = self.process_emojis(json_data["messages"], guild["_id"])
 
 		self.insert_guild(guild)
 		self.insert_channel(channel)
@@ -701,6 +751,9 @@ class JsonProcessor:
 
 		for author in authors:
 			self.insert_author(author)
+
+		for emoji in emojis:
+			self.insert_emoji(emoji)
 
 		self.mark_as_processed(self.json_path)
 
