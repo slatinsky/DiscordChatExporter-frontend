@@ -71,15 +71,22 @@ export async function getMessageContent(messageId: string): Promise<Message> {
 		// timeout after 10 seconds
 		const unsubscribe = justFetchedMessageIds.subscribe((messageIds: string[]) => {
 			if (messageIds.includes(messageId)) {
-				unsubscribe()
-				clearTimeout(timeout)
+				setTimeout(() => {  // (hopefully) fix race condition
+					clearTimeout(timeout)
+					unsubscribe()
+				}, 0)
 				resolve(messages[messageId])
 			}
 		})
 
 		const timeout = setTimeout(() => {
 			unsubscribe()
-			reject("Error loading message_id " + messageId)
+			if (messages[messageId]) {
+				resolve(messages[messageId])
+			}
+			else {
+				reject("Error loading message_id " + messageId)
+			}
 		}, 10000)
 
 		// add message id to queue if it's not already there

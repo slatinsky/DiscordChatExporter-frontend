@@ -49,10 +49,10 @@
 
 		// get last word
 		let lastWord = inputValue.split(' ').pop();
-		console.log('last word', lastWord);
+		// console.log('last word', lastWord);
 
 		if (lastWord === undefined) {
-			console.log('no last word');
+			// console.log('no last word');
 			return { key, value };
 		}
 		else if (lastWord.includes(':')) {
@@ -184,7 +184,7 @@
 		let { key, value } = getSearchKeyValue(newValue);
 		searchKey = key;
 		searchValue = value;
-		console.log('key', key, 'value', value);
+		// console.log('key', key, 'value', value);
 
 		if (value === null) {
 			filteredCategories = categories.filter((category) => {
@@ -206,13 +206,12 @@
 		let query = inputValue;
 		let response = await fetch(`/api/search?guild_id=${guildId}&prompt=${query}`);
 		let json = await response.json();
-		console.log('search response', json);
 		$searchResultsMessageIds = json;
 		$searchShown = true;
 	}
 
-	$: console.log('selectedMenuIndex', selectedMenuIndex);
-	$: console.log('inputValue', inputValue);
+	// $: console.log('selectedMenuIndex', selectedMenuIndex);
+	// $: console.log('inputValue', inputValue);
 </script>
 
 <div class="search">
