@@ -8,7 +8,7 @@
 
 	import ChannelsMenu from '../../../components/channels/MenuCategories.svelte';
 
-	let currentGuildId = data.guildId;
+	let currentGuildId: string = data.guildId;
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time
 		if (currentGuildId !== data.guildId) {
 			currentGuildId = data.guildId;
@@ -37,7 +37,7 @@
 		</div>
 		{#if $searchShown}
 			<div id="search">
-				<SearchResults guildId={data.guildId} />
+				<SearchResults guildId={currentGuildId} />
 			</div>
 		{/if}
 	</div>

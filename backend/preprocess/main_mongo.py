@@ -386,7 +386,7 @@ class JsonProcessor:
 		channel["guildId"] = guild_id
 		return channel
 
-	def process_messages(self, messages, guild_id, channel_id, category_id):
+	def process_messages(self, messages, guild_id, channel_id, channel_name):
 		"""
 		rename id to mongo _id
 		pad ids to 24 digits
@@ -433,7 +433,7 @@ class JsonProcessor:
 			# reference to guild and channel
 			message["guildId"] = guild_id
 			message["channelId"] = channel_id
-			message["categoryId"] = category_id
+			message["channelName"] = channel_name
 
 			# because content may be edited, we need to change content field to an array
 			latest_timestamp = message["timestampEdited"] if message["timestampEdited"] != None else message["timestamp"]
@@ -691,7 +691,7 @@ class JsonProcessor:
 
 		guild = self.process_guild(json_data["guild"])
 		channel = self.process_channel(json_data["channel"], guild["_id"])
-		messages = self.process_messages(json_data["messages"], guild["_id"], channel["_id"], channel["categoryId"])
+		messages = self.process_messages(json_data["messages"], guild["_id"], channel["_id"], channel["name"])
 		authors = self.process_authors(json_data["messages"])
 
 		self.insert_guild(guild)

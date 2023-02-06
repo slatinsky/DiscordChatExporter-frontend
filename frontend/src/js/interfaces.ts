@@ -115,6 +115,7 @@ export interface Message {
 	} | null;
 	guildId: string;
 	channelId: string;
+	channelName: string;
 }
 
 export interface MessageIdLoad {

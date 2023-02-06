@@ -16,9 +16,13 @@
 	export let selectedGuildId: string
 
 	let isSameAuthor = false;
-
 	if (previousMessage && previousMessage.author?._id === message.author._id) {
 		isSameAuthor = true;
+	}
+
+	let previousMessageFromDifferentChannel = true;
+	if (previousMessage && previousMessage.channelId === message.channelId) {
+		previousMessageFromDifferentChannel = false;
 	}
 
 	function full_name(author) {
@@ -84,6 +88,10 @@
 	<!-- transition:fade={{ duration: 125 }} -->
 	{#if !isSameAuthor}
 		<div class="padder"></div>
+	{/if}
+
+	{#if previousMessageFromDifferentChannel}
+		<div class="channel-name"><a href="/channels/{selectedGuildId}/{message.channelId}/"># {message?.channelName}</a></div>
 	{/if}
 	<div on:contextmenu|preventDefault={e=>onRightClick(e, message)}>
 		<div

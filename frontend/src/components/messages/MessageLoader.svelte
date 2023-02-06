@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
 	import { onDestroy, onMount } from "svelte";
 	import { cancelMessageContentRequest, getMessageContent } from "../../js/messageMiddleware";
 	import NewMessage from "./NewMessage.svelte";
 	export let messageId = null;
 	export let previousMessageId = null;
-	export let selectedGuildId = null;
+	export let selectedGuildId: string;
 
 	// fetch message from api
 	let messagePromise = getMessageContent(messageId);

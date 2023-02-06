@@ -4,7 +4,7 @@
 	import { searchResultsMessageIds, searchShown } from './searchStores';
 	import MessageLoader from '../messages/MessageLoader.svelte';
 	let searchResults
-	let guildId: string
+	export let guildId: string
 </script>
 
 {#if $searchShown}
