@@ -16,6 +16,6 @@
 <style>
 	:global(.chatlog__sticker-image) {
 		max-width: 200px;
-		max-height: auto;
+		height: auto;
 	}
 </style>
