@@ -1,10 +1,22 @@
 <!-- GUILDS MENU -->
 
 <script lang="ts">
-	import { checkUrl } from "src/js/helpers";
+	import { contextMenuItems } from "src/components/menu/menuStore";
+	import { checkUrl, copyTextToClipboard } from "src/js/helpers";
 	import type { Guild } from "../js/interfaces";
 	export let guilds: Guild[] = [];
 	export let selectedGuildId: string | null = null;
+
+	function onRightClick(e, id) {
+		$contextMenuItems = [
+			{
+				"name": "Copy guild ID",
+				"action": () => {
+					copyTextToClipboard(BigInt(id))
+				}
+			}
+		]
+	}
 </script>
 
 <div class="guilds">
@@ -21,7 +33,7 @@
 	{#if guilds}
 		{#each guilds as guild}
 			<a href="/channels/{guild._id}">
-				<div class="guild">
+				<div class="guild" on:contextmenu|preventDefault={e=>onRightClick(e, guild._id)}>
 					{#if selectedGuildId === guild._id}
 						<div class="guild-selected" />
 					{/if}

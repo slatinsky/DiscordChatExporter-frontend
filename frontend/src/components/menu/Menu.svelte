@@ -1,12 +1,11 @@
-<script>
+<script lang="ts">
 	import { onMount, setContext, createEventDispatcher } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { position } from './menuStore';
 	const key = {};
-    export let visible
 
-    $: x = $position.x;
-    $: y = $position.y;
+    let x = $position.x;
+    let y = $position.y;
 
 	// whenever x and y is changed, restrict box to be within bounds
 	$: (() => {
@@ -23,18 +22,15 @@
 		dispatchClick: () => dispatch('click')
 	});
 
-	let menuEl;
+	let menuEl: HTMLElement;
 	function onPageClick(e) {
         if (e.target.classList.contains("menu-option")) {
-            $visible = false;
+            dispatch('clickoutside');
         }
         else {
-            $visible = true;
 		    dispatch('clickoutside');
         }
 	}
-
-    // $: console.log("isRightClickMenuVisible", $visible);
 </script>
 
 <style>
@@ -50,8 +46,6 @@
 
 <svelte:body on:click={onPageClick} />
 
-{#if $visible}
-    <div transition:fade={{ duration: 100 }} bind:this={menuEl} style="top: {y}px; left: {x}px;">
-        <slot />
-    </div>
-{/if}
+<div transition:fade={{ duration: 100 }} bind:this={menuEl} style="top: {y}px; left: {x}px;">
+	<slot />
+</div>

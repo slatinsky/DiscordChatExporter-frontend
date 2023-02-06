@@ -1,11 +1,7 @@
 <script lang="ts">
-	import ContextMenu from '../../../components/menu/ContextMenu.svelte';
-	import MenuOption from '../../../components/menu/MenuOption.svelte';
-	import { isMenuVisible, setMenuVisible } from '../../../components/menu/menuStore';
 	import Header from './Header.svelte';
 	import SearchResults from '../../../components/search/SearchResults.svelte';
 	import { searchShown, searchResultsMessageIds } from '../../../components/search/searchStores';
-	import { copyTextToClipboard } from '../../../js/helpers';
 
 	import type { PageServerData } from './$types';
 	export let data: PageServerData;
@@ -22,21 +18,6 @@
 		console.log('current guild', data.guild);
 	}
 	$: guildChanged(data);
-
-
-
-	let rightClickId = null;
-	function onRightClick(e, id) {
-		$isMenuVisible = false  // close previous menu
-		setTimeout(() => {
-			rightClickId = id;
-			setMenuVisible(e)
-		}, 0);
-	}
-
-	$: if (!$isMenuVisible) {
-		rightClickId = null
-	}
 </script>
 
 
@@ -44,7 +25,7 @@
 	<div id="guild-layout" class={$searchShown ? 'with-search' : ''}>
 		<div id="channels">
 			<div class="guild-name">{data.guild.name}</div>
-			<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} {onRightClick} />
+			<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} />
 		</div>
 		<div id="header">
 			{#key data.channelId}
@@ -61,14 +42,6 @@
 		{/if}
 	</div>
 {/key}
-
-{#if rightClickId}
-<ContextMenu let:visible>
-	<MenuOption
-			on:click={() => copyTextToClipboard(BigInt(rightClickId))}
-			text="Copy channel ID" {visible} />
-</ContextMenu>
-{/if}
 
 <style>
 	#guild-layout {

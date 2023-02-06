@@ -1,9 +1,10 @@
-import { writable } from "svelte/store";
+import { writable, type Writable } from "svelte/store";
 
-export const isMenuVisible = writable(false);
+export const contextMenuItems: Writable<any[]> = writable([]);
 export const position = writable({ x: 0, y: 0 });
 
-export const setMenuVisible = (e) => {
-    position.set({ x: e.clientX, y: e.clientY });
-    isMenuVisible.set(true);
-}
+// export const setMenuVisible = (e) => {
+//     const rect=e.target.getBoundingClientRect();
+//     position.set({x:100,y:100});
+//     isMenuVisible.set(true);
+// }

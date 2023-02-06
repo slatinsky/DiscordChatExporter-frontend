@@ -1,11 +1,24 @@
 <script>
 	import IconChannel from 'src/components/icons/IconChannel.svelte';
 	import IconChannelWithThreads from 'src/components/icons/IconChannelWithThreads.svelte';
+	import { copyTextToClipboard } from '../../js/helpers';
+	import { contextMenuItems } from '../menu/menuStore';
 	export let guildId;
 	export let id;
 	export let name;
 	export let isSelected = false;
 	export let threadCount = 0;
+
+	function onRightClick(e, id) {
+		$contextMenuItems = [
+			{
+				"name": "Copy channel ID",
+				"action": () => {
+					copyTextToClipboard(BigInt(id))
+				}
+			}
+		]
+	}
 </script>
 
 <a

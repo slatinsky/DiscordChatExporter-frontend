@@ -2,6 +2,8 @@
 	import MenuChannel from './MenuChannel.svelte';
 	import IconDropdown from '../icons/IconDropdown.svelte';
 	import MenuThread from './MenuThread.svelte';
+	import { copyTextToClipboard } from 'src/js/helpers';
+	import { contextMenuItems } from '../menu/menuStore';
 
 	export let channels: any;
 	export let guildId: string;
@@ -42,9 +44,20 @@
 	let isOpen = localStorageIsOpen(categoryId);
 
 	$: saveToLocalStorage(isOpen, categoryId);
+
+	function onRightClick(e, id) {
+		$contextMenuItems = [
+			{
+				"name": "Copy category ID",
+				"action": () => {
+					copyTextToClipboard(BigInt(id))
+				}
+			}
+		]
+	}
 </script>
 
-<div class="category" on:click={() => (isOpen = !isOpen)}>
+<div class="category" on:click={() => (isOpen = !isOpen)} on:contextmenu|preventDefault={(e) => onRightClick(e, categoryId)}>
 	<div class="icon-dropdown {isOpen? '' : 'rotate'}"><IconDropdown size={16}/></div>
 	{categoryName}
 </div>

@@ -3,9 +3,7 @@
 	import type { Message } from 'src/js/interfaces';
 	import { renderTimestamp } from 'src/js/time';
 	import ImageGallery from 'src/routes/channels/[guildId]/[channelId]/ImageGallery.svelte';
-	import MenuOption from '../menu/MenuOption.svelte';
-	import ContextMenu from '../menu/ContextMenu.svelte';
-	import { isMenuVisible, setMenuVisible } from '../menu/menuStore';
+	import { contextMenuItems} from '../menu/menuStore';
 	import { linkHandler, nameRenderer } from 'src/routes/settingsStore';
 	import MessageAttachments from './MessageAttachments.svelte';
 	import MessageEmbeds from './MessageEmbeds.svelte';
@@ -39,16 +37,41 @@
 		}
 	}
 
-	let rightClickMessage = null;
+
+
 	function onRightClick(e, message) {
-		$isMenuVisible = false  // close previous menu
-		setTimeout(() => {
-			rightClickMessage = message;
-			setMenuVisible(e)
-		}, 0);
-	}
-	$: if (!$isMenuVisible) {
-		rightClickMessage = null
+		$contextMenuItems = [
+			{
+				"name": "Open in discord",
+				"action": () => {
+					window.open(($linkHandler === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(selectedGuildId)}/${BigInt(message.channelId)}/${BigInt(message._id)}`,'_blank')
+				}
+			},
+			{
+				"name": "Copy message link",
+				"action": () => {
+					copyTextToClipboard(`https://discord.com/channels/${BigInt(selectedGuildId)}/${BigInt(message.channelId)}/${BigInt(message._id)}`);
+				}
+			},
+			{
+				"name": "Print message object to console",
+				"action": () => {
+					console.log(JSON.stringify(message, null, 2))
+				}
+			},
+			{
+				"name": "Copy message ID",
+				"action": () => {
+					copyTextToClipboard(BigInt(message._id))
+				}
+			},
+			{
+				"name": "Copy author ID",
+				"action": () => {
+					copyTextToClipboard(BigInt(message.author._id))
+				}
+			}
+		]
 	}
 </script>
 
@@ -201,26 +224,6 @@
 		</div>
 	</div>
 </div>
-
-{#if rightClickMessage}
-	<ContextMenu let:visible>
-		<MenuOption
-				on:click={() => copyTextToClipboard(BigInt(message.author._id))}
-				text="Copy author ID" {visible} />
-		<MenuOption
-				on:click={() => copyTextToClipboard(BigInt(message._id))}
-				text="Copy message ID" {visible} />
-		<MenuOption
-				on:click={() => copyTextToClipboard(`https://discord.com/channels/${BigInt(selectedGuildId)}/${BigInt(message.channelId)}/${BigInt(message._id)}`)}
-				text="Copy message link" {visible} />
-		<MenuOption
-				on:click={() => window.open(($linkHandler === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(selectedGuildId)}/${BigInt(message.channelId)}/${BigInt(message._id)}`,'_blank')}
-				text="Open in discord" {visible} />
-		<MenuOption
-			on:click={() => console.log(JSON.stringify(message, null, 2))}
-			text="Print message object to console" {visible} />
-	</ContextMenu>
-{/if}
 
 <style>
 

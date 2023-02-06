@@ -1,12 +1,25 @@
 <script>
 	import IconThread from 'src/components/icons/IconThread.svelte';
 	import IconThreadMiddle from 'src/components/icons/IconThreadMiddle.svelte';
+	import { copyTextToClipboard } from '../../js/helpers';
+	import { contextMenuItems } from '../menu/menuStore';
 
 	export let name;
 	export let id;
 	export let guildId;
 	export let selectedChannelId;
 	export let isLast;
+
+	function onRightClick(e, id) {
+		$contextMenuItems = [
+			{
+				"name": "Copy thread/forum post ID",
+				"action": () => {
+					copyTextToClipboard(BigInt(id))
+				}
+			}
+		]
+	}
 </script>
 
 <div class="thread" title={name}>
