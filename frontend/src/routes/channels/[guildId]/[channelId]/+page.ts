@@ -1,36 +1,37 @@
-import { error } from "@sveltejs/kit";
+import type { Load } from "@sveltejs/kit";
+import type { Channel, Guild } from "src/js/interfaces";
 
 export const prerender = false;
 export const ssr = false;
 
-export async function load({ params, parent }) {
-    const { guilds, guild } = await parent();
-    let messages = guild.messages[params.channelId]
+export const load: Load = async({ fetch, params, parent }) => {
+	let selectedGuildId = params.guildId;
+	let selectedChannelId = params.channelId;
+    const { guilds, channels } = await parent();
+	let channel = channels.find((c: Channel) => c._id === selectedChannelId);
+	let guild: Guild | undefined = guilds.find(g => g._id === selectedGuildId);
 
-    // calculate thread exit message
-    let mainChannelMessage = null
-    let channelId = params.channelId
-    if (channelId in guild.threadIdToMessageId) {
-        let messageIdBack = guild.threadIdToMessageId[channelId]
-        console.log('threadIdToMessageId', messageIdBack);
-        // loop through all data.messages channels
-        console.log('data.messages', messages);
-        for (let channelIdLoop in guild.messages) {
-            if (guild.messages[channelIdLoop][messageIdBack]) {
-                mainChannelMessage = guild.messages[channelIdLoop][messageIdBack]
-                break
-            }
-        }
+	let messages
+	try {
+        let response = await fetch('/api/message-ids?channel_id=' + params.channelId)
+        let messageIds = await response.json()
+
+		messages = messageIds.map((messageId: string) => {
+			return {
+				_id: messageId,
+				loaded: false,
+			}
+		})
+    }
+    catch (e) {
+		console.error(e)
     }
 
-
     return {
-        guilds: guilds,
-        guildId: params.guildId,
-        channelId: params.channelId,
-        channel: guild.channels[params.channelId],
         guild: guild,
+        guildId: selectedGuildId,
+		channel: channel,
+        channelId: selectedChannelId,
         messages: messages,
-        mainChannelMessage: mainChannelMessage
     };
 }

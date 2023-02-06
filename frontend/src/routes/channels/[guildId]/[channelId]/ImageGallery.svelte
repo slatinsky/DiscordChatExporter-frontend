@@ -1,40 +1,56 @@
-<script>
-	import { checkUrl, getFileNameFromUrl } from '../../../../helpers';
-    export let url
-    export let imgclass
+<script lang="ts">
+	import type { Asset } from 'src/js/interfaces';
+	import { checkUrl } from '../../../../js/helpers';
+	export let asset: Asset
 
-    function viewGallery() {
-        showGallery = true;
-    }
+	export let imgclass: string = '';
 
-    let showGallery = false;
+	export let inline = false;
+	export let alt: string = '';
+	export let width: number | undefined = undefined;
+	export let height: number | undefined = undefined;
+
+	let domImg: HTMLImageElement;
+
+	function viewGallery() {
+		// if doesn't have class media-spoiler, then show gallery
+		if (!domImg.classList.contains('media-spoiler')) {
+			showGallery = true;
+		}
+	}
+
+	let showGallery = false;
+
+	$: isSpoiler = asset?.filenameWithoutHash.startsWith('SPOILER');
 </script>
 
-<div class:media-spoiler={getFileNameFromUrl(url?.url).startsWith('SPOILER')}>
-    <img
-        on:click={viewGallery}
-        class={imgclass}
-        src={checkUrl(url?.url)}
-        alt="Attachment"
-        loading="lazy"
-        width="{url.width ?? undefined}"
-        height="{url.height ?? undefined}"
-        onerror="this.style.visibility='hidden'"
-    />
-</div>
+
+
+<img
+	bind:this={domImg}
+	class:media-spoiler={isSpoiler} 
+	on:click={viewGallery}
+	class={imgclass}
+	src={checkUrl(asset)}
+	alt="Attachment"
+	width="{asset?.width ?? undefined}"
+	height="{asset?.height ?? undefined}"
+	onerror="this.style.visibility='hidden'"
+	class:inline
+/>
+
 
 {#if showGallery}
-    <div class="gallery-wrapper" on:click={()=>showGallery=false}>
-        <div class="gallery-closebtn" on:click={()=>showGallery=false}>&times;</div>
-        <div class="imgbox" on:click|stopPropagation>
-            <img class="center-fit" src={checkUrl(url?.url)}>
-            <div class="open-original">
-                <a href={checkUrl(url?.url)} target="_blank">Open original</a>
-            </div>
-        </div>
-    </div>
+	<div class="gallery-wrapper" on:click={()=>showGallery=false}>
+		<div class="gallery-closebtn" on:click={()=>showGallery=false}>&times;</div>
+		<div class="imgbox" on:click|stopPropagation>
+			<img class="center-fit" src={checkUrl(asset)} {alt} {width} {height}>
+			<div class="open-original">
+				<a href={checkUrl(asset)} target="_blank">Open original</a>
+			</div>
+		</div>
+	</div>
 {/if}
-
 <style>
     .chatlog__attachment img {
         cursor: pointer;
@@ -87,4 +103,8 @@
     .open-original > a {
         color: gray;
     }
+
+	.inline {
+		display: inline-block;
+	}
 </style>

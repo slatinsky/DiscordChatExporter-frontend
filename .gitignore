@@ -22,6 +22,9 @@ __pycache__
 /backend/nginx/logs
 /backend/nginx/temp
 
+# mongodb
+/backend/mongodb/db
+
 
 # Preprocess
 /backend/preprocess/*.spec

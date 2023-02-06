@@ -1,24 +1,25 @@
-<script>
+<script lang="ts">
 	import IconChannel from '../../../components/icons/IconChannel.svelte';
-	import SearchFilter from './SearchFilter.svelte';
+	import SearchFilter from '../../../components/search/SearchFilter.svelte';
 
-	export let channel;
-	export let guild;
+	export let channelName = '';
+	export let channelTopic = '';
+	export let guildId: string;
 </script>
 
 <section class="header-container">
 	<div class="channel-header">
 		<div class="channel-header__left">
-			{#if channel}
+			{#if channelName}
 				<IconChannel />
-				<div class="channel-name elipsis"> {channel.name}</div>
-				{#if channel.topic}
+				<div class="channel-name elipsis"> {channelName}</div>
+				{#if channelTopic}
 					<div class="divider">|</div>
-					<div class="topic elipsis">{channel.topic}</div>
+					<div class="topic elipsis">{channelTopic}</div>
 				{/if}
 			{/if}
 			<div class="spacer" />
-			<SearchFilter {guild} />
+			<SearchFilter {guildId} />
 		</div>
 	</div>
 </section>

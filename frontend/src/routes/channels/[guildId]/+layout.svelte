@@ -1,90 +1,55 @@
-<script>
-	import ContextMenu from '../../../components/menu/ContextMenu.svelte';
-	import MenuOption from '../../../components/menu/MenuOption.svelte';
-	import { isMenuVisible, setMenuVisible } from '../../../components/menu/menuStore';
+<script lang="ts">
 	import Header from './Header.svelte';
-	import SearchResults from './SearchResults.svelte';
-	import { searched, found_messages, filters } from './searchStores';
-	import { copyTextToClipboard } from '../../../helpers';
-	import MenuCategory from './MenuCategory.svelte';
-	export let data;
-	import { goto } from '$app/navigation';
+	import SearchResults from '../../../components/search/SearchResults.svelte';
+	import { searchShown, searchResultsMessageIds } from '../../../components/search/searchStores';
 
-	// redirect to first channel if no channel in guild is selected
-	if (data.guildId !== undefined && data.channelId === undefined && Object.keys(data.guild.channels).length > 0) {  // data.guildId can be zero (DMs) so we need to check for undefined
-        goto(`/channels/${data.guildId}/${Object.keys(data.guild.channels)[0]}`);
-    }
+	import type { PageServerData } from './$types';
+	export let data: PageServerData;
 
-	let currentGuildId = data.guildId;
+	import ChannelsMenu from '../../../components/channels/MenuCategories.svelte';
+	import Container from 'src/components/containers/Container.svelte';
+
+	let currentGuildId: string = data.guildId;
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time
 		if (currentGuildId !== data.guildId) {
 			currentGuildId = data.guildId;
-			$found_messages = [];
-			$searched = false;
+			$searchResultsMessageIds = [];
+			$searchShown = false;
 		}
 		console.log('current guild', data.guild);
 	}
 	$: guildChanged(data);
-
-
-
-	let rightClickId = null;
-	function onRightClick(e, id) {
-		$isMenuVisible = false  // close previous menu
-		setTimeout(() => {
-			rightClickId = id;
-			setMenuVisible(e)
-		}, 0);
-	}
-
-	$: if (!$isMenuVisible) {
-		rightClickId = null
-	}
 </script>
 
 
-
-<div id="guild-layout" class={$searched ? 'with-search' : ''}>
-	<div id="channels">
-		<div class="guild-name">{data.guilds[data.guildId].name}</div>
-		{#each Object.values(data.guild.categories) as category}
-			<MenuCategory {category} guildId={data.guildId} selectedChannelId={data.channelId} {onRightClick}/>
-		{/each}
-		{#if data.guildId != '0'}
-		<div id="backup-helper">
-			<a href="/channels/{data.guildId}/continue">Backup helper</a>
-		</div>
-		{/if}
-
-	</div>
-	<div id="header">
-		{#key data.channelId}
-			<Header
-				guild={data.guild}
-				channel={data.guild.channels[data.channelId]}
-				messages={data.messages}
-			/>
-		{/key}
-	</div>
-	<div id="messages">
-		<slot />
-	</div>
-	{#if $searched}
-		<div id="search">
-			{#key $filters}
-				<SearchResults guild={data.guild} />
-			{/key}
+{#key currentGuildId}
+	{#if !data.guild}
+		<Container>
+			<div class="txt">Guild ID {currentGuildId} not found</div>
+		</Container>
+	{:else}
+		<div id="guild-layout" class={$searchShown ? 'with-search' : ''}>
+			<div id="channels">
+				<div class="guild-name">{data.guild.name}</div>
+				<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} />
+			</div>
+			<div id="header">
+				{#key data.channelId}
+					<Header channelName={data.channel?.name} channelTopic={data.channel?.topic} guildId={data.guildId} />
+				{/key}
+			</div>
+			<div id="messages">
+				<slot />
+			</div>
+			{#if $searchShown}
+				<div id="search">
+					<SearchResults guildId={currentGuildId} />
+				</div>
+			{/if}
 		</div>
 	{/if}
-</div>
-
-{#if rightClickId}
-<ContextMenu let:visible>
-	<MenuOption
-			on:click={() => copyTextToClipboard(BigInt(rightClickId))}
-			text="Copy channel ID" {visible} />
-</ContextMenu>
-{/if}
+	
+{/key}
 
 <style>
 	#guild-layout {

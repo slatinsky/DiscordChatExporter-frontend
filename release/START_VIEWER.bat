@@ -1,11 +1,25 @@
 pushd "%~dp0"
-cd dcef/backend/preprocess
-preprocess.exe ../../../exports/ temp/
 
-cd ../nginx
+cd dcef/backend/mongodb
+if not exist db mkdir db
+start "mongodb" mongod --dbpath "db/"
+cd ../../..
+
+cd dcef/backend/nginx
 if not exist logs mkdir logs
 if not exist temp mkdir temp
 start "nginx" nginx.exe -c .\conf\nginx-prod.conf
+cd ../../..
+
+cd dcef/backend/fastapi
+start "fastapi" fastapi.exe
+cd ../../..
+
+timeout /t 1 /nobreak >nul
+
+cd dcef/backend/preprocess
+preprocess.exe ../../../exports/ temp/
+cd ../../..
 
 timeout /t 1 /nobreak >nul
 if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" (
@@ -17,4 +31,3 @@ if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" (
         start "" rundll32 url.dll,FileProtocolHandler http://127.0.0.1:21011/
     )
 )
-cd ../../../
