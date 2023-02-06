@@ -15,13 +15,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.16.0
-          cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
-
       - name: Setup Python
         uses: actions/setup-python@v2.3.3
         with:
@@ -34,6 +27,9 @@ jobs:
           mkdir -p build\dcef\backend\nginx\conf
           mkdir -p build\dcef\backend\nginx\logs
           mkdir -p build\dcef\backend\nginx\temp
+          mkdir -p build\dcef\backend\fastapi
+          mkdir -p build\dcef\backend\mongodb
+          mkdir -p build\dcef\backend\mongodb\db
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -49,18 +45,30 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller==5.5
 
-      - name: Build executable with pyinstaller
+      - name: Install fastapi dependencies
+        working-directory: backend/fastapi
+        run: |
+          pip install -r requirements.txt
+          pip install uvicorn==0.20.0
+
+      - name: Build preprocess executable with pyinstaller
         working-directory: backend/preprocess
-        run: pyinstaller --onefile --name preprocess main.py
+        run: pyinstaller --onefile --name preprocess main_mongo.py
+
+      - name: Build fastapi executable with pyinstaller
+        working-directory: backend/fastapi
+        run: pyinstaller --onefile --name fastapi main.py --hidden-import "uvicorn.logging" --hidden-import "uvicorn.loops" --hidden-import "uvicorn.loops.auto" --hidden-import "uvicorn.protocols" --hidden-import "uvicorn.protocols.http" --hidden-import "uvicorn.protocols.http.auto" --hidden-import "uvicorn.protocols.websockets" --hidden-import "uvicorn.protocols.websockets.auto" --hidden-import "uvicorn.lifespan" --hidden-import "uvicorn.lifespan.on" --hidden-import "app"
 
       - name: Move files to build folder
         run: |
           mv frontend\build build\dcef\frontend
-          mv backend\preprocess\dist\preprocess.exe build\dcef\backend\preprocess
-          cp backend\preprocess\emojiIndex.json build\dcef\backend\preprocess
-          cp backend\nginx\nginx.exe build\dcef\backend\nginx
+          mv backend\preprocess\dist\preprocess.exe build\dcef\backend\preprocess\preprocess.exe
+          mv backend\fastapi\dist\fastapi.exe build\dcef\backend\fastapi\fastapi.exe
+          cp backend\preprocess\emojiIndex.json build\dcef\backend\preprocess\emojiIndex.json
+          cp backend\nginx\nginx.exe build\dcef\backend\nginx\nginx.exe
           cp backend\nginx\conf\nginx-prod.conf build\dcef\backend\nginx\conf\nginx-prod.conf
           cp backend\nginx\conf\mime.types build\dcef\backend\nginx\conf\mime.types
+          cp backend\mongodb\mongod.exe build\dcef\backend\mongodb\mongod.exe
           Copy-Item -Path release\exports\* -Destination build\exports -Recurse
           cp release\START_VIEWER.bat build\START_VIEWER.bat
 
