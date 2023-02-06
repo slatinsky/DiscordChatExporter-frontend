@@ -12,6 +12,7 @@
     }
     function process(content: string): void {
         processedContent = window.discordMarkdown.toHTML(content, {embed});
+        processedContent = processedContent.replaceAll('<a href=', '<a target="_blank" href=')  // open all links in new tab
         // let regex = /:\w+:/g;
         // // if regex matches, replace with emoji
         // if (regex.test(processedContent)) {
@@ -26,20 +27,20 @@
         // }
 
         // // message links
-        // regex = /href="https:\/\/discord(?:app)?\.com\/channels\/(\d+)\/(\d+)\/(\d+)"/
-        // if (regex.test(processedContent)) {
-        //     processedContent = processedContent.replace(regex, (match, guildId, channelId, messageId) => {
-        //         return `href="/channels/${guildId.toString().padStart(24, '0')}/${channelId.toString().padStart(24, '0')}#${messageId.toString().padStart(24, '0')}"`
-        //     })
-        // }
+        let regex = /target="_blank" href="https:\/\/discord(?:app)?\.com\/channels\/(\d+)\/(\d+)\/(\d+)"/
+        if (regex.test(processedContent)) {
+            processedContent = processedContent.replace(regex, (match, guildId, channelId, messageId) => {
+                return `href="/channels/${guildId.toString().padStart(24, '0')}/${channelId.toString().padStart(24, '0')}#${messageId.toString().padStart(24, '0')}"`
+            })
+        }
 
         // // channel links
-        // regex = /href="https:\/\/discord(?:app)?\.com\/channels\/(\d+)\/(\d+)"/
-        // if (regex.test(processedContent)) {
-        //     processedContent = processedContent.replace(regex, (match, guildId, channelId) => {
-        //         return `href="/channels/${guildId.toString().padStart(24, '0')}/${channelId.toString().padStart(24, '0')}"`
-        //     })
-        // }
+        regex = /target="_blank" href="https:\/\/discord(?:app)?\.com\/channels\/(\d+)\/(\d+)"/
+        if (regex.test(processedContent)) {
+            processedContent = processedContent.replace(regex, (match, guildId, channelId) => {
+                return `href="/channels/${guildId.toString().padStart(24, '0')}/${channelId.toString().padStart(24, '0')}"`
+            })
+        }
 
         // if (message.mentions && message.mentions.length > 0) {
         //     message.mentions.forEach(mention => {
