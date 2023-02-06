@@ -97,13 +97,13 @@
 					{#if embed.thumbnail}
 						<div class="chatlog__embed-thumbnail-container">
 								<!-- {console.warn(embed.thumbnail.type)} -->
-								{#if embed.thumbnail?.url?.type === 'video'}
-									<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.url?.url}" target="_blank">
-										<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.thumbnail?.url?.url)}" autoplay loop muted playsinline
+								{#if embed.thumbnail?.type === 'video'}
+									<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.url}" target="_blank">
+										<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.thumbnail)}" autoplay loop muted playsinline
 										width="{embed.thumbnail?.width ?? 16}"
 										height="{embed.thumbnail?.height ?? 16}"/>
 									</a>
-								{:else if embed.thumbnail?.url?.url}
+								{:else if embed.thumbnail?.type === 'image'}
 									<ImageGallery asset={embed.thumbnail} imgclass={"chatlog__embed-thumbnail"} />
 								{/if}
 						</div>
