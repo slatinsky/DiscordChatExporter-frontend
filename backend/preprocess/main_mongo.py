@@ -3,6 +3,7 @@ from hashlib import sha256
 import hashlib
 import os
 import re
+import sys
 
 import imagesize
 from pymongo import MongoClient
@@ -760,20 +761,20 @@ class JsonProcessor:
 
 
 
-def main():
+def main(input_dir, output_dir):
 	print("main_mongo loaded")
 
 	database = MongoDatabase()
 	# DEBUG clear database
-	database.clear_database_except_assets()
+	# database.clear_database_except_assets()
 
-	file_finder = FileFinder("../../exports/")
+	file_finder = FileFinder(input_dir)
 
 	jsons = file_finder.find_channel_exports()
 	print("found " + str(len(jsons)) + " json channel exports")
 
 	# DEBUG get only first n files
-	jsons = jsons[:400]
+	# jsons = jsons[:400]
 
 	asset_processor = AssetProcessor(file_finder, database)
 	asset_processor.set_fast_mode(True)  # don't process slow actions
@@ -787,5 +788,7 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+	input_dir = sys.argv[1]
+	output_dir = sys.argv[2]
+	main(input_dir, output_dir)
 
