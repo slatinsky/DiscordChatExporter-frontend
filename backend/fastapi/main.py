@@ -9,6 +9,7 @@ collection_messages = db["messages"]
 collection_channels = db["channels"]
 collection_guilds = db["guilds"]
 collection_authors = db["authors"]
+collection_emojis = db["emojis"]
 
 app = FastAPI(
 	title="DCEF backend api",
@@ -152,6 +153,30 @@ def extend_users(user_ids: list, usernames: list):
 	user_ids = list(set(user_ids))  # remove duplicates
 	return user_ids
 
+def extend_reactions(reaction_ids: list, reactions: list):
+	"""
+	Find new reaction ids by reaction names.
+	Support partial or lowercase match.
+
+	"""
+	if len(reactions) == 0:
+		return reactions
+
+	reaction_ids = reaction_ids.copy()
+	# partial match
+
+	or_ = []
+	for reaction in reactions:
+		or_.append({"name": {"$regex": reaction, "$options": "i"}})
+
+	query = {"$or": or_}
+
+	new_reaction_ids_cursor = collection_emojis.find(query, {"_id": 1})
+	new_reaction_ids = [reaction["_id"] for reaction in new_reaction_ids_cursor]
+	reaction_ids.extend(new_reaction_ids)
+	reaction_ids = list(set(reaction_ids))  # remove duplicates
+	return reaction_ids
+
 
 def parse_prompt(prompt: str):
 	"""
@@ -165,6 +190,7 @@ def parse_prompt(prompt: str):
 		"mentions_user_ids": [],         # user ids (strings) (or)
 		"mentions_users": [],            # user names (or)
 		"reaction_ids": [],              # emoji ids (strings) (or)
+		"reactions": [],                 # emoji names (or)
 		"extensions": [],                # file extensions like "pdf", "java" (or)
 		"filenames": [],                 # file names (or)
 		"in_channel_ids": [],            # channel ids (strings) (or)
@@ -182,7 +208,7 @@ def parse_prompt(prompt: str):
 	# loop throught all characters
 	inside_quotes = False
 	word = ""
-	valid_search_keys = ["message_id", "user_id", "user", "mentions_user_id", "mentions_user", "reaction_id", "extension", "filename", "in_channel_id", "in_category_id",
+	valid_search_keys = ["message_id", "user_id", "user", "mentions_user_id", "mentions_user", "reaction_id", "reaction" ,"extension", "filename", "in_channel_id", "in_category_id",
 	"is_pinned", "has_audio", "has_image", "has_video", "has_other", "has_link", "is_edited", "limit"]
 	current_key = None
 
@@ -209,6 +235,8 @@ def parse_prompt(prompt: str):
 				search["mentions_users"].append(word)
 			elif (current_key == "reaction_id"):
 				search["reaction_ids"].append(word)
+			elif (current_key == "reaction"):
+				search["reactions"].append(word)
 			elif (current_key == "extension"):
 				search["extensions"].append(word)
 			elif (current_key == "filename"):
@@ -288,6 +316,7 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 	mentions_user_ids = search["mentions_user_ids"]
 	mentions_users = search["mentions_users"]
 	reaction_ids = search["reaction_ids"]
+	reactions = search["reactions"]
 	extensions = search["extensions"]
 	filenames = search["filenames"]
 	in_channel_ids = search["in_channel_ids"]
@@ -311,6 +340,8 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 	mentions_users = [user.lower() for user in mentions_users]
 	mentions_user_ids = extend_users(mentions_user_ids, mentions_users)
 	reaction_ids = [pad_id(id) for id in reaction_ids]
+	reactions = [reaction.lower() for reaction in reactions]
+	reaction_ids = extend_reactions(reaction_ids, reactions)
 	extensions = [ext.lower() for ext in extensions]
 	in_channel_ids = [pad_id(id) for id in in_channel_ids]
 	in_channel_ids = extend_channels(in_channel_ids)      # extend channels with threads and forum posts

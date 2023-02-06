@@ -113,6 +113,11 @@
 			type: 'discord_snowflake',
 		},
 		{
+			key: 'reaction',
+			description: 'string',
+			type: 'string',
+		},
+		{
 			key: 'extension',
 			description: 'pdf/png/jpg/etc',
 			type: 'string',
