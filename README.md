@@ -71,6 +71,8 @@ docker run --volume "$(pwd):/dcef/exports" --volume dcef_cache:/dcef/cache --rm 
 
 To debug running container, run `docker exec -it $(docker ps | grep 'dcef' | awk '{ print $1 }') sh`. This will open a shell inside the container.
 
+To remove volume `dcef_cache` with temporary files, run `docker volume rm dcef_cache`
+
 </p>
 </details>
 

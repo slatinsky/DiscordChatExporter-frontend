@@ -54,7 +54,7 @@ class MongoDatabase():
 			"jsons": self.database["jsons"]
 		}
 
-		self.create_indexes()
+		# self.create_indexes()
 
 	def create_indexes(self):
 		# create case insensitive text indexes
@@ -309,6 +309,7 @@ class AssetProcessor:
 		"""
 		if original_filepath == None:
 			return
+		original_filepath = self.file_finder.normalize_path(original_filepath)
 
 		is_remote = self.is_remote(original_filepath)
 		filename_with_hash = self.get_filename_with_hash(original_filepath, is_remote)
