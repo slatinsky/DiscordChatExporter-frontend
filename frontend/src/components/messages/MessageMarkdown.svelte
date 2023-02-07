@@ -1,8 +1,13 @@
 <script lang="ts">
+	import { checkUrl } from "src/js/helpers";
+	import type { Emoji } from "src/js/interfaces";
+
+
     export let content: string
     // export let guild
     // export let message
     export let embed = false
+    export let emotes: Emoji[] | null = null
     let processedContent: string
 
     function escapeHTML(unsafeText: string): string {  // source https://stackoverflow.com/a/48054293
@@ -13,18 +18,13 @@
     function process(content: string): void {
         processedContent = window.discordMarkdown.toHTML(content, {embed});
         processedContent = processedContent.replaceAll('<a href=', '<a target="_blank" href=')  // open all links in new tab
-        // let regex = /:\w+:/g;
-        // // if regex matches, replace with emoji
-        // if (regex.test(processedContent)) {
-        //     try {
-        //         processedContent = processedContent.replace(regex, (match) => {
-        //             return `<img src="${checkUrl(Object.values(guild.emojis).find(emoji => emoji.name === match.slice(1, -1)).imageUrl?.url)}" alt="${match}" title="${match}" class="message-emoji">`
-        //         })
-        //     }
-        //     catch (e) {
-        //         console.warn("emojis not found", processedContent.match(regex));
-        //     }
-        // }
+        if (emotes) {
+            for (let emote of emotes) {
+                console.warn(emote.name, emote.image.path);
+                console.log(processedContent);
+                processedContent = processedContent.replaceAll(`:${emote.name}:`, `<img src="${checkUrl(emote.image)}" alt="${emote.name}" title="${emote.name}" class="message-emoji">`)
+            }
+        }
 
         // // message links
         let regex = /target="_blank" href="https:\/\/discord(?:app)?\.com\/channels\/(\d+)\/(\d+)\/(\d+)"/

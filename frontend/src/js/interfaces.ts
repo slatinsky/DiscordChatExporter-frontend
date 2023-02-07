@@ -48,15 +48,17 @@ export interface Sticker {
 	source: Asset;
 }
 
+export interface Emoji {
+	id: string;
+	name: string;
+	isAnimated: boolean;
+	image: Asset;
+	source: "default" | "custom";
+	guildId: string | null;
+}
+
 export interface Reaction {
-	emoji: {
-		id: string;
-		name: string;
-		isAnimated: boolean;
-		image: Asset;
-		source: "default" | "custom";
-		guildId: string | null;
-	};
+	emoji: Emoji;
 	count: number;
 }
 
@@ -106,7 +108,8 @@ export interface Message {
 	}[];
 	author: Author;
 	stickers: Sticker[] | null;
-	reactions: Reaction[] | null;
+	reactions: Emoji[] | null;
+	emotes: Reaction[] | null;   // emotes in the message
 	mentions: Mention[] | null;
 	attachments: Asset[] | null;
 	embeds: NewType[] | null;

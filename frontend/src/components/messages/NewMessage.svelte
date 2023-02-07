@@ -175,7 +175,7 @@
 										<span
 											class="chatlog__reference-link"
 											>
-											<MessageMarkdown content={referencedMessage.content[0].content.replace("\n", " ")} />
+											<MessageMarkdown content={referencedMessage.content[0].content.replace("\n", " ")}/>
 											</span
 										>
 									</div>
@@ -201,7 +201,7 @@
 						<div class="chatlog__content chatlog__markdown">
 							<span class="chatlog__markdown-preserve"
 								>
-								<MessageMarkdown content={message.content[0].content} />
+								<MessageMarkdown content={message.content[0].content} emotes={message?.emotes || undefined} />
 								</span
 							>
 							{#if message.timestampEdited != null}

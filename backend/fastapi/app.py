@@ -1,4 +1,5 @@
 from pprint import pprint
+import re
 import pymongo
 from fastapi import FastAPI, Query
 
@@ -111,7 +112,9 @@ async def get_multiple_message_content(message_ids: list):
 	Returns the content of multiple messages by their ids.
 	"""
 	messages = collection_messages.find({"_id": {"$in": message_ids}})
-	return list(messages)
+	list_of_messages = list(messages)
+	list_of_messages = enrich_messages(list_of_messages)
+	return list_of_messages
 
 
 def extend_channels(channels: list):
@@ -153,6 +156,7 @@ def extend_users(user_ids: list, usernames: list):
 	user_ids = list(set(user_ids))  # remove duplicates
 	return user_ids
 
+
 def extend_reactions(reaction_ids: list, reactions: list):
 	"""
 	Find new reaction ids by reaction names.
@@ -177,6 +181,58 @@ def extend_reactions(reaction_ids: list, reactions: list):
 	reaction_ids = list(set(reaction_ids))  # remove duplicates
 	return reaction_ids
 
+
+
+def get_emotes_from_db(emote_names: list) -> dict:
+	"""
+	try to find emotes from DB by their name
+	use exact match only
+	"""
+	if len(emote_names) == 0:
+		return {}
+
+	or_ = []
+	for emote_name in emote_names:
+		or_.append({"name": emote_name})
+
+	query = {"$or": or_}
+
+	emotes = collection_emojis.find(query)
+	emotes = {emote["name"]: emote for emote in emotes}
+	return emotes
+
+def enrich_messages(list_of_messages: list) -> list:
+	regex = re.compile(r':([^ ]+):')
+
+	possible_emotes = []
+	for message in list_of_messages:
+		for content in message["content"]:
+			message_content = content["content"]
+			# match all
+			search = regex.findall(message_content)
+			possible_emotes.extend(search)
+
+	possible_emotes = list(set(possible_emotes))
+
+
+	# get all emotes from db
+	emotes = get_emotes_from_db(emote_names=possible_emotes)
+
+	# replace emotes in messages
+	for message in list_of_messages:
+		message_emotes = []
+		for content in message["content"]:
+			message_content = content["content"]
+			search = regex.findall(message_content)
+			for emote_name in search:
+				if emote_name in emotes:
+					emote = emotes[emote_name]
+					message_emotes.append(emote)
+
+		if len(message_emotes) > 0:
+			message["emotes"] = message_emotes
+
+	return list_of_messages
 
 def parse_prompt(prompt: str):
 	"""
@@ -296,7 +352,6 @@ def parse_prompt(prompt: str):
 
 	print(search)
 	return search
-
 
 
 
@@ -486,5 +541,7 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 	if only_ids:
 		ids=[str(id["_id"]) for id in cursor]
 		return ids
-
-	return list(cursor)
+	else:
+		list_of_messages = list(cursor)
+		list_of_messages = enrich_messages(list_of_messages)
+		return list_of_messages
