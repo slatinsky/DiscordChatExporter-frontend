@@ -1,23 +1,37 @@
 <script lang="ts">
+	import type { Channel } from 'src/js/interfaces';
 	import IconChannel from '../../../components/icons/IconChannel.svelte';
 	import SearchFilter from '../../../components/search/SearchFilter.svelte';
 
-	export let channelName = '';
-	export let channelTopic = '';
+	export let channel: Channel | null = null;
+	export let thread: Channel | null = null;
 	export let guildId: string;
 </script>
 
 <section class="header-container">
 	<div class="channel-header">
 		<div class="channel-header__left">
-			{#if channelName}
+			{#if channel !== null}
 				<IconChannel />
-				<div class="channel-name elipsis"> {channelName}</div>
-				{#if channelTopic}
+				<a href={`/channels/${guildId}/${channel._id}`}>
+					<div class="channel-name elipsis"> {channel.name}</div>
+				</a>
+				{#if thread === null && channel.topic !== null}
 					<div class="divider">|</div>
-					<div class="topic elipsis">{channelTopic}</div>
+					<div class="topic elipsis">{channel.topic}</div>
 				{/if}
 			{/if}
+			{#if thread !== null}
+					<div class="divider">|</div>
+					<IconChannel />
+					<a href={`/channels/${guildId}/${thread._id}`}>
+						<div class="channel-name elipsis"> {thread.name}</div>
+					</a>
+					{#if thread.topic !== null}
+						<div class="divider">|</div>
+						<div class="topic elipsis">{thread.topic}</div>
+					{/if}
+				{/if}
 			<div class="spacer" />
 			<SearchFilter {guildId} />
 		</div>

@@ -35,7 +35,7 @@
 			</div>
 			<div id="header">
 				{#key data.channelId}
-					<Header channelName={data.channel?.name} channelTopic={data.channel?.topic} guildId={data.guildId} />
+					<Header channel={data.channel} thread={data.thread} guildId={data.guildId} />
 				{/key}
 			</div>
 			<div id="messages">

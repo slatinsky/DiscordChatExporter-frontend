@@ -24,15 +24,24 @@ export const load: Load = async({ fetch, params, parent }) => {
         guildIdCached = guildId
     }
 
-	let channel
+	let channel: Channel
+	let thread: Channel
     if (channels) {
-        channels.find((c: Channel) => c._id === selectedChannelId);
+        channel = channels.find((c: Channel) => c._id === selectedChannelId);
+        if (channel && (channel.type === "GuildPublicThread" || channel.type === "GuildPrivateThread")) {
+            thread = channel
+            channel = channels.find((c: Channel) => c._id === channel.categoryId);
+        }
+    }
+    else {
+        console.error('Channels not found')
     }
 
     return {
         guildId: selectedGuildId,
         channelId: selectedChannelId,
 		channel: channel,
+		thread: thread,
 		guild: guild,
         channels: channels
     };
