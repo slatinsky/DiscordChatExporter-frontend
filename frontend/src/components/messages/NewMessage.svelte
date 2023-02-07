@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { checkUrl, copyTextToClipboard } from 'src/js/helpers';
-	import type { Message } from 'src/js/interfaces';
+	import type { Author, Message } from 'src/js/interfaces';
 	import { renderTimestamp } from 'src/js/time';
 	import ImageGallery from 'src/routes/channels/[guildId]/[channelId]/ImageGallery.svelte';
 	import { contextMenuItems} from '../menu/menuStore';
@@ -10,7 +10,6 @@
 	import MessageMarkdown from './MessageMarkdown.svelte';
 	import MessageReactions from './MessageReactions.svelte';
 	import MessageStickers from './MessageStickers.svelte';
-	import { goto } from '$app/navigation';
 
 	export let message: Message;
 	export let previousMessage: Message | null = null;
@@ -33,15 +32,18 @@
 		return author.name + '#' + author.discriminator;
 	}
 
-	function nickname(author) {
-		if ($nameRenderer === 'nickname') {
-			return author?.nickname ?? full_name(author);
+	function nickname(author: Author): string {
+		if ($nameRenderer === 'handle') {
+			return full_name(author);
+		}
+		else if ($nameRenderer === 'nickname') {
+			return author?.nicknames?.[0] ?? full_name(author);
 		}
 		else if ($nameRenderer === 'both') {
-			return author?.nickname + ' (' + full_name(author) + ')';
+			return author?.nicknames?.[0] + ' (' + full_name(author) + ')';
 		}
 		else {
-			return full_name(author);
+			console.error('Unknown name renderer: ' + $nameRenderer);
 		}
 	}
 
