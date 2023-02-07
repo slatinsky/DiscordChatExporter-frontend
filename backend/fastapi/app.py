@@ -201,6 +201,26 @@ def get_emotes_from_db(emote_names: list) -> dict:
 	emotes = {emote["name"]: emote for emote in emotes}
 	return emotes
 
+def get_channel_info(channel_id):
+	"""
+	get channel info by id
+	'channel' can be thread or channel or forum post
+	"""
+
+	# print("get_channel_info", channel_id)
+	channel = collection_channels.find_one({"_id": channel_id})
+	if not channel:
+		return {
+			"type": "GuildPublicThread",
+			"name": "Not found",
+		}
+
+	# print("get_channel_info", channel)
+	msg_count = collection_messages.count_documents({"channelId": channel_id})
+	channel["msgCount"] = msg_count
+	return channel
+
+
 def enrich_messages(list_of_messages: list) -> list:
 	regex = re.compile(r':([^ ]+):')
 
@@ -231,6 +251,10 @@ def enrich_messages(list_of_messages: list) -> list:
 
 		if len(message_emotes) > 0:
 			message["emotes"] = message_emotes
+
+	for message in list_of_messages:
+		if message["type"] == "ThreadCreated":
+			message["thread"] = get_channel_info(message["reference"]["channelId"])
 
 	return list_of_messages
 

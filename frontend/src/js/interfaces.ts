@@ -121,6 +121,7 @@ export interface Message {
 	guildId: string;
 	channelId: string;
 	channelName: string;
+	thread?: Channel;            // if message type is "ThreadCreated"
 }
 
 export interface MessageIdLoad {

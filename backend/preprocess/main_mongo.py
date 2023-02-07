@@ -54,11 +54,13 @@ class MongoDatabase():
 			"jsons": self.database["jsons"]
 		}
 
-		# self.create_indexes()
+		self.create_indexes()
 
 	def create_indexes(self):
 		# create case insensitive text indexes
-		self.col["messages"].create_index("content.content", default_language="none")
+		# self.col["messages"].create_index("content.content", default_language="none")
+		self.col["messages"].create_index("channelId", default_language="none")
+
 
 
 	def clear_database_except_assets(self):

@@ -131,9 +131,9 @@
 						<a href="/channels/{selectedGuildId}/{message.reference.channelId}">
 							<div class="chatlog__message-primary thread-created">
 								<div>
-									<span class="thread-name">{message.threadName}</span>
-									{#if message.threadMsgCount}
-										<span class="thread-msg-count">{message.threadMsgCount} messages</span>
+									<span class="thread-name">{message?.thread?.name ?? "Thread not found"}</span>
+									{#if message?.thread?.msgCount}
+										<span class="thread-msg-count">{message?.thread?.msgCount} messages</span>
 									{/if}
 								</div>
 								<span
