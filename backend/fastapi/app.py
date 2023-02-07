@@ -258,6 +258,149 @@ def enrich_messages(list_of_messages: list) -> list:
 
 	return list_of_messages
 
+SEARCH_CATEGORIES = [
+	{
+		"key": 'message_id',
+		"description": 'id',
+		"type": 'discord_snowflake',
+		"multiple": True,
+		"mapTo": "message_ids",
+	},
+	{
+		"key": 'user_id',
+		"description": 'id',
+		"type": 'discord_snowflake',
+		"multiple": True,
+		"mapTo": "from_user_ids",
+	},
+	{
+		"key": 'user',
+		"description": 'string',
+		"type": 'string',
+		"multiple": True,
+		"mapTo": "from_users",
+	},
+	{
+		"key": 'mentions_user_id',
+		"description": 'id',
+		"type": 'discord_snowflake',
+		"multiple": True,
+		"mapTo": "mentions_user_ids",
+	},
+	{
+		"key": 'mentions_user',
+		"description": 'string',
+		"type": 'string',
+		"multiple": True,
+		"mapTo": "mentions_users",
+	},
+	{
+		"key": 'reaction_id',
+		"description": 'id',
+		"type": 'discord_snowflake',
+		"multiple": True,
+		"mapTo": "reaction_ids",
+	},
+	{
+		"key": 'reaction',
+		"description": 'string',
+		"type": 'string',
+		"multiple": True,
+		"mapTo": "reactions",
+	},
+	{
+		"key": 'extension',
+		"description": 'pdf/png/jpg/etc',
+		"type": 'string',
+		"multiple": True,
+		"mapTo": "extensions",
+	},
+	{
+		"key": 'filename',
+		"description": 'string',
+		"type": 'string',
+		"multiple": True,
+		"mapTo": "filenames",
+	},
+	{
+		"key": 'in_channel_id',
+		"description": 'id',
+		"type": 'discord_snowflake',
+		"multiple": True,
+		"mapTo": "in_channel_ids",
+	},
+	{
+		"key": 'in_category_id',
+		"description": 'id',
+		"type": 'discord_snowflake',
+		"multiple": True,
+		"mapTo": "in_category_ids",
+	},
+	{
+		"key": 'is_pinned',
+		"description": 'true/false',
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "is_pinned",
+	},
+	{
+		"key": 'has_audio',
+		"description": 'true/false',
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "attachment_is_audio",
+	},
+	{
+		"key": 'has_image',
+		"description": 'true/false',
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "attachment_is_image",
+	},
+	{
+		"key": 'has_video',
+		"description": 'true/false',
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "attachment_is_video",
+	},
+	{
+		"key": 'has_other',
+		"description": 'true/false',
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "attachment_is_other",
+	},
+	{
+		"key": 'has_link',
+		"description": 'true/false',
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "containing_links",
+	},
+	{
+		"key": 'is_edited',
+		"description": 'true/false',
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "is_edited",
+	},
+	{
+		"key": 'limit',
+		"description": 'number (default 100000)',
+		"type": 'number',
+		"multiple": False,
+		"mapTo": "limit",
+	},
+]
+
+
+@app.get("/search-categories")
+def search_categories():
+	return SEARCH_CATEGORIES
+
+
+
 def parse_prompt(prompt: str):
 	"""
 	Parses a prompt into categories.
@@ -288,8 +431,7 @@ def parse_prompt(prompt: str):
 	# loop throught all characters
 	inside_quotes = False
 	word = ""
-	valid_search_keys = ["message_id", "user_id", "user", "mentions_user_id", "mentions_user", "reaction_id", "reaction" ,"extension", "filename", "in_channel_id", "in_category_id",
-	"is_pinned", "has_audio", "has_image", "has_video", "has_other", "has_link", "is_edited", "limit"]
+	valid_search_keys = [x["key"] for x in SEARCH_CATEGORIES]
 	current_key = None
 
 	for i, char in enumerate(prompt.strip() + " "):
@@ -303,71 +445,33 @@ def parse_prompt(prompt: str):
 			continue
 
 		if char == ' ' and not inside_quotes:
-			if (current_key == "message_id"):
-				search["message_ids"].append(word)
-			elif (current_key == "user_id"):
-				search["from_user_ids"].append(word)
-			elif (current_key == "user"):
-				search["from_users"].append(word)
-			elif (current_key == "mentions_user_id"):
-				search["mentions_user_ids"].append(word)
-			elif (current_key == "mentions_user"):
-				search["mentions_users"].append(word)
-			elif (current_key == "reaction_id"):
-				search["reaction_ids"].append(word)
-			elif (current_key == "reaction"):
-				search["reactions"].append(word)
-			elif (current_key == "extension"):
-				search["extensions"].append(word)
-			elif (current_key == "filename"):
-				search["filenames"].append(word)
-			elif (current_key == "in_channel_id"):
-				search["in_channel_ids"].append(word)
-			elif (current_key == "in_category_id"):
-				search["in_category_ids"].append(word)
-			elif (current_key == "is_pinned"):
-				if word == "true":
-					search["is_pinned"] = True
-				elif word == "false":
-					search["is_pinned"] = False
-			elif (current_key == "has_audio"):
-				if word == "true":
-					search["attachment_is_audio"] = True
-				elif word == "false":
-					search["attachment_is_audio"] = False
-			elif (current_key == "has_image"):
-				if word == "true":
-					search["attachment_is_image"] = True
-				elif word == "false":
-					search["attachment_is_image"] = False
-			elif (current_key == "has_video"):
-				if word == "true":
-					search["attachment_is_video"] = True
-				elif word == "false":
-					search["attachment_is_video"] = False
-			elif (current_key == "has_other"):
-				if word == "true":
-					search["attachment_is_other"] = True
-				elif word == "false":
-					search["attachment_is_other"] = False
-			elif (current_key == "has_link"):
-				if word == "true":
-					search["containing_links"] = True
-				elif word == "false":
-					search["containing_links"] = False
-			elif (current_key == "is_edited"):
-				if word == "true":
-					search["is_edited"] = True
-				elif word == "false":
-					search["is_edited"] = False
-			elif (current_key == "limit"):
-				search["limit"] = int(word)
-			else:
-				if word != "":
-					search["message_contains"].append(word)
-
 			if current_key in valid_search_keys:
+				search_category = filter(lambda x: x["key"] == current_key, SEARCH_CATEGORIES)[0]
+
+				if search_category["type"] == "boolean":
+					if word.lower() == "true":
+						word = True
+						search[search_category["mapTo"]] = True
+					elif word.lower() == "false":
+						word = False
+						search[search_category["mapTo"]] = False
+					else:
+						word = None
+				elif search_category["type"] == "number":
+					try:
+						word = int(word)
+						search[search_category["mapTo"]] = word
+					except ValueError:
+						word = None
+						print("Invalid number")
+
+				elif search_category["type"] == "string" or search_category["type"] == "discord_snowflake":
+					search[search_category["mapTo"]].append(word)
+
 				current_key = None
+
+			elif word != "":
+				search["message_contains"].append(word)
 
 			word = ""
 			continue

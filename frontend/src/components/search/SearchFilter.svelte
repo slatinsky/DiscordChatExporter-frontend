@@ -2,6 +2,16 @@
 	import { searchResultsMessageIds, searchShown } from "./searchStores";
 	export let guildId: string;
 
+	let categories: FilterCategory[] = []
+
+	async function fetchCategories() {
+		const res = await fetch('/api/search-categories')
+		const json = await res.json()
+		categories = json
+	}
+
+	fetchCategories()
+
 	// input
 	let domInput: HTMLInputElement;
 	let isInputFocused = false;
@@ -81,103 +91,7 @@
 		type: 'string' | 'discord_snowflake' | 'number' | 'boolean';
 	}
 
-	let categories: FilterCategory[] = [
-		{
-			key: 'message_id',
-			description: 'id',
-			type: 'discord_snowflake'
-		},
-		{
-			key: 'user_id',
-			description: 'id',
-			type: 'discord_snowflake',
-		},
-		{
-			key: 'user',
-			description: 'string',
-			type: 'string',
-		},
-		{
-			key: 'mentions_user_id',
-			description: 'id',
-			type: 'discord_snowflake',
-		},
-		{
-			key: 'mentions_user',
-			description: 'string',
-			type: 'string',
-		},
-		{
-			key: 'reaction_id',
-			description: 'id',
-			type: 'discord_snowflake',
-		},
-		{
-			key: 'reaction',
-			description: 'string',
-			type: 'string',
-		},
-		{
-			key: 'extension',
-			description: 'pdf/png/jpg/etc',
-			type: 'string',
-		},
-		{
-			key: 'filename',
-			description: 'string',
-			type: 'string',
-		},
-		{
-			key: 'in_channel_id',
-			description: 'id',
-			type: 'discord_snowflake',
-		},
-		{
-			key: 'in_category_id',
-			description: 'id',
-			type: 'discord_snowflake',
-		},
-		{
-			key: 'is_pinned',
-			description: 'true/false',
-			type: 'boolean',
-		},
-		{
-			key: 'has_audio',
-			description: 'true/false',
-			type: 'boolean',
-		},
-		{
-			key: 'has_image',
-			description: 'true/false',
-			type: 'boolean',
-		},
-		{
-			key: 'has_video',
-			description: 'true/false',
-			type: 'boolean',
-		},
-		{
-			key: 'has_other',
-			description: 'true/false',
-			type: 'boolean',
-		},
-		{
-			key: 'has_link',
-			description: 'true/false',
-			type: 'boolean',
-		},
-		{
-			key: 'is_edited',
-			description: 'true/false',
-			type: 'boolean',
-		},
-		{
-			key: 'limit',
-			description: 'number (default 100000)',
-			type: 'number',
-		},
-	]
+
 
 	let filteredCategories: FilterCategory[] = [];
 	function filterOptions(newValue: string) {
