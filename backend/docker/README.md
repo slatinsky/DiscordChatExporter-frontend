@@ -2,4 +2,4 @@
 ```bash
 build.sh
 ```
-This helper file at the end of Dockerfile to automatically run the preprocessor and nginx after container is started.
+This helper file at the end of Dockerfile to run the container
