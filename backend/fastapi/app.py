@@ -89,7 +89,7 @@ async def get_message_ids(channel_id: str = None):
 	if channel_id:
 		query["channelId"] = channel_id
 
-	ids = collection_messages.find(query, {"_id": 1})
+	ids = collection_messages.find(query, {"_id": 1}).sort([("_id", pymongo.ASCENDING)])
 	new_ids = [str(id["_id"]) for id in ids]
 	return new_ids
 
@@ -479,9 +479,9 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 		cursor.limit(limit)
 
 	if order_by == "newest":
-		cursor.sort([("timestamp", pymongo.DESCENDING)])
+		cursor.sort([("_id", pymongo.DESCENDING)])
 	else:
-		cursor.sort([("timestamp", pymongo.ASCENDING)])
+		cursor.sort([("_id", pymongo.ASCENDING)])
 
 	if only_ids:
 		ids=[str(id["_id"]) for id in cursor]
