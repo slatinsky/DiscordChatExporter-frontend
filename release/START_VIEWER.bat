@@ -8,8 +8,9 @@ cd ../../..
 cd dcef/backend/nginx
 if not exist logs mkdir logs
 if not exist temp mkdir temp
-start "nginx" nginx.exe -c .\conf\nginx-prod.conf
 cd ../../..
+if not exist logs mkdir logs
+start "nginx" ./dcef/backend/nginx/nginx.exe -c ./dcef/backend/nginx/conf/nginx-prod.conf
 
 cd dcef/backend/fastapi
 start "fastapi" fastapi.exe

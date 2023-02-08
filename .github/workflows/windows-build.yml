@@ -23,6 +23,7 @@ jobs:
       - name: Create directories
         run: |
           mkdir -p build\exports
+          mkdir -p build\registry_tweaks
           mkdir -p build\dcef\backend\preprocess
           mkdir -p build\dcef\backend\nginx\conf
           mkdir -p build\dcef\backend\nginx\logs
@@ -72,6 +73,9 @@ jobs:
           Copy-Item -Path release\exports\* -Destination build\exports -Recurse
           cp release\START_VIEWER.bat build\START_VIEWER.bat
           cp release\clear_database.bat build\clear_database.bat
+          cp release\registry_tweaks\change_260_character_path_limit_to_32767.reg build\registry_tweaks\change_260_character_path_limit_to_32767.reg
+          cp release\registry_tweaks\restore_260_character_path_limit.reg build\registry_tweaks\restore_260_character_path_limit.reg
+          cp release\registry_tweaks\README.txt build\registry_tweaks\README.txt
 
       - name: Upload build folder
         uses: actions/upload-artifact@v2
