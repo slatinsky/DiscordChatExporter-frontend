@@ -1,41 +1,110 @@
 <script lang="ts">
+	import { onMount } from "svelte";
+
+	interface SearchCategory {
+		key: string;
+		description: string;
+		type: 'string' | 'discord_snowflake' | 'number' | 'boolean';
+		multiple: boolean;
+		mapTo: string;    // mapTo - useful only on the backend
+	}
+	interface SearchSuggestion {
+		key: string;
+		description: string;
+		action: () => void;
+	}
+
+
 	import { searchResultsMessageIds, searchShown } from "./searchStores";
 	export let guildId: string;
 
-	let categories: FilterCategory[] = []
+	let searchCategories: SearchCategory[] = []
 
-	async function fetchCategories() {
+	async function fetchCategories(): Promise<SearchCategory> {
 		const res = await fetch('/api/search-categories')
 		const json = await res.json()
-		categories = json
+		return json
 	}
 
-	fetchCategories()
+
+
 
 	// input
 	let domInput: HTMLInputElement;
+	let searchSuggestionDoms: HTMLDivElement[] = [];
 	let isInputFocused = false;
 	let inputValue = '';
-	let searchKey = '';
-	let searchValue = null;
 	let selectedMenuIndex = -1;
-	let unfocusTimeout;
+
+
+	function parsePrompt(prompt: string) {
+		let insideQuotes = false;
+		let validSearchCategoriesKeys = searchCategories.map((category) => category.key);
+
+		let foundKeys: string[] = [];
+		let key = '';
+		let value = '';
+
+		let state: 'key' | 'value' = 'key';
+
+		for (let i = 0; i < prompt.length; i++) {
+			let char = prompt[i];
+			if (char === '"') {
+				insideQuotes = !insideQuotes;
+				continue
+			}
+			if (char === ':' && !insideQuotes && validSearchCategoriesKeys.includes(key)) {
+				state = 'value';
+				foundKeys.push(key);
+				continue
+			}
+			if (char === ' ' && !insideQuotes) {
+				state = 'key';
+				key = '';
+				value = '';
+				continue
+			}
+
+			if (state === 'key') {
+				key += char;
+			}
+			else if (state === 'value') {
+				value += char;
+			}
+		}
+
+		return { key, value, state, foundKeys }
+	}
+
+	function scrollToSuggestion(index: number) {
+		if (index >= 0 && index < searchSuggestions.length) {
+			searchSuggestionDoms[index].scrollIntoView({ behavior: "smooth", block: "nearest" });
+		}
+	}
+
 
 	function inputOnKeyDown(e: KeyboardEvent) {
 		if (e.key === 'ArrowDown') {
 			selectedMenuIndex++;
+			if (selectedMenuIndex >= searchSuggestions.length) {
+				selectedMenuIndex = -1;
+			}
+			scrollToSuggestion(selectedMenuIndex)
 			e.preventDefault();
 		} else if (e.key === 'ArrowUp') {
 			selectedMenuIndex--;
+			if (selectedMenuIndex < -1) {
+				selectedMenuIndex = searchSuggestions.length - 1;
+			}
+			scrollToSuggestion(selectedMenuIndex)
 			e.preventDefault();
 		}
 		// if enter
 		else if (e.key === 'Enter') {
 			if (selectedMenuIndex > -1) {
-				let categoryKey = filteredCategories[selectedMenuIndex].key;
-				replaceLastWord(categoryKey + ':')
-				console.log("todo: select menu item");
+				searchSuggestions[selectedMenuIndex].action();
 				selectedMenuIndex = -1;
+				e.preventDefault();
 			}
 			else {
 				domInput.blur();
@@ -44,74 +113,64 @@
 		}
 	}
 
-	function inputOnFocus() {
-		inputValueChanged(inputValue);
-		isInputFocused = true;
-	}
-	function inputOnBlur() {
-		unfocusTimeout = setTimeout(() => (isInputFocused = false), 100);
-	}
 
-
-	function getSearchKeyValue(inputValue: string): { key: string , value: string | null } {
-		let key = "";
-		let value = null;
-
-		// get last word
-		let lastWord = inputValue.split(' ').pop();
-		// console.log('last word', lastWord);
-
-		if (lastWord === undefined) {
-			// console.log('no last word');
-			return { key, value };
-		}
-		else if (lastWord.includes(':')) {
-			[key, value] = lastWord.split(':');
-		}
-		else {
-			key = lastWord;
-		}
-
-		return { key, value };
-	}
-
-	function replaceLastWord(newWord: string): void {
-		let words = inputValue.split(' ');
-		words.pop();
-		words.push(newWord);
-		inputValue = words.join(' ');
-
-		domInput.focus();
-		isInputFocused = true;
-	}
-
-	interface FilterCategory {
-		key: string;
-		description: string;
-		type: 'string' | 'discord_snowflake' | 'number' | 'boolean';
-	}
-
-
-
-	let filteredCategories: FilterCategory[] = [];
-	function filterOptions(newValue: string) {
-		let { key, value } = getSearchKeyValue(newValue);
-		searchKey = key;
-		searchValue = value;
-		// console.log('key', key, 'value', value);
-
-		if (value === null) {
-			filteredCategories = categories.filter((category) => {
-				return category.key.includes(key);
-			});
-		}
-		else {
-			filteredCategories = [];
-		}
-	}
-
+	let searchSuggestions: SearchSuggestion[] = []
 	function inputValueChanged() {
-		filterOptions(inputValue);
+		const validSearchCategoriesKeys = searchCategories.map((category) => category.key);
+		const singleOnlySearchCategoriesKeys = searchCategories.filter((category) => !category.multiple).map((category) => category.key);
+
+		const { key, value, state, foundKeys } = parsePrompt(inputValue);
+		const usedSingleKeys = foundKeys.filter((key) => {
+			return singleOnlySearchCategoriesKeys.includes(key);
+		});
+
+		console.log('key', key, 'value', value, 'state', state, 'foundKeys', foundKeys, 'singleKeys', usedSingleKeys);
+
+		if (state === 'key') {
+			searchSuggestions = searchCategories.filter((category) => {
+				return category.key.includes(key) && !usedSingleKeys.includes(category.key);
+			}).map((category) => {
+				return {
+					key: category.key,
+					description: category.description,
+					action: () => {
+						console.log("accept suggestion", category.key);
+						// inputValue = inputValue.replace(key, category.key + ':');
+						inputValue = inputValue.replace(new RegExp(`${key}$`), `${category.key}:`);
+					}
+				}
+			});
+			console.log('searchSuggestions', searchSuggestions);
+		}
+		else if (key !== '' && validSearchCategoriesKeys.includes(key)) {
+				const searchCategory = searchCategories.find((category) => category.key === key);
+				if (searchCategory?.type === "boolean") {
+					searchSuggestions = [
+						{
+							key: "true",
+							description: "",
+							action: () => {
+								inputValue = inputValue.replace(new RegExp(`:${value}$`), ":true ");
+							}
+						},
+						{
+							key: "false",
+							description: "",
+							action: () => {
+								inputValue = inputValue.replace(new RegExp(`:${value}$`), ":false ");
+							}
+						}
+					].filter((suggestion) => {
+						return suggestion.key.includes(value);
+					});
+				}
+				else {
+					searchSuggestions = [];
+				}
+			}
+		else {
+			searchSuggestions = [];
+		}
 	}
 
 	async function inputOnSubmit() {
@@ -124,8 +183,38 @@
 		$searchShown = true;
 	}
 
-	// $: console.log('selectedMenuIndex', selectedMenuIndex);
-	// $: console.log('inputValue', inputValue);
+
+	let unfocusTimeout: NodeJS.Timeout;
+	function inputOnFocus() {
+		isInputFocused = true;
+		clearTimeout(unfocusTimeout);
+		inputValueChanged()
+	}
+	function inputOnBlur() {
+		unfocusTimeout = setTimeout(() => (isInputFocused = false), 100);
+	}
+	function focusInput() {
+		domInput.focus();
+		isInputFocused = true;
+		clearTimeout(unfocusTimeout);
+	}
+
+	function onClickSuggestion(suggestionAction: () => void) {
+		suggestionAction();
+		focusInput()
+	}
+
+	function searchSuggestionsChanged() {
+		selectedMenuIndex = -1;
+	}
+
+	$: searchSuggestions, searchSuggestionsChanged();
+	$: inputValue, inputValueChanged()
+
+
+	onMount(async () => {
+		searchCategories = await fetchCategories()
+	})
 </script>
 
 <div class="search">
@@ -143,40 +232,24 @@
 		<button on:click={inputOnSubmit} id="search-submit-btn">Search</button>
 	</div>
 
-	{#if isInputFocused}
+	{#if isInputFocused && searchSuggestions.length > 0}
 		<div class="search-options">
-			
-			{#if searchValue === null}
-				{#if filteredCategories.length > 0}
-					{#each filteredCategories as category, i}
-						{#key category}
-							<div
-								class="search-option" class:active={selectedMenuIndex === i}
-								on:click={() => replaceLastWord(category.key + ':')}
-							>
-								<b>{category.key}: </b>{category.description}
-								
-							</div>
-						{/key}
-					{/each}
-				{/if}
-			{:else}
-				{@const category = categories.find(c => c.key === searchKey)}
-				{#if category && category.type == 'boolean'}
-					{#each ['true', 'false'] as option, i}
-						{#key option}
-							<div
-								class="search-option" class:active={selectedMenuIndex === i}
-								on:click={() => replaceLastWord(option)}
-							>
-								<b>{option}</b>
-							</div>
-						{/key}
-					{/each}
-				{/if}
-			{/if}
+			{#each searchSuggestions as suggestion, i}
+				{#key suggestion}
+					<div
+						class="search-option" class:active={selectedMenuIndex === i}
+						on:click|stopPropagation|capture={()=>onClickSuggestion(suggestion.action)} bind:this={searchSuggestionDoms[i]}
+					>
+							{#if suggestion.description !== ""}
+								<b>{suggestion.key}:</b> {suggestion.description}
+							{:else}
+								<b>{suggestion.key}</b>
+							{/if}
+					</div>
+				{/key}
+			{/each}
 		</div>
-	{/if}
+		{/if}
 </div>
 
 <style>

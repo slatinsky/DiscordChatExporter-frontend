@@ -434,6 +434,8 @@ def parse_prompt(prompt: str):
 	valid_search_keys = [x["key"] for x in SEARCH_CATEGORIES]
 	current_key = None
 
+	searchCategoriesMap = {x["key"]: x for x in SEARCH_CATEGORIES}
+
 	for i, char in enumerate(prompt.strip() + " "):
 		if char == '"':
 			inside_quotes = not inside_quotes
@@ -446,7 +448,7 @@ def parse_prompt(prompt: str):
 
 		if char == ' ' and not inside_quotes:
 			if current_key in valid_search_keys:
-				search_category = filter(lambda x: x["key"] == current_key, SEARCH_CATEGORIES)[0]
+				search_category = searchCategoriesMap[current_key]
 
 				if search_category["type"] == "boolean":
 					if word.lower() == "true":
