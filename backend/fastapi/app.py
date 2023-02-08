@@ -11,6 +11,7 @@ collection_channels = db["channels"]
 collection_guilds = db["guilds"]
 collection_authors = db["authors"]
 collection_emojis = db["emojis"]
+collection_assets = db["assets"]
 
 app = FastAPI(
 	title="DCEF backend api",
@@ -117,6 +118,41 @@ async def get_multiple_message_content(message_ids: list):
 	return list_of_messages
 
 
+def channel_names_to_ids(in_channel_ids: list, in_channels: list, guild_id: str = None):
+	"""
+	Convert channel names to ids.
+	"""
+	if len(in_channels) == 0:
+		return in_channel_ids
+
+	out_channel_ids = in_channel_ids.copy()
+	for channel in in_channels:
+		if channel in out_channel_ids:
+			continue
+
+		channel_id = collection_channels.find_one({"name": channel, "guildId": guild_id}, {"_id": 1})
+		if channel_id:
+			out_channel_ids.append(channel_id["_id"])
+
+	return out_channel_ids
+
+def category_names_to_ids(in_category_ids: list, in_categories: list, guild_id: str = None):
+	"""
+	Convert category names to ids.
+	"""
+	if len(in_categories) == 0:
+		return in_category_ids
+
+	out_category_ids = in_category_ids.copy()
+	for category in in_categories:
+		if category in out_category_ids:
+			continue
+
+		category_id = collection_channels.find_one({"category": category, "guildId": guild_id}, {"_id": 1})
+		if category_id:
+			out_category_ids.append(category_id["_id"])
+
+
 def extend_channels(channels: list):
 	"""
 	Extend a list of channels with thread ids and forum post ids.
@@ -137,18 +173,29 @@ def extend_channels(channels: list):
 def extend_users(user_ids: list, usernames: list):
 	"""
 	Find new user ids by user names.
+	exactly patch name+discriminator
 	"""
 	if len(usernames) == 0:
 		return usernames
+
+	print("---")
+	print(usernames)
 
 	user_ids = user_ids.copy()
 	# partial match
 
 	or_ = []
 	for username in usernames:
-		or_.append({"name": {"$regex": username, "$options": "i"}})
+		if "#" not in username:
+			continue
+
+		name, discriminator = username.split("#")
+		or_.append({"name": name, "discriminator": discriminator})
 
 	query = {"$or": or_}
+
+
+	print(query)
 
 	new_user_ids_cursor = collection_authors.find(query, {"_id": 1})
 	new_user_ids = [user["_id"] for user in new_user_ids_cursor]
@@ -265,6 +312,7 @@ SEARCH_CATEGORIES = [
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "message_ids",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'user_id',
@@ -272,13 +320,15 @@ SEARCH_CATEGORIES = [
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "from_user_ids",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'user',
-		"description": 'string',
+		"description": 'string (exact match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "from_users",
+		"autocompleteApi": "users",
 	},
 	{
 		"key": 'mentions_user_id',
@@ -286,13 +336,15 @@ SEARCH_CATEGORIES = [
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "mentions_user_ids",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'mentions_user',
-		"description": 'string',
+		"description": 'string (exact match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "mentions_users",
+		"autocompleteApi": "users",
 	},
 	{
 		"key": 'reaction_id',
@@ -300,6 +352,7 @@ SEARCH_CATEGORIES = [
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "reaction_ids",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'reaction',
@@ -307,6 +360,7 @@ SEARCH_CATEGORIES = [
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "reactions",
+		"autocompleteApi": "reactions",
 	},
 	{
 		"key": 'extension',
@@ -314,6 +368,7 @@ SEARCH_CATEGORIES = [
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "extensions",
+		"autocompleteApi": "extensions",
 	},
 	{
 		"key": 'filename',
@@ -321,6 +376,7 @@ SEARCH_CATEGORIES = [
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "filenames",
+		"autocompleteApi": "filenames",
 	},
 	{
 		"key": 'in_channel_id',
@@ -328,6 +384,15 @@ SEARCH_CATEGORIES = [
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "in_channel_ids",
+		"autocompleteApi": None,
+	},
+	{
+		"key": 'in_channel',
+		"description": 'string (exact match)',
+		"type": 'string',
+		"multiple": True,
+		"mapTo": "in_channels",
+		"autocompleteApi": "channels",
 	},
 	{
 		"key": 'in_category_id',
@@ -335,6 +400,15 @@ SEARCH_CATEGORIES = [
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "in_category_ids",
+		"autocompleteApi": None,
+	},
+{
+		"key": 'in_category',
+		"description": 'string (exact match)',
+		"type": 'string',
+		"multiple": True,
+		"mapTo": "in_categoriess",
+		"autocompleteApi": "categories",
 	},
 	{
 		"key": 'is_pinned',
@@ -342,6 +416,7 @@ SEARCH_CATEGORIES = [
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "is_pinned",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'has_audio',
@@ -349,6 +424,7 @@ SEARCH_CATEGORIES = [
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "attachment_is_audio",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'has_image',
@@ -356,6 +432,7 @@ SEARCH_CATEGORIES = [
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "attachment_is_image",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'has_video',
@@ -363,6 +440,7 @@ SEARCH_CATEGORIES = [
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "attachment_is_video",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'has_other',
@@ -370,6 +448,7 @@ SEARCH_CATEGORIES = [
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "attachment_is_other",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'has_link',
@@ -377,6 +456,7 @@ SEARCH_CATEGORIES = [
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "containing_links",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'is_edited',
@@ -384,6 +464,7 @@ SEARCH_CATEGORIES = [
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "is_edited",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'limit',
@@ -391,8 +472,130 @@ SEARCH_CATEGORIES = [
 		"type": 'number',
 		"multiple": False,
 		"mapTo": "limit",
+		"autocompleteApi": None,
 	},
 ]
+
+def autocomplete_categories(guild_id: str, partial_category: str, limit: int):
+	"""
+	Searches for categories.
+	limited to {limit} results * 10
+	"""
+	limit = limit * 10
+
+	# type is not "GuildPublicThread" or "GuildPrivateThread"
+	query = {
+		"category": {
+			"$regex": partial_category,
+			"$options": "i"
+		},
+		"guildId": guild_id,
+		"type": {
+			"$nin": [
+				"GuildPublicThread",
+				"GuildPrivateThread"
+			]
+		}
+	}
+	print(query)
+	cursor = collection_channels.find(query, {"category": 1}).limit(limit).sort([("category", 1)])
+	category_names = []
+	for category in cursor:
+		category_names.append(category['category'])
+
+	# remove duplicates
+	category_names = list(set(category_names))
+	return category_names
+
+def autocomplete_channels(guild_id: str, partial_channel: str, limit: int):
+	"""
+	Searches for channels.
+	limited to {limit} results
+	"""
+
+	query = {"name": {"$regex": partial_channel, "$options": "i"}, "guildId": guild_id}
+	cursor = collection_channels.find(query, {"name": 1}).limit(limit).sort([("name", 1)])
+	channel_names = []
+	for channel in cursor:
+		channel_names.append(channel['name'])
+
+	# remove duplicates
+	channel_names = list(set(channel_names))
+	return channel_names
+
+def autocomplete_reactions(guild_id: str, partial_reaction: str, limit: int):
+	"""
+	Searches for reactions.
+	limited to {limit} results
+	"""
+
+	query = {"name": {"$regex": partial_reaction, "$options": "i"}, "$or": [{"guild_id": guild_id}, {"guild_id": None}]}
+	print(query)
+	cursor = collection_emojis.find(query, {"name": 1}).limit(limit).sort([("name", 1)])
+	reaction_names = []
+	for reaction in cursor:
+		print(reaction)
+		reaction_names.append(reaction['name'])
+
+	print(reaction_names)
+	# remove duplicates
+	reaction_names = list(set(reaction_names))
+	# TODO: by removing duplicates, we are not respecting the limit anymore (more results could exist)
+	return reaction_names
+
+
+def autocomplete_filenames(guild_id: str, partial_filename: str, limit: int):
+	"""
+	Searches for filenames.
+	limited to {limit} results
+	"""
+
+	query = {"filenameWithoutHash": {"$regex": partial_filename, "$options": "i"}}
+	cursor = collection_assets.find(query, {"filenameWithoutHash": 1}).limit(limit).sort([("filenameWithoutHash", 1)])
+	filenames = []
+	for filename in cursor:
+		filenames.append(filename['filenameWithoutHash'])
+
+	# remove duplicates
+	filenames = list(set(filenames))
+	# TODO: by removing duplicates, we are not respecting the limit anymore (more results could exist)
+	return filenames
+
+
+def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
+	"""
+	Searches for users by name.
+	limited to {limit} results
+	"""
+
+	# TODO: filter by guildId
+
+	query = {"name": {"$regex": partial_user_name, "$options": "i"}}
+	cursor = collection_authors.find(query, {"name": 1, "discriminator": 1}).limit(limit).sort([("name", 1), ("discriminator", 1)])
+	authors= []
+	for author in cursor:
+		authors.append(author['name'] + "#" + author['discriminator'])
+	return authors
+
+@app.get("/search-autocomplete")
+def search_autocomplete(guild_id: str = None, key: str = None, value: str = None, limit: int = 20):
+	if (guild_id == None or key == None or value == None):
+		return []
+
+	guild_id = pad_id(guild_id)
+
+	if (key == "users"):
+		return autocomplete_users(guild_id, value, limit)
+	elif (key == "filenames"):
+		return autocomplete_filenames(guild_id, value, limit)
+	elif (key == "reactions"):
+		return autocomplete_reactions(guild_id, value, limit)
+	elif (key == "channels"):
+		return autocomplete_channels(guild_id, value, limit)
+	elif (key == "categories"):
+		return autocomplete_categories(guild_id, value, limit)
+	else:
+		return []
 
 
 @app.get("/search-categories")
@@ -417,7 +620,9 @@ def parse_prompt(prompt: str):
 		"extensions": [],                # file extensions like "pdf", "java" (or)
 		"filenames": [],                 # file names (or)
 		"in_channel_ids": [],            # channel ids (strings) (or)
+		"in_channels": [],               # channel names (or)
 		"in_category_ids": [],           # category ids (strings) (or)
+		"in_categories": [],             # category names (or)
 		"is_pinned": None,               # boolean (None means both)
 		"attachment_is_audio": None,     # boolean (None means both) (or in group attachment_is)
 		"attachment_is_image": None,     # boolean (None means both) (or in group attachment_is)
@@ -469,6 +674,8 @@ def parse_prompt(prompt: str):
 
 				elif search_category["type"] == "string" or search_category["type"] == "discord_snowflake":
 					search[search_category["mapTo"]].append(word)
+				else:
+					print("Invalid search category type", search_category["type"])
 
 				current_key = None
 
@@ -480,7 +687,7 @@ def parse_prompt(prompt: str):
 
 		word += char
 
-	print(search)
+	print("search", search)
 	return search
 
 
@@ -505,7 +712,9 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 	extensions = search["extensions"]
 	filenames = search["filenames"]
 	in_channel_ids = search["in_channel_ids"]
+	in_channels = search["in_channels"]
 	in_category_ids = search["in_category_ids"]
+	in_categories = search["in_categories"]
 	is_pinned = search["is_pinned"]
 	attachment_is_audio = search["attachment_is_audio"]
 	attachment_is_image = search["attachment_is_image"]
@@ -519,17 +728,17 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 	message_contains = [word.lower() for word in message_contains]
 	message_ids = [pad_id(id) for id in message_ids]
 	from_user_ids = [pad_id(id) for id in from_user_ids]
-	from_users = [user.lower() for user in from_users]
 	from_user_ids = extend_users(from_user_ids, from_users)
 	mentions_user_ids = [pad_id(id) for id in mentions_user_ids]
-	mentions_users = [user.lower() for user in mentions_users]
 	mentions_user_ids = extend_users(mentions_user_ids, mentions_users)
 	reaction_ids = [pad_id(id) for id in reaction_ids]
 	reactions = [reaction.lower() for reaction in reactions]
 	reaction_ids = extend_reactions(reaction_ids, reactions)
 	extensions = [ext.lower() for ext in extensions]
+	in_channel_ids = channel_names_to_ids(in_channel_ids, in_channels, guild_id)
 	in_channel_ids = [pad_id(id) for id in in_channel_ids]
 	in_channel_ids = extend_channels(in_channel_ids)      # extend channels with threads and forum posts
+	in_category_ids = category_names_to_ids(in_category_ids, in_categories, guild_id)
 	in_category_ids = [pad_id(id) for id in in_category_ids]
 	in_category_ids = extend_channels(in_category_ids)  # extend categories with channels
 	in_category_ids = extend_channels(in_category_ids)  # extend channels with threads and forum posts
@@ -656,7 +865,7 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 	if query["$and"] == []:
 		del query["$and"]
 
-	print(query)
+	print("query", query)
 
 	cursor=collection_messages.find(query, limited_fields)
 

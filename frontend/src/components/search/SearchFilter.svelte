@@ -6,7 +6,8 @@
 		description: string;
 		type: 'string' | 'discord_snowflake' | 'number' | 'boolean';
 		multiple: boolean;
-		mapTo: string;    // mapTo - useful only on the backend
+		mapTo: string;  
+		autocompleteApi: string | null  // mapTo - useful only on the backend
 	}
 	interface SearchSuggestion {
 		key: string;
@@ -150,19 +151,42 @@
 							key: "true",
 							description: "",
 							action: () => {
-								inputValue = inputValue.replace(new RegExp(`:${value}$`), ":true ");
+								inputValue = inputValue.replace(new RegExp(`:"?${value}$`), ":true ");
 							}
 						},
 						{
 							key: "false",
 							description: "",
 							action: () => {
-								inputValue = inputValue.replace(new RegExp(`:${value}$`), ":false ");
+								inputValue = inputValue.replace(new RegExp(`:"?${value}$`), ":false ");
 							}
 						}
 					].filter((suggestion) => {
 						return suggestion.key.includes(value);
 					});
+				}
+				else if (searchCategory.autocompleteApi !== null) {
+					searchSuggestions = [];
+					// do a fetch to the server to search for the message
+					(async () => {
+						let query = inputValue;
+						let response = await fetch(`/api/search-autocomplete?guild_id=${encodeURIComponent(guildId)}&key=${encodeURIComponent(searchCategory.autocompleteApi)}&value=${encodeURIComponent(value)}`);
+						let json = await response.json();
+						if (json.type !== "unknown_key") {
+							searchSuggestions = json.map((suggestion) => {
+								if (suggestion.includes(" ")) {
+									suggestion = `"${suggestion}"`;
+								}
+								return {
+									key: suggestion,
+									description: "",
+									action: () => {
+										inputValue = inputValue.replace(new RegExp(`:"?${value}$`), `:${suggestion} `);
+									}
+								}
+							});
+						}
+					})();
 				}
 				else {
 					searchSuggestions = [];
@@ -177,7 +201,7 @@
 		// do a fetch to the server to search for the message
 
 		let query = inputValue;
-		let response = await fetch(`/api/search?guild_id=${guildId}&prompt=${query}`);
+		let response = await fetch(`/api/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(query)}`);
 		let json = await response.json();
 		$searchResultsMessageIds = json;
 		$searchShown = true;
