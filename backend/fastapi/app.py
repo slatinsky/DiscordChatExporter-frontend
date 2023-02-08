@@ -178,8 +178,6 @@ def extend_users(user_ids: list, usernames: list):
 	if len(usernames) == 0:
 		return usernames
 
-	print("---")
-	print(usernames)
 
 	user_ids = user_ids.copy()
 	# partial match
@@ -193,9 +191,6 @@ def extend_users(user_ids: list, usernames: list):
 		or_.append({"name": name, "discriminator": discriminator})
 
 	query = {"$or": or_}
-
-
-	print(query)
 
 	new_user_ids_cursor = collection_authors.find(query, {"_id": 1})
 	new_user_ids = [user["_id"] for user in new_user_ids_cursor]
@@ -254,7 +249,6 @@ def get_channel_info(channel_id):
 	'channel' can be thread or channel or forum post
 	"""
 
-	# print("get_channel_info", channel_id)
 	channel = collection_channels.find_one({"_id": channel_id})
 	if not channel:
 		return {
@@ -262,7 +256,6 @@ def get_channel_info(channel_id):
 			"name": "Not found",
 		}
 
-	# print("get_channel_info", channel)
 	msg_count = collection_messages.count_documents({"channelId": channel_id})
 	channel["msgCount"] = msg_count
 	return channel
@@ -497,7 +490,6 @@ def autocomplete_categories(guild_id: str, partial_category: str, limit: int):
 			]
 		}
 	}
-	print(query)
 	cursor = collection_channels.find(query, {"category": 1}).limit(limit).sort([("category", 1)])
 	category_names = []
 	for category in cursor:
@@ -530,14 +522,11 @@ def autocomplete_reactions(guild_id: str, partial_reaction: str, limit: int):
 	"""
 
 	query = {"name": {"$regex": partial_reaction, "$options": "i"}, "$or": [{"guild_id": guild_id}, {"guild_id": None}]}
-	print(query)
 	cursor = collection_emojis.find(query, {"name": 1}).limit(limit).sort([("name", 1)])
 	reaction_names = []
 	for reaction in cursor:
-		print(reaction)
 		reaction_names.append(reaction['name'])
 
-	print(reaction_names)
 	# remove duplicates
 	reaction_names = list(set(reaction_names))
 	# TODO: by removing duplicates, we are not respecting the limit anymore (more results could exist)
