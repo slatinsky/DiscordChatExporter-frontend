@@ -641,7 +641,7 @@ class JsonProcessor:
 		Merges the message content with the existing message if it already exists.
 		"""
 
-		content = message["content"]
+		content = message["content"][0]['content']
 		latest_timestamp = message["timestamp"]
 		if message["timestampEdited"] != None:
 			latest_timestamp = message["timestampEdited"]
