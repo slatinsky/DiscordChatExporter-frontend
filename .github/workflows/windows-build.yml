@@ -20,6 +20,13 @@ jobs:
         with:
           python-version: '3.11.0'
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.16.0
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
       - name: Create directories
         run: |
           mkdir -p build\exports
@@ -29,8 +36,12 @@ jobs:
           mkdir -p build\dcef\backend\nginx\logs
           mkdir -p build\dcef\backend\nginx\temp
           mkdir -p build\dcef\backend\fastapi
+          mkdir -p build\dcef\backend\http-server
           mkdir -p build\dcef\backend\mongodb
           mkdir -p build\dcef\backend\mongodb\db
+
+      - name: Install pkg
+        run: npm install -g pkg
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -60,6 +71,14 @@ jobs:
         working-directory: backend/fastapi
         run: pyinstaller --onefile --name fastapi main.py --hidden-import "uvicorn.logging" --hidden-import "uvicorn.loops" --hidden-import "uvicorn.loops.auto" --hidden-import "uvicorn.protocols" --hidden-import "uvicorn.protocols.http" --hidden-import "uvicorn.protocols.http.auto" --hidden-import "uvicorn.protocols.websockets" --hidden-import "uvicorn.protocols.websockets.auto" --hidden-import "uvicorn.lifespan" --hidden-import "uvicorn.lifespan.on" --hidden-import "app"
 
+      - name: Install http-server
+        working-directory: backend/http-server
+        run: npm install
+
+      - name: Create executable for http-server
+        working-directory: backend/http-server
+        run: pkg node_modules/http-server/bin/http-server --target node16-win-x64
+
       - name: Move files to build folder
         run: |
           mv frontend\build build\dcef\frontend
@@ -70,6 +89,7 @@ jobs:
           cp backend\nginx\conf\nginx-prod.conf build\dcef\backend\nginx\conf\nginx-prod.conf
           cp backend\nginx\conf\mime.types build\dcef\backend\nginx\conf\mime.types
           cp backend\mongodb\mongod.exe build\dcef\backend\mongodb\mongod.exe
+          cp backend\http-server\http-server.exe build\dcef\backend\http-server\http-server.exe
           Copy-Item -Path release\exports\* -Destination build\exports -Recurse
           cp release\START_VIEWER.bat build\START_VIEWER.bat
           cp release\clear_database.bat build\clear_database.bat

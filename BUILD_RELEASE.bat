@@ -10,6 +10,7 @@ mkdir "release\dcef\backend\nginx\conf\"
 mkdir "release\dcef\backend\nginx\logs\"
 mkdir "release\dcef\backend\nginx\temp\"
 mkdir "release\dcef\backend\fastapi\"
+mkdir "release\dcef\backend\http-server\"
 mkdir "release\dcef\backend\mongodb\"
 mkdir "release\dcef\backend\mongodb\db\"
 
@@ -38,6 +39,10 @@ move "backend\fastapi\dist\main.exe" "release\dcef\backend\fastapi\fastapi.exe"
 del backend\fastapi\main.spec
 rmdir "backend/fastapi/dist/" /s /q
 rmdir "backend/fastapi/build/" /s /q
+
+
+call pkg backend/http-server/node_modules/http-server/bin/http-server --target node16-win-x64
+move "http-server.exe" "release\dcef\backend\http-server\http-server.exe"
 
 
 @REM copy nginx

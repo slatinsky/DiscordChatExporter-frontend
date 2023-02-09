@@ -1,5 +1,7 @@
 pushd "%~dp0"
 
+start "http-server" ./dcef/backend/http-server/http-server.exe "./exports" --port 21013 -c-1 --silent -P http://127.0.0.1:21013?
+
 cd dcef/backend/mongodb
 if not exist db mkdir db
 start "mongodb" mongod --dbpath "db/"

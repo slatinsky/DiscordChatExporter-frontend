@@ -21,6 +21,9 @@ __pycache__
 # nginx
 /backend/nginx/logs
 /backend/nginx/temp
+error.log
+access.log
+nginx.pid
 
 # mongodb
 /backend/mongodb/db
