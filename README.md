@@ -33,12 +33,17 @@ Note: Discord servers are known internally as guilds
 
 ## Quick start (Windows)
 Using prebuilt binaries is the easiest way to use this tool on Windows.
+
+if you don't have any exports yet, you can try out the viewer with example exports included in the release. Just skip step 3.
+
 1. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
 2. Extract the archive
-3. (optional) Move your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/exports/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs. **Skip this step if you** don't have any exports yet and **want to try out the viewer** - example exports are included in the release.
-4. Run `START_VIEWER.bat` - DiscordChatExporter-frontend will open in your default browser
+3. Move your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/exports/` folder ([supported exports](#supported-exports)). Folder structure inside this folder doesn't matter, script will find everything it needs.
+4. Run `dcef.exe`
 
-NOTE: command prompt window ("black rectangle") named "nginx" will open. It provides local web server for the viewer. After you are done with using the viewer, you can close it.
+**Important:** files in exports folder may exceed Windows path length limit of 260 characters. If you have any issues with loading your assets you can choose one of the following solutions:
+- move your exports to a folder with shorter path
+- or run `registry_tweaks/change_260_character_path_limit_to_32767.reg` to increase the limit to 32767 characters (requires admin privileges) and restart your computer
 
 ### Beta builds (Windows)
 If you want to try out the latest features, you can use [beta builds](https://github.com/slatinsky/DiscordChatExporter-frontend/actions/workflows/windows-build.yml). They are automatically built from the latest commit on `master` branch or from pull requests.
@@ -87,7 +92,8 @@ Want to upgrade from previous version? Follow these steps:
 1. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
 2. Extract the archive
 3. Move your `/exports` folder to the new release folder.
-4. Delete old release folder
+4. run `clear_database.bat` in the new release folder
+5. Delete old release folder
 
 Info: since release 1.10.0, exports folder was changed from `/static/input/` to `/exports/`.
 
