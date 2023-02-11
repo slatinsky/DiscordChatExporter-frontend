@@ -2,6 +2,7 @@ pushd "%~dp0"
 
 @REM delete old release
 rmdir "release/dcef/" /s /q
+del release\dcef.exe
 
 @REM create folder struture
 mkdir "release\exports"
@@ -31,6 +32,14 @@ move "backend\preprocess\dist\main_mongo.exe" "release\dcef\backend\preprocess\p
 del backend\preprocess\main_mongo.spec
 rmdir "backend/preprocess/dist/" /s /q
 rmdir "backend/preprocess/build/" /s /q
+
+cd backend/windows-runner
+py -m PyInstaller .\windows-runner.py --onefile --icon=icon.ico --name dcef
+cd ../..
+move "backend\windows-runner\dist\dcef.exe" "release\dcef.exe"
+del backend\windows-runner\dcef.spec
+rmdir "backend/windows-runner/dist/" /s /q
+rmdir "backend/windows-runner/build/" /s /q
 
 cd backend/fastapi
 py -m PyInstaller main.py -F --hidden-import "uvicorn.logging" --hidden-import "uvicorn.loops" --hidden-import "uvicorn.loops.auto" --hidden-import "uvicorn.protocols" --hidden-import "uvicorn.protocols.http" --hidden-import "uvicorn.protocols.http.auto" --hidden-import "uvicorn.protocols.websockets" --hidden-import "uvicorn.protocols.websockets.auto" --hidden-import "uvicorn.lifespan" --hidden-import "uvicorn.lifespan.on" --hidden-import "app"

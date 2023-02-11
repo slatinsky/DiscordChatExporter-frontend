@@ -18,6 +18,10 @@ __pycache__
 /build.zip
 
 
+# windows-runner
+logs.txt
+dcef.exe
+
 # nginx
 /backend/nginx/logs
 /backend/nginx/temp
