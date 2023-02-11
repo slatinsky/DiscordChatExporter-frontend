@@ -11,7 +11,12 @@ from pymongo import MongoClient
 import json
 from pprint import pprint
 from colorthief import ColorThief
+import functools
 
+# fix PIPE encoding error on Windows, auto flush print
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+print = functools.partial(print, flush=True)
 
 
 def pad_id(id):

@@ -19,6 +19,8 @@ __pycache__
 
 
 # windows-runner
+/backend/windows-runner/build/
+/backend/windows-runner/dist/
 logs.txt
 dcef.exe
 

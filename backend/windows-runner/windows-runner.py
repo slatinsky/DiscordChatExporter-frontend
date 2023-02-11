@@ -32,7 +32,7 @@ def custom_print(source, *args, **kwargs):
 
 	str_args = [str(arg) for arg in args]
 
-	log_message = source.ljust(15) + ' '.join(str_args)
+	log_message = source.ljust(16) + ' '.join(str_args)
 	if 'end' in kwargs and kwargs['end'] == '':
 		log_message = log_message[:-1]
 
@@ -74,15 +74,16 @@ def create_dir_if_not_exists(path):
 
 def runner(name, args, cwd):
 	custom_print("windows-runner:", name + " started")
-
-	process = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE, bufsize=1, universal_newlines=True, cwd=cwd, stderr=subprocess.STDOUT)
+	args = ['cmd.exe', '/u','/c', 'cd', cwd, '&&'] + args
+	process = subprocess.Popen(args, stdout=subprocess.PIPE, bufsize=1, cwd=cwd, stderr=subprocess.STDOUT, encoding='utf-8')
 	processes.append(process)
-	try:
-		for line in process.stdout:
-			custom_print(name + ':', line, end='') # process line here
 
-	except Exception as e:
-		custom_print("windows-runner:", 'error in ' + name + ' thread')
+	for byte_line in iter(process.stdout.readline, ''):
+		try:
+			custom_print(name + ':', byte_line, end='') # process line here
+		except Exception as e:
+			# it looks like the message is printed even if the exception is raised. So we can ignore it
+			pass
 
 	custom_print("windows-runner:", name + ' finished')
 

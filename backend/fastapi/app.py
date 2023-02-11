@@ -1,7 +1,15 @@
+import functools
 from pprint import pprint
 import re
+import sys
 import pymongo
 from fastapi import FastAPI, Query
+
+# fix PIPE encoding error on Windows, auto flush print
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+print = functools.partial(print, flush=True)
+
 
 URI = "mongodb://127.0.0.1:27017"
 client = pymongo.MongoClient(URI)
