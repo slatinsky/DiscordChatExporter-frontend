@@ -23,6 +23,7 @@ __pycache__
 /backend/windows-runner/dist/
 logs.txt
 dcef.exe
+/backend/windows-runner/dcef.spec
 
 # nginx
 /backend/nginx/logs
