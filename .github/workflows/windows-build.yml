@@ -100,6 +100,8 @@ jobs:
           cp backend\nginx\conf\nginx-prod.conf build\dcef\backend\nginx\conf\nginx-prod.conf
           cp backend\nginx\conf\mime.types build\dcef\backend\nginx\conf\mime.types
           cp backend\mongodb\mongod.exe build\dcef\backend\mongodb\mongod.exe
+          cp backend\mongodb\vcruntime140_1.dll build\dcef\backend\mongodb\vcruntime140_1.dll
+          cp backend\mongodb\msvcp140.dll build\dcef\backend\mongodb\msvcp140.dll
           cp backend\http-server\http-server.exe build\dcef\backend\http-server\http-server.exe
           cp backend\windows-runner\dist\dcef.exe build\dcef.exe
           Copy-Item -Path release\exports\* -Destination build\exports -Recurse

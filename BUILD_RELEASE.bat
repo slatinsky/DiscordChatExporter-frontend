@@ -59,3 +59,5 @@ copy "backend\nginx\conf\nginx-prod.conf" "release\dcef\backend\nginx\conf\nginx
 copy "backend\nginx\conf\mime.types" "release\dcef\backend\nginx\conf\mime.types" /y
 copy "backend\nginx\nginx.exe" "release\dcef\backend\nginx\nginx.exe" /y
 copy "backend\mongodb\mongod.exe" "release\dcef\backend\mongodb\mongod.exe" /y
+copy "backend\mongodb\msvcp140.dll" "release\dcef\backend\mongodb\msvcp140.dll" /y
+copy "backend\mongodb\vcruntime140_1.dll" "release\dcef\backend\mongodb\vcruntime140_1.dll" /y
