@@ -121,7 +121,7 @@ class FileFinder():
 	def find_local_assets(self):
 		input_directory = self.base_directory
 		all_files = {}
-		regex_pattern = re.compile(r'.+\-[A-F0-9]{5}\..+')
+		regex_pattern = re.compile(r'.+\-[A-F0-9]{5}(?:\..+)?')
 		for path in glob.glob(input_directory + '**/*', recursive=True):
 			if regex_pattern.match(path):
 				filename = os.path.basename(path)
@@ -257,7 +257,7 @@ class AssetProcessor:
 		"""
 		removes hash from filename
 		"""
-		return re.sub(r'-[A-F0-9]{5}(?=\..+$)', '', filename)
+		return re.sub(r'-[A-F0-9]{5}(?=\..+$)?$', '', filename)
 
 	def get_colors(self, path: str, local_path_exists: bool, filetype: str):
 		"""
