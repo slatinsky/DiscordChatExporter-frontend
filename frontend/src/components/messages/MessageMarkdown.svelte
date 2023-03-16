@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { checkUrl } from "src/js/helpers";
 	import type { Emoji } from "src/js/interfaces";
+    import { get } from "svelte/store";
+    import { online } from "src/routes/settingsStore";
+
 
 
     export let content: string
@@ -8,6 +11,8 @@
     // export let message
     export let embed = false
     export let emotes: Emoji[] | null = null
+    export let mentions: any[] | null = null
+    export let guildId: string
     let processedContent: string
 
     function escapeHTML(unsafeText: string): string {  // source https://stackoverflow.com/a/48054293
@@ -16,13 +21,29 @@
         return div.innerHTML;
     }
     function process(content: string): void {
+        if (emotes) {  // transform emotes to old format if exports were created using --markdown false
+            for (let emote of emotes) {
+                let regex = new RegExp(`<:${emote.name}:\\d{17,32}>`)
+                if (regex.test(content)) {
+                    content = content.replace(regex, `:${emote.name}:`)
+                }
+            }
+        }
+
         processedContent = window.discordMarkdown.toHTML(content, {embed});
         processedContent = processedContent.replaceAll('<a href=', '<a target="_blank" href=')  // open all links in new tab
         if (emotes) {
             for (let emote of emotes) {
-                console.warn(emote.name, emote.image.path);
-                console.log(processedContent);
                 processedContent = processedContent.replaceAll(`:${emote.name}:`, `<img src="${checkUrl(emote.image)}" alt="${emote.name}" title="${emote.name}" class="message-emoji">`)
+            }
+        }
+
+        if (!get(online)){
+            // If the emoji is not archived, discordMarkdown will transform it to a link - and that doesn't respect offline only setting in DCEF
+            // to fix it, intentionally break the link if offline only mode set to true
+            if (processedContent.includes('https://cdn.discordapp.com/emojis/')) {
+                console.warn('intentionally breaking emoji link (https->hxxps), because you wish to view your exports offline only. If you want to view the emoji, please set the "offline only" setting to false.');
+                processedContent = processedContent.replaceAll('https://cdn.discordapp.com/emojis/', 'hxxps://cdn.discordapp.com/emojis/')
             }
         }
 
@@ -42,11 +63,21 @@
             })
         }
 
-        // if (message.mentions && message.mentions.length > 0) {
-        //     message.mentions.forEach(mention => {
-        //         processedContent = processedContent.replace(`@${mention.name}`, `<span class="message-mention">@${escapeHTML(mention.name)}#${escapeHTML(mention.discriminator)}</span>`)
-        //     })
-        // }
+        if (mentions && mentions.length > 0) {
+            mentions.forEach(mention => {
+                processedContent = processedContent.replace(`@${mention.name}`, `<span class="message-mention">@${escapeHTML(mention.name)}#${escapeHTML(mention.discriminator)}</span>`)
+                processedContent = processedContent.replace(`@${BigInt(mention._id)}`, `<span class="message-mention">@${escapeHTML(mention.name)}#${escapeHTML(mention.discriminator)}</span>`)
+            })
+        }
+
+        if (guildId) {
+            let channelRegex = /#(\d{17,32})/g
+            if (channelRegex.test(processedContent)) {
+                processedContent = processedContent.replace(channelRegex, (match, channelId) => {
+                    return `<a href="/channels/${guildId}/${channelId.toString().padStart(24, '0')}">#${channelId}</a>`
+                })
+            }
+        }
     }
 
     $: process(content)
@@ -56,7 +87,8 @@
 
 
 <style>
-    :global(.message-emoji) {
+    :global(.message-emoji),
+    :global(.d-emoji) {
         width: 22px;
         height: 22px;
         transform: translate(0px, 2px);

@@ -24,7 +24,7 @@ This project aims to provide you with better experience than what you get by jus
 - Windows and Linux support
 
 
-### System requirements (per guild)
+### System requirements
 - You need 1.5+ GB of free RAM for the mongodb database to work correctly
 - The browser viewer has almost no requirements, but it's recommended to have at least 1 GB of free RAM
 - Chromium based browsers and Firefox are supported, but most of the testing was done on Chromium.
@@ -110,6 +110,7 @@ Exports are done by [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatE
 
 - JSON export format (`--format Json`) is required
 - Including assets (`--media --reuse-media`) is highly recommended, but not required
+- Skipping markdown prerendering (`--markdown false`) is highly recommended, but not required
 - Don't forget to export **threads and forums**, because they **are not included in the main export** (see examples below for a guide on how to export them)
 
 <details><summary>CLI examples</summary>
@@ -117,15 +118,15 @@ Exports are done by [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatE
 
 Export all accessible channels from guild:
 ```
-DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g GUILD_ID --media --reuse-media --format Json --output OUTPUT_FOLDER_PATH
+DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g GUILD_ID --media --reuse-media --markdown false --format Json --output OUTPUT_FOLDER_PATH
 ```
 Export all dms (sadly, exporting dms can't be done without selfboting):
 ```
-DiscordChatExporter.Cli.exe exportdm --token DISCORD_TOKEN --media --reuse-media --format Json --output OUTPUT_FOLDER_PATH
+DiscordChatExporter.Cli.exe exportdm --token DISCORD_TOKEN --media --reuse-media --markdown false --format Json --output OUTPUT_FOLDER_PATH
 ```
 Export channel/thread/forum posts:
 ```
-DiscordChatExporter.Cli export --token DISCORD_TOKEN  --media --reuse-media --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_1 CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_2 CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_3 CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_4
+DiscordChatExporter.Cli export --token DISCORD_TOKEN  --media --reuse-media --markdown false --output OUTPUT_FOLDER_PATH --format Json --channel CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_1 CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_2 CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_3 CHANNEL_OR_THREAD_ID_OR_FORUM_POST_ID_4
 ```
 
 Viewer also supports html export with assets + json export without assets - but it's not recommended, because most embeds will be missing.
@@ -218,7 +219,7 @@ function captureIds() {
 }
 
 function printIds() {
-    console.log('DiscordChatExporter.Cli.exe export --token TOKEN --output "exports/threads" --format Json --media --reuse-media --channel',ids.join(' '))
+    console.log('DiscordChatExporter.Cli.exe export --token TOKEN --output "exports/threads" --format Json --media --reuse-media --markdown false --channel',ids.join(' '))
 }
 
 function mainFunc() {
@@ -272,7 +273,7 @@ function captureIds() {
 }
 
 function printIds() {
-    console.log('DiscordChatExporter.Cli.exe export --token TOKEN --output "exports/forums" --format Json --media --reuse-media --channel',ids.join(' '))
+    console.log('DiscordChatExporter.Cli.exe export --token TOKEN --output "exports/forums" --format Json --media --reuse-media --markdown false --channel',ids.join(' '))
 }
 
 scrollToPosition(0)

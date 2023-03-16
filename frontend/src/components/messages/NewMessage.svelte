@@ -10,6 +10,7 @@
 	import MessageMarkdown from './MessageMarkdown.svelte';
 	import MessageReactions from './MessageReactions.svelte';
 	import MessageStickers from './MessageStickers.svelte';
+	import { guildId } from 'src/js/stores';
 
 	export let message: Message;
 	export let previousMessage: Message | null = null;
@@ -203,7 +204,7 @@
 						<div class="chatlog__content chatlog__markdown">
 							<span class="chatlog__markdown-preserve"
 								>
-								<MessageMarkdown content={message.content[0].content} emotes={message?.emotes || undefined} />
+								<MessageMarkdown content={message.content[0].content} emotes={message?.emotes || undefined} mentions={message?.mentions || undefined} guildId={message?.guildId}/>
 								</span
 							>
 							{#if message.timestampEdited != null}
