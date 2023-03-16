@@ -89,6 +89,8 @@
 <!-- Rewritten https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/Html/MessageGroupTemplate.cshtml to svelte -->
 <div class="msg-root">
 
+	<a class="msg-jump" href="/channels/{message.guildId}/{message.channelId}#{message._id}">Jump</a>
+
 	<!-- {#if search && message.searchPrevMessageChannelId && message.searchPrevMessageChannelId !== message.channelId}
 		<div class="channel-name"><a href="/channels/{selectedGuildId}/{message.channelId}/"># {guild.channels[message.channelId]?.name}</a></div>
 	{/if} -->
@@ -301,5 +303,21 @@
 	audio {
 		max-width: 80%;
 		width: 700px;
+	}
+
+	.msg-root .msg-jump {
+		visibility: hidden;
+		position: absolute;
+		top: 20px;
+		right: 10px;
+		background-color: #1E1E1F;
+		color: white;
+		font-size: x-small;
+		padding: .2rem .3rem;
+		border-radius: 2px;
+	}
+
+	.msg-root:hover .msg-jump {
+		visibility: visible;
 	}
 </style>
