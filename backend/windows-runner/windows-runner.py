@@ -1,4 +1,5 @@
 import ctypes
+from datetime import datetime
 import os
 import signal
 import sys
@@ -48,7 +49,9 @@ def custom_print(source, *args, **kwargs):
 
 	str_args = [str(arg) for arg in args]
 
-	log_message = source.ljust(16) + ' '.join(str_args)
+	datetime_obj = datetime.now()
+
+	log_message = str(datetime_obj) + "  " + source.ljust(16) + ' '.join(str_args)
 	if 'end' in kwargs and kwargs['end'] == '':
 		log_message = log_message[:-1]
 
@@ -94,7 +97,7 @@ def check_used_ports():
 		custom_print("windows-runner:", '##########################################################################################')
 		custom_print("windows-runner:", '# WARNING: THE PROGRAM MAY NOT WORK PROPERLY, BECAUSE REQUIRED PORTS ARE ALREADY IN USE! #')
 		custom_print("windows-runner:", '##########################################################################################')
-		time.sleep(3)
+		time.sleep(5)
 	else:
 		custom_print("windows-runner:", 'OK: All required ports are available.')
 
