@@ -7,6 +7,8 @@ import webview
 import subprocess
 import atexit
 import threading
+import psutil
+
 
 # https://stackoverflow.com/a/65501621
 from win32event import CreateMutex
@@ -55,6 +57,47 @@ def custom_print(source, *args, **kwargs):
 	# log to file
 	with open(LOG_FILE, 'a') as f:
 		f.write(log_message + '\n')
+
+
+def check_used_ports():
+	connections = psutil.net_connections()
+	used_ports = set()
+
+	for connection in connections:
+		if connection.status == 'LISTEN':
+			used_ports.add(connection.laddr.port)
+
+	used_ports_list = list(used_ports)
+	used_ports_list.sort()
+
+	custom_print("windows-runner:", 'used ports:', " ".join([str(port) for port in used_ports_list]))
+
+	required_port_is_used = False
+
+	if 21011 in used_ports:
+		custom_print("windows-runner:", 'WARNING: Needed port 21011 is already in use. This port is required by nginx')
+		required_port_is_used = True
+
+	if 21013 in used_ports:
+		custom_print("windows-runner:", 'WARNING: Needed port 21013 is already in use. This port is required by http-server.')
+		required_port_is_used = True
+
+	if 27017 in used_ports:
+		custom_print("windows-runner:", 'WARNING: Needed port 27017 is already in use. This port is required by mongodb.')
+		required_port_is_used = True
+
+	if 58000 in used_ports:
+		custom_print("windows-runner:", 'WARNING: Needed port 58000 is already in use. This port is required by fastapi')
+		required_port_is_used = True
+
+	if required_port_is_used:
+		custom_print("windows-runner:", '##########################################################################################')
+		custom_print("windows-runner:", '# WARNING: THE PROGRAM MAY NOT WORK PROPERLY, BECAUSE REQUIRED PORTS ARE ALREADY IN USE! #')
+		custom_print("windows-runner:", '##########################################################################################')
+		time.sleep(3)
+	else:
+		custom_print("windows-runner:", 'OK: All required ports are available.')
+
 
 def cleanup():
 	global terminating_now
@@ -180,6 +223,7 @@ def main():
 			os.remove(LOG_FILE)
 
 		custom_print("windows-runner:", "started primary instance")
+		check_used_ports()
 		atexit.register(cleanup)
 		th_nginx = start_nginx()
 		time.sleep(1)
