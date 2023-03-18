@@ -1,4 +1,6 @@
 import functools
+import json
+import os
 from pprint import pprint
 import re
 import sys
@@ -33,6 +35,13 @@ def pad_id(id):
 	if id == None:
 		return None
 	return str(id).zfill(24)
+
+
+def is_compiled():
+	if os.path.exists(__file__):
+		return False
+	else:
+		return True
 
 
 @app.get("/")
@@ -95,12 +104,33 @@ async def get_message_ids(channel_id: str = None):
 	Returns a list of message ids.
 	Optionally, a channel_id query parameter can be provided to filter by channel.
 	"""
+	if is_compiled():
+		cache_path = f"../../storage/cache/message-ids/{channel_id}.json"
+	else:
+		cache_path = f"../../release/dcef/storage/cache/message-ids/{channel_id}.json"
+
+	if os.path.exists(cache_path):
+		# read file and return content
+		with open(cache_path, "r", encoding="utf-8") as f:
+			print("get_message_ids() cache hit - channel id", channel_id)
+			file_content = f.read()
+			return json.loads(file_content)
+
+	print("get_message_ids() cache miss - channel id", channel_id)
+
+
 	query = {}
 	if channel_id:
 		query["channelId"] = channel_id
 
 	ids = collection_messages.find(query, {"_id": 1}).sort([("_id", pymongo.ASCENDING)])
 	new_ids = [str(id["_id"]) for id in ids]
+
+	# save to cache
+	with open(cache_path, "w", encoding="utf-8") as f:
+		file_content = re.sub(r"'", '"', str(new_ids))
+		f.write(file_content)
+
 	return new_ids
 
 

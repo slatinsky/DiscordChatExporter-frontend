@@ -37,6 +37,13 @@ def get_emoji_code(name):
         return name
 
 
+def is_compiled():
+	if os.path.exists(__file__):
+		return False
+	else:
+		return True
+
+
 class MongoDatabase():
 	"""
 	Connects to the MongoDB database
@@ -161,6 +168,71 @@ class FileFinder():
 		replace all \ with /
 		"""
 		return path.replace("\\", "/")
+
+class ChannelCache:
+	"""
+	channels are cached in json files
+	this class invalidates the cache when a channel is updated
+	if you update any channel, call invalidate_channel_id(channel_id)
+	"""
+	def __init__(self, database: MongoDatabase):
+		if is_compiled():
+			self.cache_folder_path = "../../storage/cache/message-ids"
+		else:
+			self.cache_folder_path = "../../release/dcef/storage/cache/message-ids"
+
+		if not os.path.exists(self.cache_folder_path):
+			os.makedirs(self.cache_folder_path)
+
+		self.database = database
+		self.cached_channel_ids = self._cached_channels_ids_from_db()
+
+
+	def _get_cache_file_path(self, channel_id: str):
+		return self.cache_folder_path + "/" + channel_id + ".json"
+
+	def _delete_cache_file(self, channel_id: str):
+		path = self._get_cache_file_path(channel_id)
+		if os.path.exists(path):
+			os.remove(path)
+
+	def _cached_channels_ids_from_db(self):
+		"""
+		fetch cached channel ids from database
+		this should done before processing files
+		"""
+		cached_channel_ids = set()
+		database_channel_ids = set()
+		for channel in self.database.get_collection("channels").find():
+			database_channel_ids.add(channel["_id"])
+
+		# if cache json exists with that channel id, mark it as cached
+		for channel_id in database_channel_ids:
+			path = self._get_cache_file_path(channel_id)
+
+			if os.path.exists(path):
+				cached_channel_ids.add(channel_id)
+
+		# remove cache files that don't have a channel in the database
+		for filename in os.listdir(self.cache_folder_path):
+			if filename.endswith(".json"):
+				channel_id = filename[:-5]
+				if channel_id not in database_channel_ids:
+					print("removing cache file for channel id", channel_id, "because this channel doesn't exist in the database")
+					self._delete_cache_file(channel_id)
+
+
+		return cached_channel_ids
+
+
+	def invalidate_channel_id(self, channel_id: str):
+		"""
+		if we make any changes to a channel, we should invalidate the cache
+		"""
+		if channel_id in self.cached_channel_ids:
+			print("invalidating cache for channel id", channel_id, "because it was updated and the cache is now invalid")
+			self.cached_channel_ids.remove(channel_id)
+			self._delete_cache_file(channel_id)
 
 
 class AssetProcessor:
@@ -365,7 +437,7 @@ class AssetProcessor:
 		return asset
 
 class JsonProcessor:
-	def __init__(self, database: MongoDatabase, file_finder: FileFinder, json_path:str, asset_processor: AssetProcessor):
+	def __init__(self, database: MongoDatabase, file_finder: FileFinder, json_path:str, asset_processor: AssetProcessor, channel_cache: ChannelCache):
 		self.json_path = json_path
 		self.database = database
 		self.collection_guilds = self.database.get_collection("guilds")
@@ -377,6 +449,7 @@ class JsonProcessor:
 		self.collection_jsons = self.database.get_collection("jsons")
 		self.file_finder = file_finder
 		self.asset_processor = asset_processor
+		self.channel_cache = channel_cache
 
 	def read_json_file(self, file_path):
 		file_path_with_base_directory = self.file_finder.add_base_directory(file_path)
@@ -767,6 +840,8 @@ class JsonProcessor:
 
 		self.mark_as_processed(self.json_path)
 
+		self.channel_cache.invalidate_channel_id(channel["_id"])
+
 
 
 def download_gg(output_directory):
@@ -817,11 +892,12 @@ def main(input_dir, output_dir):
 	# DEBUG get only first n files
 	# jsons = jsons[:400]
 
+	channel_cache = ChannelCache(database)
 	asset_processor = AssetProcessor(file_finder, database)
 	asset_processor.set_fast_mode(True)  # don't process slow actions
 
 	for json_path in jsons:
-		p = JsonProcessor(database, file_finder, json_path, asset_processor)
+		p = JsonProcessor(database, file_finder, json_path, asset_processor, channel_cache)
 		p.process()
 
 	download_gg(output_dir)
