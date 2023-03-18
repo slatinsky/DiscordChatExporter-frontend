@@ -17,6 +17,12 @@
 				"action": () => {
 					copyTextToClipboard(BigInt(id))
 				}
+			},
+			{
+				"name": "Copy thread/forum post name",
+				"action": () => {
+					copyTextToClipboard(name)
+				}
 			}
 		]
 	}

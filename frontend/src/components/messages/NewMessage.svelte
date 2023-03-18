@@ -33,12 +33,16 @@
 		return author.name + '#' + author.discriminator;
 	}
 
+	function nickname_only(author) {
+		return author?.nicknames?.[0] ?? full_name(author);
+	}
+
 	function nickname(author: Author): string {
 		if ($nameRenderer === 'handle') {
 			return full_name(author);
 		}
 		else if ($nameRenderer === 'nickname') {
-			return author?.nicknames?.[0] ?? full_name(author);
+			return nickname_only(author);
 		}
 		else if ($nameRenderer === 'both') {
 			return author?.nicknames?.[0] + ' (' + full_name(author) + ')';
@@ -81,7 +85,19 @@
 				"action": () => {
 					copyTextToClipboard(BigInt(message.author._id))
 				}
-			}
+			},
+			{
+				"name": "Copy author nickname",
+				"action": () => {
+					copyTextToClipboard(nickname_only(message.author))
+				}
+			},
+			{
+				"name": "Copy author name+handle",
+				"action": () => {
+					copyTextToClipboard(full_name(message.author))
+				}
+			},
 		]
 	}
 </script>

@@ -16,6 +16,12 @@
 				"action": () => {
 					copyTextToClipboard(BigInt(id))
 				}
+			},
+			{
+				"name": "Copy channel name",
+				"action": () => {
+					copyTextToClipboard(name)
+				}
 			}
 		]
 	}
