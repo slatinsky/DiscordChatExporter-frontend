@@ -4,6 +4,7 @@ import os
 from pprint import pprint
 import re
 import sys
+import traceback
 import pymongo
 from fastapi import FastAPI, Query
 
@@ -726,188 +727,193 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 	Searches for messages that contain the prompt.
 	"""
 
-	# todo: parse prompt
-	search = parse_prompt(prompt)
-	message_contains = search["message_contains"]
-	message_ids = search["message_ids"]
-	from_user_ids = search["from_user_ids"]
-	from_users = search["from_users"]
-	mentions_user_ids = search["mentions_user_ids"]
-	mentions_users = search["mentions_users"]
-	reaction_ids = search["reaction_ids"]
-	reactions = search["reactions"]
-	extensions = search["extensions"]
-	filenames = search["filenames"]
-	in_channel_ids = search["in_channel_ids"]
-	in_channels = search["in_channels"]
-	in_category_ids = search["in_category_ids"]
-	in_categories = search["in_categories"]
-	is_pinned = search["is_pinned"]
-	attachment_is_audio = search["attachment_is_audio"]
-	attachment_is_image = search["attachment_is_image"]
-	attachment_is_video = search["attachment_is_video"]
-	attachment_is_other = search["attachment_is_other"]
-	containing_links = search["containing_links"]
-	is_edited = search["is_edited"]
-	limit = search["limit"]
+	try:
+		# todo: parse prompt
+		search = parse_prompt(prompt)
+		message_contains = search["message_contains"]
+		message_ids = search["message_ids"]
+		from_user_ids = search["from_user_ids"]
+		from_users = search["from_users"]
+		mentions_user_ids = search["mentions_user_ids"]
+		mentions_users = search["mentions_users"]
+		reaction_ids = search["reaction_ids"]
+		reactions = search["reactions"]
+		extensions = search["extensions"]
+		filenames = search["filenames"]
+		in_channel_ids = search["in_channel_ids"]
+		in_channels = search["in_channels"]
+		in_category_ids = search["in_category_ids"]
+		in_categories = search["in_categories"]
+		is_pinned = search["is_pinned"]
+		attachment_is_audio = search["attachment_is_audio"]
+		attachment_is_image = search["attachment_is_image"]
+		attachment_is_video = search["attachment_is_video"]
+		attachment_is_other = search["attachment_is_other"]
+		containing_links = search["containing_links"]
+		is_edited = search["is_edited"]
+		limit = search["limit"]
 
-	# clean up
-	message_contains = [word.lower() for word in message_contains]
-	message_ids = [pad_id(id) for id in message_ids]
-	from_user_ids = [pad_id(id) for id in from_user_ids]
-	from_user_ids = extend_users(from_user_ids, from_users)
-	mentions_user_ids = [pad_id(id) for id in mentions_user_ids]
-	mentions_user_ids = extend_users(mentions_user_ids, mentions_users)
-	reaction_ids = [pad_id(id) for id in reaction_ids]
-	reactions = [reaction.lower() for reaction in reactions]
-	reaction_ids = extend_reactions(reaction_ids, reactions)
-	extensions = [ext.lower() for ext in extensions]
-	in_channel_ids = channel_names_to_ids(in_channel_ids, in_channels, guild_id)
-	in_channel_ids = [pad_id(id) for id in in_channel_ids]
-	in_channel_ids = extend_channels(in_channel_ids)      # extend channels with threads and forum posts
-	in_category_ids = category_names_to_ids(in_category_ids, in_categories, guild_id)
-	in_category_ids = [pad_id(id) for id in in_category_ids]
-	in_category_ids = extend_channels(in_category_ids)  # extend categories with channels
-	in_category_ids = extend_channels(in_category_ids)  # extend channels with threads and forum posts
-
-
-
-	# query builder
-	query = {}
-	limited_fields = {}
-
-	query["$and"] = []
-
-	if len(message_ids) > 0:
-		query["_id"] = {"$in": message_ids}
-
-	if len(from_user_ids) > 0:
-		query["author._id"] = {"$in": from_user_ids}
-
-	if len(mentions_user_ids) > 0:
-		query["mentions._id"] = {"$in": mentions_user_ids}
-
-	if len(reaction_ids) > 0:
-		query["reactions.emoji._id"] = {"$in": reaction_ids}
-
-	if len(extensions) > 0:
-		# extension can be in attachments or embeds
-		query["$and"].append(
-			{
-				"$or":
-				[
-					{"attachments.extension": {"$in": extensions}},
-					{"embeds.thumbnail.extension": {"$in": extensions}}
-				]
-			}
-		)
-
-	if len(filenames) > 0:
-		# filename can be in attachments or embeds
-		# case insensitive search
-		# match partial filenames
-		or_ = []
-		for filename in filenames:
-			or_.append({"attachments.filenameWithoutHash": {"$regex": filename, "$options": "i"}})
-			or_.append({"embeds.thumbnail.filenameWithoutHash": {"$regex": filename, "$options": "i"}})
-
-		query["$and"].append({"$or": or_})
+		# clean up
+		message_contains = [word.lower() for word in message_contains]
+		message_ids = [pad_id(id) for id in message_ids]
+		from_user_ids = [pad_id(id) for id in from_user_ids]
+		from_user_ids = extend_users(from_user_ids, from_users)
+		mentions_user_ids = [pad_id(id) for id in mentions_user_ids]
+		mentions_user_ids = extend_users(mentions_user_ids, mentions_users)
+		reaction_ids = [pad_id(id) for id in reaction_ids]
+		reactions = [reaction.lower() for reaction in reactions]
+		reaction_ids = extend_reactions(reaction_ids, reactions)
+		extensions = [ext.lower() for ext in extensions]
+		in_channel_ids = channel_names_to_ids(in_channel_ids, in_channels, guild_id)
+		in_channel_ids = [pad_id(id) for id in in_channel_ids]
+		in_channel_ids = extend_channels(in_channel_ids)      # extend channels with threads and forum posts
+		in_category_ids = category_names_to_ids(in_category_ids, in_categories, guild_id)
+		in_category_ids = [pad_id(id) for id in in_category_ids]
+		in_category_ids = extend_channels(in_category_ids)  # extend categories with channels
+		in_category_ids = extend_channels(in_category_ids)  # extend channels with threads and forum posts
 
 
-	if len(in_channel_ids) > 0:
-		query["channelId"] = {"$in": in_channel_ids}
 
-	if len(in_category_ids) > 0:
-		query["channelId"] = {"$in": in_category_ids}
+		# query builder
+		query = {}
+		limited_fields = {}
 
-	if is_pinned is not None:
-		query["isPinned"] = is_pinned
+		query["$and"] = []
 
-	if attachment_is_audio is not None or attachment_is_image is not None or attachment_is_video is not None or attachment_is_other is not None:
-		or_ = []
-		if attachment_is_audio is not None:
-			or_.append({
-				"$or": [
-					{"attachments.type": "audio"},
-					{"embeds.thumbnail.type": "audio"}
-				]
-			})
+		if len(message_ids) > 0:
+			query["_id"] = {"$in": message_ids}
 
-		if attachment_is_image is not None:
-			or_.append({
-				"$or": [
-					{"attachments.type": "image"},
-					{"embeds.thumbnail.type": "image"}
-				]
-			})
+		if len(from_user_ids) > 0:
+			query["author._id"] = {"$in": from_user_ids}
 
-		if attachment_is_video is not None:
-			or_.append({
-				"$or": [
-					{"attachments.type": "video"},
-					{"embeds.thumbnail.type": "video"}
-				]
-			})
+		if len(mentions_user_ids) > 0:
+			query["mentions._id"] = {"$in": mentions_user_ids}
 
-		if attachment_is_other is not None:
-			or_.append({
-				"$or": [
-					{"attachments.type": {"$nin": ["audio", "image", "video"]}},
-					{"embeds.thumbnail.type": {"$nin": ["audio", "image", "video"]}}
-				]
-			})
+		if len(reaction_ids) > 0:
+			query["reactions.emoji._id"] = {"$in": reaction_ids}
 
-		query["$and"].append({"$or": or_})
+		if len(extensions) > 0:
+			# extension can be in attachments or embeds
+			query["$and"].append(
+				{
+					"$or":
+					[
+						{"attachments.extension": {"$in": extensions}},
+						{"embeds.thumbnail.extension": {"$in": extensions}}
+					]
+				}
+			)
 
-	if containing_links is not None:
-		# todo: check if we can really use ^ for faster search without removing valid results
-		if containing_links:
-			query["content.content"] = {"$regex": "^http|^www"}
+		if len(filenames) > 0:
+			# filename can be in attachments or embeds
+			# case insensitive search
+			# match partial filenames
+			or_ = []
+			for filename in filenames:
+				or_.append({"attachments.filenameWithoutHash": {"$regex": filename, "$options": "i"}})
+				or_.append({"embeds.thumbnail.filenameWithoutHash": {"$regex": filename, "$options": "i"}})
+
+			query["$and"].append({"$or": or_})
+
+
+		if len(in_channel_ids) > 0:
+			query["channelId"] = {"$in": in_channel_ids}
+
+		if len(in_category_ids) > 0:
+			query["channelId"] = {"$in": in_category_ids}
+
+		if is_pinned is not None:
+			query["isPinned"] = is_pinned
+
+		if attachment_is_audio is not None or attachment_is_image is not None or attachment_is_video is not None or attachment_is_other is not None:
+			or_ = []
+			if attachment_is_audio is not None:
+				or_.append({
+					"$or": [
+						{"attachments.type": "audio"},
+						{"embeds.thumbnail.type": "audio"}
+					]
+				})
+
+			if attachment_is_image is not None:
+				or_.append({
+					"$or": [
+						{"attachments.type": "image"},
+						{"embeds.thumbnail.type": "image"}
+					]
+				})
+
+			if attachment_is_video is not None:
+				or_.append({
+					"$or": [
+						{"attachments.type": "video"},
+						{"embeds.thumbnail.type": "video"}
+					]
+				})
+
+			if attachment_is_other is not None:
+				or_.append({
+					"$or": [
+						{"attachments.type": {"$nin": ["audio", "image", "video"]}},
+						{"embeds.thumbnail.type": {"$nin": ["audio", "image", "video"]}}
+					]
+				})
+
+			query["$and"].append({"$or": or_})
+
+		if containing_links is not None:
+			# todo: check if we can really use ^ for faster search without removing valid results
+			if containing_links:
+				query["content.content"] = {"$regex": "^http|^www"}
+			else:
+				query["content.content"] = {"$not": {"$regex": "^http|^www"}}
+
+		if is_edited is not None:
+			# if message is edited, timestampEdited is not null
+			if is_edited:
+				query["timestampEdited"] = {"$ne": None}
+			else:
+				query["timestampEdited"] = None
+
+
+		if len(message_contains) > 0:
+			and_ = []
+			for message_should_contain in message_contains:
+				and_.append({"content.content": {"$regex": message_should_contain, "$options": "i"}})
+
+			query["$and"].append({"$and": and_})
+
+
+
+		if guild_id:
+			query["guildId"]=guild_id
+
+		if only_ids:
+			limited_fields["_id"]=1
+
+		if query["$and"] == []:
+			del query["$and"]
+
+		print("query", query)
+
+		cursor=collection_messages.find(query, limited_fields)
+
+		if limit > 0:
+			cursor.limit(limit)
+
+		if order_by == "newest":
+			cursor.sort([("_id", pymongo.DESCENDING)])
 		else:
-			query["content.content"] = {"$not": {"$regex": "^http|^www"}}
+			cursor.sort([("_id", pymongo.ASCENDING)])
 
-	if is_edited is not None:
-		# if message is edited, timestampEdited is not null
-		if is_edited:
-			query["timestampEdited"] = {"$ne": None}
+		if only_ids:
+			ids=[str(id["_id"]) for id in cursor]
+			return ids
 		else:
-			query["timestampEdited"] = None
-
-
-	if len(message_contains) > 0:
-		and_ = []
-		for message_should_contain in message_contains:
-			and_.append({"content.content": {"$regex": message_should_contain, "$options": "i"}})
-
-		query["$and"].append({"$and": and_})
-
-
-
-	if guild_id:
-		query["guildId"]=guild_id
-
-	if only_ids:
-		limited_fields["_id"]=1
-
-	if query["$and"] == []:
-		del query["$and"]
-
-	print("query", query)
-
-	cursor=collection_messages.find(query, limited_fields)
-
-	if limit > 0:
-		cursor.limit(limit)
-
-	if order_by == "newest":
-		cursor.sort([("_id", pymongo.DESCENDING)])
-	else:
-		cursor.sort([("_id", pymongo.ASCENDING)])
-
-	if only_ids:
-		ids=[str(id["_id"]) for id in cursor]
-		return ids
-	else:
-		list_of_messages = list(cursor)
-		list_of_messages = enrich_messages(list_of_messages)
-		return list_of_messages
+			list_of_messages = list(cursor)
+			list_of_messages = enrich_messages(list_of_messages)
+			return list_of_messages
+	except Exception as e:
+		print("/search error:")
+		traceback.print_exc()
+		return ["error"]

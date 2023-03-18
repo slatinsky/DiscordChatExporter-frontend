@@ -37,8 +37,9 @@
 	// promise
 	let fullMessagesPromise = fetchMessages(messageId, previousMessageId);
 </script>
-
-{#if messageId}
+{#if messageId == "error"}
+	<div class="search-error">SEARCH ERROR - check server logs for details</div>
+{:else if messageId}
 	{#await fullMessagesPromise}
 		<div class="loading">Loading... {messageId}</div>
 	{:then messages}
@@ -60,5 +61,10 @@
 		cursor: pointer;
 		background-color: black;
 		padding: 2.5px 5px;
+	}
+
+	.search-error {
+		color: red;
+		padding: 1rem 2rem;
 	}
 </style>
