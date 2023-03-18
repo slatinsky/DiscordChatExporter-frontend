@@ -187,9 +187,11 @@ def category_names_to_ids(in_category_ids: list, in_categories: list, guild_id: 
 		if category in out_category_ids:
 			continue
 
-		category_id = collection_channels.find_one({"category": category, "guildId": guild_id}, {"_id": 1})
-		if category_id:
-			out_category_ids.append(category_id["_id"])
+		channel_id = collection_channels.find_one({"category": category, "guildId": guild_id}, {"categoryId": 1})
+		if channel_id:
+			out_category_ids.append(channel_id["categoryId"])
+
+	return out_category_ids
 
 
 def extend_channels(channels: list):
@@ -215,7 +217,7 @@ def extend_users(user_ids: list, usernames: list):
 	exactly patch name+discriminator
 	"""
 	if len(usernames) == 0:
-		return usernames
+		return user_ids
 
 
 	user_ids = user_ids.copy()
@@ -245,7 +247,7 @@ def extend_reactions(reaction_ids: list, reactions: list):
 
 	"""
 	if len(reactions) == 0:
-		return reactions
+		return reaction_ids
 
 	reaction_ids = reaction_ids.copy()
 	# partial match
@@ -391,7 +393,7 @@ SEARCH_CATEGORIES = [
 		"description": 'string (exact match)',
 		"type": 'string',
 		"multiple": True,
-		"mapTo": "in_categoriess",
+		"mapTo": "in_categories",
 		"autocompleteApi": "categories",
 	},
 	{
@@ -767,6 +769,7 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 		in_channel_ids = channel_names_to_ids(in_channel_ids, in_channels, guild_id)
 		in_channel_ids = [pad_id(id) for id in in_channel_ids]
 		in_channel_ids = extend_channels(in_channel_ids)      # extend channels with threads and forum posts
+		in_category_ids = [pad_id(id) for id in in_category_ids]
 		in_category_ids = category_names_to_ids(in_category_ids, in_categories, guild_id)
 		in_category_ids = [pad_id(id) for id in in_category_ids]
 		in_category_ids = extend_channels(in_category_ids)  # extend categories with channels
@@ -828,36 +831,68 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 		if attachment_is_audio is not None or attachment_is_image is not None or attachment_is_video is not None or attachment_is_other is not None:
 			or_ = []
 			if attachment_is_audio is not None:
-				or_.append({
-					"$or": [
-						{"attachments.type": "audio"},
-						{"embeds.thumbnail.type": "audio"}
-					]
-				})
+				if not attachment_is_audio:
+					or_.append({
+						"$and": [
+							{"attachments.type": {"$nin": ["audio"]}},
+							{"embeds.thumbnail.type": {"$nin": ["audio"]}}
+						]
+					})
+				else:
+					or_.append({
+						"$or": [
+							{"attachments.type": "audio"},
+							{"embeds.thumbnail.type": "audio"}
+						]
+					})
 
 			if attachment_is_image is not None:
-				or_.append({
-					"$or": [
-						{"attachments.type": "image"},
-						{"embeds.thumbnail.type": "image"}
-					]
-				})
+				if not attachment_is_image:
+					or_.append({
+						"$and": [
+							{"attachments.type": {"$nin": ["image"]}},
+							{"embeds.thumbnail.type": {"$nin": ["image"]}}
+						]
+					})
+				else:
+					or_.append({
+						"$or": [
+							{"attachments.type": "image"},
+							{"embeds.thumbnail.type": "image"}
+						]
+					})
 
 			if attachment_is_video is not None:
-				or_.append({
-					"$or": [
-						{"attachments.type": "video"},
-						{"embeds.thumbnail.type": "video"}
-					]
-				})
+				if not attachment_is_video:
+					or_.append({
+						"$and": [
+							{"attachments.type": {"$nin": ["video"]}},
+							{"embeds.thumbnail.type": {"$nin": ["video"]}}
+						]
+					})
+				else:
+					or_.append({
+						"$or": [
+							{"attachments.type": "video"},
+							{"embeds.thumbnail.type": "video"}
+						]
+					})
 
 			if attachment_is_other is not None:
-				or_.append({
-					"$or": [
-						{"attachments.type": {"$nin": ["audio", "image", "video"]}},
-						{"embeds.thumbnail.type": {"$nin": ["audio", "image", "video"]}}
-					]
-				})
+				if not attachment_is_other:
+					or_.append({
+						"$and": [
+							{"attachments.type": {"$nin": ["unknown"]}},
+							{"embeds.thumbnail.type": {"$nin": ["unknown"]}}
+						]
+					})
+				else:
+					or_.append({
+						"$or": [
+							{"attachments.type": "unknown"},
+							{"embeds.thumbnail.type": "unknown"}
+						]
+					})
 
 			query["$and"].append({"$or": or_})
 
