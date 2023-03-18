@@ -356,7 +356,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'reaction',
-		"description": 'string (partial match)',
+		"description": 'regex (partial match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "reactions",
@@ -372,14 +372,14 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'filename',
-		"description": 'string (partial match)',
+		"description": 'regex (partial match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "filenames",
 		"autocompleteApi": "filenames",
 	},
 	{
-		"key": 'channel',
+		"key": 'in',
 		"description": 'string (exact match)',
 		"type": 'string',
 		"multiple": True,
@@ -467,8 +467,8 @@ SEARCH_CATEGORIES = [
 		"autocompleteApi": None,
 	},
 	{
-		"key": 'channel_id',
-		"description": 'id',
+		"key": 'in_id',
+		"description": 'channel_id',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "in_channel_ids",
@@ -476,7 +476,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'category_id',
-		"description": 'id',
+		"description": 'category_id',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "in_category_ids",
@@ -484,7 +484,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'from_id',
-		"description": 'id',
+		"description": 'author_id',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "from_user_ids",
@@ -492,7 +492,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'mentions_id',
-		"description": 'id',
+		"description": 'author_id',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "mentions_user_ids",
@@ -500,7 +500,7 @@ SEARCH_CATEGORIES = [
 	},
 		{
 		"key": 'reaction_id',
-		"description": 'id',
+		"description": 'emoji_id',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "reaction_ids",
