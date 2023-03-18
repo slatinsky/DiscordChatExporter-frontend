@@ -8,16 +8,25 @@
 	import MesssageSpoilerHandler from "src/components/messages/MesssageSpoilerHandler.svelte";
 	import Container from "src/components/containers/Container.svelte";
 	import { channelScrollPosition } from "src/routes/settingsStore";
+	import { onMount } from "svelte";
 
 	let startPosition = 0;
 
+	let previousScrollTop = 0;
 	function tryToScrollToMessageId(messageId: string) {
+		console.log("tryToScrollToMessageId", messageId);
 		const element = document.querySelector(`#messages [data-message-id='${messageId}']`)
 		if (element) {
 			const absoluteElement = element.closest(".scroll-absolute-element");
 			if (absoluteElement) {
-				absoluteElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				const currentScrollTop = element.offsetTop;  // scroll only if element position was updated
+				if (currentScrollTop !== previousScrollTop || currentScrollTop === 0) {
+					console.log("scrolling to message", currentScrollTop, previousScrollTop);
+					absoluteElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
 			}
+
+			previousScrollTop = element.offsetTop;
 		}
 	}
 
@@ -32,24 +41,19 @@
 			startPosition = index;
 			console.log("hash message found at index", index);
 
-			setTimeout(() => {
-				tryToScrollToMessageId(hash.slice(1));
-			}, 0);
-
-			setTimeout(() => {
-				tryToScrollToMessageId(hash.slice(1));
-			}, 300);
-
-			setTimeout(() => {
-				tryToScrollToMessageId(hash.slice(1));
-			}, 500);
+			let timeouts = [0, 300, 500, 1000, 1500, 2000];
+			// use for loop
+			for (let i = 0; i < timeouts.length; i++) {
+				setTimeout(() => {
+					tryToScrollToMessageId(hash.slice(1));
+				}, timeouts[i]);
+			}
 		}
 		else {
 			console.log("hash message not found");
 			startPosition = $channelScrollPosition === "bottom" ? data.messages.length - 1 : 0
 		}
 	}
-
 	$: data.messages, updateStartPosition()
 </script>
 
