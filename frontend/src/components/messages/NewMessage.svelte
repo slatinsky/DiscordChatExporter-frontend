@@ -174,7 +174,7 @@
 						</a>
 					{:else}
 						{#if referencedMessage}
-							<a href="#{referencedMessage._id}">
+							<a href="/channels/{message.guildId}/{message.channelId}#{referencedMessage._id}">
 								<div class="chatlog__reference">
 									<img
 										class="chatlog__reference-avatar"
