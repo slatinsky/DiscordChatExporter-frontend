@@ -331,6 +331,7 @@
 		font-size: x-small;
 		padding: .2rem .3rem;
 		border-radius: 2px;
+		z-index: 99;
 	}
 
 	.msg-root:hover .msg-jump {
