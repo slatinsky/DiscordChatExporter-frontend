@@ -324,7 +324,7 @@
 	.msg-root .msg-jump {
 		visibility: hidden;
 		position: absolute;
-		top: 20px;
+		top: 3px;
 		right: 10px;
 		background-color: #1E1E1F;
 		color: white;
