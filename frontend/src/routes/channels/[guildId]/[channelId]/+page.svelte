@@ -11,6 +11,16 @@
 
 	let startPosition = 0;
 
+	function tryToScrollToMessageId(messageId: string) {
+		const element = document.querySelector(`#messages [data-message-id='${messageId}']`)
+		if (element) {
+			const absoluteElement = element.closest(".scroll-absolute-element");
+			if (absoluteElement) {
+				absoluteElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}
+		}
+	}
+
 	// hashchange event listener
 	function updateStartPosition() {
 		const hash = window.location.hash;
@@ -21,6 +31,18 @@
 		if (index !== -1) {
 			startPosition = index;
 			console.log("hash message found at index", index);
+
+			setTimeout(() => {
+				tryToScrollToMessageId(hash.slice(1));
+			}, 0);
+
+			setTimeout(() => {
+				tryToScrollToMessageId(hash.slice(1));
+			}, 300);
+
+			setTimeout(() => {
+				tryToScrollToMessageId(hash.slice(1));
+			}, 500);
 		}
 		else {
 			console.log("hash message not found");

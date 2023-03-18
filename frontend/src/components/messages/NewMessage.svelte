@@ -128,7 +128,7 @@
 					? 'chatlog__message-container--deleted'
 					: ''}
 				"
-			data-message-id={message.id}
+			data-message-id={message._id}
 		>
 			<div class="chatlog__message">
 				<!--            TODO: system notification-->
