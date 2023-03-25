@@ -408,7 +408,7 @@ Docker release should work on Linux x64 and (hopefully) Mac M1 (arm64) computers
 And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pyinstaller, nginx, mongodb
 
 ## License
-GNU GENERAL PUBLIC LICENSE
+GNU GENERAL PUBLIC LICENSE. See [LICENSE](LICENSE) for more details.
 
 This product contains software provided by NGINX and its contributors.
 
