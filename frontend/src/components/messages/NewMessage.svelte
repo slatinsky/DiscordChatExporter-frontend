@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { checkUrl, copyTextToClipboard } from 'src/js/helpers';
+	import { checkUrl, copyTextToClipboard, snowflakeToDate } from 'src/js/helpers';
 	import type { Author, Message } from 'src/js/interfaces';
 	import { renderTimestamp } from 'src/js/time';
 	import ImageGallery from 'src/routes/channels/[guildId]/[channelId]/ImageGallery.svelte';
@@ -17,17 +17,49 @@
 	export let referencedMessage: Message | null = null;
 	export let selectedGuildId: string
 
-	let isSameAuthor = false;
-
-
 	let previousMessageFromDifferentChannel = true;
 	if (previousMessage && previousMessage.channelId === message.channelId) {
 		previousMessageFromDifferentChannel = false;
 	}
 
-	if (previousMessage && previousMessage.author?._id === message.author._id && !previousMessageFromDifferentChannel) {
-		isSameAuthor = true;
+	$: mergeWithPrevious = shouldMerge(previousMessage, message);
+
+	// should we should visually group this message with the previous one?
+	function shouldMerge(previousMessage: Message | null, message: Message) {
+		// null checks
+		if (!previousMessage) {
+			return false;
+		}
+		if (!message) {
+			return false;
+		}
+
+		// if from different author, don't merge
+		if (previousMessage.author?._id !== message.author._id) {
+			return false;
+		}
+
+		// if from different channel, don't merge
+		if (previousMessage.channelId !== message.channelId) {
+			return false;
+		}
+
+
+		// if more than 5 minutes between messages, don't merge
+		let prevDate = snowflakeToDate(previousMessage._id);
+		let date = snowflakeToDate(message._id);
+		if (date.getTime() - prevDate.getTime() > 5 * 60 * 1000) {
+			return false;
+		}
+
+		// if is reply, don't merge
+		if (message.type === "Reply") {
+			return false;
+		}
+
+		return true;
 	}
+
 
 	function full_name(author) {
 		return author.name + '#' + author.discriminator;
@@ -111,7 +143,7 @@
 		<div class="channel-name"><a href="/channels/{selectedGuildId}/{message.channelId}/"># {guild.channels[message.channelId]?.name}</a></div>
 	{/if} -->
 	<!-- transition:fade={{ duration: 125 }} -->
-	{#if !isSameAuthor}
+	{#if !mergeWithPrevious}
 		<div class="padder"></div>
 	{/if}
 
@@ -138,7 +170,7 @@
 						<div class="chatlog__reference-symbol" />
 					{/if}
 
-					{#if !isSameAuthor}
+					{#if !mergeWithPrevious}
 						{#if message.type != 'ThreadCreated'}
 							<ImageGallery asset={message.author?.avatar} imgclass={"chatlog__avatar"} />
 						{/if}
@@ -203,7 +235,7 @@
 								</div>
 							</a>
 						{/if}
-						{#if !isSameAuthor}
+						{#if !mergeWithPrevious}
 							<div class="chatlog__header">
 								<span
 									class="chatlog__author"

@@ -68,3 +68,14 @@ export function getFileNameFromUrl(url) {
 export function clamp(num: number, min: number, max: number): number {
     return Math.min(Math.max(num, min), max);
 }
+
+
+// (modified) https://github.com/vegeta897/snow-stamp/blob/4803e7889da524b8c83bc2d72882b82f02622662/src/convert.js#L1-L9
+// Converts a snowflake ID string into a JS Date object using the Discord's epoch (in ms)
+const DISCORD_EPOCH = 1420070400000
+export function snowflakeToDate(snowflake: string) {
+	// Convert snowflake to BigInt to extract timestamp bits
+	// https://discord.com/developers/docs/reference#snowflakes
+	const milliseconds = BigInt(snowflake) >> 22n
+	return new Date(Number(milliseconds) + DISCORD_EPOCH)
+}
