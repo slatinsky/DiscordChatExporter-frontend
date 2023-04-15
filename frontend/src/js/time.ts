@@ -73,3 +73,6 @@ export function renderTimestamp(date) {
     return timestampRenderers[get(timestampFormat)](date);
 }
 
+export function renderDate(date) {
+    return moment(date).format('YYYY-MM-DD');
+}

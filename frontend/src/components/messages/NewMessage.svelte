@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { checkUrl, copyTextToClipboard, snowflakeToDate } from 'src/js/helpers';
 	import type { Author, Message } from 'src/js/interfaces';
-	import { renderTimestamp } from 'src/js/time';
+	import { renderDate, renderTimestamp } from 'src/js/time';
 	import ImageGallery from 'src/routes/channels/[guildId]/[channelId]/ImageGallery.svelte';
 	import { contextMenuItems} from '../menu/menuStore';
 	import { linkHandler, nameRenderer } from 'src/routes/settingsStore';
@@ -23,6 +23,8 @@
 	}
 
 	$: mergeWithPrevious = shouldMerge(previousMessage, message);
+
+	
 
 	// should we should visually group this message with the previous one?
 	function shouldMerge(previousMessage: Message | null, message: Message) {
@@ -58,6 +60,23 @@
 		}
 
 		return true;
+	}
+
+	$: showDateSeparator = isDateDifferent(previousMessage, message);
+
+	function isDateDifferent(previousMessage: Message | null, message: Message) {
+		// null checks
+		if (!previousMessage) {
+			return true;
+		}
+		if (!message) {
+			return true;
+		}
+
+		let prevDate = snowflakeToDate(previousMessage._id);
+		let date = snowflakeToDate(message._id);
+
+		return prevDate.getDate() !== date.getDate() || prevDate.getMonth() !== date.getMonth() || prevDate.getFullYear() !== date.getFullYear()
 	}
 
 
@@ -136,6 +155,14 @@
 
 <!-- Rewritten https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/Html/MessageGroupTemplate.cshtml to svelte -->
 <div class="msg-root">
+
+	{#if showDateSeparator}
+		<div class="date-separator">
+			<div class="date-separator-line"></div>
+			<div class="date-separator-text">{renderDate(snowflakeToDate(message._id))}</div>
+			<div class="date-separator-line"></div>
+		</div>
+	{/if}
 
 	<a class="msg-jump" href="/channels/{message.guildId}/{message.channelId}#{message._id}">Jump</a>
 
@@ -368,5 +395,26 @@
 
 	.msg-root:hover .msg-jump {
 		visibility: visible;
+	}
+
+
+	.date-separator {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin: 10px 0;
+		gap: 10px;
+	}
+
+	.date-separator-line {
+		width: 100%;
+		height: 1px;
+		background-color: #3F4147;
+	}
+
+	.date-separator-text {
+		color: #949BA4;
+		font-size: 12px;
+		white-space: nowrap;  /* never break the line */
 	}
 </style>
