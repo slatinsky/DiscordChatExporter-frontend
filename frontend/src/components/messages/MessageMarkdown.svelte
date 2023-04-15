@@ -15,6 +15,17 @@
     export let guildId: string
     let processedContent: string
 
+    function messageContainsOnlyEmojis(content: string): boolean {
+        let regex = /<a?:\w+:\d{17,32}>/g
+        let matches = content.match(regex)
+        if (matches) {
+            return matches.length === content.split(' ').length
+        }
+        return false
+    }
+
+    let onlyemojis = messageContainsOnlyEmojis(content)
+
     function escapeHTML(unsafeText: string): string {  // source https://stackoverflow.com/a/48054293
         let div = document.createElement('div');
         div.innerText = unsafeText;
@@ -83,7 +94,7 @@
     $: process(content)
 </script>
 
-<span>{@html processedContent}</span>
+<span class:onlyemojis={onlyemojis}>{@html processedContent}</span>
 
 
 <style>
@@ -93,6 +104,14 @@
         height: 22px;
         transform: translate(0px, 2px);
     }
+
+    :global(.onlyemojis .message-emoji),
+    :global(.onlyemojis .d-emoji) {
+        width: 50px;
+        height: 50px;
+    }
+
+
     :global(.message-mention) {
         color: #D4E0FC;
         background-color: #414675;
