@@ -1,4 +1,4 @@
-# first stage - build sveltekit app
+# build sveltekit static app
 FROM node:16.18-alpine3.15 as build
 WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
@@ -6,15 +6,9 @@ RUN npm install
 COPY frontend/ .
 RUN npm run build
 
-# second stage - install http server, copy static files from first stage build
-# FROM nikolaik/python-nodejs:python3.11-nodejs16-alpine
-FROM mongo:6.0.4-jammy
-# RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.9/main' >> /etc/apk/repositories
-# RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' >> /etc/apk/repositories
-# RUN apk update
-# RUN apk add --no-cache nginx mongodb yaml-cpp=0.6.2-r2 cargo
+# first stage
+FROM mongo:6.0.5-jammy
 WORKDIR /dcef
-RUN sed -i 's/htt[p|ps]:\/\/archive.ubuntu.com\/ubuntu\//mirror:\/\/mirrors.ubuntu.com\/mirrors.txt/g' /etc/apt/sources.list
 RUN apt-get update && apt-get install python3.11 python3-pip nginx -y
 RUN mkdir -p /dcef/exports/
 COPY /release/exports/ /dcef/exports/

@@ -1,3 +1,4 @@
+#!/bin/bash
 mkdir -p /dcef/cache/preprocess
 mkdir -p /dcef/cache/db
 mongod --dbpath "/dcef/cache/db/" --wiredTigerCacheSizeGB 1.5 &
