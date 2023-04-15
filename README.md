@@ -46,46 +46,60 @@ if you don't have any exports yet, you can try out the viewer with example expor
 - move your exports to a folder with shorter path
 - or run `registry_tweaks/change_260_character_path_limit_to_32767.reg` to increase the limit to 32767 characters (requires admin privileges) and restart your computer
 
+
 ### Beta builds (Windows)
 If you want to try out the latest features, you can use [beta builds](https://github.com/slatinsky/DiscordChatExporter-frontend/actions/workflows/windows-build.yml). They are automatically built from the latest commit on `master` branch or from pull requests.
 
-## Docker version (Linux)
+## Docker (cross-platform)
+**Info**: Tested on Ubuntu 22.04 and WSL2 on Windows 10. **Not** tested on arm based systems like Raspberry Pi or Apple M1.
+
 This verion is the best way to [host the viewer on a server](docs/Server-hosting.md) for others to use.
+
+1. pull the image from docker hub
+
+```bash
+docker pull slada/dcef:main
+```
+
+2. Navigate to a folder with your exports
+
+```bash
+cd /path/to/your/exports
+```
+
+3. Run the container
+```bash
+docker run --volume "$(pwd):/dcef/exports" --volume dcef_cache:/dcef/cache --rm --name dcef -p 21011:21011 -it slada/dcef:main
+```
+
+4. Open `http://127.0.0.1:21011/` in your browser
+
+
+<details><summary>Build docker image from source code</summary>
+<p>
 
 You need docker and git installed. Tested on non-snap version of docker on Ubuntu 22.04.
 1. Build image
+
 ```bash
 git clone https://github.com/slatinsky/DiscordChatExporter-frontend
 cd DiscordChatExporter-frontend
 docker build -t dcef .
 ```
-2. Navigate to folder with your exports
-```bash
-cd [path to your exports]
-```
-
-3. Run container
-```bash
-docker run --volume "$(pwd):/dcef/exports" --volume dcef_cache:/dcef/cache --rm -p 21011:21011 -it dcef
-```
-
-4. Open `http://127.0.0.1:21011/` in your browser
+Then use the same instructions as for the docker hub version, but replace `slada/dcef:main` with `dcef` in step 3.
+</p>
+</details>
 
 <details><summary>Debugging containers</summary>
 <p>
 
-To debug running container, run `docker exec -it $(docker ps | grep 'dcef' | awk '{ print $1 }') sh`. This will open a shell inside the container.
+To debug a running container, run `docker exec -it $(docker ps | grep 'dcef' | awk '{ print $1 }') sh`. This will open a shell inside the container.
 
 To remove volume `dcef_cache` with temporary files, run `docker volume rm dcef_cache`
 
 </p>
 </details>
 
-## Docker version (Mac)
-
-Use the instructions for linux.
-
-I don't use Mac, so it relies on community support in case of issues.
 ## Upgrade guide (Windows)
 Want to upgrade from previous version? Follow these steps:
 
