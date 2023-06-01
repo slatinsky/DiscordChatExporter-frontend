@@ -271,6 +271,8 @@ class JsonProcessor:
 			# channel already exists
 			return
 
+		channel["msg_count"] = 0
+
 		self.collection_channels.insert_one(channel)
 
 	def insert_author(self, author):
@@ -278,6 +280,7 @@ class JsonProcessor:
 
 		if database_author == None:
 			# author doesn't exist yet
+			author["msg_count"] = 0
 			self.collection_authors.insert_one(author)
 			return
 
@@ -342,6 +345,13 @@ class JsonProcessor:
 			return
 
 		self.collection_messages.insert_one(message)
+
+
+		# update message count of channel
+		self.collection_channels.update_one({"_id": message["channelId"]}, {"$inc": {"msg_count": 1}})
+		# update message count of author
+		self.collection_authors.update_one({"_id": message["author"]["_id"]}, {"$inc": {"msg_count": 1}})
+		return
 
 	def check_if_processed(self, json_path):
 		"""
@@ -432,13 +442,23 @@ class JsonProcessor:
 		authors = self.process_authors(json_data["messages"], guild["_id"])
 		emojis = self.process_emojis(json_data["messages"], guild["_id"])
 
-		self.insert_guild(guild)
+		# channel needs to be inserted before messages,
+		# because we count the messages per channel in insert_message()
 		self.insert_channel(channel)
+
+		# authors needs to be inserted before messages,
+		# because we count the messages per author in insert_message()
+		for author in authors:
+			self.insert_author(author)
+
+
 		for message in messages:
 			self.insert_message(message)
 
-		for author in authors:
-			self.insert_author(author)
+		self.insert_guild(guild)
+
+
+
 
 		for emoji in emojis:
 			self.insert_emoji(emoji)
