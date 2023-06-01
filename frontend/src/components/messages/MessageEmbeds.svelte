@@ -5,6 +5,11 @@
 	import MessageMarkdown from "./MessageMarkdown.svelte";
 
 	export let embeds: Embed[];
+	$: embedUrl = embeds?.[0]?.url ?? null;
+	// get the youtube video id
+	const reg = /^(?:https?:)?\/\/(?:www|m)\.(?:youtube(?:-nocookie)?\.com|youtu.be)\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?[\w\-]+/
+	$: youtubeId = embedUrl?.match(reg)?.[0]?.split('v=')?.[1]?.split('&')?.[0] ?? null;
+	let playVideo = false;
 </script>
 
 {#each embeds as embed}
@@ -94,7 +99,7 @@
 
 
 				<!-- @{/* Embed content */} -->
-					{#if embed.thumbnail}
+					{#if embed.thumbnail && !playVideo}
 						<div class="chatlog__embed-thumbnail-container">
 								<!-- {console.warn(embed.thumbnail.type)} -->
 								{#if embed.thumbnail?.type === 'video'}
@@ -120,6 +125,17 @@
 						{/each}
 					{/if}
 
+					<!-- @{/* Youtube embed */} -->
+					{#if youtubeId}
+						{#if playVideo}
+							<div class="chatlog__embed-youtube-container">
+								<iframe class="chatlog__embed-youtube" src="http://www.youtube.com/embed/{youtubeId}" allowfullscreen></iframe>
+							</div>
+						{:else}
+							<button on:click={() => playVideo = true}>Play video</button>
+						{/if}
+					{/if}
+
 					<!-- @{/* Embed footer & icon */} -->
 					{#if embed.footer}
 						<div class="chatlog__embed-footer">
@@ -142,3 +158,20 @@
 		</div>
 	</div>
 {/each}
+
+<style>
+	.chatlog__embed-youtube-container {
+		position: relative;
+		width: 100%;
+		height: 0;
+		padding-bottom: 56.25%;
+	}
+
+	.chatlog__embed-youtube-container iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>
