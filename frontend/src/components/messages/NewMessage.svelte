@@ -24,7 +24,6 @@
 
 	$: mergeWithPrevious = shouldMerge(previousMessage, message);
 
-	
 
 	// should we should visually group this message with the previous one?
 	function shouldMerge(previousMessage: Message | null, message: Message) {
@@ -193,7 +192,7 @@
 				<!--            TODO: system notification-->
 				<!--            Regular message-->
 				<div class="chatlog__message-aside">
-					{#if referencedMessage}
+					{#if message.reference}
 						<div class="chatlog__reference-symbol" />
 					{/if}
 
@@ -261,6 +260,17 @@
 									</div>
 								</div>
 							</a>
+						{:else if message.reference}
+							<div class="chatlog__reference">
+								<div class="chatlog__reference-content">
+									<span
+										class="chatlog__reference-link"
+										>
+										<i>Original message was deleted</i>
+										</span
+									>
+								</div>
+							</div>
 						{/if}
 						{#if !mergeWithPrevious}
 							<div class="chatlog__header">
