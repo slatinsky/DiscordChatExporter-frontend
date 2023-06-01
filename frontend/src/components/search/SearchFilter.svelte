@@ -17,6 +17,7 @@
 
 
 	import { searchResultsMessageIds, searchShown } from "./searchStores";
+	import { checkUrl } from "src/js/helpers";
 	export let guildId: string;
 
 	let searchCategories: SearchCategory[] = []
@@ -176,14 +177,16 @@
 						
 						if (json.type !== "unknown_key") {
 							searchSuggestions = json.map((suggestion) => {
-							if (suggestion.value.includes(" ")) {
-								suggestion.value = `"${suggestion.value}"`;
+							if (suggestion.key.includes(" ")) {
+								suggestion.key = `"${suggestion.key}"`;
 							}
 							return {
-									key: suggestion.value,
-									description: suggestion.label,
+									key: suggestion.key,
+									description: suggestion.description,
+									description2: suggestion?.description2 ?? undefined,
+									icon: suggestion?.icon ?? undefined,
 									action: () => {
-										inputValue = inputValue.replace(new RegExp(`:"?${value}$`), `:${suggestion.value} `);
+										inputValue = inputValue.replace(new RegExp(`:"?${value}$`), `:${suggestion.key} `);
 									}
 								}
 							});
@@ -267,11 +270,32 @@
 						class="search-option" class:active={selectedMenuIndex === i}
 						on:click|stopPropagation|capture={()=>onClickSuggestion(suggestion.action)} bind:this={searchSuggestionDoms[i]}
 					>
-							{#if suggestion.description !== ""}
-								<b>{suggestion.key}:</b> {suggestion.description}
-							{:else}
-								<b>{suggestion.key}</b>
+						<div class="search-option-inner">
+							{#if suggestion.icon}
+								<img
+									class=""
+									src={checkUrl(suggestion.icon)}
+									alt="Avatar"
+									loading="lazy"
+									width="48"
+									height="48"
+									onerror="this.style.visibility='hidden'"
+								/>
 							{/if}
+							<div>
+								{#if suggestion.description !== ""}
+									<b>{suggestion.key}:</b> {suggestion.description}
+								{:else}
+									<b>{suggestion.key}</b>
+								{/if}
+	
+								{#if suggestion.description2}
+									<div>
+										<small>{suggestion.description2}</small>
+									</div>
+								{/if}
+							</div>
+						</div>
 					</div>
 				{/key}
 			{/each}
@@ -368,5 +392,10 @@
 		justify-content: space-between;
 		gap: 15px;
 		/* margin: 5px 30px; */
+	}
+
+	.search-option-inner {
+		display: flex;
+		gap: 15px;
 	}
 </style>
