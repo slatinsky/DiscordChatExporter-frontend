@@ -214,22 +214,16 @@ def extend_channels(channels: list):
 def extend_users(user_ids: list, usernames: list):
 	"""
 	Find new user ids by user names.
-	exactly patch name+discriminator
+	exactly match user names
 	"""
 	if len(usernames) == 0:
 		return user_ids
 
-
 	user_ids = user_ids.copy()
-	# partial match
 
 	or_ = []
 	for username in usernames:
-		if "#" not in username:
-			continue
-
-		name, discriminator = username.split("#")
-		or_.append({"name": name, "discriminator": discriminator})
+		or_.append({"names": username})
 
 	query = {"$or": or_}
 
