@@ -69,16 +69,27 @@ def autocomplete_reactions(db, guild_id: str, partial_reaction: str, limit: int)
 	"""
 	collection_emojis = db["emojis"]
 
-	query = {"name": {"$regex": partial_reaction, "$options": "i"}, "$or": [{"guild_id": guild_id}, {"guild_id": None}]}
+	query = {
+		"name": {
+			"$regex": partial_reaction,
+			"$options": "i"
+		},
+		"guildIds": guild_id
+	}
 	cursor = collection_emojis.find(query, {
 		"name": 1,
-		"image": 1
-	}).limit(limit).sort([("name", 1)])
+		"image": 1,
+		"usage_count": 1
+	}).limit(limit).sort([
+		("usage_count", -1),
+		("name", 1)
+	])
 	reaction_names = []
 	for reaction in cursor:
 		reaction_names.append({
 			"key": reaction['name'],
 			"description": "",
+			"description2": str(reaction['usage_count']) + "x",
 			"icon": reaction['image']
 
 		})

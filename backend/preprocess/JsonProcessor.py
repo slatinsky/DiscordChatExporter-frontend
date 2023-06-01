@@ -165,13 +165,12 @@ class JsonProcessor:
 			if "reactions" in message:
 				for reaction in message["reactions"]:
 					if "emoji" in reaction:
-						reaction["emoji"]["guildId"] = guild_id
+						reaction["emoji"]["guildIds"] = [guild_id]
 						reaction["emoji"]["source"] = "custom"
 						reaction["emoji"]["_id"] = pad_id(reaction["emoji"].pop("id"))
 						if reaction["emoji"]["_id"] == pad_id(0):
 							reaction["emoji"]["name"] = get_emoji_code(reaction["emoji"]["name"]).replace(":", "")
 							reaction["emoji"]["_id"] = reaction["emoji"]["name"]
-							del reaction["emoji"]["guildId"]
 							reaction["emoji"]["source"] = "default"
 
 						reaction["emoji"]["image"] = self.asset_processor.process(reaction["emoji"].pop("imageUrl"))
@@ -232,7 +231,7 @@ class JsonProcessor:
 
 		return authors_list
 
-	def process_emojis(self, messages: list, guild_id) -> list:
+	def process_emojis(self, messages: list) -> list:
 		"""
 		extracts all emojis from messages and returns a list of emojis
 		"""
@@ -246,7 +245,12 @@ class JsonProcessor:
 						# emoji already exists, ignore
 						continue
 
-					emojis[emoji["_id"]] = emoji
+					count = reaction["count"]
+
+					emojis[emoji["_id"]] = {
+						"emoji": emoji,
+						"count": count
+					}
 
 		emojis_list = []
 		for emoji_id in emojis:
@@ -300,14 +304,29 @@ class JsonProcessor:
 		return
 
 
-	def insert_emoji(self, emoji):
-		database_document = self.collection_emojis.find_one({"_id": emoji["_id"]})
+	def insert_emoji(self, emoji, guild_id):
+		database_document = self.collection_emojis.find_one({"_id": emoji['emoji']["_id"]})
 
-		if database_document != None:
-			# emoji already exists
+		if database_document == None:
+			# new emoji
+			emoji['emoji']["usage_count"] = emoji['count']
+			emoji['emoji']["guildIds"] = [guild_id]
+			self.collection_emojis.insert_one(emoji['emoji'])
 			return
 
-		self.collection_emojis.insert_one(emoji)
+		guildIds = list(set(emoji['emoji']["guildIds"] + database_document["guildIds"]))
+
+		# increase usage count
+		self.collection_emojis.update_one({"_id": emoji['emoji']["_id"]}, {
+			"$inc": {
+				"usage_count": emoji['count']
+			},
+			"$set": {
+				"guildIds": guildIds
+			}
+		})
+
+
 
 	def insert_message(self, message):
 		"""
@@ -440,7 +459,7 @@ class JsonProcessor:
 		channel = self.process_channel(json_data["channel"], guild["_id"])
 		messages = self.process_messages(json_data["messages"], guild["_id"], channel["_id"], channel["name"])
 		authors = self.process_authors(json_data["messages"], guild["_id"])
-		emojis = self.process_emojis(json_data["messages"], guild["_id"])
+		emojis = self.process_emojis(json_data["messages"])
 
 		# channel needs to be inserted before messages,
 		# because we count the messages per channel in insert_message()
@@ -458,10 +477,8 @@ class JsonProcessor:
 		self.insert_guild(guild)
 
 
-
-
 		for emoji in emojis:
-			self.insert_emoji(emoji)
+			self.insert_emoji(emoji, guild["_id"])
 
 		self.mark_as_processed(self.json_path)
 
