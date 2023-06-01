@@ -20,7 +20,8 @@ class MongoDatabase():
 			"emojis": self.database["emojis"],
 			"jsons": self.database["jsons"],
 			"assets": self.database["assets"],
-			"jsons": self.database["jsons"]
+			"jsons": self.database["jsons"],
+			"config": self.database["config"],
 		}
 
 		self.create_indexes()
@@ -40,6 +41,8 @@ class MongoDatabase():
 		"""
 		for collection_name in self.col:
 			if collection_name == "assets": # assets are expensive to recompute
+				continue
+			if collection_name == "config":
 				continue
 			self.col[collection_name].delete_many({})
 

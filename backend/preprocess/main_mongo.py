@@ -18,11 +18,38 @@ sys.stderr.reconfigure(encoding='utf-8')
 print = functools.partial(print, flush=True)
 
 
+def wipe_database(database):
+	"""
+	Deletes all collections on version bump (on program update)
+	Change EXPECTED_VERSION to force wipe on incompatible schema changes
+	"""
+	EXPECTED_VERSION = 1    # <---- change this to wipe database
+	config = database.get_collection("config")
+
+	version = config.find_one({"key": "version"})
+	if version is None:
+		version = {"key": "version", "value": 0}
+		config.insert_one(version)
+
+	if version["value"] == EXPECTED_VERSION:
+		print("Database schema up to date, no wipe needed")
+		return
+
+	print("Wiping database...")
+	database.clear_database_except_assets()
+	database.clear_assets()
+	print("Done wiping database")
+
+	version["value"] = EXPECTED_VERSION
+	config.update_one({"key": "version"}, {"$set": version})
+
 
 def main(input_dir, output_dir):
 	print("main_mongo loaded")
 
 	database = MongoDatabase()
+	wipe_database(database)
+
 	# DEBUG clear database
 	# database.clear_database_except_assets()
 	# database.clear_assets()
