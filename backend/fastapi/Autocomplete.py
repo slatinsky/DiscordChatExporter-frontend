@@ -51,13 +51,18 @@ def autocomplete_channels(db, guild_id: str, partial_channel: str, limit: int):
 	}
 	cursor = collection_channels.find(query, {
 		"name": 1,
-		"category": 1
-	}).limit(limit).sort([("name", 1)])
+		"category": 1,
+		"msg_count": 1
+	}).limit(limit).sort([
+		("msg_count", -1),
+		("name", 1)
+	])
 	channel_names = []
 	for channel in cursor:
 		channel_names.append({
 			"key": channel['name'],
-			"description": channel['category']
+			"description": channel['category'],
+			"description2": str(channel['msg_count']) + " messages",
 		})
 
 	return channel_names
