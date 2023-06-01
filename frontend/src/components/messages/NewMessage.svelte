@@ -80,7 +80,7 @@
 
 
 	function full_name(author) {
-		return author.name + '#' + author.discriminator;
+		return author.names.join(', ')
 	}
 
 	function nickname_only(author) {
@@ -246,9 +246,9 @@
 									<div
 										class="chatlog__reference-author"
 										style="color: {referencedMessage.author.color}"
-										title={referencedMessage.author.name}
+										title={referencedMessage.author.names.join(", ")}
 									>
-										{referencedMessage.author.name}
+										{referencedMessage.author.names.join(", ")}
 									</div>
 									<div class="chatlog__reference-content">
 										<span

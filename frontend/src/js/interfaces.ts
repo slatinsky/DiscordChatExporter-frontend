@@ -32,8 +32,7 @@ export interface Channel {
 }
 
 export interface Author {
-	name: string;
-	discriminator: string;
+	names: string[];
 	nicknames: string[];
 	color: string;
 	isBot: boolean;
