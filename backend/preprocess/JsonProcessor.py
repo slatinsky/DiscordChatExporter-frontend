@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+from pprint import pprint
 
 from AssetProcessor import AssetProcessor
 from ChannelCache import ChannelCache
@@ -197,7 +198,7 @@ class JsonProcessor:
 
 		return messages
 
-	def process_authors(self, messages: list) -> list:
+	def process_authors(self, messages: list, guild_id: str) -> list:
 		"""
 		Extracts all authors from messages and returns a list of authors
 		"""
@@ -213,8 +214,10 @@ class JsonProcessor:
 						authors[author["_id"]]["nicknames"].append(message["author"]["nickname"])
 					continue
 
+				author["guildIds"] = [guild_id]
 				author["avatar"] = self.asset_processor.process(author.pop("avatarUrl"))
 				author["nicknames"] = [author.pop("nickname")]
+				author["names"] = [author.pop("name") + "#" + author.pop("discriminator")]
 				authors[author["_id"]] = author  # new author
 
 		authors_list = []
@@ -271,13 +274,28 @@ class JsonProcessor:
 		self.collection_channels.insert_one(channel)
 
 	def insert_author(self, author):
-		database_document = self.collection_authors.find_one({"_id": author["_id"]})
+		database_author = self.collection_authors.find_one({"_id": author["_id"]})
 
-		if database_document != None:
-			# author already exists
+		if database_author == None:
+			# author doesn't exist yet
+			self.collection_authors.insert_one(author)
 			return
 
-		self.collection_authors.insert_one(author)
+		# merge new author with existing author
+		guildIds = list(set(author["guildIds"] + database_author["guildIds"]))
+		nicknames = list(set(author["nicknames"] + database_author["nicknames"]))
+		names = list(set(author["names"] + database_author["names"]))
+
+		# update guildIds and nicknames in database
+		self.collection_authors.update_one({"_id": author["_id"]}, {
+			"$set": {
+				"guildIds": guildIds,
+				"nicknames": nicknames,
+				"names": names
+			}
+		})
+		return
+
 
 	def insert_emoji(self, emoji):
 		database_document = self.collection_emojis.find_one({"_id": emoji["_id"]})
@@ -328,6 +346,8 @@ class JsonProcessor:
 	def check_if_processed(self, json_path):
 		"""
 		Checks if a file has already been processed
+		Returns True if the file has already been processed
+		Returns False if the file has not been processed yet
 		"""
 
 		json_path_with_base_dir = self.file_finder.add_base_directory(json_path)
@@ -336,28 +356,34 @@ class JsonProcessor:
 		json = self.collection_jsons.find_one({"_id": json_path})
 
 		if json == None:
+			# file not found in database, it is new file
 			return False
 
-		# check if file size is the same
+		# do quick checks first (date modified, file size), because hashing is slow
+
+		date_modified = os.path.getmtime(json_path_with_base_dir)
+		if json["date_modified"] == date_modified:
+			# if time modified is the same, file was not modified
+			return True
+
 		file_size = os.path.getsize(json_path_with_base_dir)
-		if json["size"] != file_size:
-			# delete from database
-			self.collection_jsons.delete_one({"_id": json_path})
-			return False
+		if json["size"] == file_size:
+			# file size is the same, file was not modified
+			return True
 
-		# check if file hash is the same
+		# slow check - file hash
 		file_hash = hashlib.sha256()
 		with open(json_path_with_base_dir, "rb") as f:
 			for byte_block in iter(lambda: f.read(4096), b""):
 				file_hash.update(byte_block)
 		hex_hash = file_hash.hexdigest()
 
-		if json["sha256_hash"] != hex_hash:
-			# delete from database
-			self.collection_jsons.delete_one({"_id": json_path})
-			return False
+		if json["sha256_hash"] == hex_hash:
+			# file hash is the same, file was not modified
+			return True
 
-		return True
+		# all checks failed, process the file again
+		self.collection_jsons.delete_one({"_id": json_path})
 
 	def mark_as_processed(self, json_path):
 		"""
@@ -368,6 +394,9 @@ class JsonProcessor:
 
 		# get file size
 		file_size = os.path.getsize(json_path_with_base_dir)
+
+		# get date modified
+		date_modified = os.path.getmtime(json_path_with_base_dir)
 
 		# get file hash of file content
 		file_hash = hashlib.sha256()
@@ -380,7 +409,8 @@ class JsonProcessor:
 		self.collection_jsons.insert_one({
 			"_id": json_path,
 			"size": file_size,
-			"sha256_hash": hex_hash
+			"sha256_hash": hex_hash,
+			"date_modified": date_modified
 		})
 
 	def process(self):
@@ -399,7 +429,7 @@ class JsonProcessor:
 		guild = self.process_guild(json_data["guild"])
 		channel = self.process_channel(json_data["channel"], guild["_id"])
 		messages = self.process_messages(json_data["messages"], guild["_id"], channel["_id"], channel["name"])
-		authors = self.process_authors(json_data["messages"])
+		authors = self.process_authors(json_data["messages"], guild["_id"])
 		emojis = self.process_emojis(json_data["messages"], guild["_id"])
 
 		self.insert_guild(guild)
