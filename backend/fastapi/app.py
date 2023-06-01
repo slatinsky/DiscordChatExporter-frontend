@@ -596,15 +596,19 @@ def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 	"""
 	Searches for users by name.
 	limited to {limit} results
+	only shows users that have messages in the guild {guild_id}
 	"""
 
-	# TODO: filter by guildId
-
-	query = {"name": {"$regex": partial_user_name, "$options": "i"}}
-	cursor = collection_authors.find(query, {"name": 1, "discriminator": 1}).limit(limit).sort([("name", 1), ("discriminator", 1)])
+	query = {
+		"guildIds": guild_id,
+		"names": {
+			"$regex": partial_user_name, "$options": "i"
+		}
+	}
+	cursor = collection_authors.find(query, {"names": 1}).limit(limit).sort([("names", 1)])
 	authors= []
 	for author in cursor:
-		authors.append(author['name'] + "#" + author['discriminator'])
+		authors.append(author['names'][0])
 	return authors
 
 @app.get("/search-autocomplete")
