@@ -1,3 +1,6 @@
+from pprint import pprint
+
+
 def autocomplete_categories(db, guild_id: str, partial_category: str, limit: int):
 	"""
 	Searches for categories.
@@ -24,10 +27,13 @@ def autocomplete_categories(db, guild_id: str, partial_category: str, limit: int
 	cursor = collection_channels.find(query, {"category": 1}).limit(limit).sort([("category", 1)])
 	category_names = []
 	for category in cursor:
-		category_names.append(category['category'])
+		category_names.append({
+			"value": category['category'],
+			"label": category['category']
+		})
 
-	# remove duplicates
-	category_names = list(set(category_names))
+	# TODO: remove duplicates
+
 	return category_names
 
 def autocomplete_channels(db, guild_id: str, partial_channel: str, limit: int):
@@ -37,14 +43,23 @@ def autocomplete_channels(db, guild_id: str, partial_channel: str, limit: int):
 	"""
 	collection_channels = db["channels"]
 
-	query = {"name": {"$regex": partial_channel, "$options": "i"}, "guildId": guild_id}
-	cursor = collection_channels.find(query, {"name": 1}).limit(limit).sort([("name", 1)])
+	query = {
+		"name": {
+			"$regex": partial_channel, "$options": "i"
+		},
+		"guildId": guild_id
+	}
+	cursor = collection_channels.find(query, {
+		"name": 1,
+		"category": 1
+	}).limit(limit).sort([("name", 1)])
 	channel_names = []
 	for channel in cursor:
-		channel_names.append(channel['name'])
+		channel_names.append({
+			"value": channel['name'],
+			"label": channel['category']
+		})
 
-	# remove duplicates
-	channel_names = list(set(channel_names))
 	return channel_names
 
 def autocomplete_reactions(db, guild_id: str, partial_reaction: str, limit: int):
@@ -58,11 +73,13 @@ def autocomplete_reactions(db, guild_id: str, partial_reaction: str, limit: int)
 	cursor = collection_emojis.find(query, {"name": 1}).limit(limit).sort([("name", 1)])
 	reaction_names = []
 	for reaction in cursor:
-		reaction_names.append(reaction['name'])
+		reaction_names.append({
+			"value": reaction['name'],
+			"label": reaction['name']
+		})
 
-	# remove duplicates
-	reaction_names = list(set(reaction_names))
-	# TODO: by removing duplicates, we are not respecting the limit anymore (more results could exist)
+	# TODO: remove duplicates
+
 	return reaction_names
 
 
@@ -73,15 +90,34 @@ def autocomplete_filenames(db, guild_id: str, partial_filename: str, limit: int)
 	"""
 	collection_assets = db["assets"]
 
-	query = {"filenameWithoutHash": {"$regex": partial_filename, "$options": "i"}}
-	cursor = collection_assets.find(query, {"filenameWithoutHash": 1}).limit(limit).sort([("filenameWithoutHash", 1)])
-	filenames = []
-	for filename in cursor:
-		filenames.append(filename['filenameWithoutHash'])
+	query = {
+		"filenameWithoutHash": {
+			"$regex": partial_filename,
+			"$options": "i"
+		}
+	}
+	cursor = collection_assets.aggregate([
+		{"$match": query},
+		{
+			"$group": {
+				"_id": "$filenameWithoutHash",
+				"doc": { "$first": "$$ROOT" }
+			}
+		},
+		{"$limit": limit},
+		{"$sort": {"_id": 1}}
+	])
 
-	# remove duplicates
-	filenames = list(set(filenames))
-	# TODO: by removing duplicates, we are not respecting the limit anymore (more results could exist)
+
+	filenames = []
+	for db_result in cursor:
+		filenames.append({
+			"value": db_result['doc']['filenameWithoutHash'],
+			"label": db_result['doc']["type"]
+		})
+
+	# TODO: remove duplicates
+
 	return filenames
 
 
@@ -99,8 +135,15 @@ def autocomplete_users(db, guild_id: str, partial_user_name: str, limit: int):
 			"$regex": partial_user_name, "$options": "i"
 		}
 	}
-	cursor = collection_authors.find(query, {"names": 1}).limit(limit).sort([("names", 1)])
+	cursor = collection_authors.find(query, {
+		"names": 1,
+		"nicknames": 1
+	}).limit(limit).sort([("names", 1)])
 	authors= []
 	for author in cursor:
-		authors.append(author['names'][0])
+		print(author)
+		authors.append({
+			"value": author['names'][0],
+			"label": ", ".join(author['nicknames'])
+		})
 	return authors

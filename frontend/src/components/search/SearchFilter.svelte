@@ -172,19 +172,22 @@
 						let query = inputValue;
 						let response = await fetch(`/api/search-autocomplete?guild_id=${encodeURIComponent(guildId)}&key=${encodeURIComponent(searchCategory.autocompleteApi)}&value=${encodeURIComponent(value)}`);
 						let json = await response.json();
+						console.log('json', json);
+						
 						if (json.type !== "unknown_key") {
 							searchSuggestions = json.map((suggestion) => {
-								if (suggestion.includes(" ")) {
-									suggestion = `"${suggestion}"`;
-								}
-								return {
-									key: suggestion,
-									description: "",
+							if (suggestion.value.includes(" ")) {
+								suggestion.value = `"${suggestion.value}"`;
+							}
+							return {
+									key: suggestion.value,
+									description: suggestion.label,
 									action: () => {
-										inputValue = inputValue.replace(new RegExp(`:"?${value}$`), `:${suggestion} `);
+										inputValue = inputValue.replace(new RegExp(`:"?${value}$`), `:${suggestion.value} `);
 									}
 								}
 							});
+							
 						}
 					})();
 				}
