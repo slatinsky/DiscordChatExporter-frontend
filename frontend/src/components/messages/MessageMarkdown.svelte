@@ -33,6 +33,9 @@
         // split by spaces to array
         let terms = newValue.split(' ')
 
+        // remove empty strings
+        terms = terms.filter(term => term.length > 0)
+
         // apply highlight
         highlight = terms
     }
