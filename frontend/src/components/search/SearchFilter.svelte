@@ -16,7 +16,7 @@
 	}
 
 
-	import { searchResultsMessageIds, searchShown } from "./searchStores";
+	import { searchPrompt, searchResultsMessageIds, searchShown } from "./searchStores";
 	import { checkUrl } from "src/js/helpers";
 	export let guildId: string;
 
@@ -35,7 +35,7 @@
 	let domInput: HTMLInputElement;
 	let searchSuggestionDoms: HTMLDivElement[] = [];
 	let isInputFocused = false;
-	let inputValue = '';
+
 	let selectedMenuIndex = -1;
 
 
@@ -117,11 +117,11 @@
 
 
 	let searchSuggestions: SearchSuggestion[] = []
-	function inputValueChanged() {
+	function searchPromptChanged() {
 		const validSearchCategoriesKeys = searchCategories.map((category) => category.key);
 		const singleOnlySearchCategoriesKeys = searchCategories.filter((category) => !category.multiple).map((category) => category.key);
 
-		const { key, value, state, foundKeys } = parsePrompt(inputValue);
+		const { key, value, state, foundKeys } = parsePrompt($searchPrompt);
 		const usedSingleKeys = foundKeys.filter((key) => {
 			return singleOnlySearchCategoriesKeys.includes(key);
 		});
@@ -137,8 +137,8 @@
 					description: category.description,
 					action: () => {
 						console.log("accept suggestion", category.key);
-						// inputValue = inputValue.replace(key, category.key + ':');
-						inputValue = inputValue.replace(new RegExp(`${key}$`), `${category.key}:`);
+						// $searchPrompt = $searchPrompt.replace(key, category.key + ':');
+						$searchPrompt = $searchPrompt.replace(new RegExp(`${key}$`), `${category.key}:`);
 					}
 				}
 			});
@@ -152,14 +152,14 @@
 							key: "true",
 							description: "",
 							action: () => {
-								inputValue = inputValue.replace(new RegExp(`:"?${value}$`), ":true ");
+								$searchPrompt = $searchPrompt.replace(new RegExp(`:"?${value}$`), ":true ");
 							}
 						},
 						{
 							key: "false",
 							description: "",
 							action: () => {
-								inputValue = inputValue.replace(new RegExp(`:"?${value}$`), ":false ");
+								$searchPrompt = $searchPrompt.replace(new RegExp(`:"?${value}$`), ":false ");
 							}
 						}
 					].filter((suggestion) => {
@@ -170,7 +170,7 @@
 					searchSuggestions = [];
 					// do a fetch to the server to search for the message
 					(async () => {
-						let query = inputValue;
+						let query = $searchPrompt;
 						let response = await fetch(`/api/search-autocomplete?guild_id=${encodeURIComponent(guildId)}&key=${encodeURIComponent(searchCategory.autocompleteApi)}&value=${encodeURIComponent(value)}`);
 						let json = await response.json();
 						console.log('json', json);
@@ -186,7 +186,7 @@
 									description2: suggestion?.description2 ?? undefined,
 									icon: suggestion?.icon ?? undefined,
 									action: () => {
-										inputValue = inputValue.replace(new RegExp(`:"?${value}$`), `:${suggestion.key} `);
+										$searchPrompt = $searchPrompt.replace(new RegExp(`:"?${value}$`), `:${suggestion.key} `);
 									}
 								}
 							});
@@ -206,7 +206,7 @@
 	async function inputOnSubmit() {
 		// do a fetch to the server to search for the message
 
-		let query = inputValue;
+		let query = $searchPrompt;
 		let response = await fetch(`/api/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(query)}`);
 		let json = await response.json();
 		$searchResultsMessageIds = json;
@@ -218,7 +218,7 @@
 	function inputOnFocus() {
 		isInputFocused = true;
 		clearTimeout(unfocusTimeout);
-		inputValueChanged()
+		searchPromptChanged()
 	}
 	function inputOnBlur() {
 		unfocusTimeout = setTimeout(() => (isInputFocused = false), 100);
@@ -239,7 +239,7 @@
 	}
 
 	$: searchSuggestions, searchSuggestionsChanged();
-	$: inputValue, inputValueChanged()
+	$: $searchPrompt, searchPromptChanged()
 
 
 	onMount(async () => {
@@ -252,12 +252,12 @@
 		<input
 			type="text"
 			placeholder="Search in guild"
-			bind:value={inputValue}
+			bind:value={$searchPrompt}
 			bind:this={domInput}
 			on:focus={inputOnFocus}
 			on:blur={inputOnBlur}
 			on:keydown={inputOnKeyDown}
-			on:input={inputValueChanged}
+			on:input={searchPromptChanged}
 		/>
 		<button on:click={inputOnSubmit} id="search-submit-btn">Search</button>
 	</div>

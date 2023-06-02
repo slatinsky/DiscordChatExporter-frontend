@@ -3,6 +3,7 @@
 	import type { Emoji } from "src/js/interfaces";
     import { get } from "svelte/store";
     import { online } from "src/routes/settingsStore";
+	import { searchPrompt } from "../search/searchStores";
 
 
 
@@ -14,6 +15,28 @@
     export let mentions: any[] | null = null
     export let guildId: string
     let processedContent: string
+
+
+    // highlight search terms
+    let highlight: string[] = []
+    function searchPromptChanged(newValue: string): void {
+        // remove everything with `:` in it, we want to highlight only words
+        // supports removal of values with quotes, like `from:"Deleted User#0000"`
+        newValue = newValue.replaceAll(/\w+:".*?"|\w+:\w+|\w+:/gi, '')
+
+        // remove all double spaces
+        newValue = newValue.replaceAll(/\s{2,}/g, ' ')
+
+        // remove all spaces at the beginning and end
+        newValue = newValue.trim()
+
+        // split by spaces to array
+        let terms = newValue.split(' ')
+
+        // apply highlight
+        highlight = terms
+    }
+    $: $searchPrompt, searchPromptChanged($searchPrompt)
 
     function messageContainsOnlyEmojis(content: string): boolean {
         let regex = /<a?:\w+:\d{17,32}>/g
@@ -89,6 +112,16 @@
                 })
             }
         }
+
+        // highlight search terms
+        if (highlight.length > 0) {
+            highlight.forEach(term => {
+                let regex = new RegExp(`(${term})`, 'gi')
+                processedContent = processedContent.replace(regex, (match, p1) => {
+                    return `<span class="highlight">${p1}</span>`
+                })
+            })
+        }
     }
 
     $: process(content)
@@ -123,5 +156,12 @@
         padding: 0.5em 10px;
         width: 100%;
         border-radius: 4px;
+    }
+
+    :global(#search-results .highlight) {
+        background-color: #6A5936;
+        color: #fff;
+        /* padding: 0px 2px; */
+        /* border-radius: 4px; */
     }
 </style>
