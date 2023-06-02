@@ -124,7 +124,7 @@ def cleanup():
 
 def create_window():
 	custom_print("windows-runner:", "creating window")
-	title = 'DiscordChatExported-frontend'
+	title = 'DiscordChatExporter-frontend'
 	if myapp.is_secondary_instance():
 		title += ' (secondary instance)'
 	window = webview.create_window(title, 'http://127.0.0.1:21011/',
