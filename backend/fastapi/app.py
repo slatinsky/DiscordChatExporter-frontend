@@ -509,7 +509,7 @@ SEARCH_CATEGORIES = [
 
 
 @app.get("/search-autocomplete")
-def search_autocomplete(guild_id: str = None, key: str = None, value: str = None, limit: int = 20):
+def search_autocomplete(guild_id: str = None, key: str = None, value: str = None, limit: int = 100):
 	if (guild_id == None or key == None or value == None):
 		return []
 

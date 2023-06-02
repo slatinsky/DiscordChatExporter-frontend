@@ -8,9 +8,7 @@ def autocomplete_categories(db, guild_id: str, partial_category: str, limit: int
 	"""
 	collection_channels = db["channels"]
 
-	limit = limit * 10
-
-	# type is not "GuildPublicThread" or "GuildPrivateThread"
+	# ignore "GuildPublicThread" or "GuildPrivateThread", because their category is channel name
 	query = {
 		"category": {
 			"$regex": partial_category,
@@ -24,15 +22,36 @@ def autocomplete_categories(db, guild_id: str, partial_category: str, limit: int
 			]
 		}
 	}
-	cursor = collection_channels.find(query, {"category": 1}).limit(limit).sort([("category", 1)])
+
+	cursor = collection_channels.aggregate([
+		{
+			"$match": query
+		},
+		{
+			"$group": {
+				"_id": "$category",
+				"total_msg_count": { "$sum": "$msg_count" },
+				"doc": { "$first": "$$ROOT" },
+			}
+		},
+		{
+			"$limit": limit
+		},
+		{
+			"$sort": {
+				"total_msg_count": -1,
+				"category": 1
+			}
+		}
+	])
+
 	category_names = []
 	for category in cursor:
 		category_names.append({
-			"key": category['category'],
-			"description": category['category']
+			"key": category['doc']['category'],
+			"description": "",
+			"description2": str(category['total_msg_count']) + " messages (without threads)",   # TODO: messages in threads are not counted
 		})
-
-	# TODO: remove duplicates
 
 	return category_names
 
@@ -99,8 +118,6 @@ def autocomplete_reactions(db, guild_id: str, partial_reaction: str, limit: int)
 
 		})
 
-	# TODO: remove duplicates
-
 	return reaction_names
 
 
@@ -136,8 +153,6 @@ def autocomplete_filenames(db, guild_id: str, partial_filename: str, limit: int)
 			"key": db_result['doc']['filenameWithoutHash'],
 			"description": db_result['doc']["type"]
 		})
-
-	# TODO: remove duplicates
 
 	return filenames
 
