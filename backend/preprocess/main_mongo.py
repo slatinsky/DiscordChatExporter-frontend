@@ -59,12 +59,13 @@ def main(input_dir, output_dir):
 	jsons = file_finder.find_channel_exports()
 	print("found " + str(len(jsons)) + " json channel exports")
 
-	channel_cache = ChannelCache(database)
+	channel_cache = ChannelCache()
+	channel_cache.invalidate_all()
 	asset_processor = AssetProcessor(file_finder, database)
 	asset_processor.set_fast_mode(True)  # don't process slow actions
 
 	for json_path in jsons:
-		p = JsonProcessor(database, file_finder, json_path, asset_processor, channel_cache)
+		p = JsonProcessor(database, file_finder, json_path, asset_processor)
 		p.process()
 
 	download_gg(output_dir)

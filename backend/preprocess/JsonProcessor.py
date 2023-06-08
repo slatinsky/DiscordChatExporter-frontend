@@ -13,7 +13,7 @@ from helpers import get_emoji_code, pad_id
 
 
 class JsonProcessor:
-	def __init__(self, database: MongoDatabase, file_finder: FileFinder, json_path:str, asset_processor: AssetProcessor, channel_cache: ChannelCache):
+	def __init__(self, database: MongoDatabase, file_finder: FileFinder, json_path:str, asset_processor: AssetProcessor):
 		self.json_path = json_path
 		self.database = database
 		self.collection_guilds = self.database.get_collection("guilds")
@@ -25,7 +25,6 @@ class JsonProcessor:
 		self.collection_jsons = self.database.get_collection("jsons")
 		self.file_finder = file_finder
 		self.asset_processor = asset_processor
-		self.channel_cache = channel_cache
 
 	def read_json_file(self, file_path):
 		file_path_with_base_directory = self.file_finder.add_base_directory(file_path)
@@ -481,5 +480,3 @@ class JsonProcessor:
 			self.insert_emoji(emoji, guild["_id"])
 
 		self.mark_as_processed(self.json_path)
-
-		self.channel_cache.invalidate_channel_id(channel["_id"])
