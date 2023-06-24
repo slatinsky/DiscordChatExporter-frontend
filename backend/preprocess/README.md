@@ -1,2 +1,2 @@
 # Preprocess script
-This script is used to preprocess exports from DiscordChatExported to mongodb database
+This script is used to preprocess exports from DiscordChatExporter to mongodb database
