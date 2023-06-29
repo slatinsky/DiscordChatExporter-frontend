@@ -7,7 +7,8 @@ COPY frontend/ .
 RUN npm run build
 
 # first stage
-FROM mongo:6.0.5-jammy
+# FROM mongo:6.0.5-jammy
+FROM arm64v8/mongo:6.0.6
 WORKDIR /dcef
 RUN apt-get update && apt-get install python3.11 python3-pip nginx -y
 RUN mkdir -p /dcef/exports/
