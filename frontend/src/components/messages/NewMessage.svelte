@@ -12,6 +12,8 @@
 	import MessageStickers from './MessageStickers.svelte';
 	import { guildId } from 'src/js/stores';
 
+	import identicons from 'identicons'
+
 	export let message: Message;
 	export let previousMessage: Message | null = null;
 	export let referencedMessage: Message | null = null;
@@ -198,7 +200,11 @@
 
 					{#if !mergeWithPrevious}
 						{#if message.type != 'ThreadCreated'}
-							<ImageGallery asset={message.author?.avatar} imgclass={"chatlog__avatar"} />
+							{#if message.author?.avatar}
+								<ImageGallery asset={message.author?.avatar} imgclass={"chatlog__avatar"} />
+							{:else}
+								<img class="chatlog__avatar" src={identicons.generateSVGDataURIString(message.author._id, { width: 200, size: 3 })} />
+							{/if}
 						{/if}
 					{/if}
 				</div>
@@ -426,5 +432,10 @@
 		color: #949BA4;
 		font-size: 12px;
 		white-space: nowrap;  /* never break the line */
+	}
+
+	.chatlog__avatar {
+		image-rendering: crisp-edges;
+		background-color: white;  /*For identicons*/
 	}
 </style>
