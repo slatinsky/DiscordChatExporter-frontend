@@ -49,6 +49,7 @@
 		background-color: var(--panel-guilds-bg);
 		height: 100%;
 		overflow-y: auto;
+		position: relative;
 	}
 
 	img {
