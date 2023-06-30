@@ -95,7 +95,7 @@ async def get_guilds(guild_id: str = None):
 				"$nin": blacklisted_guild_ids
 			}
 		}
-	).sort([("_id", pymongo.ASCENDING)])
+	).sort([("msg_count", pymongo.DESCENDING)])
 
 
 

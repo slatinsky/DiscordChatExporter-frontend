@@ -265,6 +265,8 @@ class JsonProcessor:
 			# guild already exists, ignore
 			return
 
+		guild["msg_count"] = 0
+
 		self.collection_guilds.insert_one(guild)
 
 	def insert_channel(self, channel):
@@ -367,6 +369,8 @@ class JsonProcessor:
 
 		# update message count of channel
 		self.collection_channels.update_one({"_id": message["channelId"]}, {"$inc": {"msg_count": 1}})
+		# update message count of guild
+		self.collection_guilds.update_one({"_id": message["guildId"]}, {"$inc": {"msg_count": 1}})
 		# update message count of author
 		self.collection_authors.update_one({"_id": message["author"]["_id"]}, {"$inc": {"msg_count": 1}})
 		return
