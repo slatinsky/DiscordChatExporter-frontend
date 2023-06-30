@@ -207,16 +207,19 @@ class JsonProcessor:
 				author = message["author"]
 
 				if author["_id"] in authors:
-					# save new nickname if different
-					if message["author"]["nickname"] not in authors[author["_id"]]["nicknames"]:
+					# save new nickname if different. Ignore null nicknames (discordless exports)
+					if message["author"]["nickname"] not in authors[author["_id"]]["nicknames"] and message["author"]["nickname"] != None:
 						authors[author["_id"]]["nicknames"].append(message["author"]["nickname"])
 					continue
 
 				author["guildIds"] = [guild_id]
 				author["avatar"] = self.asset_processor.process(author.pop("avatarUrl"))
-				author["nicknames"] = [author.pop("nickname")]
 				author["names"] = [author.pop("name") + "#" + author.pop("discriminator")]
 				authors[author["_id"]] = author  # new author
+
+				author["nicknames"] = [author.pop("nickname")]
+				author["nicknames"] = list(filter(None, author["nicknames"]))   # remove null nicknames (discordless exports)
+
 
 		authors_list = []
 		for author_id in authors:
