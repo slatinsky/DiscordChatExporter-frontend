@@ -7,7 +7,8 @@
 	export let selectedChannelId: string | null = null;
 	export let selectedGuildId: string | null = null;
 
-	let channelsByCategoryId: any = {};
+	let channelsByCategoryId: any = {};  // {categoryId: channels}
+	let categoryId_msgCount: any = [];   // {categoryId: msgCount}
 
 	// interface Channel with channels array
 	interface ChannelTree extends Channel {
@@ -26,6 +27,7 @@
 			name: 'Lost threads / forums',
 			topic: null,
 			threads: [],
+			msg_count: 0,
 			guildId: selectedGuildId as string,
 		})
 
@@ -42,11 +44,14 @@
 			}
 			// @ts-ignore
 			channel.threads.push(thread)
+
+			// increase msg count
+			channel.msg_count += thread.msg_count
 		})
 
-		// sort threads by _id
+		// sort threads by message count
 		channels.forEach(channel => {
-			channel.threads.sort((a, b) => a._id.localeCompare(b._id))
+			channel.threads.sort((a, b) => b.msg_count - a.msg_count)
 		})
 
 
@@ -59,6 +64,11 @@
 			channelsByCategoryId[channel.categoryId].push(channel)
 		})
 
+		// sort channels by message count in each category
+		Object.values(channelsByCategoryId).forEach((channels: ChannelTree[]) => {
+			channels.sort((a, b) => b.msg_count - a.msg_count)
+		})
+
 		// remove lost threads category if it contains no threads
 		if (channelsByCategoryId['0'][0].threads.length === 0) {
 			delete channelsByCategoryId['0']
@@ -69,13 +79,24 @@
 
 	function processChannels(channels: Channel[]) {
 		channelsByCategoryId = getCategoriesFromChannels(channels)
-		console.log(channelsByCategoryId);
+
+		// count message count in each category
+		categoryId_msgCount = Object.values(channelsByCategoryId).map((channels: ChannelTree[]) => {
+			return {
+				categoryId: channels[0].categoryId,
+				msg_count: channels.reduce((acc, channel) => acc + channel.msg_count, 0)
+			}
+		})
+
+		// sort category ids by message count
+		categoryId_msgCount.sort((a, b) => b.msg_count - a.msg_count)
 	}
 
 	$: processChannels(channels);
 </script>
 
-
-{#each Object.values(channelsByCategoryId) as channels}
+<!-- Print categories from the largest msg_count to the smallest msg_count -->
+{#each categoryId_msgCount as obj}
+	{@const channels = channelsByCategoryId[obj.categoryId]}
 	<MenuCategory {channels} guildId={selectedGuildId} selectedChannelId={selectedChannelId}/>
 {/each}

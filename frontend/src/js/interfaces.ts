@@ -2,6 +2,7 @@ export interface Guild {
 	_id: string;
 	name: string;
 	icon: Asset;
+	msg_count: number;
 }
 
 export interface Asset {
@@ -29,6 +30,7 @@ export interface Channel {
 	name: string;
 	topic: string | null;
 	guildId: string;
+	msg_count: number;
 }
 
 export interface Author {
