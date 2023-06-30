@@ -16,6 +16,19 @@ sys.stderr.reconfigure(encoding='utf-8')
 print = functools.partial(print, flush=True)
 
 
+def pad_id(id):
+	if id == None:
+		return None
+	return str(id).zfill(24)
+
+
+# specify guild ids that should be hidden from the public (list of strings)
+# TODO: move to config file
+blacklisted_guild_ids = []
+
+blacklisted_guild_ids = [pad_id(id) for id in blacklisted_guild_ids]
+
+
 URI = "mongodb://127.0.0.1:27017"
 client = pymongo.MongoClient(URI)
 db = client["dcef"]
@@ -34,10 +47,7 @@ app = FastAPI(
 )
 
 
-def pad_id(id):
-	if id == None:
-		return None
-	return str(id).zfill(24)
+
 
 
 def is_compiled():
@@ -67,14 +77,28 @@ async def get_guilds(guild_id: str = None):
 	"""
 	Returns a list of guilds
 	or a single guild if a guild_id query parameter is provided.
+
+	Filters out blacklisted guilds from the config.toml file.
 	"""
 	if guild_id:
+		if guild_id in blacklisted_guild_ids:
+			return {"message": "Not found"}
+
 		guild = collection_guilds.find_one({"_id": guild_id})
 		if not guild:
 			return {"message": "Not found"}
 		return guild
 
-	cursor = collection_guilds.find({})
+	cursor = collection_guilds.find(
+		{
+			"_id": {
+				"$nin": blacklisted_guild_ids
+			}
+		}
+	).sort([("_id", pymongo.ASCENDING)])
+
+
+
 	return list(cursor)
 
 
@@ -88,16 +112,32 @@ async def get_channels(guild_id: str = None, channel_id: str = None):
 	Optionally, a channel_id query parameter can be provided to get only specific channel.
 	"""
 	if guild_id:
+		if guild_id in blacklisted_guild_ids:
+			return []
+
 		cursor = collection_channels.find({"guildId": guild_id})
 		return list(cursor)
 
 	if channel_id:
-		channel = collection_channels.find_one({"_id": channel_id})
+		channel = collection_channels.find_one(
+			{
+				"_id": channel_id,
+				"guildId": {
+					"$nin": blacklisted_guild_ids
+				}
+			}
+		)
 		if not channel:
 			return {"message": "Not found"}
 		return channel
 
-	cursor = collection_channels.find({})
+	cursor = collection_channels.find(
+		{
+			"guildId": {
+				"$nin": blacklisted_guild_ids
+			}
+		}
+	)
 	return list(cursor)
 
 
@@ -121,8 +161,11 @@ async def get_message_ids(channel_id: str = None):
 
 	print("get_message_ids() cache miss - channel id", channel_id)
 
-
-	query = {}
+	query = {
+		"guildId": {
+			"$nin": blacklisted_guild_ids
+		}
+	}
 	if channel_id:
 		query["channelId"] = channel_id
 
@@ -142,8 +185,18 @@ async def get_message_content(message_id: str):
 	"""
 	Returns the content of a message by its id.
 	"""
-	message = collection_messages.find_one({"_id": message_id})
+	message = collection_messages.find_one(
+		{
+			"_id": message_id,
+			"guildId": {
+				"$nin": blacklisted_guild_ids
+			}
+   		}
+	)
 	if not message:
+		return {"message": "Not found"}
+
+	if message["guildId"] in blacklisted_guild_ids:
 		return {"message": "Not found"}
 	return message
 
@@ -153,7 +206,16 @@ async def get_multiple_message_content(message_ids: list):
 	"""
 	Returns the content of multiple messages by their ids.
 	"""
-	messages = collection_messages.find({"_id": {"$in": message_ids}})
+	messages = collection_messages.find(
+		{
+			"_id": {
+				"$in": message_ids
+			},
+			"guildId": {
+				"$nin": blacklisted_guild_ids
+			}
+		}
+	)
 	list_of_messages = list(messages)
 	list_of_messages = enrich_messages(list_of_messages)
 	return list_of_messages
@@ -166,12 +228,23 @@ def channel_names_to_ids(in_channel_ids: list, in_channels: list, guild_id: str 
 	if len(in_channels) == 0:
 		return in_channel_ids
 
+	if guild_id in blacklisted_guild_ids:
+		return []
+
 	out_channel_ids = in_channel_ids.copy()
 	for channel in in_channels:
 		if channel in out_channel_ids:
 			continue
 
-		channel_id = collection_channels.find_one({"name": channel, "guildId": guild_id}, {"_id": 1})
+		channel_id = collection_channels.find_one(
+			{
+				"name": channel,
+				"guildId": guild_id
+			},
+			{
+				"_id": 1
+			}
+		)
 		if channel_id:
 			out_channel_ids.append(channel_id["_id"])
 
@@ -183,6 +256,9 @@ def category_names_to_ids(in_category_ids: list, in_categories: list, guild_id: 
 	"""
 	if len(in_categories) == 0:
 		return in_category_ids
+
+	if guild_id in blacklisted_guild_ids:
+		return []
 
 	out_category_ids = in_category_ids.copy()
 	for category in in_categories:
@@ -286,7 +362,12 @@ def get_channel_info(channel_id):
 	'channel' can be thread or channel or forum post
 	"""
 
-	channel = collection_channels.find_one({"_id": channel_id})
+	channel = collection_channels.find_one(
+		{
+			"_id": channel_id,
+			"guildId": {"$nin": blacklisted_guild_ids}
+		}
+	)
 	if not channel:
 		return {
 			"type": "GuildPublicThread",
@@ -511,6 +592,9 @@ SEARCH_CATEGORIES = [
 @app.get("/search-autocomplete")
 def search_autocomplete(guild_id: str = None, key: str = None, value: str = None, limit: int = 100):
 	if (guild_id == None or key == None or value == None):
+		return []
+
+	if guild_id in blacklisted_guild_ids:
 		return []
 
 	guild_id = pad_id(guild_id)
@@ -820,9 +904,12 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 			query["$and"].append({"$and": and_})
 
 
-
 		if guild_id:
+			if guild_id in blacklisted_guild_ids:
+				return []
 			query["guildId"]=guild_id
+		else:
+			query["guildId"]={"$nin": blacklisted_guild_ids}
 
 		if only_ids:
 			limited_fields["_id"]=1
