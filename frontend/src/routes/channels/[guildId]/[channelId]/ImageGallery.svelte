@@ -90,6 +90,13 @@
         margin: .7rem;
         text-align: left;
     }
+
+    /*Make SVGs larger in the gallery*/
+    .imgbox img[src$=".svg"] {
+        width: 100%;
+        height: 100%;
+    }
+
     .center-fit {
         max-width: 100%;
         max-height: calc(100vh - 60px);
