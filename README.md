@@ -1,7 +1,7 @@
 ![](docs/screenshot.png)
 
-# DiscordChatExporter-frontend
-View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports as if you were using Discord interface.
+# DiscordChatExporter-frontend (DCEF)
+View your JSON [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports as if you were using Discord interface. Also supports other exporters like [Roachbones/discordless](https://github.com/Roachbones/discordless) exporting in the same JSON format as DiscordChatExporter.
 
 ## Why JSON exports are better than HTML exports?
 - better-suited for long-term preservation
