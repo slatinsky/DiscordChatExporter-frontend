@@ -54,6 +54,7 @@ export function checkUrl(asset: Asset) {
             return "";
         }
         console.warn('online url', url);
+        return url;
     }
     return "/input/" + url
 }
