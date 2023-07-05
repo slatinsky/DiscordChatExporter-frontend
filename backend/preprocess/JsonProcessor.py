@@ -127,7 +127,26 @@ class JsonProcessor:
 							embed["thumbnail"]["width"] = original_width
 							embed["thumbnail"]["height"] = original_height
 
+					# embed.image field is redundant - merge with embed.images field and remove duplicate images
+					# note - this field is not always duplicated with the first item in embed.images field - discordless uses only image field without creating embed.images field
+					if "image" in embed:
+						if "images" not in embed:  # discordless doesn't create embed.images field
+							embed["images"] = []
+
+						# merge with embed.images and remove redundant embed.image field
+						embed["images"].append(embed["image"])
+						del embed["image"]
+
 					if "images" in embed:
+						# deduplicate embed.images by url, unique value is image url
+						unique_images = []
+						for image in embed["images"]:
+							print(image)
+							if image["url"] not in [x["url"] for x in unique_images]:
+								unique_images.append(image)
+						embed["images"] = unique_images
+
+						# process images
 						new_images = []
 						for image in embed["images"]:
 							if "width" in image and "height" in image:
@@ -143,17 +162,6 @@ class JsonProcessor:
 							new_images.append(image)
 
 						embed["images"] = new_images
-
-					if "image" in embed:
-						if "width" in embed["image"] and "height" in embed["image"]:
-							original_width = embed["image"]["width"]
-							original_height = embed["image"]["height"]
-						embed["image"] = self.asset_processor.process(embed["image"]["url"])
-
-						# restore some fields, because we are losing them in the asset preprocess if url is remote
-						if "originalWidth" in locals():
-							embed["image"]["width"] = original_width
-							embed["image"]["height"] = original_height
 
 					if "footer" in embed and "iconUrl" in embed["footer"]:
 						embed["footer"]["icon"] = self.asset_processor.process(embed["footer"].pop("iconUrl"))
