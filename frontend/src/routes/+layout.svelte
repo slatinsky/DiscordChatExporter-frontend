@@ -50,12 +50,18 @@
 <style>
 	.app {
 		display: grid;
-		grid-template-columns: 70px 1fr;
+		grid-template-columns: 72px 1fr;
 		height: 100vh;
+		overflow-y: hidden;  /* firefox temp fix */
 	}
 
 	.right {
 		height: 100%;
+	}
+
+	main {
+		max-height: 100vh;
+		overflow-y: auto;
 	}
 
 </style>

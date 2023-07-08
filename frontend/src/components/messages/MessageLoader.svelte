@@ -55,6 +55,7 @@
 	.loading {
 		height: 100px;
 		color: gray;
+		padding-left: 2rem;
 	}
 	.retry-btn {
 		color: white;

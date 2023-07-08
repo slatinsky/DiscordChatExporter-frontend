@@ -31,11 +31,11 @@
 	--channel-text-unread: white;
 	--channel-bg-hover: #3C3F45;
 
-	--header-icon: #B9BBBE;
+	--header-icon: #b5bac1;
 	--header-icon-hover: #DCDDDE;
 
-	--panel-guilds-bg: #202225;
-	--panel-channels-bg: #2F3136;
+	--panel-guilds-bg: #1e1f22;
+	--panel-channels-bg: #2b2d31;
 	--panel-messages-bg: #36393F;
 
 	--ping-bg: #414675;
@@ -237,9 +237,9 @@ a {
 	text-decoration: none
 }
 
-a:hover {
+/* a:hover {
 	text-decoration: underline
-}
+} */
 
 img {
 	object-fit: contain;
@@ -886,7 +886,7 @@ img {
 
 
 
-/* thin dark scrollbar */
+/* custom dark scrollbar - chromium only*/
 ::-webkit-scrollbar {
 	width: 10px;
 	height: 3px;
@@ -896,13 +896,9 @@ img {
 	background-color: var(--panel-channels-bg);
 }
 
-::-webkit-scrollbar-track-piece {
-	background-color: #2F3136;
-}
-
 ::-webkit-scrollbar-thumb {
 	height: 50px;
-	background-color: #202225;
+	background-color: #1a1b1e;
 	border-radius: 3px;
 }
 
@@ -914,6 +910,66 @@ img {
 	background-color: #666;
 }
 
+#channels::-webkit-scrollbar {
+	width: 11px;
+}
+#channels::-webkit-scrollbar-thumb {
+	width: 5px;
+	border-radius: 10px;
+
+	/*left+right scrollbar padding magix*/
+	background-clip: padding-box;
+	border: 3px solid rgba(0, 0, 0, 0);
+}
+
+#messages ::-webkit-scrollbar-track-piece {
+	background-color:#313338;
+}
+#messages ::-webkit-scrollbar {
+	width: 14px;
+}
+#messages ::-webkit-scrollbar-thumb {
+	width: 5px;
+	border-radius: 10px;
+
+	/*left+right scrollbar padding magix*/
+	background-clip: padding-box;
+	border: 3px solid rgba(0, 0, 0, 0);
+}
+
+
+#search-options::-webkit-scrollbar-thumb {
+	background-color:#313338;
+}
+#search-options::-webkit-scrollbar-track-piece {
+	background-color:#111214;
+}
+#search-options::-webkit-scrollbar {
+	width: 14px;
+}
+#search-options::-webkit-scrollbar-thumb {
+	width: 5px;
+	border-radius: 10px;
+
+	/*left+right scrollbar padding magix*/
+	background-clip: padding-box;
+	border: 3px solid rgba(0, 0, 0, 0);
+}
+
+#search-results ::-webkit-scrollbar-track-piece {
+	background-color:#2b2d31;
+}
+#search-results ::-webkit-scrollbar {
+	width: 11px;
+}
+#search-results ::-webkit-scrollbar-thumb {
+	width: 5px;
+	border-radius: 10px;
+
+	/*left+right scrollbar padding magix*/
+	background-clip: padding-box;
+	border: 3px solid rgba(0, 0, 0, 0);
+}
 
 .txt {
 	font-size: 32px;

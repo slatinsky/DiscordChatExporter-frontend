@@ -21,22 +21,19 @@
 
 <div class="guilds">
 	<a href="/">
-		<div class="guild">
+		<div class="guild" class:selected={!selectedGuildId}>
 			<!-- if root path -->
-			{#if !selectedGuildId}
-				<div class="guild-selected" />
-			{/if}
+			<div class="guild-selected-indicator" />
 			<div class="home-guild">HOME</div>
 		</div>
 	</a>
+	<hr>
 	<!--        guild list-->
 	{#if guilds}
 		{#each guilds as guild}
 			<a href="/channels/{guild._id}">
-				<div class="guild" on:contextmenu|preventDefault={e=>onRightClick(e, guild._id)}>
-					{#if selectedGuildId === guild._id}
-						<div class="guild-selected" />
-					{/if}
+				<div class="guild" on:contextmenu|preventDefault={e=>onRightClick(e, guild._id)} class:selected={selectedGuildId === guild._id}>
+					<div class="guild-selected-indicator" />
 					<img src={checkUrl(guild.icon)} alt={guild.name} on:error={e => (e.target.src = "/favicon.png")} />
 				</div>
 			</a>
@@ -47,33 +44,55 @@
 <style>
 	.guilds {
 		background-color: var(--panel-guilds-bg);
-		height: 100%;
+		height: calc(100% - 14px);  /* - padding */
 		overflow-y: auto;
 		position: relative;
+
+		padding: 7px 0 7px 0;
+		scrollbar-width: none; /* hide scrollbar - Firefox */
 	}
 
-	img {
+	.guilds::-webkit-scrollbar {
+		display: none;  /* hide scrollbar - Safari and Chrome */
+	}
+
+	.guild img,
+	.home-guild {
+		margin: 5px 5px 3px 2px;
+		border-radius: 50%;
 		width: 48px;
 		height: 48px;
-		margin: 5px 5px 5px 0px;
+		transition: border-radius 0.2s ease-in-out;
+	}
+
+	.guild.selected img,
+	.guild:hover img,
+	.guild.selected .home-guild,
+	.guild:hover .home-guild {
+		border-radius: 25%;
 	}
 
 	.home-guild {
-		width: 48px;
-		height: 48px;
-		margin: 5px;
-		background-color: #00000099;
-		border-radius: 50%;
+		background-color: #313338;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-
-		/* Border white circle */
-		border-width: 1px;
-		border-style: solid;
-		border-color: #ffffff;
-
 		font-size: small;
+
+		color: #dbdee1;
+	}
+
+	.guild:hover .home-guild,
+	.guild.selected .home-guild {
+		background-color: #5865f2;
+		color: white;
+	}
+
+	hr {
+		border: 0;
+		height: 2px;
+		background: #333;
+		margin: 5px 20px
 	}
 
 	.guild {
@@ -84,13 +103,29 @@
 		gap: 10px;
 	}
 
-	.guild-selected {
-		width: 10px;
-		height: 40px;
-		background-color: var(--color-contrast);
-		border-radius: 5px;
+	.guild .guild-selected-indicator {
 		position: absolute;
 		left: -6px;
+		width: 6px;
+		height: 0px;
+		background-color: var(--color-contrast);
+		border-radius: 5px;
 		z-index: 100;
+
+		transition: height 0.2s ease-in-out;
 	}
+
+	.guild:hover .guild-selected-indicator {
+		height: 20px;
+		width: 10px;
+		transition: width 0.2s ease-in-out;
+	}
+
+	.guild.selected .guild-selected-indicator {
+		height: 40px;
+		width: 10px;
+		transition: height 0.2s ease-in-out;
+	}
+
+
 </style>

@@ -58,7 +58,7 @@
 </script>
 
 <div class="category" on:click={() => (isOpen = !isOpen)} on:contextmenu|preventDefault={(e) => onRightClick(e, categoryId)}>
-	<div class="icon-dropdown {isOpen? '' : 'rotate'}"><IconDropdown size={16}/></div>
+	<div class="icon-dropdown {isOpen? '' : 'rotate'}"><IconDropdown size={13}/></div>
 	{categoryName}
 </div>
 {#if isOpen}
@@ -91,6 +91,7 @@
 		color: var(--channel-text-read);
 		cursor: pointer;
         user-select: none;
+		letter-spacing: 0.24px;
 
         margin: 16px 0px 0px 0px;
         font-weight: 600;  /*Original 500*/
@@ -99,6 +100,7 @@
         color: var(--channel-text-read-hover);
     }
     .icon-dropdown {
+		margin: 2px 2px 0 0;
         transition: transform 0.2s ease-in-out;
     }
 	.icon-dropdown.rotate {

@@ -57,6 +57,7 @@
 	.channel:hover,
 	.channel.selected {
 		background-color: var(--channel-bg-hover);
+		color: #dbdee1;
 	}
 
 	a {
@@ -65,6 +66,10 @@
 	}
 	.thread-name {
 		color: var(--channel-text-read);
+	}
+
+	.channel:hover .thread-name {
+		color: #dbdee1;
 	}
 
 	.thread-name.selected {

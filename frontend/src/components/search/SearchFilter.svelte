@@ -110,7 +110,7 @@
 			}
 			else {
 				domInput.blur();
-				inputOnSubmit();
+				submitSearch();
 			}
 		}
 	}
@@ -153,6 +153,7 @@
 							description: "",
 							action: () => {
 								$searchPrompt = $searchPrompt.replace(new RegExp(`:"?${value}$`), ":true ");
+								submitSearch();
 							}
 						},
 						{
@@ -160,6 +161,7 @@
 							description: "",
 							action: () => {
 								$searchPrompt = $searchPrompt.replace(new RegExp(`:"?${value}$`), ":false ");
+								submitSearch();
 							}
 						}
 					].filter((suggestion) => {
@@ -187,10 +189,10 @@
 									icon: suggestion?.icon ?? undefined,
 									action: () => {
 										$searchPrompt = $searchPrompt.replace(new RegExp(`:"?${value}$`), `:${suggestion.key} `);
+										submitSearch();
 									}
 								}
 							});
-							
 						}
 					})();
 				}
@@ -203,7 +205,7 @@
 		}
 	}
 
-	async function inputOnSubmit() {
+	async function submitSearch() {
 		// do a fetch to the server to search for the message
 
 		let query = $searchPrompt;
@@ -251,7 +253,8 @@
 	<div class="search-input-container">
 		<input
 			type="text"
-			placeholder="Search in guild"
+			placeholder="Search"
+			class:filled={$searchPrompt !== ''}
 			bind:value={$searchPrompt}
 			bind:this={domInput}
 			on:focus={inputOnFocus}
@@ -259,11 +262,12 @@
 			on:keydown={inputOnKeyDown}
 			on:input={searchPromptChanged}
 		/>
-		<button on:click={inputOnSubmit} id="search-submit-btn">Search</button>
+		<svg class:hidden={$searchPrompt !== ''} class="icon-magnifying-glass" aria-hidden="true" role="img" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21.707 20.293L16.314 14.9C17.403 13.504 18 11.799 18 10C18 7.863 17.167 5.854 15.656 4.344C14.146 2.832 12.137 2 10 2C7.863 2 5.854 2.832 4.344 4.344C2.833 5.854 2 7.863 2 10C2 12.137 2.833 14.146 4.344 15.656C5.854 17.168 7.863 18 10 18C11.799 18 13.504 17.404 14.9 16.314L20.293 21.706L21.707 20.293ZM10 16C8.397 16 6.891 15.376 5.758 14.243C4.624 13.11 4 11.603 4 10C4 8.398 4.624 6.891 5.758 5.758C6.891 4.624 8.397 4 10 4C11.603 4 13.109 4.624 14.242 5.758C15.376 6.891 16 8.398 16 10C16 11.603 15.376 13.11 14.242 14.243C13.109 15.376 11.603 16 10 16Z"></path></svg>
+		<svg class:hidden={$searchPrompt == ''} on:click={() => $searchPrompt = ''} aria-hidden="true" role="img" class="icon-clear" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18.4 4L12 10.4L5.6 4L4 5.6L10.4 12L4 18.4L5.6 20L12 13.6L18.4 20L20 18.4L13.6 12L20 5.6L18.4 4Z"></path></svg>
 	</div>
 
 	{#if isInputFocused && searchSuggestions.length > 0}
-		<div class="search-options">
+		<div id="search-options">
 			{#each searchSuggestions as suggestion, i}
 				{#key suggestion}
 					<div
@@ -305,8 +309,8 @@
 
 <style>
 
-	.search-options {
-		background-color: #18191c;
+	#search-options {
+		background-color: #111214;
 		border-radius: 5px;
 		padding: 2px 5px;
 		max-width: 700px;
@@ -314,7 +318,7 @@
 
 		position: absolute;
 		top: 50px;
-		right: 50px;
+		right: 0px;
 
 		z-index: 100;
 		max-height: 70vh;
@@ -335,15 +339,22 @@
 	}
 	input {
 		/* width: 100%; */
-		width: 250px;
+		width: 140px;
 		background-color: #202225;
 		color: white;
 		height: 25px;
 		border: 0px;
 		border-radius: 3px;
+		padding: 0px 10px;
+		outline: none;
 	}
 	input::placeholder {
 		color: #909297;
+	}
+
+	input:focus,
+	input.filled {
+		width: 250px;
 	}
 	.search {
 		position: relative;
@@ -397,5 +408,22 @@
 	.search-option-inner {
 		display: flex;
 		gap: 15px;
+	}
+
+	.icon-magnifying-glass,
+	.icon-clear {
+		color: #949ba4;
+		width: 16px;
+		height: 16px;
+		position: absolute;
+		right: 5px;
+	}
+
+	.icon-clear {
+		cursor: pointer;
+	}
+
+	.hidden {
+		display: none;
 	}
 </style>

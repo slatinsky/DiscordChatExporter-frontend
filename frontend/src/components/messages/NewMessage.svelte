@@ -418,8 +418,8 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		margin: 10px 0;
-		gap: 10px;
+		margin: 10px 15px;
+		gap: 5px;
 	}
 
 	.date-separator-line {
@@ -431,6 +431,7 @@
 	.date-separator-text {
 		color: #949BA4;
 		font-size: 12px;
+		font-weight: 600;
 		white-space: nowrap;  /* never break the line */
 	}
 

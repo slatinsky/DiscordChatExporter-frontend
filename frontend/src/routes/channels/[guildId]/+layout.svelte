@@ -48,7 +48,6 @@
 			{/if}
 		</div>
 	{/if}
-	
 {/key}
 
 <style>
@@ -78,30 +77,26 @@
 		flex-direction: column;
 		/* padding: 0 4px 10px 4px; */
 		margin-right: 5px;
-		overflow-y: auto;
 		font-weight: 500;
 		width: 250px;
 	}
+
+	/*Show scrollbar only on hover*/
+	#channels {
+		overflow-y: hidden;
+	}
+	#channels:hover {
+		overflow-y: auto;
+	}
 	#channels .guild-name {
-		padding: 10px 0 10px 14px;
-		font-size: 20px;
+		padding: 13px 0 13px 14px;
 		font-weight: 600;
+		font-size: 16px;
 		position: sticky;
 		top: 0;
 		background-color: var(--panel-channels-bg);
 		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 		margin-bottom: 10px;
-	}
-
-	#channels .category {
-		padding-top: 15px;
-		font-size: 0.9rem;
-		text-transform: uppercase;
-	}
-	#channels .category-name {
-		font-size: 16px;
-		font-weight: 600;
-		margin: 15px 0 0px 0;
 	}
 
 	#header {
@@ -110,6 +105,7 @@
 
 	#messages {
 		grid-area: messages;
+		background-color: #313338;
 	}
 
 	#search {
@@ -118,18 +114,6 @@
 	#search:empty {
 		display: none;
 	}
-
-	#backup-helper {
-		margin-top: auto;
-		padding: 10px 0 10px 14px;
-		font-size: 14px;
-		font-weight: 600;
-		position: sticky;
-		bottom: 0;
-		background-color: var(--panel-channels-bg);
-		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-	}
-
 
 	:global(#messages .msg-jump) {
 		display: none;

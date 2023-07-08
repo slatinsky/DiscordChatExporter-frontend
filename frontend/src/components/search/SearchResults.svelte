@@ -38,7 +38,7 @@
 		margin-right: 5px;
 		width: 100%;
 
-		background-color: #2F3136;
+		background-color: #2b2d31;
 	}
 	.search-found-count {
 		background-color: #202225;
