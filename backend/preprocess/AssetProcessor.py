@@ -15,6 +15,7 @@ class AssetProcessor:
 		self.collection_assets = database.get_collection("assets")
 		self.local_assets = file_finder.find_local_assets()
 		self.fast_mode = False
+		self.cache = {}
 
 	def set_fast_mode(self, fast_mode: bool):
 		self.fast_mode = fast_mode
@@ -160,23 +161,28 @@ class AssetProcessor:
 		provide filepath without base directory
 		original_filepath is the path from json file, but is not necessarily a valid path
 		"""
+
+		# do not process twice the same file. Processing is relatively slow
+		if original_filepath in self.cache:
+			return self.cache[original_filepath]
+
 		if original_filepath == None:
 			return
-		original_filepath = self.file_finder.normalize_path(original_filepath)
+		normalized_filepath = self.file_finder.normalize_path(original_filepath)
 
-		is_remote = self.is_remote(original_filepath)
-		filename_with_hash = self.get_filename_with_hash(original_filepath, is_remote)
+		is_remote = self.is_remote(normalized_filepath)
+		filename_with_hash = self.get_filename_with_hash(normalized_filepath, is_remote)
 
 		cached_asset = self.get_cached_asset(filename_with_hash)
 		if cached_asset is not None:
 			return cached_asset
 
-		remote_url = original_filepath if is_remote else None
+		remote_url = normalized_filepath if is_remote else None
 		local_path = self.get_local_path(filename_with_hash)
 		local_path_exists = True if local_path is not None else False
 
-		extension = self.get_extension(original_filepath)
-		filetype = self.get_file_type(original_filepath, extension)
+		extension = self.get_extension(normalized_filepath)
+		filetype = self.get_file_type(normalized_filepath, extension)
 		width, height = self.get_image_size(local_path, local_path_exists, filetype)
 		size_bytes = self.get_file_size(local_path_exists, local_path)
 		filename_without_hash = self.strip_hash_from_filename(filename_with_hash)
@@ -192,7 +198,7 @@ class AssetProcessor:
 
 		asset = {
 			"_id": filename_with_hash,
-			"originalPath": original_filepath,
+			"originalPath": normalized_filepath,
 			"localPath": local_path_without_base,
 			"remotePath": remote_url,
 			"path": path,
@@ -208,4 +214,5 @@ class AssetProcessor:
 		}
 
 		self.insert_asset(asset)
+		self.cache[original_filepath] = asset
 		return asset
