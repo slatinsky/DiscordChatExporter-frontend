@@ -286,6 +286,9 @@
 									style="color:{message.author.color}"
 									data-user-id={message.author.id}>{nickname(message.author)}</span
 								>
+								{#if message.author?.isBot}
+									<span class="chatlog__author-tag">BOT</span>
+								{/if}
 								<span class="chatlog__timestamp"
 									><a href="/channels/{selectedGuildId}/{message.channelId}#{message._id}"
 										>{renderTimestamp(message.timestamp)}</a
