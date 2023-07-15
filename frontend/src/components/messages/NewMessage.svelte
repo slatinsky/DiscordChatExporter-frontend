@@ -82,11 +82,11 @@
 
 
 	function full_name(author) {
-		return author.names.join(', ')
+		return author.name
 	}
 
 	function nickname_only(author) {
-		return author?.nicknames?.[0] ?? full_name(author);
+		return author?.nickname ?? full_name(author);
 	}
 
 	function nickname(author: Author): string {
@@ -97,7 +97,7 @@
 			return nickname_only(author);
 		}
 		else if ($nameRenderer === 'both') {
-			return author?.nicknames?.[0] + ' (' + full_name(author) + ')';
+			return author?.nickname + ' (' + full_name(author) + ')';
 		}
 		else {
 			console.error('Unknown name renderer: ' + $nameRenderer);
@@ -252,9 +252,9 @@
 									<div
 										class="chatlog__reference-author"
 										style="color: {referencedMessage.author.color}"
-										title={referencedMessage.author.names.join(", ")}
+										title={referencedMessage.author.name}
 									>
-										{referencedMessage.author.names.join(", ")}
+										{referencedMessage.author.name}
 									</div>
 									<div class="chatlog__reference-content">
 										<span

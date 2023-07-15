@@ -34,8 +34,8 @@ export interface Channel {
 }
 
 export interface Author {
-	names: string[];
-	nicknames: string[];
+	name: string;
+	nickname: string;
 	color: string;
 	isBot: boolean;
 	avatar: Asset;

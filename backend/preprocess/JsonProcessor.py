@@ -1,5 +1,6 @@
 
 
+import copy
 import hashlib
 import json
 import os
@@ -208,36 +209,40 @@ class JsonProcessor:
 		"""
 		Extracts all authors from messages and returns a list of authors
 		"""
-		# extract all authors. Dictionary is used to remove duplicates
-		authors = {}
-		for message in messages:
-			if "author" in message:
-				author = message["author"]
 
-				if author["_id"] in authors:
+		# Dictionary is used to remove duplicates
+		authors = {}
+
+		for message in messages:
+			author_copy = copy.deepcopy(message["author"])
+			if "author" in message:
+
+				# process avatar in message
+				author = message["author"]
+				author["avatar"] = self.asset_processor.process(author.pop("avatarUrl"))
+				message["author"] = author
+
+
+				# extract all authors for search
+				if author_copy["_id"] in authors:
 					# save new nickname if different. Ignore null nicknames (discordless exports)
-					if message["author"]["nickname"] not in authors[author["_id"]]["nicknames"] and message["author"]["nickname"] != None:
+					if message["author"]["nickname"] not in authors[author_copy["_id"]]["nicknames"] and message["author"]["nickname"] != None:
 						authors[author["_id"]]["nicknames"].append(message["author"]["nickname"])
 					continue
 
-				author["guildIds"] = [guild_id]
-				author["avatar"] = self.asset_processor.process(author.pop("avatarUrl"))
-				author["names"] = [author.pop("name") + "#" + author.pop("discriminator")]
-				authors[author["_id"]] = author  # new author
+				author_copy["guildIds"] = [guild_id]
+				author_copy["avatar"] = self.asset_processor.process(author_copy.pop("avatarUrl"))
+				author_copy["names"] = [author_copy.pop("name") + "#" + author_copy.pop("discriminator")]
+				authors[author_copy["_id"]] = author_copy  # new author
 
-				author["nicknames"] = [author.pop("nickname")]
-				author["nicknames"] = list(filter(None, author["nicknames"]))   # remove null nicknames (discordless exports)
+				author_copy["nicknames"] = [author_copy.pop("nickname")]
+				author_copy["nicknames"] = list(filter(None, author_copy["nicknames"]))   # remove null nicknames (discordless exports)
 
-
+		# dictionary to list
 		authors_list = []
 		for author_id in authors:
-			author = authors[author_id]
-			authors_list.append(author)
-
-		# add authors back to messages
-		for message in messages:
-			if "author" in message:
-				message["author"] = authors[message["author"]["_id"]]
+			author_copy = authors[author_id]
+			authors_list.append(author_copy)
 
 		return authors_list
 
