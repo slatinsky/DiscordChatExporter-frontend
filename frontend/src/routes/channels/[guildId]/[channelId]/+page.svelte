@@ -7,7 +7,7 @@
 	import Scroller from "src/components/containers/Scroller3.svelte";
 	import MesssageSpoilerHandler from "src/components/messages/MesssageSpoilerHandler.svelte";
 	import Container from "src/components/containers/Container.svelte";
-	import { channelScrollPosition } from "src/routes/settingsStore";
+	import { channelScrollPosition } from "src/components/settings/settingsStore";
 	import { onMount } from "svelte";
 
 	let startPosition = 0;

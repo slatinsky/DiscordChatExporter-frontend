@@ -11,6 +11,8 @@ export const channelScrollPosition = writable("bottom");
 export const hideSpoilers = writable(true);
 export const font = writable("ggsans");
 
+export const settingsShown = writable(false);
+
 function withLocalStorage(store, localstorageKey: string, type = "string") {
     const restoredValue = localStorage.getItem(localstorageKey);
     if (restoredValue) {

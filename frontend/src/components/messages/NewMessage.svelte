@@ -4,7 +4,7 @@
 	import { renderDate, renderTimestamp } from 'src/js/time';
 	import ImageGallery from 'src/routes/channels/[guildId]/[channelId]/ImageGallery.svelte';
 	import { contextMenuItems} from '../menu/menuStore';
-	import { linkHandler, nameRenderer } from 'src/routes/settingsStore';
+	import { linkHandler, nameRenderer } from 'src/components/settings/settingsStore';
 	import MessageAttachments from './MessageAttachments.svelte';
 	import MessageEmbeds from './MessageEmbeds.svelte';
 	import MessageMarkdown from './MessageMarkdown.svelte';

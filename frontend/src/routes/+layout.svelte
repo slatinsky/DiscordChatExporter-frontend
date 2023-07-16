@@ -5,12 +5,13 @@
 	import MemoryUsage from '../components/standalone/MemoryUsage.svelte';
 	import GuildsMenu from './GuildsMenu.svelte';
 
-	import { theme, hideSpoilers, font } from './settingsStore';
+	import { theme, hideSpoilers, font } from 'src/components/settings/settingsStore';
 	import './styles.css';
 
 	import type { PageServerData } from './$types';
 	import ContextMenu from 'src/components/menu/ContextMenu.svelte';
 	import { position } from 'src/components/menu/menuStore';
+	import Settings from 'src/components/settings/Settings.svelte';
 	export let data: PageServerData;
 
 	theme.subscribe(value => {
@@ -45,6 +46,7 @@
 </div>
 <MemoryUsage />
 <ContextMenu />
+<Settings />
 
 
 <style>

@@ -2,7 +2,7 @@
 	import { checkUrl } from "src/js/helpers";
 	import type { Emoji } from "src/js/interfaces";
     import { get } from "svelte/store";
-    import { online } from "src/routes/settingsStore";
+    import { online } from "src/components/settings/settingsStore";
 	import { searchPrompt } from "../search/searchStores";
 
 

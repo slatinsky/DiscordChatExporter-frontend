@@ -2,7 +2,7 @@
 
 import { get } from "svelte/store";
 import type { Asset } from "./interfaces";
-import { online } from "../routes/settingsStore";
+import { online } from "src/components/settings/settingsStore";
 
 function fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement("textarea");
