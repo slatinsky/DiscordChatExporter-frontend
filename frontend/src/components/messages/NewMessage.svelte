@@ -4,7 +4,7 @@
 	import { renderDate, renderTimestamp } from 'src/js/time';
 	import ImageGallery from 'src/routes/channels/[guildId]/[channelId]/ImageGallery.svelte';
 	import { contextMenuItems} from '../menu/menuStore';
-	import { linkHandler, nameRenderer } from 'src/components/settings/settingsStore';
+	import { linkHandler, nameRenderer, timestampFormat } from 'src/components/settings/settingsStore';
 	import MessageAttachments from './MessageAttachments.svelte';
 	import MessageEmbeds from './MessageEmbeds.svelte';
 	import MessageMarkdown from './MessageMarkdown.svelte';
@@ -247,12 +247,14 @@
 						</svg>
 					</div>
 					<div class="chatlog__message-primary">
-						<span
-							class="chatlog__system-notification-author"
-							style="color:{message.author.color}"
-							title={full_name(message.author)}
-							data-user-id={full_name(message.author)}>{nickname(message.author)}
-						</span>
+						{#key $nameRenderer}
+							<span
+								class="chatlog__system-notification-author"
+								style="color:{message.author.color}"
+								title={full_name(message.author)}
+								data-user-id={full_name(message.author)}>{nickname(message.author)}
+							</span>
+						{/key}
 
 						<!-- Space out the content -->
 						<span> </span>
@@ -328,21 +330,25 @@
 											<span class="thread-msg-count">{message?.thread?.msgCount} messages</span>
 										{/if}
 									</div>
-									<span
-										class="chatlog__system-notification-author"
-										style="color:{message.author.color}"
-										title={full_name(message.author)}
-										data-user-id={full_name(message.author)}>{nickname(message.author)}</span
-									>
+									{#key $nameRenderer}
+										<span
+											class="chatlog__system-notification-author"
+											style="color:{message.author.color}"
+											title={full_name(message.author)}
+											data-user-id={full_name(message.author)}>{nickname(message.author)}</span
+										>
+									{/key}
 
 									<span class="chatlog__system-notification-content">
 										<span> started a thread.</span>
 									</span>
-									<span class="chatlog__system-notification-timestamp">
-										<a href="#{message.reference.channelId}"
-											>{renderTimestamp(message.timestamp)}</a
-										>
-									</span>
+									{#key $timestampFormat}
+										<span class="chatlog__system-notification-timestamp">
+											<a href="#{message.reference.channelId}"
+												>{renderTimestamp(message.timestamp)}</a
+											>
+										</span>
+									{/key}
 								</div>
 							</a>
 						{:else}
@@ -389,21 +395,25 @@
 							{/if}
 							{#if !mergeWithPrevious}
 								<div class="chatlog__header">
-									<span
-										class="chatlog__author"
-										title={nickname(message.author)}
-										style="color:{message.author.color}"
-										data-user-id={message.author.id}>{nickname(message.author)}</span
-									>
+									{#key $nameRenderer}
+										<span
+											class="chatlog__author"
+											title={nickname(message.author)}
+											style="color:{message.author.color}"
+											data-user-id={message.author.id}>{nickname(message.author)}</span
+										>
+									{/key}
 									{#if message.author?.isBot}
 										<span class="chatlog__author-tag">BOT</span>
 									{/if}
-									<span class="chatlog__timestamp"
-										><a href="/channels/{selectedGuildId}/{message.channelId}#{message._id}"
-											>{renderTimestamp(message.timestamp)}</a
+									{#key $timestampFormat}
+										<span class="chatlog__timestamp"
+											><a href="/channels/{selectedGuildId}/{message.channelId}#{message._id}"
+												>{renderTimestamp(message.timestamp)}</a
+											>
+											</span
 										>
-										</span
-									>
+									{/key}
 								</div>
 							{/if}
 							<div class="chatlog__content chatlog__markdown">
