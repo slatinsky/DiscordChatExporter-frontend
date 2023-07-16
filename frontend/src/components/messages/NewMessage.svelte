@@ -60,6 +60,16 @@
 			return false;
 		}
 
+		// if is system notification, don't merge
+		if (isSystemNotification(message.type)) {
+			return false;
+		}
+
+		// if nicknames are different, don't merge
+		if (previousMessage.author.nickname !== message.author.nickname) {
+			return false;
+		}
+
 		return true;
 	}
 
