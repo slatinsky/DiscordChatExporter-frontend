@@ -247,13 +247,6 @@
 						</svg>
 					</div>
 					<div class="chatlog__message-primary">
-						<!-- Author name -->
-						<!-- <span
-						class="chatlog__system-notification-author"
-						style="color:{message.author.color}"
-						title={full_name(message.author)}
-						data-user-id={full_name(message.author)}>{nickname(message.author)}</span
-					> -->
 						<span
 							class="chatlog__system-notification-author"
 							style="color:{message.author.color}"
