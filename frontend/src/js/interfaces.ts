@@ -98,7 +98,7 @@ export interface Embed {
 
 export interface Message {
 	_id: string;
-	type: "Reply";
+	type: "Default" | "RecipientAdd" | "RecipientRemove" | "Call" | "ChannelNameChange" | "ChannelIconChange" | "ChannelPinnedMessage" | "GuildMemberJoin" | "ThreadCreated" | "Reply";
 	timestamp: string;
 	timestampEdited: string | null;
 	callEndedTimestamp: string | null;
