@@ -131,21 +131,23 @@
 			<div class="title">Privacy & Safety</div>
 
 			<RadioGroup
-				title={"Fetch assets from remote servers"}
+				title={"Online mode"}
+				description={"If enabled, this will allow you to view emojis, stickers, attachments, embeds, etc. that you don't have downloaded"}
 			>
 				<RadioButton
-					title={"Never - view assets offline only"}
+					title={"Yes"}
+					name={"online"}
+					value={true}
+					bind:group={$online}
+				/>
+				<RadioButton
+					title={"No"}
 					name={"online"}
 					value={false}
 					bind:group={$online}
 				/>
 
-				<RadioButton
-					title={"If local assets don't exist"}
-					name={"online"}
-					value={true}
-					bind:group={$online}
-				/>
+
 			</RadioGroup>
 
 			<hr>
