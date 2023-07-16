@@ -143,4 +143,8 @@
 		/* padding: 10px 10px 10px 0; */
 		cursor: pointer;
 	}
+
+	.settings:hover {
+		background-color: #3d3e45;
+	}
 </style>
