@@ -1,8 +1,12 @@
 <script>
 	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, channelScrollPosition, hideSpoilers, font } from '../settingsStore';
 	import { timestampRenderers } from '../../js/time';
+	import RadioButton from '../../components/settings/RadioButton.svelte';
+	import RadioGroup from '../../components/settings/RadioGroup.svelte';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
+
+	let selectedTab = 'appearance';
 </script>
 
 <svelte:head>
@@ -10,167 +14,369 @@
     <meta name="description" content="View your JSON DiscordChatExporter exports as if you were using Discord interface"/>
 </svelte:head>
 
-<div class="title">Settings</div>
 
-<p>Name format</p>
-<div class="radios">
-	{#key $nameRenderer}
-	<label>
-		<input type="radio" name="nameRenderer" value={"nickname"} bind:group={$nameRenderer} />
-		<span>Nickname (Deleted User)</span>
-	</label>
-	<label>
-		<input type="radio" name="nameRenderer" value={"handle"} bind:group={$nameRenderer} />
-		<span>Name with handle (Deleted_User#0000)</span>
-	</label>
-	<label>
-		<input type="radio" name="nameRenderer" value={"both"} bind:group={$nameRenderer} />
-		<span>Both (Deleted User (Deleted_User#0000))</span>
-	</label>
-	{/key}
-</div>
+<div class="container">
+	<div class="tabs">
+		<div class="category">App settings</div>
+		<div class="tab" class:selected={selectedTab == "appearance"} on:click={() => selectedTab = "appearance"}>Appearance</div>
+		<div class="tab" class:selected={selectedTab == "privacy"} on:click={() => selectedTab = "privacy"}>Privacy & Safety</div>
+		<div class="tab" class:selected={selectedTab == "accessibility"} on:click={() => selectedTab = "accessibility"}>Accessibility</div>
 
-<p>Timestamp format (original "{testDate}")</p>
-<div class="radios">
-	{#each timestampRenderers as renderer, i}
-		<label>
-			<input type="radio" name="timestampRenderers" value={i} bind:group={$timestampFormat} />
-			<span>{renderer(testDate)}</span>
-		</label>
-	{/each}
-</div>
+		<hr>
 
-<p>Default scroll position (for channels/threads/forum posts)</p>
-<div class="radios">
-	{#key $channelScrollPosition}
-	<label>
-		<input type="radio" name="channelScrollPosition" value={"top"} bind:group={$channelScrollPosition} />
-		<span>Top</span>
-	</label>
-	<label>
-		<input type="radio" name="channelScrollPosition" value={"bottom"} bind:group={$channelScrollPosition} />
-		<span>Bottom</span>
-	</label>
-	{/key}
-</div>
+		<div class="category">Advanced settings</div>
+		<div class="tab" class:selected={selectedTab == "advanced"} on:click={() => selectedTab = "advanced"}>Advanced</div>
+	</div>
 
-<p>Discord font</p>
-<div class="radios">
-	{#key $font}
-	<label>
-		<input type="radio" name="font" value={"ggsans"} bind:group={$font} />
-		<span>gg sans (new discord font)</span>
-	</label>
-	<label>
-		<input type="radio" name="font" value={"whitney"} bind:group={$font} />
-		<span>Whitney (old discord font)</span>
-	</label>
-	<label>
-		<input type="radio" name="font" value={"arial"} bind:group={$font} />
-		<span>Arial</span>
-	</label>
-	<label>
-		<input type="radio" name="font" value={"timesnewroman"} bind:group={$font} />
-		<span>Times New Roman</span>
-	</label>
-	<label>
-		<input type="radio" name="font" value={"comicsans"} bind:group={$font} />
-		<span>Comic Sans</span>
-	</label>
-	{/key}
-</div>
+	<div class="settings">
+
+		<a href="/" class="close-btn">
+			<svg role="img" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M18.4 4L12 10.4L5.6 4L4 5.6L10.4 12L4 18.4L5.6 20L12 13.6L18.4 20L20 18.4L13.6 12L20 5.6L18.4 4Z"></path></svg>
+		</a>
+
+		{#if selectedTab == "appearance"}
+			<div class="title">Appearance</div>
+
+			<RadioGroup
+				title={"Name format"}
+			>
+				<RadioButton
+					title={"Display name"}
+					name={"nameRenderer"}
+					value={"nickname"}
+					bind:group={$nameRenderer}
+				/>
+
+				<RadioButton
+					title={"Username"}
+					name={"nameRenderer"}
+					value={"handle"}
+					bind:group={$nameRenderer}
+				/>
+
+				<RadioButton
+					title={"Both"}
+					name={"nameRenderer"}
+					value={"both"}
+					bind:group={$nameRenderer}
+				/>
+			</RadioGroup>
+
+			<hr>
+
+			<RadioGroup
+				title={"Timestamp format"}
+			>
+				{#each timestampRenderers as renderer, i}
+					<RadioButton
+						title={renderer(testDate)}
+						name={"timestampRenderers"}
+						value={i}
+						bind:group={$timestampFormat}
+					/>
+				{/each}
+			</RadioGroup>
+
+			<hr>
+
+			<RadioGroup
+				title={"Default scroll position"}
+				description={"For channels/threads/forum posts"}
+			>
+				<RadioButton
+					title={"Bottom"}
+					name={"channelScrollPosition"}
+					value={"bottom"}
+					bind:group={$channelScrollPosition}
+				/>
+
+				<RadioButton
+					title={"Top"}
+					name={"channelScrollPosition"}
+					value={"top"}
+					bind:group={$channelScrollPosition}
+				/>
+			</RadioGroup>
+
+			<hr>
+
+			<RadioGroup
+				title={"Theme"}
+				description={"Only dark theme works correctly at the moment"}
+			>
+				<RadioButton
+					title={"Dark"}
+					name={"theme"}
+					value={"dark"}
+					bind:group={$theme}
+				/>
+
+				<RadioButton
+					title={"Black [Work in progress]"}
+					name={"theme"}
+					value={"black"}
+					bind:group={$theme}
+				/>
+
+				<RadioButton
+					title={"White [Work in progress]"}
+					name={"theme"}
+					value={"white"}
+					bind:group={$theme}
+				/>
+			</RadioGroup>
+		{/if}
+
+		{#if selectedTab == "privacy"}
+			<div class="title">Privacy & Safety</div>
+
+			<RadioGroup
+				title={"Fetch assets from remote servers"}
+			>
+				<RadioButton
+					title={"Never - view assets offline only"}
+					name={"online"}
+					value={false}
+					bind:group={$online}
+				/>
+
+				<RadioButton
+					title={"If local assets don't exist"}
+					name={"online"}
+					value={true}
+					bind:group={$online}
+				/>
+			</RadioGroup>
+
+			<hr>
+
+			<RadioGroup
+				title={"Hide/blur spoilers"}
+			>
+				<RadioButton
+					title={"Yes"}
+					name={"hideSpoilers"}
+					value={true}
+					bind:group={$hideSpoilers}
+				/>
+
+				<RadioButton
+					title={"No"}
+					name={"hideSpoilers"}
+					value={false}
+					bind:group={$hideSpoilers}
+				/>
+			</RadioGroup>
+
+		{/if}
+
+		{#if selectedTab == "accessibility"}
+			<div class="title">Accessibility</div>
+
+			<RadioGroup
+				title={"Discord font"}
+			>
+				<RadioButton
+					title={"gg sans (new discord font)"}
+					name={"font"}
+					value={"ggsans"}
+					bind:group={$font}
+				/>
+
+				<RadioButton
+					title={"Whitney (old discord font)"}
+					name={"font"}
+					value={"whitney"}
+					bind:group={$font}
+				/>
+
+				<RadioButton
+					title={"Arial"}
+					name={"font"}
+					value={"arial"}
+					bind:group={$font}
+				/>
+
+				<RadioButton
+					title={"Times New Roman"}
+					name={"font"}
+					value={"timesnewroman"}
+					bind:group={$font}
+				/>
+
+				<RadioButton
+					title={"Comic Sans"}
+					name={"font"}
+					value={"comicsans"}
+					bind:group={$font}
+				/>
+			</RadioGroup>
+		{/if}
 
 
-<p>Show memory usage</p>
-<div class="radios">
-	{#key $developerMode}
-	<label>
-		<input type="radio" name="developerMode" value={true} bind:group={$developerMode} />
-		<span>Enabled</span>
-	</label>
-	<label>
-		<input type="radio" name="developerMode" value={false} bind:group={$developerMode} />
-		<span>Disabled</span>
-	</label>
-	{/key}
-</div>
+		{#if selectedTab == "advanced"}
+			<div class="title">Advanced</div>
 
-<p>Open discord links (right click message to open in Discord)</p>
-<div class="radios">
-	{#key $linkHandler}
-	<label>
-		<input type="radio" name="linkHandler" value={"browser"} bind:group={$linkHandler} />
-		<span>In browser</span>
-	</label>
-	<label>
-		<input type="radio" name="linkHandler" value={"app"} bind:group={$linkHandler} />
-		<!-- "discord://" URL protocol for invoking application has to be registered -->
-		<span>In discord app</span>
-	</label>
-	{/key}
-</div>
+			<!-- "discord://" URL protocol for invoking application has to be registered -->
+			<RadioGroup
+				title={"Open discord links"}
+				description={"Right click message to open in Discord"}
+			>
+				<RadioButton
+					title={"In browser"}
+					name={"linkHandler"}
+					value={"browser"}
+					bind:group={$linkHandler}
+				/>
 
-<p>Fetch assets from remote servers</p>
-<div class="radios">
-	{#key $online}
-	<label>
-		<input type="radio" name="online" value={false} bind:group={$online} />
-		<span>Never - view assets offline only</span>
-	</label>
-	<label>
-		<input type="radio" name="online" value={true} bind:group={$online} />
-		<span>If local assets don't exist</span>
-	</label>
-	{/key}
-</div>
+				<RadioButton
+					title={"In discord app"}
+					name={"linkHandler"}
+					value={"app"}
+					bind:group={$linkHandler}
+				/>
+			</RadioGroup>
 
-<p>Hide/blur spoilers</p>
-<div class="radios">
-	{#key $hideSpoilers}
-	<label>
-		<input type="radio" name="hideSpoilers" value={true} bind:group={$hideSpoilers} />
-		<span>Yes</span>
-	</label>
-	<label>
-		<input type="radio" name="hideSpoilers" value={false} bind:group={$hideSpoilers} />
-		<span>No</span>
-	</label>
-	{/key}
-</div>
-
-<p>Theme</p>
-<div class="radios">
-	{#key $theme}
-	<label>
-		<input type="radio" name="theme" value={"dark"} bind:group={$theme} />
-		<span>Dark</span>
-	</label>
-	<label>
-		<input type="radio" name="theme" value={"black"} bind:group={$theme} />
-		<span>Black [Work in progress]</span>
-	</label>
-	<label>
-		<input type="radio" name="theme" value={"white"} bind:group={$theme} />
-		<span>White [Work in progress]</span>
-	</label>
-	{/key}
+			<hr>
+			<RadioGroup
+				title={"Show memory usage"}
+			>
+				<RadioButton
+					title={"Disabled"}
+					name={"developerMode"}
+					value={false}
+					bind:group={$developerMode}
+				/>
+				<RadioButton
+					title={"Enabled"}
+					name={"developerMode"}
+					value={true}
+					bind:group={$developerMode}
+				/>
+			</RadioGroup>
+		{/if}
+	</div>
 </div>
 
 <style>
-	.title {
-		font-size: 28px;
-		padding-top: 20px;
-		padding-left: 20px;
+	.container {
+		display: grid;
+		grid-template-columns: 1fr 2fr;
+		gap: 20px;
+		height: 100vh;
+		/* padding: 20px auto; */
 	}
-
-	.radios {
+	.tabs {
+		background-color: #2b2d31;
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
-		padding-left: 20px;
+		gap: 2px;
+		padding-top: 30px;
+		padding-left: 30px;
+		padding-right: 10px;
+		align-items: flex-end;
 	}
 
-	p {
-		padding-left: 20px;
+	.tab {
+		width: 200px;
+		border-radius: 5px;
+		cursor: pointer;
+
+		padding-top: 6px;
+		padding-bottom: 6px;
+		padding-left: 10px;
+		margin-bottom: 2px;
+		border-radius: 4px;
+
+		position: relative;
+		font-size: 16px;
+		line-height: 20px;
+		cursor: pointer;
+		font-weight: 500;
+
+		color: #b5bac1;
 	}
+
+	.tab:hover
+	{
+		background-color: #35373c;
+		color: #dbdee1;
+	}
+
+	.tab.selected {
+		background-color: #404249;
+		color: white;
+	}
+
+	.tabs .category {
+		width: 200px;
+        color:#949ba4;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .02em;
+        font-size: 12px;
+        line-height: 16px;
+		margin-bottom: 5px;
+    }
+
+	.tabs hr {
+        border: 0;
+        height: 1px;
+        background: #3b3d44;
+        margin: 5px 30px 15px 0;
+		width: 172px;
+    }
+
+	.settings {
+		position: relative;
+		padding-top: 30px;
+		background-color: #313338;
+		margin-left: 35px;
+		margin-right: 35px;
+		max-width: 700px;
+	}
+
+	.close-btn {
+		position: absolute;
+		top: 30px;
+		left: 730px;
+		cursor: pointer;
+
+		display: grid;
+		place-items: center;
+
+		width: 32px;
+		height: 32px;
+
+		border: 2px solid #b5bac1;
+		border-radius: 50%;
+	}
+
+	.close-btn svg {
+		color: #b5bac1;
+	}
+
+	.close-btn:hover {
+		border: 2px solid #dbdee1;
+	}
+
+	.close-btn:hover svg {
+		color: #dbdee1;
+	}
+
+
+	.settings .title {
+		font-weight: 600;
+		font-size: 20px;
+		line-height: 24px;
+		color: #f2f3f5;
+		padding-bottom: 20px;
+	}
+
+	.settings hr {
+        border: 0;
+        height: 1px;
+        background: #3f4147;
+        margin: 30px 0 40px 0;
+    }
 </style>
