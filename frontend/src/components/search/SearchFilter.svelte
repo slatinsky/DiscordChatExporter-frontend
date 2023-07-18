@@ -16,7 +16,7 @@
 	}
 
 
-	import { searchPrompt, searchResultsMessageIds, searchShown } from "./searchStores";
+	import { searchPrompt, searchPromptLarge, searchResultsMessageIds, searchShown } from "./searchStores";
 	import { checkUrl } from "src/js/helpers";
 	export let guildId: string;
 
@@ -243,18 +243,20 @@
 	$: searchSuggestions, searchSuggestionsChanged();
 	$: $searchPrompt, searchPromptChanged()
 
+	$: $searchPromptLarge = $searchPrompt !== '' || $searchShown || isInputFocused;
+
+
 
 	onMount(async () => {
 		searchCategories = await fetchCategories()
 	})
 </script>
 
-<div class="search">
+<div class="search" class:large={$searchPromptLarge}>
 	<div class="search-input-container">
 		<input
 			type="text"
 			placeholder="Search"
-			class:filled={$searchPrompt !== ''}
 			bind:value={$searchPrompt}
 			bind:this={domInput}
 			on:focus={inputOnFocus}
@@ -320,7 +322,7 @@
 		top: 50px;
 		right: 0px;
 
-		z-index: 100;
+		z-index: 1000;
 		max-height: 70vh;
 		overflow-y: auto;
 	}
@@ -353,7 +355,7 @@
 	}
 
 	input:focus,
-	input.filled {
+	.large input {
 		width: 250px;
 	}
 	.search {
@@ -425,5 +427,18 @@
 
 	.hidden {
 		display: none;
+	}
+
+	
+	@media (max-width: 1000px) {
+		
+	@media (max-width: 1000px) {
+		.large.search {
+			width: 100%;
+		}
+		.large.search input {
+			width: 100%;
+		}
+	}
 	}
 </style>

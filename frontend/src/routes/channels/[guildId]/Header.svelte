@@ -3,6 +3,7 @@
 	import IconChannel from '../../../components/icons/IconChannel.svelte';
 	import SearchFilter from '../../../components/search/SearchFilter.svelte';
 	import HamburgerBtn from 'src/components/menu/HamburgerBtn.svelte';
+	import { searchPromptLarge } from 'src/components/search/searchStores';
 
 	export let channel: Channel | null = null;
 	export let thread: Channel | null = null;
@@ -11,30 +12,32 @@
 
 <section class="header-container">
 	<div class="channel-header">
-		<div class="channel-header__left">
+		<div class="channel-header__left-wrapper">
 			<HamburgerBtn />
 
-			{#if channel !== null}
-				<IconChannel />
-				<a href={`/channels/${guildId}/${channel._id}`}>
-					<div class="channel-name elipsis">{channel.name}</div>
-				</a>
-				{#if thread === null && channel.topic !== null}
-					<div class="divider" />
-					<div class="topic elipsis">{channel.topic}</div>
+			<div class="channel-header__left" class:searchlarge={$searchPromptLarge}>
+				{#if channel !== null}
+					<IconChannel />
+					<a href={`/channels/${guildId}/${channel._id}`}>
+						<div class="channel-name elipsis">{channel.name}</div>
+					</a>
+					{#if thread === null && channel.topic !== null}
+						<div class="divider" />
+						<div class="topic elipsis">{channel.topic}</div>
+					{/if}
 				{/if}
-			{/if}
-			{#if thread !== null}
-				<div class="divider">|</div>
-				<IconChannel />
-				<a href={`/channels/${guildId}/${thread._id}`}>
-					<div class="channel-name elipsis">{thread.name}</div>
-				</a>
-				{#if thread.topic !== null}
+				{#if thread !== null}
 					<div class="divider">|</div>
-					<div class="topic elipsis">{thread.topic}</div>
+					<IconChannel />
+					<a href={`/channels/${guildId}/${thread._id}`}>
+						<div class="channel-name elipsis">{thread.name}</div>
+					</a>
+					{#if thread.topic !== null}
+						<div class="divider">|</div>
+						<div class="topic elipsis">{thread.topic}</div>
+					{/if}
 				{/if}
-			{/if}
+			</div>
 			<div class="spacer" />
 			<SearchFilter {guildId} />
 		</div>
@@ -46,7 +49,8 @@
 		background-color: var(--panel-messages-bg);
 		height: 100dvh;
 	}
-	.channel-header__left {
+
+	.channel-header__left-wrapper {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
@@ -55,9 +59,19 @@
 
 		padding: 10px 20px;
 
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+
 		/* border-bottom: 1px solid rgba(255, 255, 255, 0.1); */
 		/*bottom shadow*/
-		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+
+	}
+	.channel-header__left {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		gap: 10px;
+
 	}
 
 	.channel-name {
@@ -93,5 +107,11 @@
 
 	.spacer {
 		flex-grow: 1;
+	}
+
+	@media (max-width: 1000px) {
+		.searchlarge {
+			display: none;
+		}
 	}
 </style>

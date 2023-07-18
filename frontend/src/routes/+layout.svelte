@@ -51,7 +51,7 @@
 		height: 100dvh;
 		overflow-y: hidden;  /* firefox temp fix */
 
-		overflow-x: hidden;
+		/* overflow-x: hidden; */
 		background-color: #313338;
 	}
 </style>

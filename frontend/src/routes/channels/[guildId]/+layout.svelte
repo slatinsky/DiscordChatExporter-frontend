@@ -78,15 +78,6 @@
 		left: 0px;
 	}
 
-	@media (max-width: 1000px) {
-		#guild-layout {
-			margin-right: -322px;
-		}
-		#guild-layout.hidden {
-			left: -322px;
-			margin-right: -322px;
-		}
-	}
 
 
 
@@ -166,5 +157,28 @@
 
 	.settings:hover {
 		background-color: #3d3e45;
+	}
+
+
+	@media (max-width: 1000px) {
+		#guild-layout {
+			margin-right: -322px;
+		}
+		#guild-layout.hidden {
+			left: -322px;
+			margin-right: -322px;
+		}
+
+		#guild-layout.with-search {
+			grid-template-columns: 250px 3fr 2fr auto-fit;
+			grid-template-areas:
+				'channels header header header'
+				'channels messages messages search';
+		}
+
+		#search {
+			width: 100vw;
+			z-index: 100;
+		}
 	}
 </style>
