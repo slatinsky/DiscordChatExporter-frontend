@@ -1,12 +1,23 @@
 <script>
+// @ts-nocheck
+
 	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, channelScrollPosition, hideSpoilers, font, settingsShown } from 'src/components/settings/settingsStore';
 	import { timestampRenderers } from '../../js/time';
 	import RadioButton from '../../components/settings/RadioButton.svelte';
 	import RadioGroup from '../../components/settings/RadioGroup.svelte';
+	import { isMenuHidden } from 'src/components/menu/menuStore';
+	import MenuOpenOverlay from '../menu/MenuOpenOverlay.svelte';
+	import HamburgerBtn from '../menu/HamburgerBtn.svelte';
 
 	let testDate = '2020-09-16T11:04:47.215+00:00';
 
 	let selectedTab = 'appearance';
+
+	function selectTab(tab) {
+		selectedTab = tab;
+		$isMenuHidden = true;
+	}
+
 </script>
 
 <svelte:head>
@@ -15,20 +26,21 @@
 </svelte:head>
 
 
-<div class="container" class:hidden={!$settingsShown}>
+<div class="container" class:hidden={!$settingsShown} class:mobilemenuhidden={$isMenuHidden}>
 	<div class="tabs">
 		<div class="category">App settings</div>
-		<div class="tab" class:selected={selectedTab == "appearance"} on:click={() => selectedTab = "appearance"}>Appearance</div>
-		<div class="tab" class:selected={selectedTab == "privacy"} on:click={() => selectedTab = "privacy"}>Privacy & Safety</div>
-		<div class="tab" class:selected={selectedTab == "accessibility"} on:click={() => selectedTab = "accessibility"}>Accessibility</div>
+		<div class="tab" class:selected={selectedTab == "appearance"} on:click={() => selectTab("appearance")}>Appearance</div>
+		<div class="tab" class:selected={selectedTab == "privacy"} on:click={() => selectTab("privacy")}>Privacy & Safety</div>
+		<div class="tab" class:selected={selectedTab == "accessibility"} on:click={() => selectTab("accessibility")}>Accessibility</div>
 
 		<hr>
 
 		<div class="category">Advanced settings</div>
-		<div class="tab" class:selected={selectedTab == "advanced"} on:click={() => selectedTab = "advanced"}>Advanced</div>
+		<div class="tab" class:selected={selectedTab == "advanced"} on:click={() => selectTab("advanced")}>Advanced</div>
 	</div>
 
 	<div class="settings-scroller">
+		<MenuOpenOverlay leftOffset={233} />
 
 		<div class="settings">
 
@@ -37,7 +49,10 @@
 			</div>
 
 			{#if selectedTab == "appearance"}
-				<div class="title">Appearance</div>
+				<div class="title-wrapper">
+					<HamburgerBtn />
+					<div class="title">Appearance</div>
+				</div>
 
 				<RadioGroup
 					title={"Name format"}
@@ -130,7 +145,10 @@
 			{/if}
 
 			{#if selectedTab == "privacy"}
-				<div class="title">Privacy & Safety</div>
+				<div class="title-wrapper">
+					<HamburgerBtn />
+					<div class="title">Privacy & Safety</div>
+				</div>
 
 				<RadioGroup
 					title={"Online mode"}
@@ -175,7 +193,10 @@
 			{/if}
 
 			{#if selectedTab == "accessibility"}
-				<div class="title">Accessibility</div>
+				<div class="title-wrapper">
+					<HamburgerBtn />
+					<div class="title">Accessibility</div>
+				</div>
 
 				<RadioGroup
 					title={"Discord font"}
@@ -219,7 +240,10 @@
 
 
 			{#if selectedTab == "advanced"}
-				<div class="title">Advanced</div>
+				<div class="title-wrapper">
+					<HamburgerBtn />
+					<div class="title">Advanced</div>
+				</div>
 
 				<!-- "discord://" URL protocol for invoking application has to be registered -->
 				<RadioGroup
@@ -279,9 +303,14 @@
 		height: 100dvh;
 		width: 100vw;
 
+		z-index: 1000;
+
+		min-width: 700px;
+
 		background-color: #313338;
 		/* padding: 20px auto; */
 	}
+
 	.tabs {
 		background-color: #2b2d31;
 		display: flex;
@@ -358,6 +387,7 @@
 
 	.settings {
 		max-width: 700px;
+		width: 80vw;
 	}
 
 	.close-btn {
@@ -389,12 +419,20 @@
 	}
 
 
+	.settings .title-wrapper {
+		display: flex;
+		gap: 20px;
+
+		align-items: center;
+		padding-bottom: 20px;
+
+	}
+
 	.settings .title {
 		font-weight: 600;
 		font-size: 20px;
 		line-height: 24px;
 		color: #f2f3f5;
-		padding-bottom: 20px;
 	}
 
 	.settings hr {
@@ -402,5 +440,32 @@
 		height: 1px;
 		background: #3f4147;
 		margin: 30px 0 40px 0;
+	}
+
+
+	@media (max-width: 1000px) {
+		.container {
+			left: 0px;
+			grid-template-columns: 233px 2fr;
+			transition: left 0.2s ease-in-out;
+		}
+
+		.container.mobilemenuhidden {
+			left: -233px;
+		}
+
+		.settings-scroller {
+			margin-right: -233px;
+			margin-left: 0px;
+		}
+
+		.close-btn {
+			position: fixed;
+			top: 30px;
+			right: 30px;
+			left: auto;
+
+			z-index: 1005;
+		}
 	}
 </style>

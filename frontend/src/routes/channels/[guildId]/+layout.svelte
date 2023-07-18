@@ -10,6 +10,7 @@
 	import Container from 'src/components/containers/Container.svelte';
 	import { settingsShown } from 'src/components/settings/settingsStore';
 	import { isMenuHidden } from 'src/components/menu/menuStore';
+	import MenuOpenOverlay from 'src/components/menu/MenuOpenOverlay.svelte';
 
 	let currentGuildId: string = data.guildId;
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time
@@ -31,7 +32,7 @@
 		</Container>
 	{:else}
 		<div id="guild-layout" class={$searchShown ? 'with-search' : ''} class:hidden={$isMenuHidden}>
-			<div id="menu-open-overlay" class:hidden={$isMenuHidden} on:click={() => $isMenuHidden = true}/>
+			<MenuOpenOverlay />
 
 			<div id="channels">
 				<div class="guild-name">{data.guild.name}</div>
@@ -59,33 +60,6 @@
 {/key}
 
 <style>
-	#menu-open-overlay {
-		position: fixed;
-		top: 0;
-		left: 322px;
-		width: 100vw;
-		height: 100dvh;
-		z-index: 100;
-		background-color: rgba(0, 0, 0, 0.5);
-
-		transition: left 0.2s ease-in-out, background-color 0.2s ease-in-out;
-
-		z-index: 1000;
-		display: none;
-	}
-
-	@media (max-width: 1000px) {
-		#menu-open-overlay {
-			display: block;
-		}
-	}
-
-	#menu-open-overlay.hidden {
-		left: 0;
-		background-color: transparent;
-		pointer-events: none;
-	}
-
 	#guild-layout {
 		display: grid;
 		/* flex-direction: row; */
