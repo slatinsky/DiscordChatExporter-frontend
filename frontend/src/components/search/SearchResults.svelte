@@ -10,7 +10,6 @@
 {#if $searchShown}
 	<div class="search-found-count">
 		<div>{$searchResultsMessageIds.length} Results</div>
-		<button on:click={()=>$searchShown=false} class="search-dismiss-btn">×</button>
 	</div>
 {/if}
 <div id="search-results" bind:this={searchResults}>
@@ -48,17 +47,5 @@
 		justify-content: space-between;
 
 		position: relative;
-	}
-
-	.search-dismiss-btn {
-		background-color: transparent;
-		border: none;
-		color: #DCDDDE;
-		font-size: 3rem;
-		font-weight: 600;
-		cursor: pointer;
-		position:absolute;
-		top: -6px;
-		right: 15px;
 	}
 </style>
