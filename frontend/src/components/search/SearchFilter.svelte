@@ -139,6 +139,7 @@
 						console.log("accept suggestion", category.key);
 						// $searchPrompt = $searchPrompt.replace(key, category.key + ':');
 						$searchPrompt = $searchPrompt.replace(new RegExp(`${key}$`), `${category.key}:`);
+						focusInput()
 					}
 				}
 			});
@@ -233,7 +234,6 @@
 
 	function onClickSuggestion(suggestionAction: () => void) {
 		suggestionAction();
-		focusInput()
 	}
 
 	function searchSuggestionsChanged() {
