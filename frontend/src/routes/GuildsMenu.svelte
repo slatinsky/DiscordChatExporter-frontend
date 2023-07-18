@@ -1,11 +1,12 @@
 <!-- GUILDS MENU -->
 
 <script lang="ts">
-	import { contextMenuItems } from "src/components/menu/menuStore";
+	import { contextMenuItems, isMenuHidden } from "src/components/menu/menuStore";
 	import { checkUrl, copyTextToClipboard } from "src/js/helpers";
 	import type { Guild } from "../js/interfaces";
 	export let guilds: Guild[] = [];
 	export let selectedGuildId: string | null = null;
+
 
 	function onRightClick(e, id) {
 		$contextMenuItems = [
@@ -19,7 +20,7 @@
 	}
 </script>
 
-<div class="guilds">
+<div class="guilds" class:hidden={$isMenuHidden}>
 	<a href="/">
 		<div class="guild" class:selected={!selectedGuildId}>
 			<!-- if root path -->
@@ -42,6 +43,7 @@
 </div>
 
 <style>
+
 	.guilds {
 		background-color: var(--panel-guilds-bg);
 		height: calc(100% - 14px);  /* - padding */
@@ -50,6 +52,15 @@
 
 		padding: 7px 0 7px 0;
 		scrollbar-width: none; /* hide scrollbar - Firefox */
+
+		transition: left 0.2s ease-in-out;
+		left: 0px
+	}
+
+	@media (max-width: 1000px) {
+		.guilds.hidden {
+			left: -322px;
+		}
 	}
 
 	.guilds::-webkit-scrollbar {

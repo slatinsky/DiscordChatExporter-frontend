@@ -2,6 +2,7 @@
 	import type { Channel } from 'src/js/interfaces';
 	import IconChannel from '../../../components/icons/IconChannel.svelte';
 	import SearchFilter from '../../../components/search/SearchFilter.svelte';
+	import HamburgerBtn from 'src/components/menu/HamburgerBtn.svelte';
 
 	export let channel: Channel | null = null;
 	export let thread: Channel | null = null;
@@ -11,6 +12,8 @@
 <section class="header-container">
 	<div class="channel-header">
 		<div class="channel-header__left">
+			<HamburgerBtn />
+
 			{#if channel !== null}
 				<IconChannel />
 				<a href={`/channels/${guildId}/${channel._id}`}>
@@ -41,7 +44,7 @@
 <style>
 	.header-container {
 		background-color: var(--panel-messages-bg);
-		height: 100vh;
+		height: 100dvh;
 	}
 	.channel-header__left {
 		display: flex;

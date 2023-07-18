@@ -313,8 +313,8 @@
 		background-color: #111214;
 		border-radius: 5px;
 		padding: 2px 5px;
-		max-width: 700px;
-		min-width: 500px;
+		max-width: 90vw;
+		width: 700px;
 
 		position: absolute;
 		top: 50px;

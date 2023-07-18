@@ -2,7 +2,7 @@
 	import IconChannel from 'src/components/icons/IconChannel.svelte';
 	import IconChannelWithThreads from 'src/components/icons/IconChannelWithThreads.svelte';
 	import { copyTextToClipboard } from '../../js/helpers';
-	import { contextMenuItems } from '../menu/menuStore';
+	import { contextMenuItems, isMenuHidden } from '../menu/menuStore';
 	export let guildId;
 	export let id;
 	export let name;
@@ -31,7 +31,7 @@
 	href="/channels/{guildId}/{id}"
 	on:contextmenu|preventDefault={(e) => onRightClick(e, id)}
 >
-	<div class="channel" class:selected={isSelected}>
+	<div class="channel" class:selected={isSelected} on:click={()=>$isMenuHidden=true}>
 		{#if threadCount > 0}
 			<IconChannelWithThreads />
 		{:else}

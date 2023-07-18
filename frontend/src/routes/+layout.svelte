@@ -37,12 +37,7 @@
 
 <div class="app" on:mousemove={handleThrottledMousemove}>
 	<GuildsMenu guilds={data.guilds} selectedGuildId={data.selectedGuildId}/>
-	<div class="right">
-		<!-- page content on the right -->
-		<main>
-			<slot />
-		</main>
-	</div>
+	<slot />
 </div>
 <MemoryUsage />
 <ContextMenu />
@@ -53,18 +48,10 @@
 	.app {
 		display: grid;
 		grid-template-columns: 72px 1fr;
-		height: 100vh;
+		height: 100dvh;
 		overflow-y: hidden;  /* firefox temp fix */
-	}
 
-	.right {
-		height: 100%;
-	}
-
-	main {
-		max-height: 100vh;
-		overflow-y: auto;
+		overflow-x: hidden;
 		background-color: #313338;
 	}
-
 </style>

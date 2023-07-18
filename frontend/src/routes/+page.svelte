@@ -20,7 +20,7 @@
 <style>
 
 	.container {
-		height: calc(100vh - 16px);
+		height: calc(100dvh - 16px);
 	}
 	img {
 		width: 100px;

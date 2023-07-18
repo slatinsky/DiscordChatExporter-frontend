@@ -276,7 +276,7 @@
 		display: grid;
 		grid-template-columns: 1fr 2fr;
 		gap: 20px;
-		height: 100vh;
+		height: 100dvh;
 		width: 100vw;
 
 		background-color: #313338;

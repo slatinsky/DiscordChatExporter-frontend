@@ -9,6 +9,7 @@
 	import ChannelsMenu from '../../../components/channels/MenuCategories.svelte';
 	import Container from 'src/components/containers/Container.svelte';
 	import { settingsShown } from 'src/components/settings/settingsStore';
+	import { isMenuHidden } from 'src/components/menu/menuStore';
 
 	let currentGuildId: string = data.guildId;
 	function guildChanged(_) {  // fix crash if shifting between guilds and searching at the same time
@@ -29,7 +30,9 @@
 			<div class="txt">Guild ID {currentGuildId} not found</div>
 		</Container>
 	{:else}
-		<div id="guild-layout" class={$searchShown ? 'with-search' : ''}>
+		<div id="guild-layout" class={$searchShown ? 'with-search' : ''} class:hidden={$isMenuHidden}>
+			<div id="menu-open-overlay" class:hidden={$isMenuHidden} on:click={() => $isMenuHidden = true}/>
+
 			<div id="channels">
 				<div class="guild-name">{data.guild.name}</div>
 				<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} />
@@ -56,11 +59,38 @@
 {/key}
 
 <style>
+	#menu-open-overlay {
+		position: fixed;
+		top: 0;
+		left: 322px;
+		width: 100vw;
+		height: 100dvh;
+		z-index: 100;
+		background-color: rgba(0, 0, 0, 0.5);
+
+		transition: left 0.2s ease-in-out, background-color 0.2s ease-in-out;
+
+		z-index: 1000;
+		display: none;
+	}
+
+	@media (max-width: 1000px) {
+		#menu-open-overlay {
+			display: block;
+		}
+	}
+
+	#menu-open-overlay.hidden {
+		left: 0;
+		background-color: transparent;
+		pointer-events: none;
+	}
+
 	#guild-layout {
 		display: grid;
 		/* flex-direction: row; */
 		background-color: var(--panel-channels-bg);
-		height: 100vh;
+		height: 100dvh;
 
 		grid-template-areas:
 			'channels header header'
@@ -68,7 +98,23 @@
 
 		grid-template-columns: 250px 3fr 2fr;
 		grid-template-rows: 50px auto;
+
+		transition: left 0.2s ease-in-out, margin-right 0.2s ease-in-out;
+		position: relative;
+		left: 0px;
 	}
+
+	@media (max-width: 1000px) {
+		#guild-layout {
+			margin-right: -322px;
+		}
+		#guild-layout.hidden {
+			left: -322px;
+			margin-right: -322px;
+		}
+	}
+
+
 
 	#guild-layout.with-search {
 		grid-template-areas:

@@ -2,7 +2,7 @@
 	import IconThread from 'src/components/icons/IconThread.svelte';
 	import IconThreadMiddle from 'src/components/icons/IconThreadMiddle.svelte';
 	import { copyTextToClipboard } from '../../js/helpers';
-	import { contextMenuItems } from '../menu/menuStore';
+	import { contextMenuItems, isMenuHidden } from '../menu/menuStore';
 
 	export let name;
 	export let id;
@@ -36,10 +36,10 @@
             <IconThreadMiddle />
         {/if}
     </div>
-	
 	<a
 		href="/channels/{guildId}/{id}"
 		on:contextmenu|preventDefault={(e) => onRightClick(e, id)}
+		on:click={()=>$isMenuHidden=true}
 	>
 		<div class="thread-name" class:selected={selectedChannelId == id}>
 			{name}

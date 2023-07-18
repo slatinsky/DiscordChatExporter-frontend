@@ -333,7 +333,7 @@
 	})
 
 </script>
-<div class="scroll-window" use:resizeObserver={element => updatedWindowWidthHeight(element.clientWidth, element.clientHeight)} bind:this={domWindow} style={"height:calc(100vh - " + negativeHeight + "px)"}>
+<div class="scroll-window" use:resizeObserver={element => updatedWindowWidthHeight(element.clientWidth, element.clientHeight)} bind:this={domWindow} style={"height:calc(100dvh - " + negativeHeight + "px)"}>
 	<div class="scroll-container" style="height: {containerHeightEstimated}px;position:relative;" bind:this={domContainer}>
 		{#each indexesToRender as messageIndex (messageIndex)}
 			<div class="scroll-absolute-element" data-index={messageIndex} style={"position: absolute; left: 0px; width:100%;top:" + (itemOffsets[messageIndex] || 0) + "px"} class:center={centerItemIndex == messageIndex} bind:this={domItems[messageIndex]} use:resizeObserver={element => updatedItemHeight(messageIndex, element.clientHeight)} >
