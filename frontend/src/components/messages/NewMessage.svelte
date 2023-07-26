@@ -2,7 +2,6 @@
 	import { checkUrl, copyTextToClipboard, snowflakeToDate } from 'src/js/helpers';
 	import type { Author, Message } from 'src/js/interfaces';
 	import { renderDate, renderTimestamp } from 'src/js/time';
-	import ImageGallery from 'src/routes/channels/[guildId]/[channelId]/ImageGallery.svelte';
 	import { contextMenuItems} from '../menu/menuStore';
 	import { linkHandler, nameRenderer, timestampFormat } from 'src/components/settings/settingsStore';
 	import MessageAttachments from './MessageAttachments.svelte';
@@ -10,9 +9,9 @@
 	import MessageMarkdown from './MessageMarkdown.svelte';
 	import MessageReactions from './MessageReactions.svelte';
 	import MessageStickers from './MessageStickers.svelte';
-	import { guildId } from 'src/js/stores';
 
 	import identicons from 'identicons'
+	import AuthorModal from 'src/routes/channels/[guildId]/[channelId]/AuthorModal.svelte';
 
 	export let message: Message;
 	export let previousMessage: Message | null = null;
@@ -184,6 +183,8 @@
 
 		return systemNotificationTypes.includes(messageType)
 	}
+
+	let authorModal: AuthorModal;
 </script>
 
 <!-- Rewritten https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/Html/MessageGroupTemplate.cshtml to svelte -->
@@ -252,7 +253,11 @@
 								class="chatlog__system-notification-author"
 								style="color:{message.author.color}"
 								title={full_name(message.author)}
-								data-user-id={full_name(message.author)}>{nickname(message.author)}
+								data-user-id={full_name(message.author)}
+								on:click={()=>{
+									authorModal.viewAuthor();
+								}}
+								>{nickname(message.author)}
 							</span>
 						{/key}
 
@@ -312,7 +317,15 @@
 						{#if !mergeWithPrevious}
 							{#if message.type != 'ThreadCreated'}
 								{#if message.author?.avatar}
-									<ImageGallery asset={message.author?.avatar} imgclass={"chatlog__avatar"} />
+								<img
+									on:click={authorModal.viewAuthor()}
+									class='chatlog__avatar'
+									src={checkUrl(message.author?.avatar)}
+									alt="Avatar"
+									width="100%"
+									height="100%"
+									onerror="this.style.visibility='hidden'"
+								/>
 								{:else}
 									<img class="chatlog__avatar" src={identicons.generateSVGDataURIString(message.author._id, { width: 200, size: 3 })} />
 								{/if}
@@ -335,7 +348,9 @@
 											class="chatlog__system-notification-author"
 											style="color:{message.author.color}"
 											title={full_name(message.author)}
-											data-user-id={full_name(message.author)}>{nickname(message.author)}</span
+											data-user-id={full_name(message.author)}
+											on:click={authorModal.viewAuthor()}
+											>{nickname(message.author)}</span
 										>
 									{/key}
 
@@ -400,7 +415,9 @@
 											class="chatlog__author"
 											title={nickname(message.author)}
 											style="color:{message.author.color}"
-											data-user-id={message.author.id}>{nickname(message.author)}</span
+											data-user-id={message.author.id}
+											on:click={authorModal.viewAuthor()}
+											>{nickname(message.author)}</span
 										>
 									{/key}
 									{#if message.author?.isBot}
@@ -456,7 +473,17 @@
 	</div>
 </div>
 
+{#if message.author}
+	<AuthorModal author={message.author} bind:this={authorModal} />
+{/if}
+
 <style>
+
+	.chatlog__author,
+	.chatlog__system-notification-author,
+	.chatlog__avatar {
+		cursor: pointer;
+	}
 
 	.padder {
 		height: 15px;
