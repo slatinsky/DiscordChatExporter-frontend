@@ -519,7 +519,8 @@
 
 	:global(.chatlog__attachment-media) {
 		max-width: calc(100% - 10px);
-		object-position:left
+		object-position:left;
+		height: auto;
 	}
 
 	:global(.chatlog__embed-thumbnail) {
