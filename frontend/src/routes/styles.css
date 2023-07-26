@@ -924,6 +924,9 @@ img {
 }
 
 #channels::-webkit-scrollbar {
+	width: 0px;
+}
+#channels:hover::-webkit-scrollbar {
 	width: 11px;
 }
 #channels::-webkit-scrollbar-thumb {

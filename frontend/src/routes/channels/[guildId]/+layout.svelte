@@ -99,9 +99,6 @@
 
 	/*Show scrollbar only on hover*/
 	#channels {
-		overflow-y: hidden;
-	}
-	#channels:hover {
 		overflow-y: auto;
 	}
 	#channels .guild-name {
