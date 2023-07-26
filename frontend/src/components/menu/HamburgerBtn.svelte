@@ -18,7 +18,7 @@
 
 		cursor: pointer;
 
-		transform: scale(0.8);
+		transform: scale(0.5);
 	}
 
 	.hamburger-menu svg {
