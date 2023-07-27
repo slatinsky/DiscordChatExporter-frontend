@@ -5,6 +5,7 @@
 	import MessageMarkdown from "./MessageMarkdown.svelte";
 
 	export let embeds: Embed[];
+	export let guildId: string;
 	$: embedUrl = embeds?.[0]?.url ?? null;
 	// get the youtube video id
 	const reg = /^(?:https?:)?\/\/(?:www|m)\.(?:youtube(?:-nocookie)?\.com|youtu.be)\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?[\w\-]+/
@@ -52,12 +53,12 @@
 							{#if embed.url}
 								<a class="chatlog__embed-title-link" href={embed?.url}>
 									<div class="chatlog__markdown chatlog__markdown-preserve">
-										<MessageMarkdown content={embed.title} />
+										<MessageMarkdown content={embed.title} {guildId} />
 									</div>
 								</a>
 							{:else}
 								<div class="chatlog__markdown chatlog__markdown-preserve">
-									<MessageMarkdown content={embed.title} />
+									<MessageMarkdown content={embed.title} {guildId} />
 								</div>
 							{/if}
 						</div>
@@ -67,7 +68,7 @@
 					{#if embed.description}
 						<div class="chatlog__embed-description">
 							<div class="chatlog__markdown chatlog__markdown-preserve">
-								<MessageMarkdown content={embed.description}/>
+								<MessageMarkdown content={embed.description} {guildId}/>
 							</div>
 						</div>
 					{/if}
@@ -80,7 +81,7 @@
 									{#if field.name}
 										<div class="chatlog__embed-field-name">
 											<div class="chatlog__markdown chatlog__markdown-preserve">
-												<MessageMarkdown content={field.name} embed={true}/>
+												<MessageMarkdown content={field.name} embed={true} {guildId}/>
 											</div>
 										</div>
 									{/if}
@@ -88,7 +89,7 @@
 									{#if field.value}
 										<div class="chatlog__embed-field-value">
 											<div class="chatlog__markdown chatlog__markdown-preserve">
-												<MessageMarkdown content={field.value} embed={true}/>
+												<MessageMarkdown content={field.value} embed={true} {guildId}/>
 											</div>
 										</div>
 									{/if}

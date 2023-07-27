@@ -390,7 +390,7 @@
 											<span
 												class="chatlog__reference-link"
 												>
-												<MessageMarkdown content={referencedMessage.content[0].content.replace("\n", " ")}/>
+												<MessageMarkdown content={referencedMessage.content[0].content.replace("\n", " ")} guildId={referencedMessage?.guildId} />
 												</span
 											>
 										</div>
@@ -454,7 +454,7 @@
 						{/if}
 
 						{#if message.embeds}
-							<MessageEmbeds embeds={message.embeds} />
+							<MessageEmbeds embeds={message.embeds} guildId={message.guildId} />
 						{/if}
 
 						<!-- stickers -->
