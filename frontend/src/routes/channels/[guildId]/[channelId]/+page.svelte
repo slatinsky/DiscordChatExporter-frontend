@@ -80,7 +80,11 @@
 					startPosition={startPosition}
 					>
 					<div slot="item" let:index>
-						<MessageLoader messageId={data.messages[index]._id} previousMessageId={data.messages[index - 1]?._id} selectedGuildId={data.guildId} />
+						{#if data.messages[index]}
+							<MessageLoader messageId={data.messages[index]._id} previousMessageId={data.messages[index - 1]?._id} selectedGuildId={data.guildId} />
+						{:else}
+							<div class="loading">Message didn't load properly</div>
+						{/if}
 					</div>
 				</Scroller>
 			<!-- {/key} -->
