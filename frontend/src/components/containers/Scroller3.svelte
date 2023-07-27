@@ -3,6 +3,7 @@
 	import { clamp } from 'src/js/helpers';
 	import {resizeObserver} from "src/js/resizeObserver";
 	import { onMount, onDestroy } from "svelte";
+	import { tick } from 'svelte';
 	export let negativeHeight: number = 50   // negative height of the 100vh container
 	export let itemCount: number;            // items count to render
 
@@ -10,6 +11,8 @@
 
 	let centerItemIndex: number = 0          // index of the item in the center of the window
 	let centerItemOffset: number = 0         // offset of the item in the center of the window
+
+	let renderingDisabled: boolean = false   // disable rendering of new items
 
 	// observed heights and widths of divs
 	let windowHeight: number | undefined
@@ -71,7 +74,7 @@
 		return offset
 	}
 
-	function updateItemOffsets() {
+	async function updateItemOffsets() {
 		let offset = centerItemOffset
 		let index = centerItemIndex
 		// down
@@ -100,9 +103,19 @@
 		const lowestOffset = Math.min(...Object.values(itemOffsets))
 		if (lowestOffset < 0) {
 			// move all items up
+			await tick();
+			renderingDisabled = true
+			await tick();
 			for (const index in itemOffsets) {
 				itemOffsets[index] -= lowestOffset
+				if (index === centerItemIndex.toString()) {
+					centerItemOffset -= lowestOffset
+					domWindow?.scrollBy(0, -lowestOffset)
+				}
 			}
+			await tick();
+			renderingDisabled = false
+			await tick();
 			console.warn("fix top items out of bounds by offset", lowestOffset);
 		}
 
@@ -185,6 +198,9 @@
 	}
 
 	function renderMoreItems() {
+		if (renderingDisabled) {
+			return
+		}
 		if (windowHeight === undefined) {
 			console.error("windowHeight is undefined");
 			return
@@ -268,11 +284,11 @@
 		}
 	}
 
-	function updatedItemHeight(index: number, newHeight: number) {
+	async function updatedItemHeight(index: number, newHeight: number) {
 		const oldItemHeight = itemHeights[index] || itemEstimatedHeight
 		itemHeights[index] = newHeight
 		// console.log("updatedItemHeight", index," ", oldItemHeight, "=>", newHeight);
-		updateItemOffsets()
+		await updateItemOffsets()
 		renderMoreItems()
 	}
 
@@ -281,44 +297,39 @@
 		windowHeight = newHeight
 	}
 
-	function startPositionChanged(newStartPosition: number) {
+	async function startPositionChanged(newStartPosition: number) {
+		await tick();
 		if (domWindow) {
 			domWindow.scrollTop = itemOffsets[newStartPosition] || startPosition * itemEstimatedHeight
 		}
 		else {  // not mounted yet
-			setTimeout(() => {
-			if (domWindow) {
-				domWindow.scrollTop = itemOffsets[newStartPosition] || startPosition * itemEstimatedHeight
-			}
-			}, 500)
+			console.error("domWindow is undefined - startPositionChanged");
 		}
 	}
 
 	$: startPositionChanged(startPosition)
 
 
-	onMount(() => {
+	onMount(async() => {
 		if (itemCount === 0) {
 			console.log("no items to render");
 			return
 		}
+		await tick();
+		if (domWindow) {
+			domWindow.scrollTop = startPosition * itemEstimatedHeight
+		}
+		else {
+			console.error("domWindow is undefined - scroll to startPosition");
+		}
 
-		setTimeout(() => {
-			if (domWindow) {
-				domWindow.scrollTop = startPosition * itemEstimatedHeight
-			}
-			else {
-				console.error("domWindow is undefined - scroll to startPosition");
-			}
-
-			console.log({windowHeight, windowWidth, containerHeightEstimated, itemHeights, domWindow, domContainer, domItems, indexesToRender});
-			if (domWindow) {
-				domWindow.addEventListener("scroll", scrollThrottledListener, { passive: true });
-			}
-			else {
-				console.error("domWindow is undefined - mount");
-			}
-		}, 0);
+		console.log({windowHeight, windowWidth, containerHeightEstimated, itemHeights, domWindow, domContainer, domItems, indexesToRender});
+		if (domWindow) {
+			domWindow.addEventListener("scroll", scrollThrottledListener, { passive: true });
+		}
+		else {
+			console.error("domWindow is undefined - mount");
+		}
 
 		giveUp()
 	})
