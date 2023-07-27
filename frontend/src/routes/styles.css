@@ -279,9 +279,9 @@ img {
 	unicode-bidi: bidi-override
 }
 
-.chatlog__message:hover {
+/* .chatlog__message:hover {
 	background-color: var(--message-hover-bg)
-}
+} */
 
 .chatlog__message:hover .chatlog__short-timestamp {
 	display: block
