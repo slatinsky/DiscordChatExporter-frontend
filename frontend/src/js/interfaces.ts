@@ -33,12 +33,20 @@ export interface Channel {
 	msg_count: number;
 }
 
+export interface Role {
+	id: string;
+	name: string;
+	color: null | string;
+	position: number;
+}
+
 export interface Author {
 	name: string;
 	nickname: string;
 	color: string;
 	isBot: boolean;
 	avatar: Asset;
+	roles?: Role[];
 	_id: string;
 }
 
@@ -50,7 +58,7 @@ export interface Sticker {
 }
 
 export interface Emoji {
-	id: string;
+	_id: string;
 	name: string;
 	isAnimated: boolean;
 	image: Asset;
@@ -58,9 +66,18 @@ export interface Emoji {
 	guildId: string | null;
 }
 
+export interface ReactionUser {
+	name: string;
+	nickname: string;
+	isBot: boolean;
+	avatar: Asset;
+	_id: string;
+}
+
 export interface Reaction {
 	emoji: Emoji;
 	count: number;
+	users?: ReactionUser[];
 }
 
 export interface Mention {

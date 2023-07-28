@@ -1008,3 +1008,17 @@ img {
 	background-clip: padding-box !important;
 	border: 3px solid rgba(0, 0, 0, 0) !important;
 }
+
+#reactions-list::-webkit-scrollbar {
+	width: 10px !important;
+}
+#reactions-list::-webkit-scrollbar-track-piece {
+	background-color: #2b2d31 !important;
+}
+
+
+
+#reaction-users::-webkit-scrollbar {
+	width: 10px !important;
+}
+

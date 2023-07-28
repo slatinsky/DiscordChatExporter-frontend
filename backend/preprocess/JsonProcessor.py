@@ -183,6 +183,11 @@ class JsonProcessor:
 
 						reaction["emoji"]["image"] = self.asset_processor.process(reaction["emoji"].pop("imageUrl"))
 
+					if "users" in reaction:
+						for user in reaction["users"]:
+							user["_id"] = pad_id(user.pop("id"))
+							user["avatar"] = self.asset_processor.process(user.pop("avatarUrl"))
+
 			new_attachments = []
 			if "attachments" in message:
 				for attachment in message["attachments"]:
