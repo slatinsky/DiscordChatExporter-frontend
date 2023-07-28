@@ -10,51 +10,34 @@
 	import { channelScrollPosition } from "src/components/settings/settingsStore";
 	import { onMount } from "svelte";
 
-	let startPosition = 0;
+	$: startPosition = $channelScrollPosition === "bottom" ? data.messages.length - 1 : 0;
 
 	let previousScrollTop = 0;
-	function tryToScrollToMessageId(messageId: string) {
-		console.log("tryToScrollToMessageId", messageId);
-		const element = document.querySelector(`#messages [data-message-id='${messageId}']`)
-		if (element) {
-			const absoluteElement = element.closest(".scroll-absolute-element");
-			if (absoluteElement) {
-				const currentScrollTop = element.offsetTop;  // scroll only if element position was updated
-				if (currentScrollTop !== previousScrollTop || currentScrollTop === 0) {
-					console.log("scrolling to message", currentScrollTop, previousScrollTop);
-					absoluteElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-				}
-			}
-
-			previousScrollTop = element.offsetTop;
-		}
-	}
 
 	// hashchange event listener
 	function updateStartPosition() {
 		const hash = window.location.hash;
 		console.log("hashchange", hash);
 
-		// try to find message with given ID
-		const index = data.messages.findIndex(m => m._id === hash.slice(1));
-		if (index !== -1) {
-			startPosition = index;
-			console.log("hash message found at index", index);
-
-			let timeouts = [0, 300, 500, 1000, 1500, 2000];
-			// use for loop
-			for (let i = 0; i < timeouts.length; i++) {
-				setTimeout(() => {
-					tryToScrollToMessageId(hash.slice(1));
-				}, timeouts[i]);
+		if (hash) {
+			// hash is message id
+			let index = data.messages.findIndex(m => m._id === hash.slice(1));
+			if (index !== -1) {
+				startPosition = index;
 			}
-		}
-		else {
-			console.log("hash message not found");
-			startPosition = $channelScrollPosition === "bottom" ? data.messages.length - 1 : 0
 		}
 	}
 	$: data.messages, updateStartPosition()
+
+	let jumpToIndex
+
+	$: if (jumpToIndex) {
+		jumpToIndex(startPosition)
+	}
+
+	setTimeout(() => {
+		jumpToIndex(50)
+	}, 1000);
 </script>
 
 <svelte:head>
@@ -78,6 +61,7 @@
 				<Scroller
 					itemCount={data.messages.length}
 					startPosition={startPosition}
+					bind:jumpToIndex
 					>
 					<div slot="item" let:index>
 						{#if data.messages[index]}

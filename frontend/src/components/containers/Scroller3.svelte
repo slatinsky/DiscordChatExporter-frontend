@@ -14,6 +14,85 @@
 
 	let renderingDisabled: boolean = false   // disable rendering of new items
 
+	let highlightedIndex: number = -1
+
+	let mounted: boolean = false
+
+	export async function jumpToIndex(index: number) {
+		if (itemCount <= index) {
+			console.error("jumpToIndex   itemCount <= index", itemCount, index);
+			return
+		}
+		if (index < 0) {
+			console.error("jumpToIndex   index < 0", index);
+			return
+		}
+		console.log("jumpToIndex", index);
+		
+		await new Promise(resolve => {  // await mounted = true
+			const interval = setInterval(() => {
+				if (mounted) {
+					clearInterval(interval)
+					resolve(null)
+				}
+			}, 5);
+		});
+		await tick();
+
+		if (domWindow) {
+			// scroll to estimated position
+			const estimatedOffset = itemOffsets[index] || itemEstimatedHeight * index
+			domWindow.scrollTop = estimatedOffset
+			await tick();
+			await new Promise(r => setTimeout(r, 100));
+
+			highlightedIndex = index
+
+			while (true) {
+				let minRenderedIndex = Math.min(...indexesToRender)
+				let maxRenderedIndex = Math.max(...indexesToRender)
+
+				// go up if needed
+				if (index < minRenderedIndex) {
+					// scroll up
+					domWindow.scrollTop -= windowHeight
+				}
+				// go down if needed
+				else if (index > maxRenderedIndex) {
+					// scroll down
+					domWindow.scrollTop += windowHeight
+				}
+				else {
+					break
+				}
+
+				await tick();
+
+				await new Promise(r => setTimeout(r, 100));
+			}
+
+
+			await tick();
+
+			await new Promise(r => setTimeout(r, 100));
+
+			// scroll to exact position
+			domWindow.scrollTop = itemOffsets[index] + itemHeights[index] / 2 - windowHeight / 2
+
+			await new Promise(r => setTimeout(r, 500));
+
+			domWindow.scrollTop = itemOffsets[index] + itemHeights[index] / 2 - windowHeight / 2  // there has to be a better way to do this
+
+			await new Promise(r => setTimeout(r, 6000));
+
+			highlightedIndex = -1
+
+		}
+		else {
+			console.error("domWindow is undefined - jumpToIndex");
+		}
+	}
+
 	// observed heights and widths of divs
 	let windowHeight: number | undefined
 	let windowWidth: number | undefined
@@ -332,6 +411,8 @@
 		}
 
 		giveUp()
+
+		mounted = true
 	})
 
 	onDestroy(() => {
@@ -347,7 +428,7 @@
 <div class="scroll-window" use:resizeObserver={element => updatedWindowWidthHeight(element.clientWidth, element.clientHeight)} bind:this={domWindow} style={"height:calc(100dvh - " + negativeHeight + "px)"}>
 	<div class="scroll-container" style="height: {containerHeightEstimated}px;position:relative;" bind:this={domContainer}>
 		{#each indexesToRender as messageIndex (messageIndex)}
-			<div class="scroll-absolute-element" data-index={messageIndex} style={"position: absolute; left: 0px; width:100%;top:" + (itemOffsets[messageIndex] || 0) + "px"} class:center={centerItemIndex == messageIndex} bind:this={domItems[messageIndex]} use:resizeObserver={element => updatedItemHeight(messageIndex, element.clientHeight)} >
+			<div class="scroll-absolute-element" data-index={messageIndex} style={"position: absolute; left: 0px; width:100%;top:" + (itemOffsets[messageIndex] || 0) + "px"} class:highlight={highlightedIndex == messageIndex} class:center={centerItemIndex == messageIndex} bind:this={domItems[messageIndex]} use:resizeObserver={element => updatedItemHeight(messageIndex, element.clientHeight)} >
 				<slot name="item" index={messageIndex} />
 			</div>
 		{/each}
@@ -361,6 +442,10 @@
 	overflow-x: hidden;
 	position: relative;
 	width: 100%;
+}
+
+.highlight {
+	background-color: #4e4913 !important;
 }
 
 /*DEBUG ONLY - highlight center item*/
