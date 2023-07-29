@@ -16,7 +16,7 @@ class FileFinder():
 		for filename in glob.glob(directory + '**/*.json', recursive=True):
 			if filename.endswith('.json'):
 				# ignore attachment files - they are made by users, not DiscordChatExporter
-				if re.search(r"([A-F0-9]{5})\.json$", filename) != None:
+				if re.search(r"([a-fA-F0-9]{5})\.json$", filename) != None:
 					continue
 
 				# ignore channel_info.json
@@ -37,7 +37,7 @@ class FileFinder():
 	def find_local_assets(self):
 		input_directory = self.base_directory
 		all_files = {}
-		regex_pattern = re.compile(r'.+\-[A-F0-9]{5}(?:\..+)?')
+		regex_pattern = re.compile(r'.+\-[a-fA-F0-9]{5}(?:\..+)?')
 		for path in glob.glob(input_directory + '**/*', recursive=True):
 			if regex_pattern.match(path):
 				filename = os.path.basename(path)

@@ -104,7 +104,7 @@ class AssetProcessor:
 		"""
 		removes hash from filename
 		"""
-		return re.sub(r'-[A-F0-9]{5}(?=\..+)?$', '', filename)
+		return re.sub(r'-[a-fA-F0-9]{5}(?=\..+)?$', '', filename)
 
 	def get_colors(self, path: str, local_path_exists: bool, filetype: str):
 		"""
