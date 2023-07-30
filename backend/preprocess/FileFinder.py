@@ -1,6 +1,7 @@
 import glob
 import re
 import os
+import traceback
 
 class FileFinder():
 	"""
@@ -23,14 +24,21 @@ class FileFinder():
 				if filename.endswith('channel_info.json'):
 					continue
 
-				# quick check if file is a export made by DiscordChatExporter
-				with open(filename, encoding='utf-8') as file:
-					first_16_bytes = file.read(16)
-					if first_16_bytes.find("guild") == -1:
-						print("invalid file " + filename)
-						continue
-				filename_without_base_directory = self.remove_base_directory(filename)
-				files.append(filename_without_base_directory)
+				try:
+					# quick check if file is a export made by DiscordChatExporter
+					with open(filename, encoding='utf-8') as file:
+						first_16_bytes = file.read(16)
+						if first_16_bytes.find("guild") == -1:
+							print("invalid file " + filename)
+							continue
+					filename_without_base_directory = self.remove_base_directory(filename)
+					files.append(filename_without_base_directory)
+
+				except Exception as e:
+					# we don't want to crash the program if a file is unreadable
+					# just print the error and continue
+					print("error while reading file " + filename)
+					print(traceback.format_exc())
 
 		return files
 
