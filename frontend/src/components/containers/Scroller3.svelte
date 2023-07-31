@@ -182,9 +182,9 @@
 		const lowestOffset = Math.min(...Object.values(itemOffsets))
 		if (lowestOffset < 0) {
 			// move all items up
-			await tick();
-			renderingDisabled = true
-			await tick();
+			// await tick();
+			// renderingDisabled = true
+			// await tick();
 			for (const index in itemOffsets) {
 				itemOffsets[index] -= lowestOffset
 				if (index === centerItemIndex.toString()) {
@@ -192,8 +192,8 @@
 					domWindow?.scrollBy(0, -lowestOffset)
 				}
 			}
-			await tick();
-			renderingDisabled = false
+			// await tick();
+			// renderingDisabled = false
 			await tick();
 			console.warn("fix top items out of bounds by offset", lowestOffset);
 		}
