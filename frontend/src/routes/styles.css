@@ -347,7 +347,8 @@ img {
 
 .chatlog__reference-content {
 	overflow: hidden;
-	text-overflow: ellipsis
+	text-overflow: ellipsis;
+	max-height: 33px;
 }
 
 .chatlog__reference-link {
@@ -355,7 +356,6 @@ img {
 }
 
 .chatlog__reference-link * {
-	display: inline;
 	pointer-events: none
 }
 
