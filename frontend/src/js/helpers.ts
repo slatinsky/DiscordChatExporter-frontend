@@ -80,3 +80,15 @@ export function snowflakeToDate(snowflake: string) {
 	const milliseconds = BigInt(snowflake) >> 22n
 	return new Date(Number(milliseconds) + DISCORD_EPOCH)
 }
+
+export function darkenColor(color: string, amount: number) {
+    let red = parseInt(color.substring(1, 3), 16);
+    let green = parseInt(color.substring(3, 5), 16);
+    let blue = parseInt(color.substring(5, 7), 16);
+
+    let redDarker = Math.round(red * (1 - amount)).toString(16).padStart(2, "0");
+    let greenDarker = Math.round(green * (1 - amount)).toString(16).padStart(2, "0");
+    let blueDarker = Math.round(blue * (1 - amount)).toString(16).padStart(2, "0");
+
+    return "#" + redDarker + greenDarker + blueDarker;
+}

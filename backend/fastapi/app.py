@@ -38,6 +38,7 @@ collection_guilds = db["guilds"]
 collection_authors = db["authors"]
 collection_emojis = db["emojis"]
 collection_assets = db["assets"]
+collection_roles = db["roles"]
 
 app = FastAPI(
 	title="DCEF backend api",
@@ -138,6 +139,45 @@ async def get_channels(guild_id: str = None, channel_id: str = None):
 			}
 		}
 	)
+	return list(cursor)
+
+
+@app.get("/roles")
+async def get_roles(guild_id: str = None, role_id: str = None):
+	"""
+	Returns a list of all roles.
+
+	Optionally, a guild_id query parameter can be provided to filter by guild.
+	Optionally, a role_id query parameter can be provided to get only specific role.
+	"""
+	if guild_id:
+		if guild_id in blacklisted_guild_ids:
+			return []
+
+		cursor = collection_roles.find({"guildId": guild_id})
+		return list(cursor)
+
+	if role_id:
+		role = collection_roles.find_one(
+			{
+				"_id": role_id,
+				"guildId": {
+					"$nin": blacklisted_guild_ids
+				}
+			}
+		)
+		if not role:
+			return {"message": "Not found"}
+		return role
+
+	# order by position desc
+	cursor = collection_roles.find(
+		{
+			"guildId": {
+				"$nin": blacklisted_guild_ids
+			}
+		}
+	).sort([("position", pymongo.DESCENDING)])
 	return list(cursor)
 
 

@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { checkUrl } from "src/js/helpers";
+	import { checkUrl, darkenColor } from "src/js/helpers";
 	import type { Emoji } from "src/js/interfaces";
     import { get } from "svelte/store";
     import { online } from "src/components/settings/settingsStore";
 	import { searchPrompt } from "../search/searchStores";
-	import { getChannelInfo } from "src/js/api";
-
+	import { getChannelInfo, getRoleInfo } from "src/js/api";
 
 
     export let content: string
@@ -136,6 +135,19 @@
 
                     let channelInfo = await getChannelInfo(channelId)
                     processedContent = processedContent.replace(fullMatch, `<a class="message-mention" href="/channels/${guildId}/${channelId.toString().padStart(24, '0')}">${channelIcon} ${channelInfo.name} </a>`)
+                }
+            }
+
+            // roles
+            let rolecRegex = /&(\d{17,32})/
+            while (rolecRegex.test(processedContent)) {
+                let matches = processedContent.match(rolecRegex)
+                if (matches) {
+                    let roleId = matches[1]
+                    let fullMatch = matches[0]
+
+                    let roleInfo = await getRoleInfo(roleId)
+                    processedContent = processedContent.replace(fullMatch, `<span class="message-mention" style="color:${roleInfo.color};background-color:${darkenColor(roleInfo.color, .65)} !important">@${roleInfo.name}</span>`)
                 }
             }
         }

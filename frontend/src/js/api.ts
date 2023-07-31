@@ -28,3 +28,27 @@ export async function getChannelInfo(channelId: string): Promise<Channel> {
 
     return json;
 }
+
+
+export async function getRoleInfo(roleId: string) {
+    if (!roleId) {
+        return {
+            "color":"#d4e0fc",
+            "_id":"000000000000000000000000",
+            "name":"Unknown role",
+        };
+    }
+    const paddedRoleId = roleId.padStart(24, "0");
+    const response = await fetch(`/api/roles?role_id=${paddedRoleId}`);
+    const json = await response.json();
+
+    if (!json._id) {
+        return {
+            "color":"#d4e0fc",
+            "_id":roleId,
+            "name":"Unknown role",
+        };
+    }
+
+    return json;
+}
