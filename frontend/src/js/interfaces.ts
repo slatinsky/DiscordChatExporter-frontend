@@ -34,7 +34,7 @@ export interface Channel {
 }
 
 export interface Role {
-	id: string;
+	_id: string;
 	name: string;
 	color: null | string;
 	position: number;
