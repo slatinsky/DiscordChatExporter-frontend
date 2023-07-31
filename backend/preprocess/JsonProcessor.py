@@ -23,6 +23,7 @@ class JsonProcessor:
 		self.collection_authors = self.database.get_collection("authors")
 		self.collection_emojis = self.database.get_collection("emojis")
 		self.collection_assets = self.database.get_collection("assets")
+		self.collection_roles = self.database.get_collection("roles")
 		self.collection_jsons = self.database.get_collection("jsons")
 		self.file_finder = file_finder
 		self.asset_processor = asset_processor
@@ -68,6 +69,9 @@ class JsonProcessor:
 			message["_id"] = pad_id(message.pop("id"))
 			if "author" in message:
 				message["author"]["_id"] = pad_id(message["author"].pop("id"))
+				if "roles" in message["author"]:
+					for role in message["author"]["roles"]:
+						role["_id"] = pad_id(role.pop("id"))
 			if "stickers" in message:
 				for sticker in message["stickers"]:
 					sticker["_id"] = pad_id(sticker.pop("id"))
@@ -142,7 +146,6 @@ class JsonProcessor:
 						# deduplicate embed.images by url, unique value is image url
 						unique_images = []
 						for image in embed["images"]:
-							print(image)
 							if image["url"] not in [x["url"] for x in unique_images]:
 								unique_images.append(image)
 						embed["images"] = unique_images
@@ -278,6 +281,25 @@ class JsonProcessor:
 
 		return emojis_list
 
+	def process_roles(self, messages: list, guild_id: str) -> list:
+		roles = {}  # role_id -> role_object
+
+		for message in messages:
+			if "author" in message:
+				author = message["author"]
+
+				if "roles" in author:
+					for role in author["roles"]:
+						role_id = role["_id"]
+
+						if role_id in roles:
+							# role already exists, ignore
+							continue
+
+						role["guildId"] = guild_id
+						roles[role_id] = role
+
+		return list(roles.values())
 
 	def insert_guild(self, guild):
 		database_document = self.collection_guilds.find_one({"_id": guild["_id"]})
@@ -348,6 +370,13 @@ class JsonProcessor:
 			}
 		})
 
+	def insert_role(self, role):
+		database_document = self.collection_roles.find_one({"_id": role["_id"]})
+
+		if database_document == None:
+			# new role
+			self.collection_roles.insert_one(role)
+			return
 
 
 	def insert_message(self, message):
@@ -380,7 +409,7 @@ class JsonProcessor:
 					"timestamp": latest_timestamp,
 					"content": content
 				})
-				print(database_document["content"])
+				# print(database_document["content"])
 				# update database
 				self.collection_messages.update_one({"_id": message["_id"]}, {"$set": database_document})
 			return
@@ -484,6 +513,7 @@ class JsonProcessor:
 		messages = self.process_messages(json_data["messages"], guild["_id"], channel["_id"], channel["name"])
 		authors = self.process_authors(json_data["messages"], guild["_id"])
 		emojis = self.process_emojis(json_data["messages"])
+		roles = self.process_roles(json_data["messages"], guild["_id"])
 
 		# channel needs to be inserted before messages,
 		# because we count the messages per channel in insert_message()
@@ -503,5 +533,8 @@ class JsonProcessor:
 
 		for emoji in emojis:
 			self.insert_emoji(emoji, guild["_id"])
+
+		for role in roles:
+			self.insert_role(role)
 
 		self.mark_as_processed(self.json_path)

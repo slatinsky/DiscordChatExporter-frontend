@@ -20,6 +20,7 @@ class MongoDatabase():
 			"emojis": self.database["emojis"],
 			"jsons": self.database["jsons"],
 			"assets": self.database["assets"],
+			"roles": self.database["roles"],
 			"jsons": self.database["jsons"],
 			"config": self.database["config"],
 		}
