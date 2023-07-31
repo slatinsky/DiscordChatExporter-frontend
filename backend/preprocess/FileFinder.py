@@ -34,6 +34,10 @@ class FileFinder():
 					filename_without_base_directory = self.remove_base_directory(filename)
 					files.append(filename_without_base_directory)
 
+				except PermissionError:
+					print("permission error while reading file " + filename)
+					print(traceback.format_exc())
+
 				except Exception as e:
 					# we don't want to crash the program if a file is unreadable
 					# just print the error and continue
