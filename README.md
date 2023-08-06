@@ -2,46 +2,51 @@
 
 # DiscordChatExporter-frontend (DCEF)
 
-Browse your [Discord chat exports](https://github.com/Tyrrrz/DiscordChatExporter) in a familiar discord like user interface. [Try a demo in your browser :)](https://dcef.slada.sk/).
+Browse your [Discord chat exports](https://github.com/Tyrrrz/DiscordChatExporter) in a single discord like user interface. [Try a demo in your browser :)](https://dcef.slada.sk/).
+
+## Features
+
+- browse multiple servers, channels, threads and forum posts in a single web based user interface
+- search messages in a server with autocomplete
+- optimized to handle really large exports well
+- customizability - change font and many other things in settings
+- self hosting option - you can host DCEF on your own server and share it with your friends. Web interface is mobile friendly too
 
 > Want to chat? Join [Tyrrrz's discord server](https://discord.gg/2SUWKFnHSm). I usually hang out in `#dce-frontend` channel
 
-## Downloads
-
-[Windows (stable binary release)](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
-
-[Linux (docker image)](https://hub.docker.com/r/slada/dcef)
-
 ## Quick start (Windows)
 
-1. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
-2. Extract the archive
-3. Move your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) JSON exports to `/exports/` folder ([supported exports](#supported-exports)).
-4. Run `dcef.exe`
+1. Export your data from Discord using [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter/tree/master/.docs). Your export should be in JSON format, disable `format markdown` option and enable `download assets` and `reuse assets` options. If exporting using a CLI - use `--media --reuse-media --markdown false --format Json` command line options. More information in [How to export data from Discord to view it in DCEF?](#supported-exports)
+2. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
+3. Extract the archive
+4. Move your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) JSON exports to `/exports/` folder ([supported exports](#supported-exports)).
+5. Run `dcef.exe`
 
 ## Quick start (Linux)
 
 
 Docker version is the best way to [host the viewer on a server](docs/Server-hosting.md) for others to use.
 
-1. pull the image from docker hub
+1. Export your data using [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter/blob/master/.docs/Getting-started.md#using-the-cli). Use `--media --reuse-media --markdown false --format Json` command line options.
+
+2. Pull the image from docker hub
 
 ```bash
 docker pull slada/dcef:main
 ```
 
-2. Navigate to a folder with your exports
+3. Navigate to a folder with your exports
 
 ```bash
 cd /path/to/your/exports
 ```
 
-3. Run the container
+4. Run the container
 ```bash
 docker run --restart=always --volume "$(pwd):/dcef/exports" --volume dcef_cache:/dcef/cache --rm --name dcef -p 21011:21011 -it slada/dcef:main
 ```
 
-4. Open `http://127.0.0.1:21011/` in your browser
+5. Open `http://127.0.0.1:21011/` in your browser
 
 **Note:** arm based systems like Raspberry Pi or Apple M1 are not officially supported. Pull requests are welcome :)
 
@@ -131,6 +136,11 @@ docker image rm slada/dcef:main
 
 JSON exports are created using [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter).
 
+> - JSON export format (`--format Json`) is required
+> - Skipping markdown prerendering (`--markdown false`) is highly recommended, but not required
+> - Downloading assets (`--media --reuse-media`) is highly recommended, but not required
+
+
 <details><summary><b>Partial export using GUI version of DiscordChatExporter</b></summary>
 
 Make sure that export format is set to `JSON` and `Format markdown` is disabled. Optionally, you should also enable `Download assets`+`Reuse assets` option to download images, videos and other types of assets.
@@ -143,15 +153,11 @@ Make sure that export format is set to `JSON` and `Format markdown` is disabled.
 
 
 
-<details><summary><b>Full guild export using CLI version of DiscordChatExporter</b></summary>
+<details><summary><b>Full server export using CLI version of DiscordChatExporter</b></summary>
 
-> - JSON export format (`--format Json`) is required
-> - Downloading assets (`--media --reuse-media`) is highly recommended, but not required
-> - Skipping markdown prerendering (`--markdown false`) is highly recommended, but not required
-
-Export all accessible channels in a guild (**without threads and forum posts**):
+Export all accessible channels in a server (**without threads and forum posts**):
 ```bash
-DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g GUILD_ID --media --reuse-media --markdown false --format Json --output OUTPUT_FOLDER_PATH
+DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g SERVER_ID --media --reuse-media --markdown false --format Json --output OUTPUT_FOLDER_PATH
 ```
 
 Export threads/forum posts (you can pass multiple thread/forum post ids):
@@ -199,6 +205,8 @@ Files in `/exports/` folder may exceed Windows path length limit of 260 characte
 
 DCEF is not just an simple viewer. This process enriches your exports with additional data and stores them in a database for search and other features to work.
 
+Impatient? Navigate to `http://127.0.0.1:21011/` in your browser to see already processed exports.
+
 </details>
 
 
@@ -207,6 +215,8 @@ DCEF is not just an simple viewer. This process enriches your exports with addit
 [This pull request](https://github.com/slatinsky/DiscordChatExporter-frontend/pull/30) may help you
 
 </details>
+
+
 
 
 ## For developers
@@ -228,8 +238,9 @@ And for other technologies used in this project - sveltekit, docker, nodejs, nvm
 
 ## Related projects
 
+- [Discord chat exports](https://github.com/Tyrrrz/DiscordChatExporter) - exporter for your Discord chats
 - [Roachbones/discordless](https://github.com/Roachbones/discordless) - real time man-in-the-middle exporter
-- [mlomb/chat-analytics](https://github.com/mlomb/chat-analytics) - analytics for your Discord chats.
+- [mlomb/chat-analytics](https://github.com/mlomb/chat-analytics) - analytics for your Discord chats
 
 ## License
 GNU GENERAL PUBLIC LICENSE. See [LICENSE](LICENSE) for more details.
@@ -241,11 +252,15 @@ DiscordChatExporter-frontend is not affiliated with Discord. Discord is a regist
 ## Contributing
 Feel free to open issues and pull requests.
 
-### Short guide, how to contribute
+<details><summary><b>Short guide, how to contribute</b></summary>
+
 - Fork the repository
 - Create a new branch
 - Implement your changes
-- Commit and push the changes
+- Commit and push your changes
 - Create a pull request
 
-If you find this project useful, please consider starring it here on GitHub :)
+</details>
+
+
+If you find this project useful, give it a star ⭐. Thank you!
