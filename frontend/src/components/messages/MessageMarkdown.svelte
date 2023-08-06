@@ -5,6 +5,7 @@
     import { online } from "src/components/settings/settingsStore";
 	import { searchPrompt } from "../search/searchStores";
 	import { getChannelInfo, getRoleInfo } from "src/js/api";
+	import { renderTimestamp } from "src/js/time";
 
 
     export let content: string
@@ -84,6 +85,33 @@
             if (processedContent.includes('https://cdn.discordapp.com/emojis/')) {
                 console.warn('intentionally breaking emoji link (https->hxxps), because you wish to view your exports offline only. If you want to view the emoji, please set the "offline only" setting to false.');
                 processedContent = processedContent.replaceAll('https://cdn.discordapp.com/emojis/', 'hxxps://cdn.discordapp.com/emojis/')
+            }
+        }
+
+        // Render timestamps
+        // possible timestamp types (https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa):
+        // Default	        <t:1543392060>    November 28, 2018 9:01 AM             28 November 2018 09:01
+        // Short Time       <t:1543392060:t>  9:01 AM                               09:01
+        // Long Time        <t:1543392060:T>  9:01:00 AM                            09:01:00
+        // Short Date       <t:1543392060:d>  11/28/2018                            28/11/2018
+        // Long Date        <t:1543392060:D>  November 28, 2018                     28 November 2018
+        // Short Date/Time  <t:1543392060:f>  November 28, 2018 9:01 AM             28 November 2018 09:01
+        // Long Date/Time   <t:1543392060:F>  Wednesday, November 28, 2018 9:01 AM  Wednesday, 28 November 2018 09:01
+        // Relative Time    <t:1543392060:R>  3 years ago                           3 years ago
+        let timeRegex = /&lt;t:(\d{1,10})(?::([tTdfFR]))?&gt;/
+        while (timeRegex.test(processedContent)) {
+            let matches = processedContent.match(timeRegex)
+            if (matches) {
+                let fullMatch = matches[0]
+                let timestamp = Number(matches[1])
+                let timestampType = ""
+                if (matches[2]) {
+                    timestampType = matches[2]
+                }
+
+                // TOOD: render other types than default
+                let timeString = renderTimestamp(timestamp * (1000))
+                processedContent = processedContent.replace(fullMatch, `<span class="message-time" data-timestamp="${timestamp}" data-timestamp-type="${timestampType}" >${timeString}</span>`)
             }
         }
 
@@ -189,6 +217,12 @@
         color: #D4E0FC;
         background-color: #414675;
         font-weight: 500;
+    }
+    :global(.message-time) {
+        color: #d1d4d6;
+        background-color: #3A3C41;
+        border-radius: 3px;
+        padding: 0 2px;
     }
     :global(blockquote) {
         border-left: 5px solid #4F545C;
