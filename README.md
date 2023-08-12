@@ -19,7 +19,7 @@ Browse your [Discord chat exports](https://github.com/Tyrrrz/DiscordChatExporter
 1. Export your data from Discord using [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter/tree/master/.docs). Your export should be in JSON format, disable `format markdown` option and enable `download assets` and `reuse assets` options. If exporting using a CLI - use `--media --reuse-media --markdown false --format Json` command line options. More information in [How to export data from Discord to view it in DCEF?](#supported-exports)
 2. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
 3. Extract the archive
-4. Move your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) JSON exports to `/exports/` folder ([supported exports](#supported-exports)).
+4. Move all your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/exports/` folder ([supported exports](#supported-exports)).
 5. Run `dcef.exe`
 
 ## Quick start (Linux)
@@ -296,7 +296,7 @@ And for other technologies used in this project - sveltekit, docker, nodejs, nvm
 
 ## Related projects
 
-- [Discord chat exports](https://github.com/Tyrrrz/DiscordChatExporter) - exporter for your Discord chats
+- [Tyrrrz/DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) - exporter for your Discord chats
 - [Roachbones/discordless](https://github.com/Roachbones/discordless) - real time man-in-the-middle exporter
 - [mlomb/chat-analytics](https://github.com/mlomb/chat-analytics) - analytics for your Discord chats
 
