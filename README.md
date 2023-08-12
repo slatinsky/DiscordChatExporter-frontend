@@ -190,7 +190,32 @@ DiscordChatExporter.Cli.exe exportdm --token DISCORD_TOKEN --media --reuse-media
 
 ## FAQ
 
-<details><summary><b>Some assets are not showing on Windows</b></summary>
+<details><summary><b>No servers show up / troubleshooting steps</b></summary>
+
+See logs (Windows `dcef/logs.txt`, Linux `docker logs dcef`) for more info.
+
+[Windows only] Please check, if the top of the log contains line `windows-runner: OK: All required ports are available.`. DCEF needs ports `21011`, `21013`, `27017`, `58000` to be available. If you have any of these ports occupied, DCEF won't start or won't work properly.
+
+[All platforms] Find line `found X json channel exports` - if this number is 0, you don't have any valid exports in `/exports/` folder.
+
+[All platforms] Find if there is line `done` (at the end of lines `processing <PATH_TO_JSON_FILE>`) - if you see this line, preprocessing step finished successfully. If you don't see this line, please check if there is any stacktrace in the logs. Stacktrace looks like this:
+
+```
+Traceback (most recent call last):
+  File "dcef/backend/preprocess/main_mongo.py", line 82, in <module>
+    main(input_dir, output_dir)
+  File "dcef/backend/preprocess/main_mongo.py", line 67, in main
+    raise Exception("Example stack trace exception")
+Exception: Example stack trace exception
+```
+
+Please [report this issue](https://github.com/slatinsky/DiscordChatExporter-frontend/issues/new) with the stacktrace attached.
+
+[Windows] If no other solution works for you, run Docker version of DCEF.
+
+</details>
+
+<details><summary><b>Some assets won't diplay on Windows / Windows path length limit</b></summary>
 
 Files in `/exports/` folder may exceed Windows path length limit of 260 characters. If you have any issues with loading your assets you can choose one of the following solutions:
 - move DCEF to a folder with shorter path
@@ -198,8 +223,26 @@ Files in `/exports/` folder may exceed Windows path length limit of 260 characte
 
 </details>
 
+<details><summary><b>Assets won't display after moving them / how to clear cache</b></summary>
 
-<details><summary><b>DCEF hangs and prints `Slow SessionWorkflow loop` to the console</b></summary>
+After you put your export to `/exports/` folder, don't remove them. DCEF keeps track of assets and if you remove or move them, they won't show up in DCEF, because the old path would become invalid.
+
+**TL;DR - only adding new files to `/exports/` folder is supported. If you want to remove or move files, you need to clear cache afterwards.**
+
+Clearing cache on Windows:
+- close DCEF
+- delete `dcef/backend/mongodb/db` folder
+- start DCEF again
+
+Clearing cache on Linux:
+- kill DCEF container
+- remove `dcef_cache` volume (`docker volume rm dcef_cache`)
+- start DCEF container again
+
+</details>
+
+
+<details><summary><b>DCEF hangs and prints `Slow SessionWorkflow loop` to the console / long preprocessing time</b></summary>
 
 `Slow SessionWorkflow loop` messages are completely normal - if you see them, you know that data is pushed to mongodb database and the process is not stuck. Just be patient and wait for the process to finish. If you have a lot of exports, it may take a while.
 
@@ -216,6 +259,21 @@ Impatient? Navigate to `http://127.0.0.1:21011/` in your browser to see already 
 
 </details>
 
+<details><summary><b>DCEF is detected as a malware</b></summary>
+
+DCEF is not a malware. It's a false positive. The project is open source, you can check the source code yourself.
+
+The windows release is exactly the same as the ones built on Github's servers by [github actions](https://github.com/slatinsky/DiscordChatExporter-frontend/blob/main/.github/workflows/windows-build.yml). Executables (`nginx.exe`, `mongod.exe`) are sourced from their official websites. I upload releases manually, but the zip is exactly the same as the last successful build on github actions.
+
+Docker image is built on Github's servers github actions [github actions](https://github.com/slatinsky/DiscordChatExporter-frontend/blob/main/.github/workflows/docker-image.yml) too. This action directly uploads the image to docker hub.
+
+But the project uses a lot of dependencies - it is susceptible to supply chain attack such as dependency hijacking. If you find anything suspicious in dependencies used, please let me know.
+
+Tinfoil hat on? Replace `nginx.exe`, `mongod.exe`, `msvcp140.dll` and `vcruntime140_1.dll` with your own trusted copy. Then compile your own version from source code. The easiest way to compile is to run github action on your own fork.
+
+[Related discussion #13](https://github.com/slatinsky/DiscordChatExporter-frontend/discussions/13)
+
+</details>
 
 
 
