@@ -6,7 +6,8 @@
 </script>
 
 {#each attachments as attachment}
-	{#if attachment.type == 'image'}
+	<!-- unknown because attachment name can be extensionless -->
+	{#if attachment.type == 'image' || attachment.type == 'unknown'}
 		<div class="chatlog__attachment">
 			<ImageGallery asset={attachment} imgclass={"chatlog__attachment-media"} />
 		</div>

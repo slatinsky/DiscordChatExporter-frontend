@@ -109,7 +109,8 @@
 										width="{embed.thumbnail?.width ?? 16}"
 										height="{embed.thumbnail?.height ?? 16}"/>
 									</a>
-								{:else if embed.thumbnail?.type === 'image'}
+								<!-- unknown because embed can be extensionless and image is the most common thumbnail -->
+								{:else if embed.thumbnail?.type === 'image' || embed.thumbnail?.type === 'unknown'}
 									<ImageGallery asset={embed.thumbnail} imgclass={"chatlog__embed-thumbnail"} />
 								{/if}
 						</div>

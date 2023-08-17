@@ -49,11 +49,16 @@ class FileFinder():
 	def find_local_assets(self):
 		input_directory = self.base_directory
 		all_files = {}
-		regex_pattern = re.compile(r'.+\-[a-fA-F0-9]{5}(?:\..+)?')
+		# file can be extensionless and without a dash
+		# valid file names
+		#  - `magic-1ED77.jpg`
+		#  - `D8ADB`
+		regex_pattern = re.compile(r'.+(\-|\/)[a-fA-F0-9]{5}(?:\..+)?')
 		for path in glob.glob(input_directory + '**/*', recursive=True, include_hidden=True):
+			path = path.replace('\\', '/')
 			if regex_pattern.match(path):
 				filename = os.path.basename(path)
-				all_files[filename] = path.replace('\\', '/')
+				all_files[filename] = path
 
 		return all_files
 
