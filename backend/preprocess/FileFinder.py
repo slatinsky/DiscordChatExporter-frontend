@@ -17,7 +17,7 @@ class FileFinder():
 		for filename in glob.glob(directory + '**/*.json', recursive=True):
 			if filename.endswith('.json'):
 				# ignore attachment files - they are made by users, not DiscordChatExporter
-				if re.search(r"([a-fA-F0-9]{5})\.json$", filename) != None:
+				if re.search(r"-([a-fA-F0-9]{5})\.json$", filename) != None:
 					continue
 
 				# ignore channel_info.json
