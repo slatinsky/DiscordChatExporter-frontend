@@ -14,7 +14,7 @@ class FileFinder():
 		print("finding channel exports in " + self.base_directory)
 		directory = self.base_directory
 		files = []
-		for filename in glob.glob(directory + '**/*.json', recursive=True):
+		for filename in glob.glob(directory + '**/*.json', recursive=True, include_hidden=True):
 			if filename.endswith('.json'):
 				# ignore attachment files - they are made by users, not DiscordChatExporter
 				if re.search(r"-([a-fA-F0-9]{5})\.json$", filename) != None:
@@ -50,7 +50,7 @@ class FileFinder():
 		input_directory = self.base_directory
 		all_files = {}
 		regex_pattern = re.compile(r'.+\-[a-fA-F0-9]{5}(?:\..+)?')
-		for path in glob.glob(input_directory + '**/*', recursive=True):
+		for path in glob.glob(input_directory + '**/*', recursive=True, include_hidden=True):
 			if regex_pattern.match(path):
 				filename = os.path.basename(path)
 				all_files[filename] = path.replace('\\', '/')

@@ -66,7 +66,7 @@ class AssetProcessor:
 		try:
 			return imagesize.get(path)
 		except:
-			print("Error: Could not get image size of " + path)
+			print("Warning: Could not get image size of " + path)
 			return None, None
 
 	def get_file_size(self, local_path_exists: bool, path: str) -> int:
@@ -153,7 +153,7 @@ class AssetProcessor:
 		if filename_with_hash in self.local_assets:
 			return self.local_assets[filename_with_hash]
 		else:
-			print("Error: Could not find local path of " + filename_with_hash)
+			print("Warning: Could not find local path of " + filename_with_hash)
 			return None
 
 	def process(self, original_filepath: str):
