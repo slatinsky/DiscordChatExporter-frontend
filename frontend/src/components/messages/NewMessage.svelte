@@ -185,6 +185,10 @@
 	}
 
 	let authorModal: AuthorModal;
+
+	function generateAvatar(el: HTMLElement, authorId: string) {
+		el.src = identicons.generateSVGDataURIString(authorId, { width: 200, size: 3 })
+	}
 </script>
 
 <!-- Rewritten https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/Html/MessageGroupTemplate.cshtml to svelte -->
@@ -321,10 +325,10 @@
 									on:click={authorModal.viewAuthor()}
 									class='chatlog__avatar'
 									src={checkUrl(message.author?.avatar)}
-									alt="Avatar"
+									alt=""
 									width="100%"
 									height="100%"
-									onerror="this.style.visibility='hidden'"
+									on:error={generateAvatar(this, message.author._id)}
 								/>
 								{:else}
 									<img class="chatlog__avatar" src={identicons.generateSVGDataURIString(message.author._id, { width: 200, size: 3 })} />
