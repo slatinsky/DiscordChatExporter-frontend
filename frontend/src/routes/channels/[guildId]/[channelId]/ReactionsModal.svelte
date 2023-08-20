@@ -8,9 +8,6 @@
 
     let activeReaction: Reaction
 
-    console.log(reactions);
-    
-
     export function viewReactions(reaction: Reaction) {
         activeReaction = reaction;
         console.log("activeReaction", activeReaction);

@@ -34,10 +34,6 @@
 	$: if (jumpToIndex) {
 		jumpToIndex(startPosition)
 	}
-
-	setTimeout(() => {
-		jumpToIndex(50)
-	}, 1000);
 </script>
 
 <svelte:head>

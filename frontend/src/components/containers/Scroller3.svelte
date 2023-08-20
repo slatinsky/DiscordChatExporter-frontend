@@ -40,27 +40,32 @@
 		await tick();
 
 		if (domWindow) {
-			// scroll to estimated position
-			const estimatedOffset = itemOffsets[index] || itemEstimatedHeight * index
-			domWindow.scrollTop = estimatedOffset
 			await tick();
-			await new Promise(r => setTimeout(r, 100));
-
-			highlightedIndex = index
-
 			while (true) {
+				// scroll to estimated position
+				const estimatedOffset = itemOffsets[index] || centerItemOffset - (index - centerItemIndex) * itemEstimatedHeight
+				// domWindow.scrollTop = estimatedOffset
+				await tick();
+				await new Promise(r => setTimeout(r, 100));
+
+				highlightedIndex = index
+
 				let minRenderedIndex = Math.min(...indexesToRender)
 				let maxRenderedIndex = Math.max(...indexesToRender)
 
+				let diff = Math.abs(index - centerItemIndex)
+
 				// go up if needed
 				if (index < minRenderedIndex) {
+					console.log("go up", index, "<", minRenderedIndex, index - minRenderedIndex);
 					// scroll up
-					domWindow.scrollTop -= windowHeight
+					domWindow.scrollTop -= Math.max(diff * itemEstimatedHeight * 0.8, windowHeight || 1000)
 				}
 				// go down if needed
 				else if (index > maxRenderedIndex) {
+					console.log("go down", index, ">", maxRenderedIndex, index - maxRenderedIndex);
 					// scroll down
-					domWindow.scrollTop += windowHeight
+					domWindow.scrollTop += Math.max(diff * itemEstimatedHeight * 0.8, windowHeight || 1000)
 				}
 				else {
 					break
@@ -107,7 +112,9 @@
 	// indexes to render
 	let indexesToRender: number[] = []
 
-	const itemEstimatedHeight = 100
+	// max div size is 33554400px, we cannot exceed this limit
+	const MAX_DIV_SIZE = 33554400
+	const itemEstimatedHeight = Math.min(MAX_DIV_SIZE / itemCount * 0.9, 100)
 	let containerHeightEstimated = itemEstimatedHeight * itemCount
 
 	function scrollListener() {
