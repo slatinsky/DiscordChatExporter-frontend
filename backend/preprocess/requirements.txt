@@ -2,3 +2,4 @@ imagesize==1.4.1
 requests==2.26.0
 pymongo==4.3.3
 colorthief==0.2.1
+ijson==3.2.3

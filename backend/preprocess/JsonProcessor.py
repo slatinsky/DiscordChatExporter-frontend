@@ -2,7 +2,6 @@
 
 import copy
 import hashlib
-import json
 import os
 from pprint import pprint
 
@@ -10,7 +9,10 @@ from AssetProcessor import AssetProcessor
 from ChannelCache import ChannelCache
 from FileFinder import FileFinder
 from MongoDatabase import MongoDatabase
-from helpers import get_emoji_code, pad_id
+from JsonFileStreamer import JsonFileStreamer
+from helpers import get_emoji_code, pad_id, batched
+
+
 
 
 class JsonProcessor:
@@ -28,19 +30,6 @@ class JsonProcessor:
 		self.file_finder = file_finder
 		self.asset_processor = asset_processor
 
-	def read_json_file(self, file_path):
-		file_path_with_base_directory = self.file_finder.add_base_directory(file_path)
-		with open(file_path_with_base_directory, "r", encoding='utf-8') as f:
-			try:
-				data = json.load(f)
-			except json.decoder.JSONDecodeError:
-				# probably media file too
-				print("JSONDecodeError: " + file_path)
-				return None
-
-			if 'guild' not in data:  # this is not a channel export, but a downloaded media json file
-				return None
-		return data
 	def process_guild(self, guild):
 		guild["_id"] = pad_id(guild.pop("id"))
 		guild["icon"] = self.asset_processor.process(guild.pop("iconUrl"))
@@ -502,39 +491,62 @@ class JsonProcessor:
 
 		print("processing " + self.json_path)
 
-		json_data = self.read_json_file(self.json_path)
+		file_path_with_base_directory = self.file_finder.add_base_directory(self.json_path)
+		with JsonFileStreamer(file_path_with_base_directory) as jfs:
+			file_size_human = jfs.get_file_size_human()
+			file_size = jfs.get_file_size()
+			guild = jfs.get_guild()
+			channel = jfs.get_channel()
+			print(f"guild: '{guild['name']}', channel '{channel['name']}, file size: {file_size_human}")
 
-		if json_data == None:
-			print("invalid file " + self.json_path)
-			return
+			print('    getting exportedAt')
+			exported_at = jfs.get_exported_at()
+			print('    exported_at:', exported_at)
 
-		guild = self.process_guild(json_data["guild"])
-		channel = self.process_channel(json_data["channel"], guild["_id"])
-		messages = self.process_messages(json_data["messages"], guild["_id"], channel["_id"], channel["name"])
-		authors = self.process_authors(json_data["messages"], guild["_id"])
-		emojis = self.process_emojis(json_data["messages"])
-		roles = self.process_roles(json_data["messages"], guild["_id"])
+			guild = self.process_guild(guild)
+			channel = self.process_channel(channel, guild["_id"])
+			guild['exportedAt'] = exported_at
+			channel['exportedAt'] = exported_at
 
-		# channel needs to be inserted before messages,
-		# because we count the messages per channel in insert_message()
-		self.insert_channel(channel)
+			current_batch = 0
+			for messages in batched(jfs.get_messages_iterator(), 1000):
+				file_pointer_position = jfs.get_file_pointer_position()
+				print(f'    processing batch {current_batch} with {len(messages)} messages, done: {round(file_pointer_position / file_size * 100, 2)} %')
 
-		# authors needs to be inserted before messages,
-		# because we count the messages per author in insert_message()
-		for author in authors:
-			self.insert_author(author)
+				print('        processing messages')
+				messages = self.process_messages(messages, guild["_id"], channel["_id"], channel["name"])
+				print('        processing authors')
+				authors = self.process_authors(messages, guild["_id"])
+				print('        processing emojis')
+				emojis = self.process_emojis(messages)
+				print('        processing roles')
+				roles = self.process_roles(messages, guild["_id"])
 
+				if current_batch == 0:
+					# channel needs to be inserted before messages,
+					# because we count the messages per channel in insert_message()
+					self.insert_channel(channel)
+					self.insert_guild(guild)
 
-		for message in messages:
-			self.insert_message(message)
+				# authors needs to be inserted before messages,
+				# because we count the messages per author in insert_message()
+				print('        inserting authors')
+				for author in authors:
+					self.insert_author(author)
 
-		self.insert_guild(guild)
+				print('        inserting messages')
+				for message in messages:
+					self.insert_message(message)
 
+				print('        inserting emojis')
+				for emoji in emojis:
+					self.insert_emoji(emoji, guild["_id"])
 
-		for emoji in emojis:
-			self.insert_emoji(emoji, guild["_id"])
+				print('        inserting roles')
+				for role in roles:
+					self.insert_role(role)
 
-		for role in roles:
-			self.insert_role(role)
+				current_batch += 1
+
 
 		self.mark_as_processed(self.json_path)
