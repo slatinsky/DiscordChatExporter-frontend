@@ -20,33 +20,20 @@ class FileFinder():
 				if re.search(r"-([a-fA-F0-9]{5})\.json$", filename) != None:
 					continue
 
-				# ignore channel_info.json
+				# ignore channel_info.json and guild_info.json
 				if filename.endswith('channel_info.json'):
 					continue
+				if filename.endswith('guild_info.json'):
+					continue
 
-				try:
-					# quick check if file is a export made by DiscordChatExporter
-					with open(filename, encoding='utf-8') as file:
-						first_16_bytes = file.read(16)
-						if first_16_bytes.find("guild") == -1:
-							print("invalid file " + filename)
-							continue
-					filename_without_base_directory = self.remove_base_directory(filename)
-					files.append(filename_without_base_directory)
+				filename_without_base_directory = self.remove_base_directory(filename)
+				files.append(filename_without_base_directory)
 
-				except PermissionError:
-					print("permission error while reading file " + filename)
-					print(traceback.format_exc())
-
-				except Exception as e:
-					# we don't want to crash the program if a file is unreadable
-					# just print the error and continue
-					print("error while reading file " + filename)
-					print(traceback.format_exc())
 
 		return files
 
 	def find_local_assets(self):
+		print("finding local assets in " + self.base_directory)
 		input_directory = self.base_directory
 		all_files = {}
 		# file can be extensionless and without a dash

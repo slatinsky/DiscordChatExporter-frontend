@@ -4,6 +4,7 @@ import copy
 import hashlib
 from itertools import zip_longest
 import os
+import ijson
 from pprint import pprint
 
 from pymongo import ReplaceOne, UpdateOne
@@ -19,7 +20,7 @@ from helpers import get_emoji_code, pad_id, batched
 
 
 class JsonProcessor:
-	def __init__(self, database: MongoDatabase, file_finder: FileFinder, json_path:str, asset_processor: AssetProcessor):
+	def __init__(self, database: MongoDatabase, file_finder: FileFinder, json_path:str, asset_processor: AssetProcessor, index: int, total: int):
 		self.json_path = json_path
 		self.database = database
 		self.collection_guilds = self.database.get_collection("guilds")
@@ -32,6 +33,8 @@ class JsonProcessor:
 		self.collection_jsons = self.database.get_collection("jsons")
 		self.file_finder = file_finder
 		self.asset_processor = asset_processor
+		self.index = index
+		self.total = total
 
 	def process_guild(self, guild):
 		guild["_id"] = pad_id(guild.pop("id"))
@@ -369,48 +372,6 @@ class JsonProcessor:
 			self.collection_roles.insert_one(role)
 			return
 
-	def check_if_processed(self, json_path):
-		"""
-		Checks if a file has already been processed
-		Returns True if the file has already been processed
-		Returns False if the file has not been processed yet
-		"""
-
-		json_path_with_base_dir = self.file_finder.add_base_directory(json_path)
-
-		# read from database
-		json = self.collection_jsons.find_one({"_id": json_path})
-
-		if json == None:
-			# file not found in database, it is new file
-			return False
-
-		# do quick checks first (date modified, file size), because hashing is slow
-
-		date_modified = os.path.getmtime(json_path_with_base_dir)
-		if json["date_modified"] == date_modified:
-			# if time modified is the same, file was not modified
-			return True
-
-		file_size = os.path.getsize(json_path_with_base_dir)
-		if json["size"] == file_size:
-			# file size is the same, file was not modified
-			return True
-
-		# slow check - file hash
-		file_hash = hashlib.sha256()
-		with open(json_path_with_base_dir, "rb") as f:
-			for byte_block in iter(lambda: f.read(4096), b""):
-				file_hash.update(byte_block)
-		hex_hash = file_hash.hexdigest()
-
-		if json["sha256_hash"] == hex_hash:
-			# file hash is the same, file was not modified
-			return True
-
-		# all checks failed, process the file again
-		self.collection_jsons.delete_one({"_id": json_path})
-
 	def mark_as_processed(self, json_path):
 		"""
 		Marks a file as processed by adding it to the jsons collection
@@ -469,17 +430,21 @@ class JsonProcessor:
 		return merged_messages
 
 	def process(self):
-		if self.check_if_processed(self.json_path):
-			print("already processed " + self.json_path)
-			return
-
-		print("processing " + self.json_path)
+		print(f"{self.index + 1}/{self.total} ({round((self.index + 1) / self.total * 100, 2)}%)  processing {self.json_path}")
 
 		file_path_with_base_directory = self.file_finder.add_base_directory(self.json_path)
 		with JsonFileStreamer(file_path_with_base_directory) as jfs:
+			try:
+				guild = jfs.get_guild()
+			except ijson.common.IncompleteJSONError:
+				print(f'    ERROR: IncompleteJSONError - file "{file_path_with_base_directory}" is corrupted')
+				return
+			if guild == None:
+				print("invalid file " + self.json_path)
+				return
+
 			file_size_human = jfs.get_file_size_human()
 			file_size = jfs.get_file_size()
-			guild = jfs.get_guild()
 			channel = jfs.get_channel()
 			print(f"guild: '{guild['name']}', channel '{channel['name']}, file size: {file_size_human}")
 

@@ -13,7 +13,7 @@ class AssetProcessor:
 	def __init__(self, file_finder: FileFinder, database: MongoDatabase):
 		self.file_finder = file_finder
 		self.collection_assets = database.get_collection("assets")
-		self.local_assets = file_finder.find_local_assets()
+		self.local_assets = None
 		self.fast_mode = False
 		self.cache = {}
 
@@ -150,6 +150,11 @@ class AssetProcessor:
 		"""
 		returns local path of asset
 		"""
+		# load local assets only if needed
+		# this cuts down loading time if no new exports were added
+		if self.local_assets is None:
+			self.local_assets = self.file_finder.find_local_assets()
+
 		if filename_with_hash in self.local_assets:
 			return self.local_assets[filename_with_hash]
 		else:

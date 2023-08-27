@@ -23,7 +23,9 @@ class ChannelCache:
 		"""
 		We need to invalidate cache to update
 		"""
+		print("invalidating cache")
 		for filename in os.listdir(self.cache_folder_path):
 			if filename.endswith(".json"):
+				print("    invalidating cache: " + filename)
 				os.remove(self.cache_folder_path + "/" + filename)
 
