@@ -96,7 +96,7 @@ class JsonFileStreamer():
 					latestTimestamp = value
 
 		if latestTimestamp is not None:
-			print(f'    warning: exportedAt filend not found, using estimated value {latestTimestamp}. Use DCE v2.40.1 or newer')
+			print(f'    warning: exportedAt field not found, using estimated value {latestTimestamp}. Use DCE v2.40.1 or newer')
 			return latestTimestamp
 
 		print('    ERROR: exportedAt not found, using current time')

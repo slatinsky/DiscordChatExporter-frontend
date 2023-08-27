@@ -527,8 +527,7 @@ class JsonProcessor:
 				existing_messages = self.collection_messages.find({"_id": {"$in": message_ids}})
 
 				print('        removing existing messages')
-				for existing_message in existing_messages:
-					message_ids.remove(existing_message["_id"])
+				self.collection_messages.delete_many({"_id": {"$in": message_ids}})
 
 				messages = self.merge_messages(list(messages), list(existing_messages))
 
