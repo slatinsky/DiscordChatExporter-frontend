@@ -2,8 +2,11 @@
 
 import copy
 import hashlib
+from itertools import zip_longest
 import os
 from pprint import pprint
+
+from pymongo import ReplaceOne, UpdateOne
 
 from AssetProcessor import AssetProcessor
 from ChannelCache import ChannelCache
@@ -270,9 +273,7 @@ class JsonProcessor:
 
 		return emojis_list
 
-	def process_roles(self, messages: list, guild_id: str) -> list:
-		roles = {}  # role_id -> role_object
-
+	def process_roles(self, messages: list, guild_id: str, exported_at: str, roles: dict) -> list:
 		for message in messages:
 			if "author" in message:
 				author = message["author"]
@@ -286,9 +287,10 @@ class JsonProcessor:
 							continue
 
 						role["guildId"] = guild_id
+						role["exportedAt"] = exported_at
 						roles[role_id] = role
 
-		return list(roles.values())
+		return roles
 
 	def insert_guild(self, guild):
 		database_document = self.collection_guilds.find_one({"_id": guild["_id"]})
@@ -367,53 +369,6 @@ class JsonProcessor:
 			self.collection_roles.insert_one(role)
 			return
 
-
-	def insert_message(self, message):
-		"""
-		Inserts a message into the database if it doesn't exist yet.
-		Merges the message content with the existing message if it already exists.
-		"""
-
-		content = message["content"][0]['content']
-		latest_timestamp = message["timestamp"]
-		if message["timestampEdited"] != None:
-			latest_timestamp = message["timestampEdited"]
-
-		# check if message already exists. If so, get the existing message
-		database_document = self.collection_messages.find_one({"_id": message["_id"]})
-
-		if database_document != None:  # message already exists
-			# print("ID exists: " + str(message["id"]))
-
-			# if message was edited, add new content
-			has_timestamp = False
-			for database_document_content in database_document["content"]:
-				# print(database_document_content["timestamp"] + " == " + latest_timestamp)
-				if database_document_content["timestamp"] == latest_timestamp:
-					has_timestamp = True
-					break
-
-			if not has_timestamp:
-				database_document["content"].append({
-					"timestamp": latest_timestamp,
-					"content": content
-				})
-				# print(database_document["content"])
-				# update database
-				self.collection_messages.update_one({"_id": message["_id"]}, {"$set": database_document})
-			return
-
-		self.collection_messages.insert_one(message)
-
-
-		# update message count of channel
-		self.collection_channels.update_one({"_id": message["channelId"]}, {"$inc": {"msg_count": 1}})
-		# update message count of guild
-		self.collection_guilds.update_one({"_id": message["guildId"]}, {"$inc": {"msg_count": 1}})
-		# update message count of author
-		self.collection_authors.update_one({"_id": message["author"]["_id"]}, {"$inc": {"msg_count": 1}})
-		return
-
 	def check_if_processed(self, json_path):
 		"""
 		Checks if a file has already been processed
@@ -484,6 +439,35 @@ class JsonProcessor:
 			"date_modified": date_modified
 		})
 
+	def merge_messages(self, messages_list1: list, messages_list2: list) -> list:
+		"""
+		merges two lists of messages based on _id
+		to choose which one to keep, use exportedAt field
+		"""
+		merged_messages = []
+		messages_list1.sort(key=lambda x: x['_id'])
+		messages_list2.sort(key=lambda x: x['_id'])
+		for message1, message2 in zip_longest(messages_list1, messages_list2):
+			if message1 is None:
+				merged_messages.append(message2)
+				continue
+			if message2 is None:
+				merged_messages.append(message1)
+				continue
+
+			if message1['_id'] == message2['_id']:
+				# compare exportedAt
+				if message1['exportedAt'] > message2['exportedAt']:
+					merged_messages.append(message1)
+				else:
+					merged_messages.append(message2)
+			elif message1['_id'] < message2['_id']:
+				merged_messages.append(message1)
+			else:
+				merged_messages.append(message2)
+
+		return merged_messages
+
 	def process(self):
 		if self.check_if_processed(self.json_path):
 			print("already processed " + self.json_path)
@@ -509,9 +493,13 @@ class JsonProcessor:
 			channel['exportedAt'] = exported_at
 
 			current_batch = 0
-			for messages in batched(jfs.get_messages_iterator(), 1000):
+			roles = {}  # role_id -> role_object
+			for messages in batched(jfs.get_messages_iterator(), 10000):
 				file_pointer_position = jfs.get_file_pointer_position()
 				print(f'    processing batch {current_batch} with {len(messages)} messages, done: {round(file_pointer_position / file_size * 100, 2)} %')
+
+				for message in messages:
+					message["exportedAt"] = exported_at
 
 				print('        processing messages')
 				messages = self.process_messages(messages, guild["_id"], channel["_id"], channel["name"])
@@ -520,7 +508,7 @@ class JsonProcessor:
 				print('        processing emojis')
 				emojis = self.process_emojis(messages)
 				print('        processing roles')
-				roles = self.process_roles(messages, guild["_id"])
+				roles = self.process_roles(messages, guild["_id"], exported_at, roles)
 
 				if current_batch == 0:
 					# channel needs to be inserted before messages,
@@ -534,19 +522,47 @@ class JsonProcessor:
 				for author in authors:
 					self.insert_author(author)
 
+				message_ids = [message["_id"] for message in messages]
+				print('        getting existing messages')
+				existing_messages = self.collection_messages.find({"_id": {"$in": message_ids}})
+
+				print('        removing existing messages')
+				for existing_message in existing_messages:
+					message_ids.remove(existing_message["_id"])
+
+				messages = self.merge_messages(list(messages), list(existing_messages))
+
+				# insert messages
 				print('        inserting messages')
+				self.collection_messages.insert_many(messages)
+
+				print('        updating message counts')
+				new_messages_count = len(messages) - len(list(existing_messages))
+				# update message count of channel
+				self.collection_channels.update_one({"_id": message["channelId"]}, {"$inc": {"msg_count": new_messages_count}})
+
+				# update message count of guild
+				self.collection_guilds.update_one({"_id": message["guildId"]}, {"$inc": {"msg_count": new_messages_count}})
+
+				# update message count of author
+				bulk = []
+				for existing_message in existing_messages:
+					bulk.append(UpdateOne({"_id": existing_message["author"]["_id"]}, {"$inc": {"msg_count": -1}}))
 				for message in messages:
-					self.insert_message(message)
+					bulk.append(UpdateOne({"_id": message["author"]["_id"]}, {"$inc": {"msg_count": 1}}))
+				if len(bulk) > 0:
+					self.collection_authors.bulk_write(bulk)
 
 				print('        inserting emojis')
 				for emoji in emojis:
 					self.insert_emoji(emoji, guild["_id"])
 
-				print('        inserting roles')
-				for role in roles:
-					self.insert_role(role)
-
 				current_batch += 1
+
+			# there is limited number of roles per guild, so we can insert them all at once at the end
+			print('    inserting roles')
+			for role_id in roles:
+				self.insert_role(roles[role_id])
 
 
 		self.mark_as_processed(self.json_path)
