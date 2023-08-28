@@ -459,7 +459,7 @@ def enrich_messages(list_of_messages: list) -> list:
 SEARCH_CATEGORIES = [
 	{
 		"key": 'from',
-		"description": 'string (exact match)',
+		"description": 'user (exact string match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "from_users",
@@ -467,15 +467,23 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'mentions',
-		"description": 'string (exact match)',
+		"description": 'user (exact string match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "mentions_users",
 		"autocompleteApi": "users",
 	},
 	{
+		"key": 'reaction_from',
+		"description": 'user (exact string match)',
+		"type": 'string',
+		"multiple": True,
+		"mapTo": "reaction_from",
+		"autocompleteApi": "users",
+	},
+	{
 		"key": 'reaction',
-		"description": 'regex (partial match)',
+		"description": 'emoji (partial regex match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "reactions",
@@ -491,7 +499,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'filename',
-		"description": 'regex (partial match)',
+		"description": 'file (partial regex match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "filenames",
@@ -499,7 +507,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'in',
-		"description": 'string (exact match)',
+		"description": 'channel (exact string match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "in_channels",
@@ -507,7 +515,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'category',
-		"description": 'string (exact match)',
+		"description": 'category (exact string match)',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "in_categories",
@@ -571,7 +579,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'limit',
-		"description": 'number (default 100000)',
+		"description": 'number (default 100000, 0 disables limit)',
 		"type": 'number',
 		"multiple": False,
 		"mapTo": "limit",
@@ -579,7 +587,7 @@ SEARCH_CATEGORIES = [
 	},
 		{
 		"key": 'message_id',
-		"description": 'id',
+		"description": 'message id (discord snowflake))',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "message_ids",
@@ -587,7 +595,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'in_id',
-		"description": 'channel_id',
+		"description": 'channel id (discord snowflake)',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "in_channel_ids",
@@ -595,7 +603,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'category_id',
-		"description": 'category_id',
+		"description": 'category id (discord snowflake)',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "in_category_ids",
@@ -603,7 +611,7 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'from_id',
-		"description": 'author_id',
+		"description": 'author id (discord snowflake)',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "from_user_ids",
@@ -611,15 +619,23 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'mentions_id',
-		"description": 'author_id',
+		"description": 'author id (discord snowflake)',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "mentions_user_ids",
 		"autocompleteApi": None,
 	},
-		{
+	{
+		"key": 'reaction_from_id',
+		"description": 'user id (discord_snowflake)',
+		"type": 'discord_snowflake',
+		"multiple": True,
+		"mapTo": "reaction_from_ids",
+		"autocompleteApi": "users",
+	},
+	{
 		"key": 'reaction_id',
-		"description": 'emoji_id',
+		"description": 'emoji id (discord snowflake)',
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "reaction_ids",
@@ -668,6 +684,8 @@ def parse_prompt(prompt: str):
 		"message_ids": [],               # message ids (strings) (or)
 		"from_user_ids": [],             # user ids (strings) (or)
 		"from_users": [],                # user names (or)
+		"reaction_from_ids": [],         # user ids (strings) (or)
+		"reaction_from": [],             # user names (or)
 		"mentions_user_ids": [],         # user ids (strings) (or)
 		"mentions_users": [],            # user names (or)
 		"reaction_ids": [],              # emoji ids (strings) (or)
@@ -761,6 +779,8 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 		message_ids = search["message_ids"]
 		from_user_ids = search["from_user_ids"]
 		from_users = search["from_users"]
+		reaction_from_ids = search["reaction_from_ids"]
+		reaction_from = search["reaction_from"]
 		mentions_user_ids = search["mentions_user_ids"]
 		mentions_users = search["mentions_users"]
 		reaction_ids = search["reaction_ids"]
@@ -783,8 +803,15 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 		# clean up
 		message_contains = [word.lower() for word in message_contains]
 		message_ids = [pad_id(id) for id in message_ids]
+
 		from_user_ids = [pad_id(id) for id in from_user_ids]
 		from_user_ids = extend_users(from_user_ids, from_users)
+
+		print("from_user_ids", from_user_ids)
+
+		reaction_from_ids = [pad_id(id) for id in reaction_from_ids]
+		reaction_from_ids = extend_users(reaction_from_ids, reaction_from)
+
 		mentions_user_ids = [pad_id(id) for id in mentions_user_ids]
 		mentions_user_ids = extend_users(mentions_user_ids, mentions_users)
 		reaction_ids = [pad_id(id) for id in reaction_ids]
@@ -813,6 +840,9 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 
 		if len(from_user_ids) > 0:
 			query["author._id"] = {"$in": from_user_ids}
+
+		if len(reaction_from_ids) > 0:
+			query["reactions.users._id"] = {"$in": reaction_from_ids}
 
 		if len(mentions_user_ids) > 0:
 			query["mentions._id"] = {"$in": mentions_user_ids}
