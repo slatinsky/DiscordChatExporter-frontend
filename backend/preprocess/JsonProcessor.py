@@ -453,43 +453,6 @@ class JsonProcessor:
 
 		return merged_messages
 
-	def find_deleted_messages(self, old_channel_ids: set, new_channel_ids: set) -> list:
-		# old_channel_ids = {0,1,3,4,6,7}
-		# new_channel_ids = {2,3,4,5,7,8,9,10,11}
-
-		# both sets must be at least 2 elements
-		if len(old_channel_ids) < 2 or len(new_channel_ids) < 2:
-			return []
-
-		# find lowest and highest
-		lowest_set1 = min(old_channel_ids)
-		lowest_set2 = min(new_channel_ids)
-		highest_set1 = max(old_channel_ids)
-		highest_set2 = max(new_channel_ids)
-
-		# find common boundaries
-		higher_lowest = max(lowest_set1, lowest_set2)
-		lower_highest = min(highest_set1, highest_set2)
-
-		print(lowest_set1, lowest_set2, highest_set1, highest_set2)
-		print(higher_lowest, lower_highest)
-
-		# create new sets between boundaries
-
-		new_set1 = set()
-		new_set2 = set()
-		for i in old_channel_ids:
-			if i >= higher_lowest and i <= lower_highest:
-				new_set1.add(i)
-		for i in new_channel_ids:
-			if i >= higher_lowest and i <= lower_highest:
-				new_set2.add(i)
-
-		print(new_set1, new_set2)
-
-		# find symmetric difference (deleted messages)
-		symmetric_difference = new_set1.symmetric_difference(new_set2)
-		return symmetric_difference
 
 	def process(self):
 		print(f"{self.index + 1}/{self.total} ({round((self.index + 1) / self.total * 100, 2)}%)  processing {self.json_path}")
@@ -523,23 +486,23 @@ class JsonProcessor:
 			roles = {}  # role_id -> role_object
 
 			print('    deleted messages - stage 1/3')
-			old_channel_ids = set()
-			iterator = self.collection_messages.find({"channelId": channel["_id"]}, {"_id": 1, "channelId": 1}).sort("_id", 1)
+			iterator = self.collection_messages.find({"channelId": channel["_id"]}, {"_id": 1, "sources": 1}).sort("_id", 1)
 			old_channel_ids_by_source = {}  # source -> set of ids
 			for message in iterator:
-				if message["channelId"] not in old_channel_ids_by_source:
-					old_channel_ids_by_source[message["channelId"]] = set()
-
-				old_channel_ids_by_source[message["channelId"]].add(message["_id"])
+				for source in message["sources"]:
+					if source not in old_channel_ids_by_source:
+						old_channel_ids_by_source[source] = set()
+					old_channel_ids_by_source[source].add(message["_id"])
 
 			old_channel_ids_by_source = list(old_channel_ids_by_source.values())  # convert to list of sets
+
 
 			new_channel_ids = set()
 			print('        this channel was in', len(old_channel_ids_by_source), 'previous exports')
 
-			# first 5 characters of sha256 hash of self.json_path
+			# first 10 characters of sha256 hash of self.json_path
 			# we need to keep this short, because deleted messages sorter uses this as a key and it would use too much memory
-			hashed_json_path = hashlib.sha256(self.json_path.encode("utf-8")).hexdigest()[:5].upper()
+			hashed_json_path = hashlib.sha256(self.json_path.encode("utf-8")).hexdigest()[:10].upper()
 			for messages in batched(jfs.get_messages_iterator(), 10000):
 				file_pointer_position = jfs.get_file_pointer_position()
 				print(f'    processing batch {current_batch} with {len(messages)} messages, done: {round(file_pointer_position / file_size * 100, 2)} %')
