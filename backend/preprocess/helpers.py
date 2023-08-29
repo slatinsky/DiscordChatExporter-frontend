@@ -1,6 +1,10 @@
+import functools
 from itertools import islice
 import json
 import os
+
+print = functools.partial(print, flush=True)
+
 
 
 with open('emojiIndex.json', 'r', encoding='utf8') as f:

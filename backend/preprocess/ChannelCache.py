@@ -1,9 +1,11 @@
 
+import functools
 import os
 
 from MongoDatabase import MongoDatabase
 from helpers import is_compiled
 
+print = functools.partial(print, flush=True)
 
 class ChannelCache:
 	"""

@@ -1,5 +1,7 @@
+import functools
 import time
 
+print = functools.partial(print, flush=True)
 
 class Timer(object):
     def __init__(self, name=None):

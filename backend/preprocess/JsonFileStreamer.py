@@ -1,5 +1,8 @@
+import functools
 import ijson
 import datetime
+
+print = functools.partial(print, flush=True)
 
 
 class JsonFileStreamer():

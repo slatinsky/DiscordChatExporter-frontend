@@ -1,7 +1,10 @@
+import functools
 import glob
 import re
 import os
-import traceback
+
+print = functools.partial(print, flush=True)
+
 
 class FileFinder():
 	"""

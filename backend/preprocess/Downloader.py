@@ -1,9 +1,13 @@
 
 
 
+import functools
 import os
 
 import requests
+
+print = functools.partial(print, flush=True)
+
 
 
 def download_gg(output_directory):

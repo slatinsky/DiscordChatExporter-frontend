@@ -1,5 +1,9 @@
 
+import functools
 from pymongo import MongoClient
+
+print = functools.partial(print, flush=True)
+
 
 class MongoDatabase():
 	"""

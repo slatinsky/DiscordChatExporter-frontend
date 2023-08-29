@@ -1,4 +1,5 @@
 
+import functools
 import os
 import re
 from colorthief import ColorThief
@@ -8,6 +9,7 @@ from hashlib import sha256
 from FileFinder import FileFinder
 from MongoDatabase import MongoDatabase
 
+print = functools.partial(print, flush=True)
 
 class AssetProcessor:
 	def __init__(self, file_finder: FileFinder, database: MongoDatabase):

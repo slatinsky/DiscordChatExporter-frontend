@@ -1,6 +1,7 @@
 
 
 import copy
+import functools
 import hashlib
 from itertools import zip_longest
 import os
@@ -16,7 +17,7 @@ from MongoDatabase import MongoDatabase
 from JsonFileStreamer import JsonFileStreamer
 from helpers import find_additional_missing_numbers, get_emoji_code, pad_id, batched
 
-
+print = functools.partial(print, flush=True)
 
 
 class JsonProcessor:
