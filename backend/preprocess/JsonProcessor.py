@@ -14,7 +14,7 @@ from ChannelCache import ChannelCache
 from FileFinder import FileFinder
 from MongoDatabase import MongoDatabase
 from JsonFileStreamer import JsonFileStreamer
-from helpers import get_emoji_code, pad_id, batched
+from helpers import find_additional_missing_numbers, get_emoji_code, pad_id, batched
 
 
 
@@ -400,34 +400,96 @@ class JsonProcessor:
 			"date_modified": date_modified
 		})
 
+	def merge_message(self, message_to_keep: dict, message_to_discard: dict) -> dict:
+		"""
+		merges two messages
+		"""
+		message_to_keep['sources'] = message_to_keep['sources'] + message_to_discard['sources']
+		return message_to_keep
+
 	def merge_messages(self, messages_list1: list, messages_list2: list) -> list:
 		"""
 		merges two lists of messages based on _id
 		to choose which one to keep, use exportedAt field
+		there may be missing messages in the middle
 		"""
 		merged_messages = []
 		messages_list1.sort(key=lambda x: x['_id'])
 		messages_list2.sort(key=lambda x: x['_id'])
-		for message1, message2 in zip_longest(messages_list1, messages_list2):
-			if message1 is None:
-				merged_messages.append(message2)
-				continue
-			if message2 is None:
-				merged_messages.append(message1)
-				continue
 
-			if message1['_id'] == message2['_id']:
-				# compare exportedAt
-				if message1['exportedAt'] > message2['exportedAt']:
+		current_index1 = 0
+		current_index2 = 0
+
+		# increase index based on _id
+		while current_index1 < len(messages_list1) and current_index2 < len(messages_list2):
+			message1 = messages_list1[current_index1]
+			message2 = messages_list2[current_index2]
+
+			if message1["_id"] < message2["_id"]:
+				merged_messages.append(message1)
+				current_index1 += 1
+			elif message1["_id"] > message2["_id"]:
+				merged_messages.append(message2)
+				current_index2 += 1
+			else:
+				# _id is the same, check exportedAt
+				if message1["exportedAt"] > message2["exportedAt"]:
+					message1 = self.merge_message(message1, message2)
 					merged_messages.append(message1)
 				else:
+					message2 = self.merge_message(message2, message1)
 					merged_messages.append(message2)
-			elif message1['_id'] < message2['_id']:
-				merged_messages.append(message1)
-			else:
-				merged_messages.append(message2)
+				current_index1 += 1
+				current_index2 += 1
+
+		# add remaining messages
+		while current_index1 < len(messages_list1):
+			merged_messages.append(messages_list1[current_index1])
+			current_index1 += 1
+
+		while current_index2 < len(messages_list2):
+			merged_messages.append(messages_list2[current_index2])
+			current_index2 += 1
 
 		return merged_messages
+
+	def find_deleted_messages(self, old_channel_ids: set, new_channel_ids: set) -> list:
+		# old_channel_ids = {0,1,3,4,6,7}
+		# new_channel_ids = {2,3,4,5,7,8,9,10,11}
+
+		# both sets must be at least 2 elements
+		if len(old_channel_ids) < 2 or len(new_channel_ids) < 2:
+			return []
+
+		# find lowest and highest
+		lowest_set1 = min(old_channel_ids)
+		lowest_set2 = min(new_channel_ids)
+		highest_set1 = max(old_channel_ids)
+		highest_set2 = max(new_channel_ids)
+
+		# find common boundaries
+		higher_lowest = max(lowest_set1, lowest_set2)
+		lower_highest = min(highest_set1, highest_set2)
+
+		print(lowest_set1, lowest_set2, highest_set1, highest_set2)
+		print(higher_lowest, lower_highest)
+
+		# create new sets between boundaries
+
+		new_set1 = set()
+		new_set2 = set()
+		for i in old_channel_ids:
+			if i >= higher_lowest and i <= lower_highest:
+				new_set1.add(i)
+		for i in new_channel_ids:
+			if i >= higher_lowest and i <= lower_highest:
+				new_set2.add(i)
+
+		print(new_set1, new_set2)
+
+		# find symmetric difference (deleted messages)
+		symmetric_difference = new_set1.symmetric_difference(new_set2)
+		return symmetric_difference
 
 	def process(self):
 		print(f"{self.index + 1}/{self.total} ({round((self.index + 1) / self.total * 100, 2)}%)  processing {self.json_path}")
@@ -450,7 +512,7 @@ class JsonProcessor:
 
 			print('    getting exportedAt')
 			exported_at = jfs.get_exported_at()
-			print('    exported_at:', exported_at)
+			print('        exported_at:', exported_at)
 
 			guild = self.process_guild(guild)
 			channel = self.process_channel(channel, guild["_id"])
@@ -459,12 +521,33 @@ class JsonProcessor:
 
 			current_batch = 0
 			roles = {}  # role_id -> role_object
+
+			print('    deleted messages - stage 1/3')
+			old_channel_ids = set()
+			iterator = self.collection_messages.find({"channelId": channel["_id"]}, {"_id": 1, "channelId": 1}).sort("_id", 1)
+			old_channel_ids_by_source = {}  # source -> set of ids
+			for message in iterator:
+				if message["channelId"] not in old_channel_ids_by_source:
+					old_channel_ids_by_source[message["channelId"]] = set()
+
+				old_channel_ids_by_source[message["channelId"]].add(message["_id"])
+
+			old_channel_ids_by_source = list(old_channel_ids_by_source.values())  # convert to list of sets
+
+			new_channel_ids = set()
+			print('        this channel was in', len(old_channel_ids_by_source), 'previous exports')
+
+			# first 5 characters of sha256 hash of self.json_path
+			# we need to keep this short, because deleted messages sorter uses this as a key and it would use too much memory
+			hashed_json_path = hashlib.sha256(self.json_path.encode("utf-8")).hexdigest()[:5].upper()
 			for messages in batched(jfs.get_messages_iterator(), 10000):
 				file_pointer_position = jfs.get_file_pointer_position()
 				print(f'    processing batch {current_batch} with {len(messages)} messages, done: {round(file_pointer_position / file_size * 100, 2)} %')
 
 				for message in messages:
+					new_channel_ids.add(pad_id(message["id"]))
 					message["exportedAt"] = exported_at
+					message["sources"] = [hashed_json_path]
 
 				print('        processing messages')
 				messages = self.process_messages(messages, guild["_id"], channel["_id"], channel["name"])
@@ -489,11 +572,13 @@ class JsonProcessor:
 
 				message_ids = [message["_id"] for message in messages]
 				print('        getting existing messages')
-				existing_messages = self.collection_messages.find({"_id": {"$in": message_ids}})
+				existing_messages = list(self.collection_messages.find({"_id": {"$in": message_ids}}))
+				print('            existing messages count:', len(list(existing_messages)))
 
 				print('        removing existing messages')
 				self.collection_messages.delete_many({"_id": {"$in": message_ids}})
 
+				print('        merging messages')
 				messages = self.merge_messages(list(messages), list(existing_messages))
 
 				# insert messages
@@ -527,6 +612,12 @@ class JsonProcessor:
 			print('    inserting roles')
 			for role_id in roles:
 				self.insert_role(roles[role_id])
+
+		print('    deleted messages - stage 2/3')
+		deleted_messages_ids = find_additional_missing_numbers(old_channel_ids_by_source, new_channel_ids)
+		print(f'        found {len(deleted_messages_ids)} new deleted messages')
+		print('    deleted messages - stage 3/3')
+		self.collection_messages.update_many({"_id": {"$in": list(deleted_messages_ids)}}, {"$set": {"isDeleted": True}})
 
 
 		self.mark_as_processed(self.json_path)

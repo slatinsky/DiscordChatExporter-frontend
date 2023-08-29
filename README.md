@@ -198,7 +198,7 @@ See logs (Windows `dcef/logs.txt`, Linux `docker logs dcef`) for more info.
 
 [All platforms] Find line `found X json channel exports` - if this number is 0, you don't have any valid exports in `/exports/` folder.
 
-[All platforms] Find if there is line `done` (at the end of lines `processing <PATH_TO_JSON_FILE>`) - if you see this line, preprocessing step finished successfully. If you don't see this line, please check if there is any stacktrace in the logs. Stacktrace looks like this:
+[All platforms] Find if there is line `preprocess done` (at the end of lines `processing <PATH_TO_JSON_FILE>`) - if you see this line, preprocessing step finished successfully. If you don't see this line, please check if there is any stacktrace in the logs. Stacktrace looks like this:
 
 ```
 Traceback (most recent call last):
