@@ -577,6 +577,14 @@ SEARCH_CATEGORIES = [
 		"mapTo": "is_edited",
 		"autocompleteApi": None,
 	},
+		{
+		"key": 'deleted',
+		"description": 'true/false',
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "is_deleted",
+		"autocompleteApi": None,
+	},
 	{
 		"key": 'limit',
 		"description": 'number (default 100000, 0 disables limit)',
@@ -703,6 +711,7 @@ def parse_prompt(prompt: str):
 		"attachment_is_other": None,     # boolean (None means both) (or in group attachment_is)
 		"containing_links": None,        # boolean (None means both)
 		"is_edited": None,               # boolean (None means both)
+		"is_deleted": None,              # boolean (None means both)
 		"limit": 100000                  # max number of messages to return (int)
 	}
 
@@ -798,6 +807,7 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 		attachment_is_other = search["attachment_is_other"]
 		containing_links = search["containing_links"]
 		is_edited = search["is_edited"]
+		is_deleted = search["is_deleted"]
 		limit = search["limit"]
 
 		# clean up
@@ -964,6 +974,12 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 				query["timestampEdited"] = {"$ne": None}
 			else:
 				query["timestampEdited"] = None
+
+		if is_deleted is not None:
+			if is_deleted:
+				query["isDeleted"] = True
+			else:
+				query["$or"] = [{"isDeleted": False}, {"isDeleted": None}]
 
 
 		if len(message_contains) > 0:
