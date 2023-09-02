@@ -12,7 +12,7 @@
 	const reg = /^(?:https?:)?\/\/(?:www|m)\.(?:youtube(?:-nocookie)?\.com|youtu.be)\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?[\w\-]+/
 	$: youtubeId = embedUrl?.match(reg)?.[0]?.split('v=')?.[1]?.split('&')?.[0] ?? null;
 
-	const regTenor = /^^(?:https?:)?\/\/(?:www\.)?(?:tenor\.com)\/(?:view|watch)\/[\w\-]+-(\d+)/
+	const regTenor = /^^(?:https?:)?\/\/(?:www\.)?(?:tenor\.com)\/(?:view|watch)\/[%\w\-]+-(\d+)/
 	$: tenorId = embedUrl?.match(regTenor)?.[1] ?? null;
 	let playVideo = false;
 </script>
