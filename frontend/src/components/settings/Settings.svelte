@@ -1,7 +1,7 @@
 <script>
 // @ts-nocheck
 
-	import { nameRenderer, timestampFormat, developerMode, theme, online, linkHandler, channelScrollPosition, hideSpoilers, font, settingsShown } from 'src/components/settings/settingsStore';
+	import { nameRenderer, timestampFormat, developerMode, theme, online, gifs, linkHandler, channelScrollPosition, hideSpoilers, font, settingsShown } from 'src/components/settings/settingsStore';
 	import { timestampRenderers } from '../../js/time';
 	import RadioButton from '../../components/settings/RadioButton.svelte';
 	import RadioGroup from '../../components/settings/RadioGroup.svelte';
@@ -172,8 +172,26 @@
 						value={false}
 						bind:group={$online}
 					/>
+				</RadioGroup>
 
+				<hr>
 
+				<RadioGroup
+					title={"Render tenor gifs"}
+					description={"If enabled, this option will render remote tenor gif instead of showing a thumbnail. Requires online mode to be enabled."}
+				>
+					<RadioButton
+						title={"Yes"}
+						name={"gifs"}
+						value={true}
+						bind:group={$gifs}
+					/>
+					<RadioButton
+						title={"No"}
+						name={"gifs"}
+						value={false}
+						bind:group={$gifs}
+					/>
 				</RadioGroup>
 
 				<hr>

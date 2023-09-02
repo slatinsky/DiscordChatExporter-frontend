@@ -6,6 +6,7 @@ export const timestampFormat = writable(0);
 export const developerMode = writable(false);
 export const theme = writable("dark");
 export const online = writable(true);
+export const gifs = writable(true);
 export const linkHandler = writable("app");
 export const channelScrollPosition = writable("bottom");
 export const hideSpoilers = writable(true);
