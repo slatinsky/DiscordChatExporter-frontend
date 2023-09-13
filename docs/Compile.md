@@ -9,7 +9,7 @@ Fork the repository and enable GitHub Actions. Then, go to the Actions tab and c
 
 ### Prerequisites
 
-Follow the instructions in [Development environment](docs/Development-env.md) to install all the dependencies.
+Follow the instructions in [Development environment](./Development-env.md) to install all the dependencies.
 
 Then install additional dependencyto compile http-server:
 
