@@ -13,7 +13,7 @@
 
 <div class="chatlog__reactions">
 	{#each reactions as reaction}
-		<div class="chatlog__reaction" title={reaction.emoji.name} on:click={reactionsModal.viewReactions(reaction)}>
+		<div class="chatlog__reaction" title=":{reaction.emoji.name}:" on:click={reactionsModal.viewReactions(reaction)}>
 			<img
 				class='chatlog__emoji chatlog__emoji--small'
 				src={checkUrl(reaction.emoji?.image)}

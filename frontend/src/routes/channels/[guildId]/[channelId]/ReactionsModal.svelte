@@ -11,7 +11,6 @@
     export function viewReactions(reaction: Reaction) {
         activeReaction = reaction;
         console.log("activeReaction", activeReaction);
-        
         showReactions = true;
 	}
 </script>
@@ -24,14 +23,24 @@
         <div id="reactions" on:click|stopPropagation>
             <div id="reactions-list">
                 {#each reactions as reaction}
-                    <div class="reaction" on:click={()=>viewReactions(reaction)} class:active={reaction.emoji._id == activeReaction?.emoji._id}>
-                        <img
-                            class='reaction-emoji-img'
-                            src={checkUrl(reaction.emoji?.image)}
-                            alt={reaction.emoji.name}
-                            width="100%"
-                            height="100%"
-                        />
+                    <div class="reaction" title=":{reaction.emoji.name}:" on:click={()=>viewReactions(reaction)} class:active={reaction.emoji._id == activeReaction?.emoji._id}>
+                        {#if reaction.emoji._id == activeReaction?.emoji._id}
+                            <ImageGallery
+                                imgclass="reaction-emoji-img"
+                                alt={reaction.emoji.name}
+                                asset={reaction.emoji?.image}
+                                width="100%"
+                                height="100%"
+                            />
+                        {:else}
+                            <img
+                                class='reaction-emoji-img'
+                                src={checkUrl(reaction.emoji?.image)}
+                                alt={reaction.emoji.name}
+                                width="100%"
+                                height="100%"
+                            />
+                        {/if}
                         <span class="reaction-count">{reaction.count}</span>
                     </div>
                 {/each}
@@ -57,33 +66,7 @@
                 {:else}
                     <div class="reactions-users-not-exported">Reaction users not exported</div>
                 {/if}
-                
-
             </div>
-            <!--<ImageGallery asset={author?.avatar} imgclass={"profile-avatar"} />
-            <div class="profile-background"></div>
-
-            <div class="profile-inner">
-                <div class="profile-header">
-                    <div class="profile-name">{author.name}</div>
-                    <div class="profile-nickname">{author.nickname}</div>
-                </div>
-                <div class="profile-scroll">
-                    <div class="mini-title">ROLES</div>
-                    <div class="roles-wrapper">
-                        {#if author.roles}
-                            {#each author.roles as role}
-                                <div class="role">
-                                    <div class="role-color" style={`background-color: ${role.color ?? "#c4c9ce"};`}></div>
-                                    <div class="role-name">{role.name}</div>
-                                </div>
-                            {/each}
-                        {:else}
-                            <div class="profile-error">Roles not exported</div>
-                        {/if}
-                    </div>
-                </div>
-            </div> -->
         </div>
     </div>
 {/if}
@@ -148,8 +131,7 @@
         height: 32px;
         display: flex;
         align-items: center;
-        justify-content: center;
-
+        padding-left: 4px;
         border-radius: 8px;
         margin-bottom: 4px;
     }
@@ -168,6 +150,7 @@
         padding: 4px 8px 4px 4px;
         width: 24px;
         height: 24px;
+        cursor: pointer;
     }
 
     #reaction-users {

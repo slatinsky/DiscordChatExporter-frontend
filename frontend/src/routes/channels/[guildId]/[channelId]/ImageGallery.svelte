@@ -30,13 +30,12 @@
 	bind:this={domImg}
 	class:media-spoiler={isSpoiler} 
 	on:click={viewGallery}
-	class={imgclass}
+	class="inline {imgclass}"
 	src={checkUrl(asset)}
 	alt="Attachment"
 	width="{asset?.width ?? undefined}"
 	height="{asset?.height ?? undefined}"
 	onerror="this.style.visibility='hidden'"
-	class:inline
 />
 
 
@@ -113,5 +112,6 @@
 
 	.inline {
 		display: inline-block;
+        cursor: pointer;
 	}
 </style>
