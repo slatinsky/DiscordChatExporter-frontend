@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Channel } from "src/js/interfaces";
+	import MenuChannel from './MenuChannel.svelte';
 	import MenuCategory from "src/components/channels/MenuCategory.svelte";
 
 
@@ -9,6 +10,7 @@
 
 	let channelsByCategoryId: any = {};  // {categoryId: channels}
 	let categoryId_msgCount: any = [];   // {categoryId: msgCount}
+	let channelsNoCategory: Channel[] = []; // channels without category
 
 	// interface Channel with channels array
 	interface ChannelTree extends Channel {
@@ -17,7 +19,8 @@
 
 	function getCategoriesFromChannels(allChannels: Channel[]) {
 		let threads: Channel[] = allChannels.filter(channel => channel.type === "GuildPublicThread" || channel.type === "GuildPrivateThread")
-		let channels: ChannelTree[] = allChannels.filter(channel => channel.type !== "GuildPublicThread" && channel.type !== "GuildPrivateThread")
+		let channels: ChannelTree[] = allChannels.filter(channel => channel.type !== "GuildPublicThread" && channel.type !== "GuildPrivateThread" && channel.categoryId !== null) // Only add to list if channel has a category
+		channelsNoCategory = allChannels.filter(channel => channel.categoryId === null) // all channels without category
 		// create channel for threads without channel
 		channels.push({
 			_id: '0',
@@ -30,6 +33,7 @@
 			msg_count: 0,
 			guildId: selectedGuildId as string,
 		})
+		console.log(channelsNoCategory);
 
 		// add channels array to all channels
 		channels.forEach(channel => {
@@ -95,7 +99,21 @@
 	$: processChannels(channels);
 </script>
 
-<!-- Print categories from the largest msg_count to the smallest msg_count -->
+<!-- Print categories from the largest msg_count to the smallest msg_count | Added: After listing channels with no category. They always comes first --> 
+{#if channelsNoCategory.length > 0}
+	{#each channelsNoCategory as channel}
+	<div class="channel">
+		<MenuChannel
+			name={channel.name}
+			id={channel._id}
+			guildId={channel.guildId}
+			isSelected={selectedChannelId == channel._id}
+			threadCount={channel?.threads?.length ?? 0}
+			type={channel.type}
+		/>
+	</div>
+	{/each}
+{/if}
 {#each categoryId_msgCount as obj}
 	{@const channels = channelsByCategoryId[obj.categoryId]}
 	<MenuCategory {channels} guildId={selectedGuildId} selectedChannelId={selectedChannelId}/>

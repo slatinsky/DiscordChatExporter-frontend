@@ -34,6 +34,7 @@
 	$: if (jumpToIndex) {
 		jumpToIndex(startPosition)
 	}
+
 </script>
 
 <svelte:head>
@@ -61,7 +62,8 @@
 					>
 					<div slot="item" let:index>
 						{#if data.messages[index]}
-							<MessageLoader messageId={data.messages[index]._id} previousMessageId={data.messages[index - 1]?._id} selectedGuildId={data.guildId} />
+						<!-- Added guild name being transfered over to message for some system message like booster. Could be optimized -->
+							<MessageLoader messageId={data.messages[index]._id} previousMessageId={data.messages[index - 1]?._id} selectedGuildId={data.guildId} guildName={data.guild.name} />
 						{:else}
 							<div class="loading">Message didn't load properly</div>
 						{/if}

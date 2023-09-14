@@ -4,6 +4,7 @@
 	export let messageId: string;
 	export let previousMessageId: string | null  = null;
 	export let selectedGuildId: string;
+	export let guildName: string;
 
 	// fetch message from api
 	async function fetchMessages(messageId: string, previousMessageId: string | null) {
@@ -44,7 +45,7 @@
 		<div class="loading">Loading... {messageId}</div>
 	{:then messages}
 		{#key messages}
-			<NewMessage message={messages.message} previousMessage={messages.previousMessage} referencedMessage={messages.referencedMessage} {selectedGuildId}/>
+			<NewMessage message={messages.message} previousMessage={messages.previousMessage} referencedMessage={messages.referencedMessage} {selectedGuildId} {guildName}/>
 		{/key}
 	{:catch error}
 		<div style="color: red" class="loading">{error} <span class="retry-btn" on:click={() => fullMessagesPromise = fetchMessages(messageId, previousMessageId)}>retry</span></div>
