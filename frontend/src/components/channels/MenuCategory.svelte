@@ -70,6 +70,7 @@
 				{guildId}
 				isSelected={selectedChannelId == channel._id}
 				threadCount={channel?.threads?.length ?? 0}
+				type={channel.type}
 			/>
 			{#if [channel._id, ...(channel.threads ? channel.threads.map(thread => thread._id) : [])].includes(selectedChannelId)}
 				{#if channel.threads}
