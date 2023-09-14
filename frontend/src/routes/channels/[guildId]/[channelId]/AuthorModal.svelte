@@ -21,8 +21,8 @@
 
             <div class="profile-inner">
                 <div class="profile-header">
-                    <div class="profile-name">{author.name}</div>
                     <div class="profile-nickname">{author.nickname}</div>
+                    <div class="profile-name">{author.name}</div>
                 </div>
                 <div class="profile-scroll">
                     <div class="mini-title">ROLES</div>
@@ -138,13 +138,13 @@
 
     }
 
-    .profile-name {
+    .profile-nickname {
         font-size: 20px;
         font-weight: 600;
         line-height: 24px;
     }
 
-    .profile-nickname,
+    .profile-name,
     .profile-error {
         word-break: break-all;
         font-size: 14px;
