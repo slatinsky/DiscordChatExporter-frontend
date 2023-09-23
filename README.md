@@ -59,7 +59,7 @@ If you want to try out the latest features, you can use [beta builds](https://gi
 
 </details>
 
-<details><summary><b>Build docker image from source code</b></summary>
+<details><summary><b>Build docker image from source code on x86_64 architecture</b></summary>
 
 You need docker and git installed. Then run:
 
@@ -67,6 +67,19 @@ You need docker and git installed. Then run:
 git clone https://github.com/slatinsky/DiscordChatExporter-frontend
 cd DiscordChatExporter-frontend
 docker build -t dcef .
+```
+Then use the same instructions as for the Linux docker version, but replace in commands `slada/dcef:main` with `dcef`.
+
+</details>
+
+<details><summary><b>Build docker image from source code on Raspberry pi 4b</b></summary>
+
+You need docker and git installed. Then run:
+
+```bash
+git clone https://github.com/slatinsky/DiscordChatExporter-frontend
+cd DiscordChatExporter-frontend
+docker build -t dcef -f Dockerfile.rpi4b
 ```
 Then use the same instructions as for the Linux docker version, but replace in commands `slada/dcef:main` with `dcef`.
 
@@ -291,6 +304,7 @@ Tinfoil hat on? Replace `nginx.exe`, `mongod.exe`, `msvcp140.dll` and `vcruntime
 ## Thanks
 - [Tyrrrz/DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) - for a great export tool
 - [brussell98/discord-markdown](https://github.com/brussell98/discord-markdown) - for discord markdown rendering library
+- [themattman/mongodb-raspberrypi-binaries](https://github.com/themattman/mongodb-raspberrypi-binaries) - unofficial mongodb builds for Raspberry Pi
 
 And for other technologies used in this project - sveltekit, docker, nodejs, nvm, pyinstaller, nginx, mongodb
 

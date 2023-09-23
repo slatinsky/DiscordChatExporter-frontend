@@ -10,6 +10,29 @@ RUN npm run build
 FROM mongo:6.0.5-jammy
 WORKDIR /dcef
 RUN apt-get update && apt-get install python3.11 python3-pip nginx wget -y
+
+# RASPBERRY PI 4b FIXES
+# builds openssl 1.1.1o to get libcrypto.so.1.1 and libssl.so.1.1 for unofficial mongo
+WORKDIR /usr/src/
+RUN wget https://www.openssl.org/source/openssl-1.1.1o.tar.gz
+RUN tar -zxvf openssl-1.1.1o.tar.gz
+WORKDIR /usr/src/openssl-1.1.1o
+RUN ./config && make
+RUN cp /usr/src/openssl-1.1.1o/libcrypto.so.1.1 /usr/lib/aarch64-linux-gnu/libcrypto.so.1.1
+RUN cp /usr/src/openssl-1.1.1o/libssl.so.1.1 /usr/lib/aarch64-linux-gnu/libssl.so.1.1
+# downloads unofficial mongodb binaries for raspberry pi 4b
+WORKDIR /usr/src/
+RUN wget https://github.com/themattman/mongodb-raspberrypi-binaries/releases/download/r7.0.1-rpi-unofficial/mongodb.ce.pi.r7.0.1.tar.gz
+RUN mkdir mongo-rpi
+RUN tar -xvzf mongodb.ce.pi.r7.0.1.tar.gz -C mongo-rpi
+# replaces mongodb binaries
+RUN cp mongo-rpi/mongos /usr/bin/
+RUN cp mongo-rpi/mongo /usr/bin/
+RUN cp mongo-rpi/mongod /usr/bin/
+RUN rm -rf /usr/src/mongo-rpi
+WORKDIR /dcef
+# END OF RASPBERRY PI 4b FIXES
+
 RUN mkdir -p /dcef/exports/
 COPY /release/exports/ /dcef/exports/
 COPY /backend/preprocess/requirements.txt /dcef/backend/preprocess/requirements.txt
