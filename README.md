@@ -16,7 +16,7 @@ Browse your [Discord chat exports](https://github.com/Tyrrrz/DiscordChatExporter
 
 ## Quick start (Windows)
 
-1. Export your data from Discord using [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter/tree/master/.docs). Your export should be in JSON format, disable `format markdown` option and enable `download assets` and `reuse assets` options. If exporting using a CLI - use `--media --reuse-media --markdown false --format Json` command line options. More information in [How to export data from Discord to view it in DCEF?](#supported-exports)
+1. Export your data from Discord using [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter/tree/master/.docs). Your export should be in JSON format, disable `format markdown` option and enable `download assets` and `reuse assets` options. If exporting using a CLI - use `--media --reuse-media --markdown false --format Json` command line options. Include threads and forum posts by adding `--include-threads All` option. More information in [How to export data from Discord to view it in DCEF?](#supported-exports)
 2. Download the latest release from [releases page](https://github.com/slatinsky/DiscordChatExporter-frontend/releases)
 3. Extract the archive
 4. Move all your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/exports/` folder ([supported exports](#supported-exports)).
@@ -152,15 +152,27 @@ JSON exports are created using [DiscordChatExporter](https://github.com/Tyrrrz/D
 > - JSON export format (`--format Json`) is required
 > - Skipping markdown prerendering (`--markdown false`) is highly recommended, but not required
 > - Downloading assets (`--media --reuse-media`) is highly recommended, but not required
+> - Including threads (`--include-threads All`) is recommended for a full server export
 
 
-<details><summary><b>Partial export using GUI version of DiscordChatExporter</b></summary>
+<details><summary><b>Incremental export using DiscordChatExporter-incrementalBackup wrapper</b></summary>
+
+I have created simple wrapper for DiscordChatExporter to simplify the process of incremental export for this frontend viewer. You declare what you want to export in a config file and the wrapper will automatically export only new messages since the last export.
+
+For more information and instructions how to use, see [slatinsky/DiscordChatExporter-incrementalBackup](https://github.com/slatinsky/DiscordChatExporter-incrementalBackup)
+
+</details>
+
+<details><summary><b>Full export using GUI version of DiscordChatExporter</b></summary>
 
 Make sure that export format is set to `JSON` and `Format markdown` is disabled. Optionally, you should also enable `Download assets`+`Reuse assets` option to download images, videos and other types of assets.
 
+Recently `Show threads` option was added to the general settings of DiscordChatExporter - if you want to export threads. Note that fetching threads is slow and it may take a while to show them in the GUI.
+
+
 ![](docs/dce-export-more.png)
 
-**NOTE**: You can't export threads and forums using GUI version of DCE. You need to use CLI version for that.
+Note: Exporting using CLI version of DiscordChatExporter is actually easier if you want to mass export everything.
 
 </details>
 
@@ -168,22 +180,10 @@ Make sure that export format is set to `JSON` and `Format markdown` is disabled.
 
 <details><summary><b>Full server export using CLI version of DiscordChatExporter</b></summary>
 
-Export all accessible channels in a server (**without threads and forum posts**):
+Export all accessible channels, threads and forum posts in a server:
 ```bash
-DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g SERVER_ID --media --reuse-media --markdown false --format Json --output OUTPUT_FOLDER_PATH
+DiscordChatExporter.Cli.exe exportguild --token DISCORD_TOKEN -g SERVER_ID --media --reuse-media --markdown false --format Json --include-threads All --output OUTPUT_FOLDER_PATH
 ```
-
-Export threads/forum posts (you can pass multiple thread/forum post ids):
-```bash
-DiscordChatExporter.Cli export --token DISCORD_TOKEN  --media --reuse-media --markdown false --output OUTPUT_FOLDER_PATH --format Json --channel THREAD_ID_OR_FORUM_POST_ID_1 THREAD_ID_OR_FORUM_POST_ID_2 THREAD_ID_OR_FORUM_POST_ID_3 THREAD_ID_OR_FORUM_POST_ID_4
-```
-
-Don't want to manually right click all threads/forums post and copy their ids? These helper scripts can help you:
-
-[Helper script to export archived threads in a channel](docs/Exporting-threads.md)
-
-[Helper script to export forum posts in a channel](docs/Exporting-threads.md)
-
 
 
 </details>
@@ -313,6 +313,7 @@ And for other technologies used in this project - sveltekit, docker, nodejs, nvm
 - [Tyrrrz/DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) - exporter for your Discord chats
 - [Roachbones/discordless](https://github.com/Roachbones/discordless) - real time man-in-the-middle exporter
 - [mlomb/chat-analytics](https://github.com/mlomb/chat-analytics) - analytics for your Discord chats
+- [slatinsky/DiscordChatExporter-incrementalBackup](https://github.com/slatinsky/DiscordChatExporter-incrementalBackup) - incrementally export your Discord chats for DiscordChatExporter-frontend
 
 ## License
 GNU GENERAL PUBLIC LICENSE. See [LICENSE](LICENSE) for more details.
