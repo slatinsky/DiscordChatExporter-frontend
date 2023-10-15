@@ -504,73 +504,77 @@ class JsonProcessor:
 			# first 10 characters of sha256 hash of self.json_path
 			# we need to keep this short, because deleted messages sorter uses this as a key and it would use too much memory
 			hashed_json_path = hashlib.sha256(self.json_path.encode("utf-8")).hexdigest()[:10].upper()
-			for messages in batched(jfs.get_messages_iterator(), 10000):
-				file_pointer_position = jfs.get_file_pointer_position()
-				print(f'    processing batch {current_batch} with {len(messages)} messages, done: {round(file_pointer_position / file_size * 100, 2)} %')
+			try:
+				for messages in batched(jfs.get_messages_iterator(), 10000):
+					file_pointer_position = jfs.get_file_pointer_position()
+					print(f'    processing batch {current_batch} with {len(messages)} messages, done: {round(file_pointer_position / file_size * 100, 2)} %')
 
-				for message in messages:
-					new_channel_ids.add(pad_id(message["id"]))
-					message["exportedAt"] = exported_at
-					message["sources"] = [hashed_json_path]
+					for message in messages:
+						new_channel_ids.add(pad_id(message["id"]))
+						message["exportedAt"] = exported_at
+						message["sources"] = [hashed_json_path]
 
-				print('        processing messages')
-				messages = self.process_messages(messages, guild["_id"], channel["_id"], channel["name"])
-				print('        processing authors')
-				authors = self.process_authors(messages, guild["_id"])
-				print('        processing emojis')
-				emojis = self.process_emojis(messages)
-				print('        processing roles')
-				roles = self.process_roles(messages, guild["_id"], exported_at, roles)
+					print('        processing messages')
+					messages = self.process_messages(messages, guild["_id"], channel["_id"], channel["name"])
+					print('        processing authors')
+					authors = self.process_authors(messages, guild["_id"])
+					print('        processing emojis')
+					emojis = self.process_emojis(messages)
+					print('        processing roles')
+					roles = self.process_roles(messages, guild["_id"], exported_at, roles)
 
-				if current_batch == 0:
-					# channel needs to be inserted before messages,
-					# because we count the messages per channel in insert_message()
-					self.insert_channel(channel)
-					self.insert_guild(guild)
+					if current_batch == 0:
+						# channel needs to be inserted before messages,
+						# because we count the messages per channel in insert_message()
+						self.insert_channel(channel)
+						self.insert_guild(guild)
 
-				# authors needs to be inserted before messages,
-				# because we count the messages per author in insert_message()
-				print('        inserting authors')
-				for author in authors:
-					self.insert_author(author)
+					# authors needs to be inserted before messages,
+					# because we count the messages per author in insert_message()
+					print('        inserting authors')
+					for author in authors:
+						self.insert_author(author)
 
-				message_ids = [message["_id"] for message in messages]
-				print('        getting existing messages')
-				existing_messages = list(self.collection_messages.find({"_id": {"$in": message_ids}}))
-				print('            existing messages count:', len(list(existing_messages)))
+					message_ids = [message["_id"] for message in messages]
+					print('        getting existing messages')
+					existing_messages = list(self.collection_messages.find({"_id": {"$in": message_ids}}))
+					print('            existing messages count:', len(list(existing_messages)))
 
-				print('        removing existing messages')
-				self.collection_messages.delete_many({"_id": {"$in": message_ids}})
+					print('        removing existing messages')
+					self.collection_messages.delete_many({"_id": {"$in": message_ids}})
 
-				print('        merging messages')
-				messages = self.merge_messages(list(messages), list(existing_messages))
+					print('        merging messages')
+					messages = self.merge_messages(list(messages), list(existing_messages))
 
-				# insert messages
-				print('        inserting messages')
-				self.collection_messages.insert_many(messages)
+					# insert messages
+					print('        inserting messages')
+					self.collection_messages.insert_many(messages)
 
-				print('        updating message counts')
-				new_messages_count = len(messages) - len(list(existing_messages))
-				# update message count of channel
-				self.collection_channels.update_one({"_id": message["channelId"]}, {"$inc": {"msg_count": new_messages_count}})
+					print('        updating message counts')
+					new_messages_count = len(messages) - len(list(existing_messages))
+					# update message count of channel
+					self.collection_channels.update_one({"_id": message["channelId"]}, {"$inc": {"msg_count": new_messages_count}})
 
-				# update message count of guild
-				self.collection_guilds.update_one({"_id": message["guildId"]}, {"$inc": {"msg_count": new_messages_count}})
+					# update message count of guild
+					self.collection_guilds.update_one({"_id": message["guildId"]}, {"$inc": {"msg_count": new_messages_count}})
 
-				# update message count of author
-				bulk = []
-				for existing_message in existing_messages:
-					bulk.append(UpdateOne({"_id": existing_message["author"]["_id"]}, {"$inc": {"msg_count": -1}}))
-				for message in messages:
-					bulk.append(UpdateOne({"_id": message["author"]["_id"]}, {"$inc": {"msg_count": 1}}))
-				if len(bulk) > 0:
-					self.collection_authors.bulk_write(bulk)
+					# update message count of author
+					bulk = []
+					for existing_message in existing_messages:
+						bulk.append(UpdateOne({"_id": existing_message["author"]["_id"]}, {"$inc": {"msg_count": -1}}))
+					for message in messages:
+						bulk.append(UpdateOne({"_id": message["author"]["_id"]}, {"$inc": {"msg_count": 1}}))
+					if len(bulk) > 0:
+						self.collection_authors.bulk_write(bulk)
 
-				print('        inserting emojis')
-				for emoji in emojis:
-					self.insert_emoji(emoji, guild["_id"])
+					print('        inserting emojis')
+					for emoji in emojis:
+						self.insert_emoji(emoji, guild["_id"])
 
-				current_batch += 1
+					current_batch += 1
+
+			except ijson.common.IncompleteJSONError as e:
+				print(f'    ERROR: IncompleteJSONError - file "{file_path_with_base_directory}" is corrupted or incomplete')
 
 			# there is limited number of roles per guild, so we can insert them all at once at the end
 			print('    inserting roles')
