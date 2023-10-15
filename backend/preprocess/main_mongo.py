@@ -12,6 +12,7 @@ from AssetProcessor import AssetProcessor
 from JsonProcessor import JsonProcessor
 from Downloader import download_gg
 from Timer import Timer
+from helpers import human_file_size
 
 # fix PIPE encoding error on Windows, auto flush print
 sys.stdout.reconfigure(encoding='utf-8')
@@ -102,16 +103,22 @@ def main(input_dir, output_dir):
 	jsons_count_before = len(jsons)
 	jsons = remove_processed_jsons(database, jsons)
 	jsons_count = len(jsons)
-	print("    found " + str(jsons_count) + " new possible json channel exports")
-	print("    found " + str(jsons_count_before - jsons_count) + " already processed json channel exports")
+	jsons_size = 0
+	jsons_size = sum(os.path.getsize(file_finder.add_base_directory(json_path)) for json_path in jsons)
+	print(f"    found {jsons_count} new possible json channel exports")
+	print(f"    found {jsons_count_before - jsons_count} already processed json channel exports")
+	print(f"    {human_file_size(jsons_size)} is total size of new json exports")
 
 	channel_cache = ChannelCache()
 	channel_cache.invalidate_all()
 	asset_processor = AssetProcessor(file_finder, database)
 	asset_processor.set_fast_mode(True)  # don't process slow actions
 
-
+	processed_bytes = 0
 	for index, json_path in enumerate(jsons):
+		processed_bytes += os.path.getsize(file_finder.add_base_directory(json_path))
+		print(f"{index + 1}/{jsons_count} ({round(processed_bytes / jsons_size * 100, 2)}%)  processing {json_path}")
+
 		p = JsonProcessor(database, file_finder, json_path, asset_processor, index, jsons_count)
 		p.process()
 

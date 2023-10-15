@@ -456,8 +456,6 @@ class JsonProcessor:
 
 
 	def process(self):
-		print(f"{self.index + 1}/{self.total} ({round((self.index + 1) / self.total * 100, 2)}%)  processing {self.json_path}")
-
 		file_path_with_base_directory = self.file_finder.add_base_directory(self.json_path)
 		with JsonFileStreamer(file_path_with_base_directory) as jfs:
 			try:
@@ -507,7 +505,7 @@ class JsonProcessor:
 			try:
 				for messages in batched(jfs.get_messages_iterator(), 10000):
 					file_pointer_position = jfs.get_file_pointer_position()
-					print(f'    processing batch {current_batch} with {len(messages)} messages, done: {round(file_pointer_position / file_size * 100, 2)} %')
+					print(f'    processing batch {current_batch + 1} with {len(messages)} messages, file progress: {round(file_pointer_position / file_size * 100, 2)} %')
 
 					for message in messages:
 						new_channel_ids.add(pad_id(message["id"]))

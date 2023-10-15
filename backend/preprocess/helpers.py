@@ -104,3 +104,18 @@ def find_additional_missing_numbers(sets: list[set], new_set:set) -> set:
     for i in range(len(sets)):
         diff = diff.union(find_missing_numbers(sets[i], new_set))
     return diff
+
+
+def human_file_size(file_size_bytes: int) -> str:
+	"""
+	returns file size in human readable format
+	"""
+	# round to 2 decimal places
+	if file_size_bytes < 1024:
+		return f'{file_size_bytes} B'
+	elif file_size_bytes < 1024 * 1024:
+		return f'{round(file_size_bytes / 1024, 2)} KB'
+	elif file_size_bytes < 1024 * 1024 * 1024:
+		return f'{round(file_size_bytes / 1024 / 1024, 2)} MB'
+	else:
+		return f'{round(file_size_bytes / 1024 / 1024 / 1024, 2)} GB'

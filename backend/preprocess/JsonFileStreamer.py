@@ -2,7 +2,11 @@ import functools
 import ijson
 import datetime
 
+from helpers import human_file_size
+
 print = functools.partial(print, flush=True)
+
+
 
 
 class JsonFileStreamer():
@@ -18,23 +22,15 @@ class JsonFileStreamer():
 
 	def get_file_size_human(self) -> str:
 		"""
-		gets file size in bytes
+		returns file size in human readable format
 		"""
-		file_size = self.get_file_size()
+		file_size_bytes = self.get_file_size()
 
-		# round to 2 decimal places
-		if file_size < 1024:
-			return f'{file_size} B'
-		elif file_size < 1024 * 1024:
-			return f'{round(file_size / 1024, 2)} KB'
-		elif file_size < 1024 * 1024 * 1024:
-			return f'{round(file_size / 1024 / 1024, 2)} MB'
-		else:
-			return f'{round(file_size / 1024 / 1024 / 1024, 2)} GB'
-	
+		return human_file_size(file_size_bytes)
+
 	def get_file_pointer_position(self) -> int:
 		return self.file.tell()
-	
+
 	def get_file_size(self) -> int:
 		"""
 		gets file size in bytes
