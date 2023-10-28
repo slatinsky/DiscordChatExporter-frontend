@@ -7,7 +7,7 @@
 		description2?: string;
 		type: 'string' | 'discord_snowflake' | 'number' | 'boolean';
 		multiple: boolean;
-		mapTo: string;  
+		mapTo: string;
 		autocompleteApi: string | null  // mapTo - useful only on the backend
 	}
 	interface SearchSuggestion {

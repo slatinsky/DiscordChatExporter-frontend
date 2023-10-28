@@ -407,6 +407,15 @@ SEARCH_CATEGORIES = [
 		"autocompleteApi": "users",
 	},
 	{
+		"key": 'has',
+		"description": 'link, embed or file',
+		"description2": 'choice',
+		"type": 'choice',
+		"multiple": True,
+		"mapTo": "has",
+		"autocompleteApi": "has",
+	},
+	{
 		"key": 'reaction_from',
 		"description": 'user',
 		"description2": "exact string match",
@@ -467,51 +476,6 @@ SEARCH_CATEGORIES = [
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "is_pinned",
-		"autocompleteApi": None,
-	},
-	{
-		"key": 'has_audio',
-		"description": 'true/false',
-		"description2": "boolean",
-		"type": 'boolean',
-		"multiple": False,
-		"mapTo": "attachment_is_audio",
-		"autocompleteApi": None,
-	},
-	{
-		"key": 'has_image',
-		"description": 'true/false',
-		"description2": "boolean",
-		"type": 'boolean',
-		"multiple": False,
-		"mapTo": "attachment_is_image",
-		"autocompleteApi": None,
-	},
-	{
-		"key": 'has_video',
-		"description": 'true/false',
-		"description2": "boolean",
-		"type": 'boolean',
-		"multiple": False,
-		"mapTo": "attachment_is_video",
-		"autocompleteApi": None,
-	},
-	{
-		"key": 'has_other',
-		"description": 'true/false',
-		"description2": "boolean",
-		"type": 'boolean',
-		"multiple": False,
-		"mapTo": "attachment_is_other",
-		"autocompleteApi": None,
-	},
-	{
-		"key": 'has_link',
-		"description": 'true/false',
-		"description2": "boolean",
-		"type": 'boolean',
-		"multiple": False,
-		"mapTo": "containing_links",
 		"autocompleteApi": None,
 	},
 	{
@@ -627,6 +591,8 @@ def search_autocomplete(guild_id: str, key: str = None, value: str = None, limit
 		return Autocomplete.autocomplete_channels(padded_guild_id, value, limit)
 	elif (key == "categories"):
 		return Autocomplete.autocomplete_categories(padded_guild_id, value, limit)
+	elif (key == "has"):
+		return Autocomplete.autocomplete_has(padded_guild_id, value, limit)
 	else:
 		return []
 
@@ -662,8 +628,10 @@ def parse_prompt(prompt: str):
 		"attachment_is_audio": None,     # boolean (None means both) (or in group attachment_is)
 		"attachment_is_image": None,     # boolean (None means both) (or in group attachment_is)
 		"attachment_is_video": None,     # boolean (None means both) (or in group attachment_is)
-		"attachment_is_other": None,     # boolean (None means both) (or in group attachment_is)
 		"containing_links": None,        # boolean (None means both)
+		"containing_attachments": None,  # TODO: implement
+		"containing_embeds": None,       # TODO: implement
+		"containing_stickers": None,
 		"is_edited": None,               # boolean (None means both)
 		"is_deleted": None,              # boolean (None means both)
 		"limit": 100000                  # max number of messages to return (int)
@@ -707,6 +675,23 @@ def parse_prompt(prompt: str):
 					except ValueError:
 						word = None
 						print("Invalid number")
+				elif search_category["type"] == "choice":
+					if current_key.lower() == "has":
+						if word.lower() == "link":
+							search["containing_links"] = True
+						elif word == "embed":
+							search["containing_embeds"] = True
+						elif word == "file":
+							search["containing_attachments"] = True
+						elif word == "video":
+							search["attachment_is_video"] = True
+						elif word == "image":
+							search["attachment_is_image"] = True
+						elif word == "sound":
+							search["attachment_is_audio"] = True
+						elif word == "sticker":
+							search["containing_stickers"] = True
+
 
 				elif search_category["type"] == "string" or search_category["type"] == "discord_snowflake":
 					search[search_category["mapTo"]].append(word)
@@ -760,7 +745,11 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		attachment_is_audio = search["attachment_is_audio"]
 		attachment_is_image = search["attachment_is_image"]
 		attachment_is_video = search["attachment_is_video"]
-		attachment_is_other = search["attachment_is_other"]
+
+		containing_attachments = search["containing_attachments"]
+		containing_embeds = search["containing_embeds"]
+		containing_stickers = search["containing_stickers"]
+
 		containing_links = search["containing_links"]
 		is_edited = search["is_edited"]
 		is_deleted = search["is_deleted"]
@@ -849,7 +838,7 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		if is_pinned is not None:
 			query["isPinned"] = is_pinned
 
-		if attachment_is_audio is not None or attachment_is_image is not None or attachment_is_video is not None or attachment_is_other is not None:
+		if attachment_is_audio is not None or attachment_is_image is not None or attachment_is_video is not None:
 			or_ = []
 			if attachment_is_audio is not None:
 				if not attachment_is_audio:
@@ -899,30 +888,28 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 						]
 					})
 
-			if attachment_is_other is not None:
-				if not attachment_is_other:
-					or_.append({
-						"$and": [
-							{"attachments.type": {"$nin": ["unknown"]}},
-							{"embeds.thumbnail.type": {"$nin": ["unknown"]}}
-						]
-					})
-				else:
-					or_.append({
-						"$or": [
-							{"attachments.type": "unknown"},
-							{"embeds.thumbnail.type": "unknown"}
-						]
-					})
-
 			query["$and"].append({"$or": or_})
+
 
 		if containing_links is not None:
 			# todo: check if we can really use ^ for faster search without removing valid results
 			if containing_links:
 				query["content.content"] = {"$regex": "^http|^www"}
-			else:
-				query["content.content"] = {"$not": {"$regex": "^http|^www"}}
+			# else:
+			# 	query["content.content"] = {"$not": {"$regex": "^http|^www"}}
+
+		if containing_stickers is not None:
+			if containing_stickers:
+				query["stickers"] = {"$exists": True}
+
+		if containing_embeds is not None:
+			if containing_embeds:
+				query["embeds"] = {"$exists": True}
+
+		if containing_attachments is not None:
+			if containing_attachments:
+				query["attachments"] = {"$exists": True}
+
 
 		if is_edited is not None:
 			# if message is edited, timestampEdited is not null

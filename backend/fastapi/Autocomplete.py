@@ -232,3 +232,25 @@ def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 			"icon": author['avatar']
 		})
 	return authors
+
+def autocomplete_has(guild_id: str, partial_has: str, limit: int):
+	options = [
+		'link',
+		'embed',
+		'file',
+		'video',
+		'image',
+		'sound',
+		'sticker'
+	]
+
+	has = []
+	for option in options:
+		if option.startswith(partial_has):
+			has.append({
+				"key": option,
+				"description": "",
+				"description2": ""
+			})
+
+	return has
