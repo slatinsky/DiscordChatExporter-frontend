@@ -34,7 +34,7 @@ class JsonProcessor:
 	def process_guild(self, guild):
 		guild["_id"] = pad_id(guild.pop("id"))
 		self.asset_processor.set_guild_id(guild["_id"])
-		guild["icon"] = self.asset_processor.process(guild.pop("iconUrl"))
+		guild["icon"] = self.asset_processor.process(guild.pop("iconUrl"), is_searchable=False)
 		return guild
 
 	def process_channel(self, channel, guild_id):
@@ -116,7 +116,7 @@ class JsonProcessor:
 						if "width" in embed["thumbnail"] and "height" in embed["thumbnail"]:
 							original_width = embed["thumbnail"]["width"]
 							original_height = embed["thumbnail"]["height"]
-						embed["thumbnail"] = self.asset_processor.process(embed["thumbnail"]["url"])
+						embed["thumbnail"] = self.asset_processor.process(embed["thumbnail"]["url"], is_searchable=False)
 
 						# restore some fields, because we are losing them in the asset preprocess if url is remote
 						if "originalWidth" in locals():
@@ -147,7 +147,7 @@ class JsonProcessor:
 							if "width" in image and "height" in image:
 								original_width = image["width"]
 								original_height = image["height"]
-							image = self.asset_processor.process(image["url"])  # does this work?
+							image = self.asset_processor.process(image["url"], is_searchable=False)  # does this work?
 
 							# restore some fields, because we are losing them in the asset preprocess if url is remote
 							if "originalWidth" in locals():
@@ -159,10 +159,10 @@ class JsonProcessor:
 						embed["images"] = new_images
 
 					if "footer" in embed and "iconUrl" in embed["footer"]:
-						embed["footer"]["icon"] = self.asset_processor.process(embed["footer"].pop("iconUrl"))
+						embed["footer"]["icon"] = self.asset_processor.process(embed["footer"].pop("iconUrl"), is_searchable=False)
 
 					if "author" in embed and "iconUrl" in embed["author"]:
-						embed["author"]["icon"] = self.asset_processor.process(embed["author"].pop("iconUrl"))
+						embed["author"]["icon"] = self.asset_processor.process(embed["author"].pop("iconUrl"), is_searchable=False)
 
 			if "reactions" in message:
 				for reaction in message["reactions"]:
@@ -175,17 +175,17 @@ class JsonProcessor:
 							reaction["emoji"]["_id"] = reaction["emoji"]["name"]
 							reaction["emoji"]["source"] = "default"
 
-						reaction["emoji"]["image"] = self.asset_processor.process(reaction["emoji"].pop("imageUrl"))
+						reaction["emoji"]["image"] = self.asset_processor.process(reaction["emoji"].pop("imageUrl"), is_searchable=False)
 
 					if "users" in reaction:
 						for user in reaction["users"]:
 							user["_id"] = pad_id(user.pop("id"))
-							user["avatar"] = self.asset_processor.process(user.pop("avatarUrl"))
+							user["avatar"] = self.asset_processor.process(user.pop("avatarUrl"), is_searchable=False)
 
 			new_attachments = []
 			if "attachments" in message:
 				for attachment in message["attachments"]:
-					new_attachment = self.asset_processor.process(attachment.pop("url"))
+					new_attachment = self.asset_processor.process(attachment.pop("url"), is_searchable=True)
 
 					# restore some fields, because we are losing them in the asset preprocess if url is remote
 					if "fileSizeBytes" in attachment:
@@ -200,7 +200,7 @@ class JsonProcessor:
 
 			if "stickers" in message:
 				for sticker in message["stickers"]:
-					sticker["source"] = self.asset_processor.process(sticker.pop("sourceUrl"))
+					sticker["source"] = self.asset_processor.process(sticker.pop("sourceUrl"), is_searchable=False)
 
 		return messages
 
@@ -218,7 +218,7 @@ class JsonProcessor:
 
 				# process avatar in message
 				author = message["author"]
-				author["avatar"] = self.asset_processor.process(author.pop("avatarUrl"))
+				author["avatar"] = self.asset_processor.process(author.pop("avatarUrl"), is_searchable=False)
 				message["author"] = author
 
 
@@ -230,7 +230,7 @@ class JsonProcessor:
 					continue
 
 				author_copy["guildIds"] = [guild_id]
-				author_copy["avatar"] = self.asset_processor.process(author_copy.pop("avatarUrl"))
+				author_copy["avatar"] = self.asset_processor.process(author_copy.pop("avatarUrl"), is_searchable=False)
 				author_copy["names"] = [author_copy.pop("name") + "#" + author_copy.pop("discriminator")]
 				authors[author_copy["_id"]] = author_copy  # new author
 

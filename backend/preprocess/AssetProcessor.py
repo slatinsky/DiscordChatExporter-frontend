@@ -173,7 +173,7 @@ class AssetProcessor:
 			print("        Warning: Could not find local path of " + filename_with_hash)
 			return None
 
-	def process(self, original_filepath: str):
+	def process(self, original_filepath: str, is_searchable: bool):
 		"""
 		provide filepath without base directory
 		original_filepath is the path from json file, but is not necessarily a valid path
@@ -231,6 +231,7 @@ class AssetProcessor:
 			"filenameWithoutHash": filename_without_hash,
 			"colorDominant": dominant_color,
 			"colorPalette": palette,
+			"searchable": is_searchable
 		}
 
 		self.insert_asset(asset)

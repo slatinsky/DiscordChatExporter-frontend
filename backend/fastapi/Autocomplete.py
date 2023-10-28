@@ -128,11 +128,13 @@ def autocomplete_filenames(guild_id: str, partial_filename: str, limit: int):
 	collection_assets = get_guild_collection(guild_id, "assets")
 
 	query = {
+		"searchable": True,
 		"filenameWithoutHash": {
 			"$regex": partial_filename,
 			"$options": "i"
 		}
 	}
+
 	cursor = collection_assets.aggregate([
 		{"$match": query},
 		{

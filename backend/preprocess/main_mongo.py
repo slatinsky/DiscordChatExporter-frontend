@@ -25,7 +25,7 @@ def wipe_database(database: MongoDatabase):
 	Deletes all collections on version bump (on program update)
 	Change EXPECTED_VERSION to force wipe on incompatible schema changes
 	"""
-	EXPECTED_VERSION = 13    # <---- change this to wipe database
+	EXPECTED_VERSION = 14    # <---- change this to wipe database
 	config = database.get_collection("config")
 
 	# add empty whitelisted_guild_ids config if it does not exist
