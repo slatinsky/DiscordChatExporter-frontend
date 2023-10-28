@@ -154,7 +154,8 @@ def autocomplete_filenames(guild_id: str, partial_filename: str, limit: int):
 	for db_result in cursor:
 		filenames.append({
 			"key": db_result['doc']['filenameWithoutHash'],
-			"description": db_result['doc']["type"]
+			"description": "",
+			# "description2": db_result['doc']["type"]
 		})
 
 	return filenames
@@ -191,7 +192,8 @@ def autocomplete_extensions(guild_id: str, partial_extension: str, limit: int):
 			continue
 		extensions.append({
 			"key": db_result['_id'],
-			"description": str(db_result['count']) + " files"
+			"description": "",
+			"description2": str(db_result['count']) + " files"
 		})
 
 	return extensions
