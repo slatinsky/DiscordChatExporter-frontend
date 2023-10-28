@@ -595,6 +595,8 @@ def search_autocomplete(guild_id: str, key: str = None, value: str = None, limit
 		return Autocomplete.autocomplete_users(padded_guild_id, value, limit)
 	elif (key == "filenames"):
 		return Autocomplete.autocomplete_filenames(padded_guild_id, value, limit)
+	elif (key == "extensions"):
+		return Autocomplete.autocomplete_extensions(padded_guild_id, value, limit)
 	elif (key == "reactions"):
 		return Autocomplete.autocomplete_reactions(padded_guild_id, value, limit)
 	elif (key == "channels"):

@@ -1,5 +1,7 @@
 from pprint import pprint
 
+import pymongo
+
 from helpers import get_guild_collection
 
 
@@ -156,6 +158,43 @@ def autocomplete_filenames(guild_id: str, partial_filename: str, limit: int):
 		})
 
 	return filenames
+
+def autocomplete_extensions(guild_id: str, partial_extension: str, limit: int):
+	"""
+	searches for file extensions
+	"""
+	collection_assets = get_guild_collection(guild_id, "assets")
+
+	query = {
+		"searchable": True,
+		"extension": {
+			"$regex": partial_extension,
+			"$options": "i"
+		}
+	}
+
+	cursor = collection_assets.aggregate([
+		{"$match": query},
+		{
+			"$group": {
+				"_id": "$extension",
+				"count": { "$sum": 1 }
+			}
+		},
+		{"$limit": limit},
+		{"$sort": {"count": pymongo.DESCENDING}}
+	])
+
+	extensions = []
+	for db_result in cursor:
+		if db_result['_id'] == "":
+			continue
+		extensions.append({
+			"key": db_result['_id'],
+			"description": str(db_result['count']) + " files"
+		})
+
+	return extensions
 
 
 def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
