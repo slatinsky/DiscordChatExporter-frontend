@@ -22,16 +22,10 @@ print = functools.partial(print, flush=True)
 
 class JsonProcessor:
 	def __init__(self, database: MongoDatabase, file_finder: FileFinder, json_path:str, asset_processor: AssetProcessor, index: int, total: int):
+		self.collections = None  # will be set after guild id is known
+
 		self.json_path = json_path
 		self.database = database
-		self.collection_guilds = self.database.get_collection("guilds")
-		self.collection_channels = self.database.get_collection("channels")
-		self.collection_messages = self.database.get_collection("messages")
-		self.collection_authors = self.database.get_collection("authors")
-		self.collection_emojis = self.database.get_collection("emojis")
-		self.collection_assets = self.database.get_collection("assets")
-		self.collection_roles = self.database.get_collection("roles")
-		self.collection_jsons = self.database.get_collection("jsons")
 		self.file_finder = file_finder
 		self.asset_processor = asset_processor
 		self.index = index
@@ -39,6 +33,7 @@ class JsonProcessor:
 
 	def process_guild(self, guild):
 		guild["_id"] = pad_id(guild.pop("id"))
+		self.asset_processor.set_guild_id(guild["_id"])
 		guild["icon"] = self.asset_processor.process(guild.pop("iconUrl"))
 		return guild
 
@@ -297,7 +292,7 @@ class JsonProcessor:
 		return roles
 
 	def insert_guild(self, guild):
-		database_document = self.collection_guilds.find_one({"_id": guild["_id"]})
+		database_document = self.collections["guilds"].find_one({"_id": guild["_id"]})
 
 		if database_document != None:
 			# guild already exists, ignore
@@ -305,10 +300,10 @@ class JsonProcessor:
 
 		guild["msg_count"] = 0
 
-		self.collection_guilds.insert_one(guild)
+		self.collections["guilds"].insert_one(guild)
 
 	def insert_channel(self, channel):
-		database_document = self.collection_channels.find_one({"_id": channel["_id"]})
+		database_document = self.collections["channels"].find_one({"_id": channel["_id"]})
 
 		if database_document != None:
 			# channel already exists
@@ -316,15 +311,15 @@ class JsonProcessor:
 
 		channel["msg_count"] = 0
 
-		self.collection_channels.insert_one(channel)
+		self.collections["channels"].insert_one(channel)
 
 	def insert_author(self, author):
-		database_author = self.collection_authors.find_one({"_id": author["_id"]})
+		database_author = self.collections["authors"].find_one({"_id": author["_id"]})
 
 		if database_author == None:
 			# author doesn't exist yet
 			author["msg_count"] = 0
-			self.collection_authors.insert_one(author)
+			self.collections["authors"].insert_one(author)
 			return
 
 		# merge new author with existing author
@@ -333,7 +328,7 @@ class JsonProcessor:
 		names = list(set(author["names"] + database_author["names"]))
 
 		# update guildIds and nicknames in database
-		self.collection_authors.update_one({"_id": author["_id"]}, {
+		self.collections["authors"].update_one({"_id": author["_id"]}, {
 			"$set": {
 				"guildIds": guildIds,
 				"nicknames": nicknames,
@@ -344,19 +339,19 @@ class JsonProcessor:
 
 
 	def insert_emoji(self, emoji, guild_id):
-		database_document = self.collection_emojis.find_one({"_id": emoji['emoji']["_id"]})
+		database_document = self.collections["emojis"].find_one({"_id": emoji['emoji']["_id"]})
 
 		if database_document == None:
 			# new emoji
 			emoji['emoji']["usage_count"] = emoji['count']
 			emoji['emoji']["guildIds"] = [guild_id]
-			self.collection_emojis.insert_one(emoji['emoji'])
+			self.collections["emojis"].insert_one(emoji['emoji'])
 			return
 
 		guildIds = list(set(emoji['emoji']["guildIds"] + database_document["guildIds"]))
 
 		# increase usage count
-		self.collection_emojis.update_one({"_id": emoji['emoji']["_id"]}, {
+		self.collections["emojis"].update_one({"_id": emoji['emoji']["_id"]}, {
 			"$inc": {
 				"usage_count": emoji['count']
 			},
@@ -366,11 +361,11 @@ class JsonProcessor:
 		})
 
 	def insert_role(self, role):
-		database_document = self.collection_roles.find_one({"_id": role["_id"]})
+		database_document = self.collections["roles"].find_one({"_id": role["_id"]})
 
 		if database_document == None:
 			# new role
-			self.collection_roles.insert_one(role)
+			self.collections["roles"].insert_one(role)
 			return
 
 	def mark_as_processed(self, json_path):
@@ -394,7 +389,7 @@ class JsonProcessor:
 
 		hex_hash = file_hash.hexdigest()
 
-		self.collection_jsons.insert_one({
+		self.collections["jsons"].insert_one({
 			"_id": json_path,
 			"size": file_size,
 			"sha256_hash": hex_hash,
@@ -477,6 +472,8 @@ class JsonProcessor:
 			print('        exported_at:', exported_at)
 
 			guild = self.process_guild(guild)
+			self.collections = self.database.get_guild_collections(guild["_id"])
+
 			channel = self.process_channel(channel, guild["_id"])
 			guild['exportedAt'] = exported_at
 			channel['exportedAt'] = exported_at
@@ -485,7 +482,7 @@ class JsonProcessor:
 			roles = {}  # role_id -> role_object
 
 			print('    deleted messages - stage 1/3')
-			iterator = self.collection_messages.find({"channelId": channel["_id"]}, {"_id": 1, "sources": 1}).sort("_id", 1)
+			iterator = self.collections["messages"].find({"channelId": channel["_id"]}, {"_id": 1, "sources": 1}).sort("_id", 1)
 			old_channel_ids_by_source = {}  # source -> set of ids
 			for message in iterator:
 				for source in message["sources"]:
@@ -535,26 +532,26 @@ class JsonProcessor:
 
 					message_ids = [message["_id"] for message in messages]
 					print('        getting existing messages')
-					existing_messages = list(self.collection_messages.find({"_id": {"$in": message_ids}}))
+					existing_messages = list(self.collections["messages"].find({"_id": {"$in": message_ids}}))
 					print('            existing messages count:', len(list(existing_messages)))
 
 					print('        removing existing messages')
-					self.collection_messages.delete_many({"_id": {"$in": message_ids}})
+					self.collections["messages"].delete_many({"_id": {"$in": message_ids}})
 
 					print('        merging messages')
 					messages = self.merge_messages(list(messages), list(existing_messages))
 
 					# insert messages
 					print('        inserting messages')
-					self.collection_messages.insert_many(messages)
+					self.collections["messages"].insert_many(messages)
 
 					print('        updating message counts')
 					new_messages_count = len(messages) - len(list(existing_messages))
 					# update message count of channel
-					self.collection_channels.update_one({"_id": message["channelId"]}, {"$inc": {"msg_count": new_messages_count}})
+					self.collections["channels"].update_one({"_id": message["channelId"]}, {"$inc": {"msg_count": new_messages_count}})
 
 					# update message count of guild
-					self.collection_guilds.update_one({"_id": message["guildId"]}, {"$inc": {"msg_count": new_messages_count}})
+					self.collections["guilds"].update_one({"_id": message["guildId"]}, {"$inc": {"msg_count": new_messages_count}})
 
 					# update message count of author
 					bulk = []
@@ -563,7 +560,7 @@ class JsonProcessor:
 					for message in messages:
 						bulk.append(UpdateOne({"_id": message["author"]["_id"]}, {"$inc": {"msg_count": 1}}))
 					if len(bulk) > 0:
-						self.collection_authors.bulk_write(bulk)
+						self.collections["authors"].bulk_write(bulk)
 
 					print('        inserting emojis')
 					for emoji in emojis:
@@ -583,7 +580,7 @@ class JsonProcessor:
 		deleted_messages_ids = find_additional_missing_numbers(old_channel_ids_by_source, new_channel_ids)
 		print(f'        found {len(deleted_messages_ids)} new deleted messages')
 		print('    deleted messages - stage 3/3')
-		self.collection_messages.update_many({"_id": {"$in": list(deleted_messages_ids)}}, {"$set": {"isDeleted": True}})
+		self.collections["messages"].update_many({"_id": {"$in": list(deleted_messages_ids)}}, {"$set": {"isDeleted": True}})
 
 
 		self.mark_as_processed(self.json_path)

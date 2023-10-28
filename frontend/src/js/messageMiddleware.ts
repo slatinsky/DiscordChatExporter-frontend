@@ -12,18 +12,24 @@ const MESSAGE_LIMIT_PER_FETCH = 250
 // observer pattern using svelte store
 export const justFetchedMessageIds: any = writable([])
 
+let messageid_guildid: Record<string, string> = {}
+
 
 async function fetchMessages(messageIds: string[]) {
 
 	console.log("fetching " + messageIds.length + " messages");
+	let guild_id = messageid_guildid[messageIds[0]]  // TODO: this is a hack, fix it
 
 	// fetch messages from server
-	const response = await fetch("/api/messages", {
+	const response = await fetch(`/api/messages`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify(messageIds),
+		body: JSON.stringify({
+			guild_id: guild_id,
+			message_ids: messageIds
+		})
 	})
 
 	// parse response
@@ -56,7 +62,8 @@ export function cancelMessageContentRequest(messageId: string) {
 }
 
 
-export async function getMessageContent(messageId: string): Promise<Message> {
+export async function getMessageContent(messageId: string, guild_id: string): Promise<Message> {
+	messageid_guildid[messageId] = guild_id
 	// if message is already loaded, return it
 	if (messages[messageId]) {
 		return new Promise((resolve) => {

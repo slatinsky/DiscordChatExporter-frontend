@@ -11,7 +11,7 @@ const config: UserConfig = {
 		},
 		https: false,
 		hmr: {
-			clientPort: 5050,
+			clientPort: 21012,
 		},
 		// host: '0.0.0.0',
 		port: 5050,

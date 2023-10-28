@@ -14,12 +14,12 @@ function createMockChannelInfo(channelId: string | undefined): Channel {
 }
 
 
-export async function getChannelInfo(channelId: string): Promise<Channel> {
+export async function getChannelInfo(channelId: string, guildId: string): Promise<Channel> {
     if (!channelId) {
         return createMockChannelInfo(undefined);
     }
     const paddedChannelId = channelId.padStart(24, "0");
-    const response = await fetch(`/api/channels?channel_id=${paddedChannelId}`);
+    const response = await fetch(`/api/channels?channel_id=${paddedChannelId}&guild_id=${guildId}`);
     const json = await response.json();
 
     if (!json._id) {
@@ -30,7 +30,7 @@ export async function getChannelInfo(channelId: string): Promise<Channel> {
 }
 
 
-export async function getRoleInfo(roleId: string) {
+export async function getRoleInfo(roleId: string, guildId: string) {
     if (!roleId) {
         return {
             "color":"#d4e0fc",
@@ -39,7 +39,7 @@ export async function getRoleInfo(roleId: string) {
         };
     }
     const paddedRoleId = roleId.padStart(24, "0");
-    const response = await fetch(`/api/roles?role_id=${paddedRoleId}`);
+    const response = await fetch(`/api/roles?role_id=${paddedRoleId}&guild_id=${guildId}`);
     const json = await response.json();
 
     if (!json._id) {

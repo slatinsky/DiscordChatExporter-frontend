@@ -1,12 +1,14 @@
 from pprint import pprint
 
+from helpers import get_guild_collection
 
-def autocomplete_categories(db, guild_id: str, partial_category: str, limit: int):
+
+def autocomplete_categories(guild_id: str, partial_category: str, limit: int):
 	"""
 	Searches for categories.
 	limited to {limit} results * 10
 	"""
-	collection_channels = db["channels"]
+	collection_channels = get_guild_collection(guild_id, "channels")
 
 	# ignore "GuildPublicThread" or "GuildPrivateThread", because their category is channel name
 	query = {
@@ -55,12 +57,12 @@ def autocomplete_categories(db, guild_id: str, partial_category: str, limit: int
 
 	return category_names
 
-def autocomplete_channels(db, guild_id: str, partial_channel: str, limit: int):
+def autocomplete_channels(guild_id: str, partial_channel: str, limit: int):
 	"""
 	Searches for channels.
 	limited to {limit} results
 	"""
-	collection_channels = db["channels"]
+	collection_channels = get_guild_collection(guild_id, "channels")
 
 	query = {
 		"name": {
@@ -86,12 +88,12 @@ def autocomplete_channels(db, guild_id: str, partial_channel: str, limit: int):
 
 	return channel_names
 
-def autocomplete_reactions(db, guild_id: str, partial_reaction: str, limit: int):
+def autocomplete_reactions(guild_id: str, partial_reaction: str, limit: int):
 	"""
 	Searches for reactions.
 	limited to {limit} results
 	"""
-	collection_emojis = db["emojis"]
+	collection_emojis = get_guild_collection(guild_id, "emojis")
 
 	query = {
 		"name": {
@@ -121,12 +123,12 @@ def autocomplete_reactions(db, guild_id: str, partial_reaction: str, limit: int)
 	return reaction_names
 
 
-def autocomplete_filenames(db, guild_id: str, partial_filename: str, limit: int):
+def autocomplete_filenames(guild_id: str, partial_filename: str, limit: int):
 	"""
 	Searches for filenames.
 	limited to {limit} results
 	"""
-	collection_assets = db["assets"]
+	collection_assets = get_guild_collection(guild_id, "assets")
 
 	query = {
 		"filenameWithoutHash": {
@@ -157,13 +159,14 @@ def autocomplete_filenames(db, guild_id: str, partial_filename: str, limit: int)
 	return filenames
 
 
-def autocomplete_users(db, guild_id: str, partial_user_name: str, limit: int):
+def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 	"""
 	Searches for users by name.
 	limited to {limit} results
 	only shows users that have messages in the guild {guild_id}
 	"""
-	collection_authors = db["authors"]
+	collection_authors = get_guild_collection(guild_id, "authors")
+	print("collection_authors", collection_authors)
 
 	query = {
 		"guildIds": guild_id,

@@ -8,16 +8,26 @@ from hashlib import sha256
 
 from FileFinder import FileFinder
 from MongoDatabase import MongoDatabase
+from helpers import pad_id
 
 print = functools.partial(print, flush=True)
 
 class AssetProcessor:
 	def __init__(self, file_finder: FileFinder, database: MongoDatabase):
+		self.database = database
 		self.file_finder = file_finder
-		self.collection_assets = database.get_collection("assets")
+		self.collection_assets = None
 		self.local_assets = None
 		self.fast_mode = False
 		self.cache = {}
+
+	def set_guild_id(self, guild_id):
+		"""
+		it is required to set guild id, to set the correct collection
+		"""
+		guild_collections = self.database.get_guild_collections(guild_id)
+		self.collection_assets = guild_collections["assets"]
+
 
 	def set_fast_mode(self, fast_mode: bool):
 		self.fast_mode = fast_mode
@@ -168,6 +178,9 @@ class AssetProcessor:
 		provide filepath without base directory
 		original_filepath is the path from json file, but is not necessarily a valid path
 		"""
+
+		if self.collection_assets is None:
+			raise Exception("AssetProcessor: Guild id not set, call set_guild_id method first")
 
 		# do not process twice the same file. Processing is relatively slow
 		if original_filepath in self.cache:

@@ -7,11 +7,11 @@
 	export let guildName: string;
 
 	// fetch message from api
-	async function fetchMessages(messageId: string, previousMessageId: string | null) {
-		const messagePromise = getMessageContent(messageId);
+	async function fetchMessages(messageId: string, previousMessageId: string | null, selectedGuildId: string) {
+		const messagePromise = getMessageContent(messageId, selectedGuildId);
 		let previousMessage
 		if (previousMessageId !== null) {
-			previousMessage = await getMessageContent(previousMessageId);
+			previousMessage = await getMessageContent(previousMessageId, selectedGuildId);
 		}
 		else {
 			previousMessage = null;
@@ -22,7 +22,7 @@
 		let referencedMessage
 
 		if (message.reference) {
-			referencedMessage = await getMessageContent(message.reference.messageId);
+			referencedMessage = await getMessageContent(message.reference.messageId, selectedGuildId);
 		}
 		else {
 			referencedMessage = null;
@@ -36,7 +36,7 @@
 	}
 
 	// promise
-	let fullMessagesPromise = fetchMessages(messageId, previousMessageId);
+	let fullMessagesPromise = fetchMessages(messageId, previousMessageId, selectedGuildId);
 </script>
 {#if messageId == "error"}
 	<div class="search-error">SEARCH ERROR - check server logs for details</div>
@@ -48,7 +48,7 @@
 			<NewMessage message={messages.message} previousMessage={messages.previousMessage} referencedMessage={messages.referencedMessage} {selectedGuildId} {guildName}/>
 		{/key}
 	{:catch error}
-		<div style="color: red" class="loading">{error} <span class="retry-btn" on:click={() => fullMessagesPromise = fetchMessages(messageId, previousMessageId)}>retry</span></div>
+		<div style="color: red" class="loading">{error} <span class="retry-btn" on:click={() => fullMessagesPromise = fetchMessages(messageId, previousMessageId, selectedGuildId)}>retry</span></div>
 	{/await}
 {/if}
 

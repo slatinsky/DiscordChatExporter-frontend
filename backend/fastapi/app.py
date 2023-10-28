@@ -7,8 +7,10 @@ import sys
 import traceback
 import pymongo
 from fastapi import FastAPI, Query
+from pydantic import BaseModel
 
 import Autocomplete
+from helpers import get_global_collection, pad_id, get_guild_collection
 
 # fix PIPE encoding error on Windows, auto flush print
 sys.stdout.reconfigure(encoding='utf-8')
@@ -16,10 +18,7 @@ sys.stderr.reconfigure(encoding='utf-8')
 print = functools.partial(print, flush=True)
 
 
-def pad_id(id):
-	if id == None:
-		return None
-	return str(id).zfill(24)
+
 
 
 # specify guild ids that should be hidden from the public (list of strings)
@@ -29,16 +28,9 @@ blacklisted_guild_ids = []
 blacklisted_guild_ids = [pad_id(id) for id in blacklisted_guild_ids]
 
 
-URI = "mongodb://127.0.0.1:27017"
-client = pymongo.MongoClient(URI)
-db = client["dcef"]
-collection_messages = db["messages"]
-collection_channels = db["channels"]
-collection_guilds = db["guilds"]
-collection_authors = db["authors"]
-collection_emojis = db["emojis"]
-collection_assets = db["assets"]
-collection_roles = db["roles"]
+
+
+
 
 app = FastAPI(
 	title="DCEF backend api",
@@ -81,6 +73,7 @@ async def get_guilds(guild_id: str = None):
 
 	Filters out blacklisted guilds from the config.toml file.
 	"""
+	collection_guilds = get_global_collection("guilds")
 	if guild_id:
 		if guild_id in blacklisted_guild_ids:
 			return {"message": "Not found"}
@@ -112,12 +105,8 @@ async def get_channels(guild_id: str = None, channel_id: str = None):
 	Optionally, a guild_id query parameter can be provided to filter by guild.
 	Optionally, a channel_id query parameter can be provided to get only specific channel.
 	"""
-	if guild_id:
-		if guild_id in blacklisted_guild_ids:
-			return []
+	collection_channels = get_guild_collection(guild_id, "channels")
 
-		cursor = collection_channels.find({"guildId": guild_id})
-		return list(cursor)
 
 	if channel_id:
 		channel = collection_channels.find_one(
@@ -131,6 +120,13 @@ async def get_channels(guild_id: str = None, channel_id: str = None):
 		if not channel:
 			return {"message": "Not found"}
 		return channel
+
+	if guild_id:
+		if guild_id in blacklisted_guild_ids:
+			return []
+
+		cursor = collection_channels.find({"guildId": guild_id})
+		return list(cursor)
 
 	cursor = collection_channels.find(
 		{
@@ -150,12 +146,7 @@ async def get_roles(guild_id: str = None, role_id: str = None):
 	Optionally, a guild_id query parameter can be provided to filter by guild.
 	Optionally, a role_id query parameter can be provided to get only specific role.
 	"""
-	if guild_id:
-		if guild_id in blacklisted_guild_ids:
-			return []
-
-		cursor = collection_roles.find({"guildId": guild_id})
-		return list(cursor)
+	collection_roles = get_guild_collection(guild_id, "roles")
 
 	if role_id:
 		role = collection_roles.find_one(
@@ -170,6 +161,13 @@ async def get_roles(guild_id: str = None, role_id: str = None):
 			return {"message": "Not found"}
 		return role
 
+	if guild_id:
+		if guild_id in blacklisted_guild_ids:
+			return []
+
+		cursor = collection_roles.find({"guildId": guild_id})
+		return list(cursor)
+
 	# order by position desc
 	cursor = collection_roles.find(
 		{
@@ -182,11 +180,12 @@ async def get_roles(guild_id: str = None, role_id: str = None):
 
 
 @app.get("/message-ids")
-async def get_message_ids(channel_id: str = None):
+async def get_message_ids(channel_id: str, guild_id: str):
 	"""
 	Returns a list of message ids.
 	Optionally, a channel_id query parameter can be provided to filter by channel.
 	"""
+	collection_messages = get_guild_collection(guild_id, "messages")
 	if is_compiled():
 		cache_path = f"../../storage/cache/message-ids/{channel_id}.json"
 	else:
@@ -220,32 +219,21 @@ async def get_message_ids(channel_id: str = None):
 	return new_ids
 
 
-@app.get("/message")
-async def get_message_content(message_id: str):
-	"""
-	Returns the content of a message by its id.
-	"""
-	message = collection_messages.find_one(
-		{
-			"_id": message_id,
-			"guildId": {
-				"$nin": blacklisted_guild_ids
-			}
-   		}
-	)
-	if not message:
-		return {"message": "Not found"}
-
-	if message["guildId"] in blacklisted_guild_ids:
-		return {"message": "Not found"}
-	return message
+class MessageRequest(BaseModel):
+	message_ids: list
+	guild_id: str
 
 
 @app.post("/messages")
-async def get_multiple_message_content(message_ids: list):
+async def get_multiple_message_content(message_req_obj: MessageRequest):
 	"""
 	Returns the content of multiple messages by their ids.
 	"""
+	message_ids = message_req_obj.message_ids
+	guild_id = message_req_obj.guild_id
+
+	collection_messages = get_guild_collection(guild_id, "messages")
+
 	messages = collection_messages.find(
 		{
 			"_id": {
@@ -257,7 +245,7 @@ async def get_multiple_message_content(message_ids: list):
 		}
 	)
 	list_of_messages = list(messages)
-	list_of_messages = enrich_messages(list_of_messages)
+	list_of_messages = enrich_messages(list_of_messages, guild_id)
 	return list_of_messages
 
 
@@ -265,6 +253,8 @@ def channel_names_to_ids(in_channel_ids: list, in_channels: list, guild_id: str 
 	"""
 	Convert channel names to ids.
 	"""
+	collection_channels = get_guild_collection(guild_id, "channels")
+
 	if len(in_channels) == 0:
 		return in_channel_ids
 
@@ -294,6 +284,8 @@ def category_names_to_ids(in_category_ids: list, in_categories: list, guild_id: 
 	"""
 	Convert category names to ids.
 	"""
+	collection_channels = get_guild_collection(guild_id, "channels")
+
 	if len(in_categories) == 0:
 		return in_category_ids
 
@@ -312,13 +304,15 @@ def category_names_to_ids(in_category_ids: list, in_categories: list, guild_id: 
 	return out_category_ids
 
 
-def extend_channels(channels: list):
+def extend_channels(channels: list, guild_id: str):
 	"""
 	Extend a list of channels with thread ids and forum post ids.
 
 	Can be also used to extend a list of categories with channel ids.
 	In this case, we will not clean category ids from the list, but it causes no problems except for a little bit of performance loss.
 	"""
+	collection_channels = get_guild_collection(guild_id, "channels")
+
 	if len(channels) == 0:
 		return channels
 
@@ -329,11 +323,12 @@ def extend_channels(channels: list):
 	channels = list(set(channels))  # remove duplicates
 	return channels
 
-def extend_users(user_ids: list, usernames: list):
+def extend_users(user_ids: list, usernames: list, guild_id: str):
 	"""
 	Find new user ids by user names.
 	exactly match user names
 	"""
+	collection_authors = get_guild_collection(guild_id, "authors")
 	if len(usernames) == 0:
 		return user_ids
 
@@ -352,12 +347,14 @@ def extend_users(user_ids: list, usernames: list):
 	return user_ids
 
 
-def extend_reactions(reaction_ids: list, reactions: list):
+def extend_reactions(reaction_ids: list, reactions: list, guild_id: str):
 	"""
 	Find new reaction ids by reaction names.
 	Support partial or lowercase match.
 
 	"""
+	collection_emojis = get_guild_collection(guild_id, "emojis")
+
 	if len(reactions) == 0:
 		return reaction_ids
 
@@ -378,11 +375,12 @@ def extend_reactions(reaction_ids: list, reactions: list):
 
 
 
-def get_emotes_from_db(emote_names: list) -> dict:
+def get_emotes_from_db(emote_names: list, guild_id: str) -> dict:
 	"""
 	try to find emotes from DB by their name
 	use exact match only
 	"""
+	collection_emojis = get_guild_collection(guild_id, "emojis")
 	if len(emote_names) == 0:
 		return {}
 
@@ -396,11 +394,13 @@ def get_emotes_from_db(emote_names: list) -> dict:
 	emotes = {emote["name"]: emote for emote in emotes}
 	return emotes
 
-def get_channel_info(channel_id):
+def get_channel_info(channel_id: str, guild_id: str):
 	"""
 	get channel info by id
 	'channel' can be thread or channel or forum post
 	"""
+	collection_channels = get_guild_collection(guild_id, "channels")
+	collection_messages = get_guild_collection(guild_id, "messages")
 
 	channel = collection_channels.find_one(
 		{
@@ -419,7 +419,7 @@ def get_channel_info(channel_id):
 	return channel
 
 
-def enrich_messages(list_of_messages: list) -> list:
+def enrich_messages(list_of_messages: list, guild_id: str) -> list:
 	regex = re.compile(r':([^ ]+):')
 
 	possible_emotes = []
@@ -434,7 +434,7 @@ def enrich_messages(list_of_messages: list) -> list:
 
 
 	# get all emotes from db
-	emotes = get_emotes_from_db(emote_names=possible_emotes)
+	emotes = get_emotes_from_db(emote_names=possible_emotes, guild_id=guild_id)
 
 	# replace emotes in messages
 	for message in list_of_messages:
@@ -452,7 +452,7 @@ def enrich_messages(list_of_messages: list) -> list:
 
 	for message in list_of_messages:
 		if message["type"] == "ThreadCreated":
-			message["thread"] = get_channel_info(message["reference"]["channelId"])
+			message["thread"] = get_channel_info(message["reference"]["channelId"], guild_id)
 
 	return list_of_messages
 
@@ -664,15 +664,15 @@ def search_autocomplete(guild_id: str = None, key: str = None, value: str = None
 	guild_id = pad_id(guild_id)
 
 	if (key == "users"):
-		return Autocomplete.autocomplete_users(db, guild_id, value, limit)
+		return Autocomplete.autocomplete_users(guild_id, value, limit)
 	elif (key == "filenames"):
-		return Autocomplete.autocomplete_filenames(db, guild_id, value, limit)
+		return Autocomplete.autocomplete_filenames(guild_id, value, limit)
 	elif (key == "reactions"):
-		return Autocomplete.autocomplete_reactions(db, guild_id, value, limit)
+		return Autocomplete.autocomplete_reactions(guild_id, value, limit)
 	elif (key == "channels"):
-		return Autocomplete.autocomplete_channels(db, guild_id, value, limit)
+		return Autocomplete.autocomplete_channels(guild_id, value, limit)
 	elif (key == "categories"):
-		return Autocomplete.autocomplete_categories(db, guild_id, value, limit)
+		return Autocomplete.autocomplete_categories(guild_id, value, limit)
 	else:
 		return []
 
@@ -781,6 +781,8 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 	Searches for messages that contain the prompt.
 	"""
 
+	collection_messages = get_guild_collection(guild_id, "messages")
+
 	try:
 		# todo: parse prompt
 		search = parse_prompt(prompt)
@@ -815,27 +817,27 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 		message_ids = [pad_id(id) for id in message_ids]
 
 		from_user_ids = [pad_id(id) for id in from_user_ids]
-		from_user_ids = extend_users(from_user_ids, from_users)
+		from_user_ids = extend_users(from_user_ids, from_users, guild_id)
 
 		print("from_user_ids", from_user_ids)
 
 		reaction_from_ids = [pad_id(id) for id in reaction_from_ids]
-		reaction_from_ids = extend_users(reaction_from_ids, reaction_from)
+		reaction_from_ids = extend_users(reaction_from_ids, reaction_from, guild_id)
 
 		mentions_user_ids = [pad_id(id) for id in mentions_user_ids]
-		mentions_user_ids = extend_users(mentions_user_ids, mentions_users)
+		mentions_user_ids = extend_users(mentions_user_ids, mentions_users, guild_id)
 		reaction_ids = [pad_id(id) for id in reaction_ids]
 		reactions = [reaction.lower() for reaction in reactions]
-		reaction_ids = extend_reactions(reaction_ids, reactions)
+		reaction_ids = extend_reactions(reaction_ids, reactions, guild_id)
 		extensions = [ext.lower() for ext in extensions]
 		in_channel_ids = channel_names_to_ids(in_channel_ids, in_channels, guild_id)
 		in_channel_ids = [pad_id(id) for id in in_channel_ids]
-		in_channel_ids = extend_channels(in_channel_ids)      # extend channels with threads and forum posts
+		in_channel_ids = extend_channels(in_channel_ids, guild_id)      # extend channels with threads and forum posts
 		in_category_ids = [pad_id(id) for id in in_category_ids]
 		in_category_ids = category_names_to_ids(in_category_ids, in_categories, guild_id)
 		in_category_ids = [pad_id(id) for id in in_category_ids]
-		in_category_ids = extend_channels(in_category_ids)  # extend categories with channels
-		in_category_ids = extend_channels(in_category_ids)  # extend channels with threads and forum posts
+		in_category_ids = extend_channels(in_category_ids, guild_id)  # extend categories with channels
+		in_category_ids = extend_channels(in_category_ids, guild_id)  # extend channels with threads and forum posts
 
 
 
@@ -1020,7 +1022,7 @@ async def search_messages(prompt: str = None, guild_id: str = None, only_ids: bo
 			return ids
 		else:
 			list_of_messages = list(cursor)
-			list_of_messages = enrich_messages(list_of_messages)
+			list_of_messages = enrich_messages(list_of_messages, guild_id)
 			return list_of_messages
 	except Exception as e:
 		print("/search error:")

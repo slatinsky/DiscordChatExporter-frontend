@@ -161,7 +161,7 @@
                     let channelId = matches[1]
                     let fullMatch = matches[0]
 
-                    let channelInfo = await getChannelInfo(channelId)
+                    let channelInfo = await getChannelInfo(channelId, guildId)
                     processedContent = processedContent.replace(fullMatch, `<a class="message-mention" href="/channels/${guildId}/${channelId.toString().padStart(24, '0')}">${channelIcon} ${channelInfo.name} </a>`)
                 }
             }
@@ -174,7 +174,7 @@
                     let roleId = matches[1]
                     let fullMatch = matches[0]
 
-                    let roleInfo = await getRoleInfo(roleId)
+                    let roleInfo = await getRoleInfo(roleId, guildId)
                     processedContent = processedContent.replace(fullMatch, `<span class="message-mention" style="color:${roleInfo.color};background-color:${darkenColor(roleInfo.color, .65)} !important">@${roleInfo.name}</span>`)
                 }
             }
