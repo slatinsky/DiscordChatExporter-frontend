@@ -16,7 +16,6 @@ def autocomplete_categories(guild_id: str, partial_category: str, limit: int):
 			"$regex": partial_category,
 			"$options": "i"
 		},
-		"guildId": guild_id,
 		"type": {
 			"$nin": [
 				"GuildPublicThread",
@@ -67,8 +66,7 @@ def autocomplete_channels(guild_id: str, partial_channel: str, limit: int):
 	query = {
 		"name": {
 			"$regex": partial_channel, "$options": "i"
-		},
-		"guildId": guild_id
+		}
 	}
 	cursor = collection_channels.find(query, {
 		"name": 1,
@@ -99,8 +97,7 @@ def autocomplete_reactions(guild_id: str, partial_reaction: str, limit: int):
 		"name": {
 			"$regex": partial_reaction,
 			"$options": "i"
-		},
-		"guildIds": guild_id
+		}
 	}
 	cursor = collection_emojis.find(query, {
 		"name": 1,
@@ -169,7 +166,6 @@ def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 	print("collection_authors", collection_authors)
 
 	query = {
-		"guildIds": guild_id,
 		"names": {
 			"$regex": partial_user_name, "$options": "i"
 		}

@@ -28,6 +28,11 @@ def wipe_database(database: MongoDatabase):
 	EXPECTED_VERSION = 13    # <---- change this to wipe database
 	config = database.get_collection("config")
 
+	# add empty whitelisted_guild_ids config if it does not exist
+	whitelisted_guild_ids = config.find_one({"key": "whitelisted_guild_ids"})
+	if whitelisted_guild_ids is None:
+		config.insert_one({"key": "whitelisted_guild_ids", "value": []})
+
 	version = config.find_one({"key": "version"})
 	if version is None:
 		version = {"key": "version", "value": 0}
