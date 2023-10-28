@@ -23,8 +23,6 @@ class MongoDatabase():
 			"config": self.database["config"],
 		}
 
-		self.create_indexes()
-
 	def get_guild_collections(self, guild_id):
 		"""
 		Returns a list of collections that are guild specific
@@ -43,12 +41,10 @@ class MongoDatabase():
 			"config":   self.database["config"],
 		}
 
-	def create_indexes(self):
+	def create_indexes(self, guild_id):
 		# create case insensitive text indexes
 		# self.col["messages"].create_index("content.content", default_language="none")
-		pass
-		# TODO: add this back
-		# self.col["messages"].create_index("channelId", default_language="none")
+		self.get_guild_collections(guild_id)["messages"].create_index("channelId", default_language="none")
 
 
 

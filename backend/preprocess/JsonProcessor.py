@@ -473,6 +473,7 @@ class JsonProcessor:
 
 			guild = self.process_guild(guild)
 			self.collections = self.database.get_guild_collections(guild["_id"])
+			self.database.create_indexes(guild["_id"])
 
 			channel = self.process_channel(channel, guild["_id"])
 			guild['exportedAt'] = exported_at
