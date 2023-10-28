@@ -4,6 +4,7 @@
 	interface SearchCategory {
 		key: string;
 		description: string;
+		description2?: string;
 		type: 'string' | 'discord_snowflake' | 'number' | 'boolean';
 		multiple: boolean;
 		mapTo: string;  
@@ -135,6 +136,7 @@
 				return {
 					key: category.key,
 					description: category.description,
+					description2: category?.description2 ?? undefined,
 					action: () => {
 						console.log("accept suggestion", category.key);
 						// $searchPrompt = $searchPrompt.replace(key, category.key + ':');

@@ -390,7 +390,8 @@ def enrich_messages(list_of_messages: list, guild_id: str) -> list:
 SEARCH_CATEGORIES = [
 	{
 		"key": 'from',
-		"description": 'user (exact string match)',
+		"description": 'user',
+		"description2": 'exact string match',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "from_users",
@@ -398,7 +399,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'mentions',
-		"description": 'user (exact string match)',
+		"description": 'user',
+		"description2": 'exact string match',
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "mentions_users",
@@ -406,7 +408,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'reaction_from',
-		"description": 'user (exact string match)',
+		"description": 'user',
+		"description2": "exact string match",
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "reaction_from",
@@ -414,7 +417,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'reaction',
-		"description": 'emoji (partial regex match)',
+		"description": 'emoji',
+		"description2": "partial regex match",
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "reactions",
@@ -422,7 +426,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'extension',
-		"description": 'pdf/png/jpg/etc (exact match)',
+		"description": 'pdf/png/jpg/etc',
+		"description2": "exact match",
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "extensions",
@@ -430,7 +435,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'filename',
-		"description": 'file (partial regex match)',
+		"description": 'file',
+		"description2": "partial regex match",
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "filenames",
@@ -438,7 +444,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'in',
-		"description": 'channel (exact string match)',
+		"description": 'channel',
+		"description2": "exact string match",
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "in_channels",
@@ -446,7 +453,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'category',
-		"description": 'category (exact string match)',
+		"description": 'category',
+		"description2": "exact string match",
 		"type": 'string',
 		"multiple": True,
 		"mapTo": "in_categories",
@@ -455,6 +463,7 @@ SEARCH_CATEGORIES = [
 	{
 		"key": 'pinned',
 		"description": 'true/false',
+		"description2": "boolean",
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "is_pinned",
@@ -463,6 +472,7 @@ SEARCH_CATEGORIES = [
 	{
 		"key": 'has_audio',
 		"description": 'true/false',
+		"description2": "boolean",
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "attachment_is_audio",
@@ -471,6 +481,7 @@ SEARCH_CATEGORIES = [
 	{
 		"key": 'has_image',
 		"description": 'true/false',
+		"description2": "boolean",
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "attachment_is_image",
@@ -479,6 +490,7 @@ SEARCH_CATEGORIES = [
 	{
 		"key": 'has_video',
 		"description": 'true/false',
+		"description2": "boolean",
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "attachment_is_video",
@@ -487,6 +499,7 @@ SEARCH_CATEGORIES = [
 	{
 		"key": 'has_other',
 		"description": 'true/false',
+		"description2": "boolean",
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "attachment_is_other",
@@ -495,6 +508,7 @@ SEARCH_CATEGORIES = [
 	{
 		"key": 'has_link',
 		"description": 'true/false',
+		"description2": "boolean",
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "containing_links",
@@ -503,6 +517,7 @@ SEARCH_CATEGORIES = [
 	{
 		"key": 'edited',
 		"description": 'true/false',
+		"description2": "boolean",
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "is_edited",
@@ -511,6 +526,7 @@ SEARCH_CATEGORIES = [
 		{
 		"key": 'deleted',
 		"description": 'true/false',
+		"description2": "boolean",
 		"type": 'boolean',
 		"multiple": False,
 		"mapTo": "is_deleted",
@@ -518,7 +534,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'limit',
-		"description": 'number (default 100000, 0 disables limit)',
+		"description": 'number',
+		"description2": "default 100000, 0 disables limit",
 		"type": 'number',
 		"multiple": False,
 		"mapTo": "limit",
@@ -526,7 +543,8 @@ SEARCH_CATEGORIES = [
 	},
 		{
 		"key": 'message_id',
-		"description": 'message id (discord snowflake))',
+		"description": 'message id',
+		"description2": "discord snowflake",
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "message_ids",
@@ -534,7 +552,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'in_id',
-		"description": 'channel id (discord snowflake)',
+		"description": 'channel id',
+		"description2": "discord snowflake",
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "in_channel_ids",
@@ -542,7 +561,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'category_id',
-		"description": 'category id (discord snowflake)',
+		"description": 'category id',
+		"description2": "discord snowflake",
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "in_category_ids",
@@ -550,7 +570,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'from_id',
-		"description": 'author id (discord snowflake)',
+		"description": 'author id',
+		"description2": "discord snowflake",
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "from_user_ids",
@@ -558,7 +579,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'mentions_id',
-		"description": 'author id (discord snowflake)',
+		"description": 'author id',
+		"description2": "discord snowflake",
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "mentions_user_ids",
@@ -566,7 +588,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'reaction_from_id',
-		"description": 'user id (discord_snowflake)',
+		"description": 'user id',
+		"description2": "discord snowflake",
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "reaction_from_ids",
@@ -574,7 +597,8 @@ SEARCH_CATEGORIES = [
 	},
 	{
 		"key": 'reaction_id',
-		"description": 'emoji id (discord snowflake)',
+		"description": 'emoji id',
+		"description2": "discord snowflake",
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "reaction_ids",
