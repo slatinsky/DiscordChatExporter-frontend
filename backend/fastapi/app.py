@@ -1,3 +1,5 @@
+import datetime
+from dateutil.relativedelta import relativedelta
 import functools
 import json
 import os
@@ -416,6 +418,69 @@ SEARCH_CATEGORIES = [
 		"autocompleteApi": "has",
 	},
 	{
+		"key": 'before',
+		"description": 'specific date',
+		"description2": 'in format YYYY-MM-DD, YYYY-MM or YYYY (UTC)',
+		"type": 'date',
+		"multiple": True,
+		"mapTo": "before",
+		"autocompleteApi": None,
+	},
+	{
+		"key": 'during',
+		"description": 'specific date',
+		"description2": 'in format YYYY-MM-DD, YYYY-MM or YYYY (UTC)',
+		"type": 'date',
+		"multiple": True,
+		"mapTo": "during",
+		"autocompleteApi": None,
+	},
+	{
+		"key": 'after',
+		"description": 'specific date',
+		"description2": 'in format YYYY-MM-DD, YYYY-MM or YYYY (UTC)',
+		"type": 'date',
+		"multiple": True,
+		"mapTo": "after",
+		"autocompleteApi": None,
+	},
+	{
+		"key": 'in',
+		"description": 'channel',
+		"description2": "exact string match",
+		"type": 'string',
+		"multiple": True,
+		"mapTo": "in_channels",
+		"autocompleteApi": "channels",
+	},
+	{
+		"key": 'pinned',
+		"description": 'true or false',
+		"description2": "boolean",
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "is_pinned",
+		"autocompleteApi": None,
+	},
+	{
+		"key": 'edited',
+		"description": 'true or false',
+		"description2": "boolean",
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "is_edited",
+		"autocompleteApi": None,
+	},
+	{
+		"key": 'deleted',
+		"description": 'true or false',
+		"description2": "boolean",
+		"type": 'boolean',
+		"multiple": False,
+		"mapTo": "is_deleted",
+		"autocompleteApi": None,
+	},
+	{
 		"key": 'reaction_from',
 		"description": 'user',
 		"description2": "exact string match",
@@ -452,15 +517,6 @@ SEARCH_CATEGORIES = [
 		"autocompleteApi": "filenames",
 	},
 	{
-		"key": 'in',
-		"description": 'channel',
-		"description2": "exact string match",
-		"type": 'string',
-		"multiple": True,
-		"mapTo": "in_channels",
-		"autocompleteApi": "channels",
-	},
-	{
 		"key": 'category',
 		"description": 'category',
 		"description2": "exact string match",
@@ -468,33 +524,6 @@ SEARCH_CATEGORIES = [
 		"multiple": True,
 		"mapTo": "in_categories",
 		"autocompleteApi": "categories",
-	},
-	{
-		"key": 'pinned',
-		"description": 'true/false',
-		"description2": "boolean",
-		"type": 'boolean',
-		"multiple": False,
-		"mapTo": "is_pinned",
-		"autocompleteApi": None,
-	},
-	{
-		"key": 'edited',
-		"description": 'true/false',
-		"description2": "boolean",
-		"type": 'boolean',
-		"multiple": False,
-		"mapTo": "is_edited",
-		"autocompleteApi": None,
-	},
-		{
-		"key": 'deleted',
-		"description": 'true/false',
-		"description2": "boolean",
-		"type": 'boolean',
-		"multiple": False,
-		"mapTo": "is_deleted",
-		"autocompleteApi": None,
 	},
 	{
 		"key": 'limit',
@@ -634,7 +663,9 @@ def parse_prompt(prompt: str):
 		"containing_stickers": None,
 		"is_edited": None,               # boolean (None means both)
 		"is_deleted": None,              # boolean (None means both)
-		"limit": 100000                  # max number of messages to return (int)
+		"limit": 100000,                 # max number of messages to return (int)
+		"before": None,
+		"after" : None,
 	}
 
 	# loop throught all characters
@@ -691,6 +722,49 @@ def parse_prompt(prompt: str):
 							search["attachment_is_audio"] = True
 						elif word == "sticker":
 							search["containing_stickers"] = True
+				elif search_category["type"] == "date":
+					yyy_mm_dd_regex = re.compile(r"^(\d{4})-(\d{1,2})-(\d{1,2})$")
+					yyy_mm_regex = re.compile(r"^(\d{4})-(\d{1,2})$")
+					yyy_regex = re.compile(r"^(\d{4})$")
+					year = None
+					month = None
+					day = None
+
+					match_found = False
+
+					if yyy_mm_dd_regex.match(word):
+						match = yyy_mm_dd_regex.match(word)
+						year = int(match.group(1))
+						month = int(match.group(2))
+						day = int(match.group(3))
+						match_found = True
+						date_from = datetime.date(year, month, day)
+						date_to = date_from + relativedelta(days=1)
+
+
+					elif yyy_mm_regex.match(word):
+						match = yyy_mm_regex.match(word)
+						year = int(match.group(1))
+						month = int(match.group(2))
+						match_found = True
+						date_from = datetime.date(year, month, 1)
+						date_to = date_from + relativedelta(months=1)
+
+					elif yyy_regex.match(word):
+						match = yyy_regex.match(word)
+						year = int(match.group(1))
+						match_found = True
+						date_from = datetime.date(year, 1, 1)
+						date_to = date_from + relativedelta(years=1)
+
+					if match_found:
+						if current_key.lower() == "before":
+							search["before"] = f"{date_from.year}-{str(date_from.month).zfill(2)}-{str(date_from.day).zfill(2)}T00:00:00"
+						if current_key.lower() == "after":
+							search["after"] = f"{date_to.year}-{str(date_to.month).zfill(2)}-{str(date_to.day).zfill(2)}T00:00:00"
+						if current_key.lower() == "during":
+							search["after"] = f"{date_from.year}-{str(date_from.month).zfill(2)}-{str(date_from.day).zfill(2)}T00:00:00"
+							search["before"] = f"{date_to.year}-{str(date_to.month).zfill(2)}-{str(date_to.day).zfill(2)}T00:00:00"
 
 
 				elif search_category["type"] == "string" or search_category["type"] == "discord_snowflake":
@@ -755,6 +829,9 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		is_deleted = search["is_deleted"]
 		limit = search["limit"]
 
+		before = search["before"]
+		after = search["after"]
+
 		# clean up
 		message_contains = [word.lower() for word in message_contains]
 		message_ids = [pad_id(id) for id in message_ids]
@@ -789,6 +866,14 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		limited_fields = {}
 
 		query["$and"] = []
+
+		# assuming that timestamp is always in UTC (comparing strings)
+		# it that will be an issue, there is always an option to compare using discord snowflakes (message id)
+		if before is not None:
+			query["$and"].append({"timestamp": {"$lt": before}})
+
+		if after is not None:
+			query["$and"].append({"timestamp": {"$gt": after}})
 
 		if len(message_ids) > 0:
 			query["_id"] = {"$in": message_ids}
@@ -938,7 +1023,8 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		if query["$and"] == []:
 			del query["$and"]
 
-		print("query", query)
+		print("query")
+		pprint(query)
 
 		cursor=collection_messages.find(query, limited_fields)
 
