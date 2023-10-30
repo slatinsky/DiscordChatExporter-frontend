@@ -50,13 +50,8 @@ class MongoDatabase():
 
 	def clear_database(self, guild_ids):
 		"""
-		Clears the database
-		Useful for debugging
-		Assets are not cleared, because they are expensive to recompute
+		Clears the database to start fresh
 		"""
-		pass
-		# TODO: add this back
-
 		for guild_id in guild_ids:
 			print(f"Wiping guild {guild_id}...")
 			collections = self.get_guild_collections(guild_id)
@@ -67,8 +62,6 @@ class MongoDatabase():
 					continue
 				print(f"  Wiping collection {collection_name}...")
 				collection.drop()
-
-		print(f"  Wiping collection {collection_name}...")
 
 		print(f"Wiping global...")
 		# this list contains old collections too, that are not used anymore
