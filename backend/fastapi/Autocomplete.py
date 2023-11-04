@@ -209,9 +209,18 @@ def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 	print("collection_authors", collection_authors)
 
 	query = {
-		"names": {
-			"$regex": partial_user_name, "$options": "i"
-		}
+		"$or": [
+			{
+				"names": {
+					"$regex": partial_user_name, "$options": "i"
+				}
+			},
+			{
+				"nicknames": {
+					"$regex": partial_user_name, "$options": "i"
+				}
+			}
+		]
 	}
 	cursor = collection_authors.find(query, {
 		"names": 1,
