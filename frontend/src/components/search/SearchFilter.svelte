@@ -17,7 +17,7 @@
 	}
 
 
-	import { searchPrompt, searchPromptLarge, searchResultsMessageIds, searchShown } from "./searchStores";
+	import { searchPrompt, searchPromptLarge, searchResultsMessageIds, searchShown, submitSearch } from "./searchStores";
 	import { checkUrl } from "src/js/helpers";
 	export let guildId: string;
 
@@ -111,7 +111,7 @@
 			}
 			else {
 				domInput.blur();
-				submitSearch();
+				submitSearch(guildId);
 			}
 		}
 	}
@@ -156,7 +156,7 @@
 							description: "",
 							action: () => {
 								$searchPrompt = $searchPrompt.replace(new RegExp(`:"?${value}$`), ":true ");
-								submitSearch();
+								submitSearch(guildId);
 							}
 						},
 						{
@@ -164,7 +164,7 @@
 							description: "",
 							action: () => {
 								$searchPrompt = $searchPrompt.replace(new RegExp(`:"?${value}$`), ":false ");
-								submitSearch();
+								submitSearch(guildId);
 							}
 						}
 					].filter((suggestion) => {
@@ -192,7 +192,7 @@
 									icon: suggestion?.icon ?? undefined,
 									action: () => {
 										$searchPrompt = $searchPrompt.replace(new RegExp(`:"?${value}$`), `:${suggestion.key} `);
-										submitSearch();
+										submitSearch(guildId);
 									}
 								}
 							});
@@ -208,15 +208,7 @@
 		}
 	}
 
-	async function submitSearch() {
-		// do a fetch to the server to search for the message
 
-		let query = $searchPrompt;
-		let response = await fetch(`/api/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(query)}`);
-		let json = await response.json();
-		$searchResultsMessageIds = json;
-		$searchShown = true;
-	}
 
 
 	let unfocusTimeout: NodeJS.Timeout;
