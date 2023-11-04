@@ -1013,7 +1013,28 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		if len(message_contains) > 0:
 			and_ = []
 			for message_should_contain in message_contains:
-				and_.append({"content.content": {"$regex": message_should_contain, "$options": "i"}})
+				and_.append({
+					"$or": [
+						{
+							"content.content": {
+								"$regex": message_should_contain,
+								"$options": "i"
+							}
+						},
+						{
+							"embeds.title": {
+								"$regex": message_should_contain,
+								"$options": "i"
+							},
+						},
+						{
+							"embeds.description": {
+								"$regex": message_should_contain,
+								"$options": "i"
+							},
+						},
+					]
+				})
 
 			query["$and"].append({"$and": and_})
 
