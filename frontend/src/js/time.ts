@@ -1,78 +1,58 @@
 import moment from 'moment/min/moment-with-locales';
 import { get } from 'svelte/store';
-import {timestampFormat } from 'src/components/settings/settingsStore';
+import {dateFormat, locale, timeFormat } from 'src/components/settings/settingsStore';
 
-function renderTimestamp1(date) {
-    return moment(date).format('YYYY-MM-DD HH:mm:ss');
-}
+export const browserLocales = [...new Set(['en', ...navigator.languages.map(lang => lang.split('-')[0])])]
 
-function renderTimestamp2(date) {
-    return moment(date).utcOffset(0).format('YYYY-MM-DD HH:mm:ss');
-}
+let dateFormats = [
+    'DD/MM/YYYY',
+    'MM/DD/YYYY',
+    'YYYY-MM-DD',
+    'D.M.YYYY',
+    'D MMMM, YYYY',
+    'MMMM D, YYYY',
+    'MMM D, YYYY',
+    'D MMM, YYYY',
+]
 
-function renderTimestamp3(date) {
-    return date;
-}
+// add local formats if not already in the list
+for (let lang of navigator.languages) {
+    let m = moment(new Date()).locale(lang);
 
-function renderTimestamp4(date) {
-    return moment(date).format();
-}
-
-function renderTimestamp5(date) {
-    return moment(date).utcOffset(0).format();
-}
-
-
-function renderTimestamp6(date) {
-    return moment(date).format('MMMM Do YYYY, h:mm:ss a');
-}
-
-
-function renderTimestampLang1(date, lang) {
-    let m = moment(date).locale(lang);
-    let format = m.format('LLL')
-    return format;
-}
-function renderTimestampLang2(date, lang) {
-    let m = moment(date).locale(lang);
-    let format = m.format('LLLL')
-    return format;
-}
-
-const timestampRenderersDup = []
-timestampRenderersDup.push(renderTimestamp1);
-timestampRenderersDup.push(renderTimestamp2);
-timestampRenderersDup.push(renderTimestamp3);
-timestampRenderersDup.push(renderTimestamp4);
-timestampRenderersDup.push(renderTimestamp5);
-timestampRenderersDup.push(renderTimestamp6);
-navigator.languages.forEach(lang => {
-    timestampRenderersDup.push((date) => renderTimestampLang1(date, lang));
-});
-
-navigator.languages.forEach(lang => {
-    timestampRenderersDup.push((date) => renderTimestampLang2(date, lang));
-});
-
-// deduplicate timestampRenderers if they return same value
-export const timestampRenderers = [];
-let testDate = '2020-09-16T11:04:47.215+00:00';
-timestampRenderersDup.forEach(renderer => {
-    let found = false;
-    timestampRenderers.forEach(renderer2 => {
-        if (renderer(testDate) === renderer2(testDate)) {
-            found = true;
+    for (let format_str of ['L', 'l', 'LL', 'll']) {
+        let format = m.localeData().longDateFormat(format_str)
+        if (!dateFormats.includes(format)) {
+            dateFormats.push(format)
         }
-    });
-    if (!found) {
-        timestampRenderers.push(renderer);
     }
-});
+}
 
-export function renderTimestamp(date) {
-    return timestampRenderers[get(timestampFormat)](date);
+export {dateFormats}
+
+export let timeFormats = [
+    'HH:mm',
+    'h:mm a',
+    'HH:mm:ss',
+    'h:mm:ss a',
+    'HH:mm:ss.SSS',
+    'h:mm:ss.SSS a',
+]
+
+
+
+export function formatMoment(date, format) {
+    moment.locale(get(locale));
+    return moment(date).format(format);
 }
 
 export function renderDate(date) {
-    return moment(date).format('YYYY-MM-DD');
+    return formatMoment(date, get(dateFormat));
+}
+
+export function renderTime(date) {
+    return formatMoment(date, get(timeFormat));
+}
+
+export function renderTimestamp(date) {
+    return renderDate(date) + ' ' + renderTime(date);
 }

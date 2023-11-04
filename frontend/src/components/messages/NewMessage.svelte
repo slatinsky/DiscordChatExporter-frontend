@@ -209,7 +209,11 @@
 	{#if showDateSeparator}
 		<div class="date-separator">
 			<div class="date-separator-line"></div>
-			<div class="date-separator-text">{renderDate(snowflakeToDate(message._id))}</div>
+			<div class="date-separator-text">
+				{#key $timestampFormat}
+					{renderDate(snowflakeToDate(message._id))}
+				{/key}
+			</div>
 			<div class="date-separator-line"></div>
 		</div>
 	{/if}
@@ -336,8 +340,10 @@
 							<!-- Added timestamps to System messages -->
 							<span class="chatlog__timestamp">
 								<a href="/channels/{selectedGuildId}/{message.channelId}#{message._id}">
-									{renderTimestamp(message.timestamp)}
-									</a></span>
+									{#key $timestampFormat}
+										{renderTimestamp(message.timestamp)}
+									{/key}
+								</a></span>
 						</span>
 					</div>
 				{:else}
@@ -390,13 +396,13 @@
 									<span class="chatlog__system-notification-content">
 										<span> started a thread.</span>
 									</span>
-									{#key $timestampFormat}
-										<span class="chatlog__system-notification-timestamp">
-											<a href="#{message.reference.channelId}"
-												>{renderTimestamp(message.timestamp)}</a
-											>
-										</span>
-									{/key}
+									<span class="chatlog__system-notification-timestamp">
+										<a href="#{message.reference.channelId}">
+											{#key $timestampFormat}
+												{renderTimestamp(message.timestamp)}
+											{/key}
+										</a>
+									</span>
 								</div>
 							</a>
 						{:else}
@@ -456,14 +462,13 @@
 									{#if message.author?.isBot}
 										<span class="chatlog__author-tag">BOT</span>
 									{/if}
-									{#key $timestampFormat}
-										<span class="chatlog__timestamp"
-											><a href="/channels/{selectedGuildId}/{message.channelId}#{message._id}"
-												>{renderTimestamp(message.timestamp)}</a
-											>
-											</span
-										>
-									{/key}
+									<span class="chatlog__timestamp"
+										><a href="/channels/{selectedGuildId}/{message.channelId}#{message._id}">
+											{#key $timestampFormat}
+												{renderTimestamp(message.timestamp)}
+											{/key}
+										</a>
+									</span>
 								</div>
 							{/if}
 							<div class="chatlog__content chatlog__markdown">

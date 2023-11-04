@@ -1,8 +1,16 @@
-import { writable } from "svelte/store";
+import { derived, writable } from "svelte/store";
 
 
 export const nameRenderer = writable("nickname");
-export const timestampFormat = writable(0);
+export const locale = writable('en');  // for date formatting
+export const dateFormat = writable('DD/MM/YYYY');
+export const timeFormat = writable('HH:mm');
+
+// for {#key} blocks
+export const timestampFormat = derived([dateFormat, timeFormat, locale], ([dateFormat, timeFormat, locale]) => {
+    return dateFormat + ' ' + timeFormat + ' ' + locale;
+});
+
 export const developerMode = writable(false);
 export const theme = writable("dark");
 export const online = writable(true);
@@ -34,8 +42,11 @@ function withLocalStorage(store, localstorageKey: string, type = "string") {
 }
 
 
+
 withLocalStorage(nameRenderer, "nameRenderer", "string");
-withLocalStorage(timestampFormat, "timestampFormat", "int");
+withLocalStorage(locale, "locale", "string");
+withLocalStorage(dateFormat, "dateFormat2", "string");
+withLocalStorage(timeFormat, "timeFormat2", "string");
 withLocalStorage(developerMode, "developerMode", "bool");
 withLocalStorage(theme, "theme", "string");
 withLocalStorage(online, "online", "bool");
@@ -44,3 +55,5 @@ withLocalStorage(channelScrollPosition, "channelScrollPosition", "string");
 withLocalStorage(hideSpoilers, "hideSpoilers", "bool");
 withLocalStorage(font, "font", "string");
 
+// old localstorage keys that should never be used again for backwards compatibility:
+// `dateFormat`, `timeFormat`

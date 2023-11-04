@@ -1,16 +1,15 @@
 <script>
 // @ts-nocheck
 
-	import { nameRenderer, timestampFormat, developerMode, theme, online, gifs, linkHandler, channelScrollPosition, hideSpoilers, font, settingsShown } from 'src/components/settings/settingsStore';
-	import { timestampRenderers } from '../../js/time';
+	import { nameRenderer, developerMode, theme, online, gifs, linkHandler, channelScrollPosition, hideSpoilers, font, settingsShown, timestampFormat, dateFormat, timeFormat, locale } from 'src/components/settings/settingsStore';
+	import { dateFormats, timeFormats, formatMoment, browserLocales,  } from '../../js/time';
 	import RadioButton from '../../components/settings/RadioButton.svelte';
 	import RadioGroup from '../../components/settings/RadioGroup.svelte';
 	import { isMenuHidden } from 'src/components/menu/menuStore';
 	import MenuOpenOverlay from '../menu/MenuOpenOverlay.svelte';
 	import HamburgerBtn from '../menu/HamburgerBtn.svelte';
 
-	let testDate = '2020-09-16T11:04:47.215+00:00';
-
+	let testDate = '2020-01-16T11:04:47.215+00:00';
 	let selectedTab = 'appearance';
 
 	function selectTab(tab) {
@@ -88,14 +87,48 @@
 				<hr>
 
 				<RadioGroup
-					title={"Timestamp format"}
+					title={"Date locale"}
+					description="Only affects date and time formats. This list is based on your browser's language settings."
 				>
-					{#each timestampRenderers as renderer, i}
+					{#each browserLocales as localeItem, i}
 						<RadioButton
-							title={renderer(testDate)}
-							name={"timestampRenderers"}
-							value={i}
-							bind:group={$timestampFormat}
+							title={localeItem}
+							name={"dateRenderers"}
+							value={localeItem}
+							bind:group={$locale}
+						/>
+					{/each}
+				</RadioGroup>
+
+				<hr>
+				{#key $timestampFormat}
+					<RadioGroup
+						title={"Date format"}
+						description={$dateFormat}
+					>
+						{#each dateFormats as dateFormatItem, i}
+							<RadioButton
+								title={formatMoment(testDate, dateFormatItem)}
+								name={"dateRenderers"}
+								value={dateFormatItem}
+								bind:group={$dateFormat}
+							/>
+						{/each}
+					</RadioGroup>
+				{/key}
+
+				<hr>
+
+				<RadioGroup
+					title={"Time format"}
+					description={$timeFormat}
+				>
+					{#each timeFormats as timeFormatItem, i}
+						<RadioButton
+							title={formatMoment(testDate, timeFormatItem)}
+							name={"timeRenderers"}
+							value={timeFormatItem}
+							bind:group={$timeFormat}
 						/>
 					{/each}
 				</RadioGroup>
