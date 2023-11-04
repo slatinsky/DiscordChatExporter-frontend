@@ -3,7 +3,7 @@
 	import type { Message } from 'src/js/interfaces';
 	import { renderDate, renderTimestamp } from 'src/js/time';
 	import { contextMenuItems} from '../menu/menuStore';
-	import { linkHandler, timestampFormat } from 'src/components/settings/settingsStore';
+	import { currentUserId, linkHandler, timestampFormat } from 'src/components/settings/settingsStore';
 	import MessageAttachments from './MessageAttachments.svelte';
 	import MessageEmbeds from './MessageEmbeds.svelte';
 	import MessageMarkdown from './MessageMarkdown.svelte';
@@ -123,7 +123,13 @@
 				}
 			},
 			{
-				"name": "Print message object to console",
+				"name": "View discord as this user",
+				"action": () => {
+					$currentUserId = message.author._id
+				}
+			},
+			{
+				"name": "Print message object to devtools",
 				"action": () => {
 					console.log(JSON.stringify(message, null, 2))
 				}
@@ -186,6 +192,8 @@
 	function generateAvatar(el: HTMLElement, authorId: string) {
 		el.src = identicons.generateSVGDataURIString(authorId, { width: 200, size: 3 })
 	}
+
+	$: isMessageHighlighted = message?.mentions?.map(m => m._id).includes($currentUserId)
 </script>
 
 <!-- Rewritten https://github.com/Tyrrrz/DiscordChatExporter/blob/master/DiscordChatExporter.Core/Exporting/Writers/Html/MessageGroupTemplate.cshtml to svelte -->
@@ -219,7 +227,7 @@
 	<div on:contextmenu|preventDefault={e=>onRightClick(e, message)}>
 		<div
 			id="{message.id}"
-			class="chatlog__message-container {message.isPinned
+			class="chatlog__message-container {isMessageHighlighted
 				? 'chatlog__message-container--pinned'
 				: ''}
 				{message.isDeleted
@@ -529,9 +537,19 @@
 		max-width: 100%;
 	}
 
-	.chatlog__message-container--deleted {
-		background-color: rgba(133, 0, 0, 0.10)
+	.chatlog__message-container--pinned {
+		background-color: #444037;
+		border-left: 2px solid #F0B132;
 	}
+
+	.chatlog__message-container--deleted {
+		background-color: #4E363B;
+	}
+
+	.chatlog__message-container--pinned.chatlog__message-container--deleted {
+		background-color: #493B39;
+	}
+
 
 	audio {
 		max-width: 80%;
