@@ -1,7 +1,7 @@
 <script lang="ts">
 	import MesssageSpoilerHandler from '../messages/MesssageSpoilerHandler.svelte';
 	import Scroller from '../containers/Scroller3.svelte';
-	import { isSearching, searchPrompt, searchResultsMessageIds, searchShown, submitSearch } from './searchStores';
+	import { doSearch, isSearching, searchPrompt, searchResultsMessageIds, searchShown, submitSearch } from './searchStores';
 	import MessageLoader from '../messages/MessageLoader.svelte';
 	let searchResults
 	export let guildId: string
@@ -18,14 +18,11 @@
 	}
 
 	function showAllResults() {
-		// check if $searchPrompt includes limit:
 		if ($searchPrompt.includes('limit:')) {
-			$searchPrompt = $searchPrompt.replace(/limit:\d+/, 'limit:0')
+			doSearch($searchPrompt.replace(/limit:\d+/, 'limit:0'), guildId)
 		} else {
-			$searchPrompt = 'limit:0 ' + $searchPrompt 
+			doSearch('limit:0 ' + $searchPrompt, guildId)
 		}
-		console.log($searchPrompt)
-		submitSearch(guildId)
 	}
 </script>
 

@@ -1,13 +1,28 @@
 <script lang="ts">
 	import type { Channel } from 'src/js/interfaces';
-	import IconChannel from '../../../components/icons/IconChannel.svelte';
-	import SearchFilter from '../../../components/search/SearchFilter.svelte';
+	import IconChannel from 'src/components/icons/IconChannel.svelte';
+	import SearchFilter from 'src/components/search/SearchFilter.svelte';
 	import HamburgerBtn from 'src/components/menu/HamburgerBtn.svelte';
-	import { searchPromptLarge } from 'src/components/search/searchStores';
+	import { doSearch, searchPrompt, searchPromptLarge } from 'src/components/search/searchStores';
+	import IconPin from 'src/components/icons/IconPin.svelte';
 
 	export let channel: Channel | null = null;
 	export let thread: Channel | null = null;
 	export let guildId: string;
+
+	function pinnedSearch() {
+		if (channel === null)
+			return;
+
+		let newPrompt = `pinned:true in:"${channel.name}"`
+
+		if ($searchPrompt == newPrompt) {
+			doSearch('', guildId);
+		}
+		else {
+			doSearch(newPrompt, guildId);
+		}
+	}
 </script>
 
 <section class="header-container">
@@ -39,6 +54,11 @@
 				{/if}
 			</div>
 			<div class="spacer" />
+			{#if channel !== null}
+				<div class="pin" on:click={pinnedSearch}>
+					<IconPin />
+				</div>
+			{/if}
 			<SearchFilter {guildId} />
 		</div>
 	</div>
@@ -113,5 +133,14 @@
 		.searchlarge {
 			display: none;
 		}
+	}
+
+	.pin {
+		color: #B5BAC1;
+		display: grid;
+		place-items: center;
+	}
+	.pin:hover {
+		color: #DBDEE1;
 	}
 </style>

@@ -18,3 +18,12 @@ export async function submitSearch(guildId: string) {
     searchShown.set(true);
     isSearching.set(false);
 }
+
+export function doSearch(prompt: string, guildId: string) {
+    if (prompt == "") {
+        searchPrompt.set("");
+        return;
+    }
+    searchPrompt.set(prompt);
+    submitSearch(guildId);
+}
