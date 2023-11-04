@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { checkUrl, copyTextToClipboard, snowflakeToDate } from 'src/js/helpers';
-	import type { Author, Message } from 'src/js/interfaces';
+	import type { Message } from 'src/js/interfaces';
 	import { renderDate, renderTimestamp } from 'src/js/time';
 	import { contextMenuItems} from '../menu/menuStore';
-	import { linkHandler, nameRenderer, timestampFormat } from 'src/components/settings/settingsStore';
+	import { linkHandler, timestampFormat } from 'src/components/settings/settingsStore';
 	import MessageAttachments from './MessageAttachments.svelte';
 	import MessageEmbeds from './MessageEmbeds.svelte';
 	import MessageMarkdown from './MessageMarkdown.svelte';
@@ -12,6 +12,7 @@
 
 	import identicons from 'identicons'
 	import AuthorModal from 'src/routes/channels/[guildId]/[channelId]/AuthorModal.svelte';
+	import MessageNickname from './MessageNickname.svelte';
 
 	export let message: Message;
 	export let previousMessage: Message | null = null;
@@ -105,22 +106,6 @@
 	function nickname_only(author) {
 		return author?.nickname ?? full_name(author);
 	}
-
-	function nickname(author: Author): string {
-		if ($nameRenderer === 'handle') {
-			return full_name(author);
-		}
-		else if ($nameRenderer === 'nickname') {
-			return nickname_only(author);
-		}
-		else if ($nameRenderer === 'both') {
-			return author?.nickname + ' (' + full_name(author) + ')';
-		}
-		else {
-			console.error('Unknown name renderer: ' + $nameRenderer);
-		}
-	}
-
 
 
 	function onRightClick(e, message) {
@@ -271,18 +256,7 @@
 						</svg>
 					</div>
 					<div class="chatlog__message-primary">
-						{#key $nameRenderer}
-							<span
-								class="chatlog__system-notification-author"
-								style="color:{message.author.color}"
-								title={full_name(message.author)}
-								data-user-id={full_name(message.author)}
-								on:click={()=>{
-									authorModal.viewAuthor();
-								}}
-								>{nickname(message.author)}
-							</span>
-						{/key}
+						<MessageNickname author={message.author} class="chatlog__system-notification-author" on:click={()=>authorModal.viewAuthor()} />
 
 						<!-- Space out the content -->
 						<span> </span>
@@ -385,16 +359,8 @@
 											<span class="thread-msg-count">{message?.thread?.msgCount} messages</span>
 										{/if}
 									</div>
-									{#key $nameRenderer}
-										<span
-											class="chatlog__system-notification-author"
-											style="color:{message.author.color}"
-											title={full_name(message.author)}
-											data-user-id={full_name(message.author)}
-											on:click={authorModal.viewAuthor()}
-											>{nickname(message.author)}</span
-										>
-									{/key}
+
+									<MessageNickname author={message.author} class="chatlog__system-notification-author" on:click={()=>authorModal.viewAuthor()} />
 
 									<span class="chatlog__system-notification-content">
 										<span> started a thread.</span>
@@ -421,13 +387,7 @@
 											height="{referencedMessage.author?.avatar?.height ?? 16}"
 											onerror="this.style.visibility='hidden'"
 										/>
-										<div
-											class="chatlog__reference-author"
-											style="color: {referencedMessage.author.color}"
-											title={referencedMessage.author.name}
-										>
-											{referencedMessage.author.name}
-										</div>
+										<MessageNickname author={referencedMessage.author} class="chatlog__reference-author" />
 										<div class="chatlog__reference-content">
 											<span
 												class="chatlog__reference-link"
@@ -452,16 +412,7 @@
 							{/if}
 							{#if !mergeWithPrevious}
 								<div class="chatlog__header">
-									{#key $nameRenderer}
-										<span
-											class="chatlog__author"
-											title={nickname(message.author)}
-											style="color:{message.author.color}"
-											data-user-id={message.author.id}
-											on:click={authorModal.viewAuthor()}
-											>{nickname(message.author)}</span
-										>
-									{/key}
+									<MessageNickname author={message.author} class="chatlog__author" on:click={authorModal.viewAuthor()} />
 									{#if message.author?.isBot}
 										<span class="chatlog__author-tag">BOT</span>
 									{/if}
@@ -520,10 +471,9 @@
 
 <style>
 
-	.chatlog__author,
-	.chatlog__system-notification-author,
-	.chatlog__avatar {
-		cursor: pointer;
+
+	.chatlog__reference {
+		align-items: end;
 	}
 
 	.padder {
