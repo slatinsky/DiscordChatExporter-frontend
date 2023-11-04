@@ -345,6 +345,9 @@
 									{/key}
 								</a></span>
 						</span>
+						{#if message.reactions}
+							<MessageReactions reactions={message.reactions} />
+						{/if}
 					</div>
 				{:else}
 					<!--            Regular message-->
