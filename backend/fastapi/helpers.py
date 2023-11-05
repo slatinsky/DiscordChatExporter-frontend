@@ -19,6 +19,10 @@ def get_whitelisted_guild_ids():
 	whitelisted_guild_ids = [pad_id(id) for id in whitelisted_guild_ids]
 	return whitelisted_guild_ids
 
+def get_blacklisted_user_ids():
+	blacklisted_user_ids = collection_config.find_one({"key": "blacklisted_user_ids"})["value"]
+	blacklisted_user_ids = [pad_id(id) for id in blacklisted_user_ids]
+	return blacklisted_user_ids
 
 
 def get_guild_collection(guild_id, collection_name):

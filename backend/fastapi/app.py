@@ -1,4 +1,5 @@
 import datetime
+import shutil
 from dateutil.relativedelta import relativedelta
 import functools
 import json
@@ -12,7 +13,7 @@ from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
 import Autocomplete
-from helpers import get_global_collection, get_whitelisted_guild_ids, is_db_online, pad_id, get_guild_collection
+from helpers import get_blacklisted_user_ids, get_global_collection, get_whitelisted_guild_ids, is_db_online, pad_id, get_guild_collection
 
 # fix PIPE encoding error on Windows, auto flush print
 sys.stdout.reconfigure(encoding='utf-8')
@@ -137,28 +138,48 @@ async def get_message_ids(channel_id: str, guild_id: str):
 	"""
 	collection_messages = get_guild_collection(guild_id, "messages")
 	if is_compiled():
-		cache_path = f"../../storage/cache/message-ids/{channel_id}.json"
+		cache_dir = "../../storage/cache/message-ids"
 	else:
-		cache_path = f"../../release/dcef/storage/cache/message-ids/{channel_id}.json"
+		cache_dir = "../../release/dcef/storage/cache/message-ids"
+
+	cache_path = f"{cache_dir}/{channel_id}.json"
+	blacklisted_user_ids_path = f"{cache_dir}/blacklisted_user_ids.json"
+
+	# clear entire cache if blacklisted user ids changed
+	blacklisted_user_ids = get_blacklisted_user_ids()
+	if os.path.exists(cache_path):
+		with open(blacklisted_user_ids_path, "r", encoding="utf-8") as f:
+			file_content = f.read()
+
+		if file_content != str(blacklisted_user_ids):
+			shutil.rmtree(cache_dir)
+			os.makedirs(cache_dir)
 
 	# read cached ids if available
 	if os.path.exists(cache_path):
+		print("get_message_ids() cache hit - channel id", channel_id)
 		with open(cache_path, "r", encoding="utf-8") as f:
-			print("get_message_ids() cache hit - channel id", channel_id)
 			file_content = f.read()
 			return json.loads(file_content)
 
 	print("get_message_ids() cache miss - channel id", channel_id)
 
 	query = {
-		"channelId": channel_id
+		"channelId": channel_id,
+		"author._id": {
+			"$nin": blacklisted_user_ids
+		}
 	}
 	ids = collection_messages.find(query, {"_id": 1}).sort([("_id", pymongo.ASCENDING)])
 	new_ids = [str(id["_id"]) for id in ids]
 
 	# save to cache
+	file_content = re.sub(r"'", '"', str(new_ids))
 	with open(cache_path, "w", encoding="utf-8") as f:
-		file_content = re.sub(r"'", '"', str(new_ids))
+		f.write(file_content)
+
+	file_content = re.sub(r"'", '"', str(blacklisted_user_ids))
+	with open(blacklisted_user_ids_path, "w", encoding="utf-8") as f:
 		f.write(file_content)
 
 	return new_ids
@@ -179,11 +200,15 @@ async def get_multiple_message_content(message_req_obj: MessageRequest):
 	guild_id = message_req_obj.guild_id
 
 	collection_messages = get_guild_collection(guild_id, "messages")
+	blacklisted_user_ids = get_blacklisted_user_ids()
 
 	messages = collection_messages.find(
 		{
 			"_id": {
 				"$in": message_ids
+			},
+			"author._id": {
+				"$nin": blacklisted_user_ids
 			}
 		}
 	)
@@ -836,16 +861,21 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		message_contains = [word.lower() for word in message_contains]
 		message_ids = [pad_id(id) for id in message_ids]
 
+		blacklisted_user_ids = get_blacklisted_user_ids()
 		from_user_ids = [pad_id(id) for id in from_user_ids]
 		from_user_ids = extend_users(from_user_ids, from_users, guild_id)
+		from_user_ids = [user_id for user_id in from_user_ids if user_id not in blacklisted_user_ids]  # remove blacklisted users
 
 		print("from_user_ids", from_user_ids)
 
 		reaction_from_ids = [pad_id(id) for id in reaction_from_ids]
 		reaction_from_ids = extend_users(reaction_from_ids, reaction_from, guild_id)
+		reaction_from_ids = [user_id for user_id in mentions_user_ids if user_id not in blacklisted_user_ids]    # remove blacklisted users
 
 		mentions_user_ids = [pad_id(id) for id in mentions_user_ids]
 		mentions_user_ids = extend_users(mentions_user_ids, mentions_users, guild_id)
+		mentions_user_ids = [user_id for user_id in mentions_user_ids if user_id not in blacklisted_user_ids]    # remove blacklisted users
+
 		reaction_ids = [pad_id(id) for id in reaction_ids]
 		reactions = [reaction.lower() for reaction in reactions]
 		reaction_ids = extend_reactions(reaction_ids, reactions, guild_id)
@@ -880,6 +910,9 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 
 		if len(from_user_ids) > 0:
 			query["author._id"] = {"$in": from_user_ids}
+
+		if len(blacklisted_user_ids) > 0:
+			query["author._id"] = {"$nin": blacklisted_user_ids}
 
 		if len(reaction_from_ids) > 0:
 			query["reactions.users._id"] = {"$in": reaction_from_ids}

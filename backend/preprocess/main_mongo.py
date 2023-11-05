@@ -1,9 +1,6 @@
 import os
 import sys
-import requests
 import functools
-
-from pprint import pprint
 
 from FileFinder import FileFinder
 from MongoDatabase import MongoDatabase
@@ -32,6 +29,10 @@ def wipe_database(database: MongoDatabase):
 	whitelisted_guild_ids = config.find_one({"key": "whitelisted_guild_ids"})
 	if whitelisted_guild_ids is None:
 		config.insert_one({"key": "whitelisted_guild_ids", "value": []})
+
+	blacklisted_user_ids = config.find_one({"key": "blacklisted_user_ids"})
+	if blacklisted_user_ids is None:
+		config.insert_one({"key": "blacklisted_user_ids", "value": []})
 
 	version = config.find_one({"key": "version"})
 	if version is None:
