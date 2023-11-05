@@ -5,7 +5,18 @@ export const nameRenderer = writable("nickname");
 export const locale = writable('en');  // for date formatting
 export const dateFormat = writable('DD/MM/YYYY');
 export const timeFormat = writable('HH:mm');
-export const currentUserId = writable('');  // discord snowflake of the current user, '' if not "logged in"
+
+export const currentUserId = writable('');
+export const currentUserName1 = writable('Anonymous');
+export const currentUserName2 = writable('click to change');
+export const currentUserPhoto = writable('/favicon.png');
+
+export function setCurrentUser(id: string, name1: string, name2: string, photo: string) {
+    currentUserId.set(id);
+    currentUserName1.set(name1);
+    currentUserName2.set(name2);
+    currentUserPhoto.set(photo);
+}
 
 // for {#key} blocks
 export const timestampFormat = derived([dateFormat, timeFormat, locale], ([dateFormat, timeFormat, locale]) => {
@@ -56,6 +67,10 @@ withLocalStorage(channelScrollPosition, "channelScrollPosition", "string");
 withLocalStorage(hideSpoilers, "hideSpoilers", "bool");
 withLocalStorage(font, "font", "string");
 withLocalStorage(currentUserId, "currentUserId", "string");
+withLocalStorage(currentUserName1, "currentUserName1", "string");
+withLocalStorage(currentUserName2, "currentUserName2", "string");
+withLocalStorage(currentUserPhoto, "currentUserPhoto", "string");
+
 
 // old localstorage keys that should never be used again for backwards compatibility:
 // `dateFormat`, `timeFormat`

@@ -3,7 +3,7 @@
 	import type { Message } from 'src/js/interfaces';
 	import { renderDate, renderTimestamp } from 'src/js/time';
 	import { contextMenuItems} from '../menu/menuStore';
-	import { currentUserId, linkHandler, timestampFormat } from 'src/components/settings/settingsStore';
+	import { currentUserId, linkHandler, setCurrentUser, timestampFormat } from 'src/components/settings/settingsStore';
 	import MessageAttachments from './MessageAttachments.svelte';
 	import MessageEmbeds from './MessageEmbeds.svelte';
 	import MessageMarkdown from './MessageMarkdown.svelte';
@@ -125,7 +125,7 @@
 			{
 				"name": "View discord as this user",
 				"action": () => {
-					$currentUserId = message.author._id
+					setCurrentUser(message.author._id, message.author.name, message.author.nickname, checkUrl(message.author.avatar))
 				}
 			},
 			{

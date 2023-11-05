@@ -238,13 +238,14 @@ def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 	])
 	authors= []
 	for author in cursor:
-		print(author)
-		authors.append({
+		new_author = {
 			"key": author['names'][0],
 			"description": ", ".join(author['nicknames']),
 			"description2": str(author['msg_count']) + " messages",
-			"icon": author['avatar']
-		})
+			"icon": author['avatar'],
+			"id": author['_id']
+		}
+		authors.append(new_author)
 	return authors
 
 def autocomplete_has(guild_id: str, partial_has: str, limit: int):
