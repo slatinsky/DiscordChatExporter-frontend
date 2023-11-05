@@ -56,6 +56,11 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller==5.5
 
+      - name: Install configurator dependencies
+        working-directory: backend/configurator
+        run: |
+          pip install -r requirements.txt
+
       - name: Install fastapi dependencies
         working-directory: backend/fastapi
         run: |
@@ -79,6 +84,10 @@ jobs:
         working-directory: backend/windows-runner
         run: pyinstaller --onefile --name dcef windows-runner.py --icon=icon.ico
 
+      - name: Build configurator executable with pyinstaller
+        working-directory: backend/configurator
+        run: pyinstaller --onefile --name configurator main.py
+
       - name: Install http-server
         working-directory: backend/http-server
         run: npm install
@@ -101,6 +110,7 @@ jobs:
           cp backend\mongodb\msvcp140.dll build\dcef\backend\mongodb\msvcp140.dll
           cp backend\http-server\http-server.exe build\dcef\backend\http-server\http-server.exe
           cp backend\windows-runner\dist\dcef.exe build\dcef.exe
+          cp backend\configurator\dist\configurator.exe build\configurator.exe
           Copy-Item -Path release\exports\* -Destination build\exports -Recurse
           cp release\registry_tweaks\change_260_character_path_limit_to_32767.reg build\registry_tweaks\change_260_character_path_limit_to_32767.reg
           cp release\registry_tweaks\restore_260_character_path_limit.reg build\registry_tweaks\restore_260_character_path_limit.reg

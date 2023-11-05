@@ -45,6 +45,7 @@ COPY /backend/nginx/conf/nginx-docker.conf /dcef/backend/nginx/conf/nginx-docker
 COPY --from=build /app/build/ ./frontend/
 COPY backend/preprocess/ ./backend/preprocess/
 COPY backend/fastapi/ ./backend/fastapi/
+COPY backend/configurator/main.py ./configurator.py
 COPY backend/docker/run_container.sh ./run_container.sh
 RUN chmod 777 /dcef/run_container.sh
 EXPOSE 21011

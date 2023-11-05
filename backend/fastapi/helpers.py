@@ -10,7 +10,6 @@ def pad_id(id):
 URI = "mongodb://127.0.0.1:27017"
 client = pymongo.MongoClient(URI)
 db = client["dcef"]
-collection_messages = db["messages"]
 collection_guilds = db["guilds"]
 collection_config = db["config"]
 
