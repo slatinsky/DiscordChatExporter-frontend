@@ -44,7 +44,7 @@
 				<ChannelsMenu selectedGuildId={data.guildId} channels={data.channels} selectedChannelId={data.channelId} />
 			</div>
 			<div id="bottom-bar">
-				<div style="width: 170px;">
+				<div style="width: 190px;">
 					<AutocompleteUser photo={$currentUserPhoto} name1={$currentUserName1} name2={$currentUserName2} on:click={() => showUserSelectionModal = true}/>
 				</div>
 				<div id="settings" on:click={()=>$settingsShown = true}>
@@ -147,6 +147,7 @@
 	}
 
 	#bottom-bar {
+		margin-top: auto;
 		position: sticky;
 		bottom: 0;
 		display: flex;
