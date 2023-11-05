@@ -66,9 +66,16 @@
 			</a>
 		</div>
 		{#if attachment.type == 'audio'}
-		<audio class="chatlog__attachment-media" controls preload="metadata">
-			<source src="{checkUrl(attachment)}" alt="{attachment?.filenameWithoutHash ?? 'Audio attachment'}" title="Audio: {attachment.filenameWithoutHash} ({Math.round(attachment.sizeBytes / 1024)} KB)">
-		</audio>
+			<audio class="" controls preload="metadata">
+				<source src="{checkUrl(attachment)}" alt="{attachment?.filenameWithoutHash ?? 'Audio attachment'}" title="Audio: {attachment.filenameWithoutHash} ({Math.round(attachment.sizeBytes / 1024)} KB)">
+			</audio>
 		{/if}
 	{/if}
 {/each}
+
+<style>
+	audio {
+		max-width: 80%;
+		width: 700px;
+	}
+</style>

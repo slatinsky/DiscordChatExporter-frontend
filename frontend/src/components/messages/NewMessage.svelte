@@ -551,11 +551,6 @@
 	}
 
 
-	audio {
-		max-width: 80%;
-		width: 700px;
-	}
-
 	.msg-root .msg-jump {
 		visibility: hidden;
 		position: absolute;
