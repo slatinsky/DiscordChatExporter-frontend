@@ -16,7 +16,7 @@ class ChannelCache:
 		if is_compiled():
 			self.cache_folder_path = "../../storage/cache/message-ids"
 		else:
-			self.cache_folder_path = "../../release/dcef/storage/cache/message-ids"
+			self.cache_folder_path = "../../cache/message-ids"
 
 		if not os.path.exists(self.cache_folder_path):
 			os.makedirs(self.cache_folder_path)

@@ -1,6 +1,7 @@
 #!/bin/bash
 mkdir -p /dcef/cache/preprocess
 mkdir -p /dcef/cache/db
+mkdir -p /dcef/cache/nginx/logs
 mongod --dbpath "/dcef/cache/db/" --wiredTigerCacheSizeGB 1.5 &
 cd /dcef/backend/preprocess
 python3.11 main_mongo.py ../../exports/ ../../cache/preprocess/
