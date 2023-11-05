@@ -611,7 +611,7 @@ SEARCH_CATEGORIES = [
 		"type": 'discord_snowflake',
 		"multiple": True,
 		"mapTo": "reaction_from_ids",
-		"autocompleteApi": "users",
+		"autocompleteApi": None,
 	},
 	{
 		"key": 'reaction_id',
@@ -870,7 +870,7 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 
 		reaction_from_ids = [pad_id(id) for id in reaction_from_ids]
 		reaction_from_ids = extend_users(reaction_from_ids, reaction_from, guild_id)
-		reaction_from_ids = [user_id for user_id in mentions_user_ids if user_id not in blacklisted_user_ids]    # remove blacklisted users
+		reaction_from_ids = [user_id for user_id in reaction_from_ids if user_id not in blacklisted_user_ids]    # remove blacklisted users
 
 		mentions_user_ids = [pad_id(id) for id in mentions_user_ids]
 		mentions_user_ids = extend_users(mentions_user_ids, mentions_users, guild_id)
@@ -908,11 +908,12 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		if len(message_ids) > 0:
 			query["_id"] = {"$in": message_ids}
 
-		if len(from_user_ids) > 0:
-			query["author._id"] = {"$in": from_user_ids}
-
-		if len(blacklisted_user_ids) > 0:
-			query["author._id"] = {"$nin": blacklisted_user_ids}
+		if len(from_user_ids) > 0 or len(blacklisted_user_ids) > 0:
+			query["author._id"] = {}
+			if len(from_user_ids) > 0:
+				query["author._id"]["$in"] = from_user_ids
+			if len(blacklisted_user_ids) > 0:
+				query["author._id"]["$nin"] = blacklisted_user_ids
 
 		if len(reaction_from_ids) > 0:
 			query["reactions.users._id"] = {"$in": reaction_from_ids}

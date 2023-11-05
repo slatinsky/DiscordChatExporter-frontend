@@ -43,7 +43,7 @@ cd /path/to/your/exports
 
 4. Run the container
 ```bash
-docker run --restart=always --volume "$(pwd):/dcef/exports" --volume dcef_cache:/dcef/cache --rm --name dcef -p 21011:21011 -it slada/dcef:main
+docker run --restart=always --volume "$(pwd):/dcef/exports" --volume dcef_cache:/dcef/cache --name dcef -p 21011:21011 -it slada/dcef:main
 ```
 
 5. Open `http://127.0.0.1:21011/` in your browser
