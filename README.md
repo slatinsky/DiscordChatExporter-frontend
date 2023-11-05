@@ -51,6 +51,24 @@ docker run --restart=always --volume "$(pwd):/dcef/exports" --volume dcef_cache:
 **Note:** arm based systems like Raspberry Pi or Apple M1 are not officially supported. Pull requests are welcome :)
 
 
+## Edit server configuration
+
+If you want to select which discord servers are shown in the viewer or which users are hidden, you need to edit server configuration. Changes in this configuration are applied immediately - you don't need to restart DCEF. This configuration is enforced server-side on all users of the viewer.
+
+### Windows
+
+1. run `dcef.exe` and wait for the user interface to appear
+2. run `configurator.exe`
+3. follow the instructions. Select actions by typing number and pressing enter.
+
+### Linux
+
+`dcef` container needs to be running. Then run:
+
+```bash
+docker exec -it dcef /usr/bin/python3.11 /dcef/configurator.py
+```
+
 ## Other ways to run DCEF
 
 <details><summary><b>Windows beta builds</b></summary>
