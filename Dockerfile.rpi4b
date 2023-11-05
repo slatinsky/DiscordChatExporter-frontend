@@ -37,6 +37,7 @@ RUN mkdir -p /dcef/exports/
 COPY /release/exports/ /dcef/exports/
 COPY /backend/preprocess/requirements.txt /dcef/backend/preprocess/requirements.txt
 COPY /backend/fastapi/requirements.txt /dcef/backend/fastapi/requirements.txt
+COPY /backend/configurator/requirements.txt /dcef/backend/configurator/requirements.txt
 RUN python3.11 -m pip install -r ./backend/preprocess/requirements.txt
 RUN python3.11 -m pip install -r ./backend/fastapi/requirements.txt
 RUN python3.11 -m pip install -r ./backend/configurator/requirements.txt
