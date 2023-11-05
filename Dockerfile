@@ -16,6 +16,7 @@ COPY /backend/preprocess/requirements.txt /dcef/backend/preprocess/requirements.
 COPY /backend/fastapi/requirements.txt /dcef/backend/fastapi/requirements.txt
 RUN python3.11 -m pip install -r ./backend/preprocess/requirements.txt
 RUN python3.11 -m pip install -r ./backend/fastapi/requirements.txt
+RUN python3.11 -m pip install -r ./backend/configurator/requirements.txt
 RUN mkdir -p /dcef/backend/nginx/logs/
 COPY /backend/nginx/conf/mime.types /dcef/backend/nginx/conf/mime.types
 COPY /backend/nginx/conf/nginx-docker.conf /dcef/backend/nginx/conf/nginx-docker.conf
