@@ -125,7 +125,7 @@
 			{
 				"name": "View discord as this user",
 				"action": () => {
-					setCurrentUser(message.author._id, message.author.name, message.author.nickname, checkUrl(message.author.avatar))
+					setCurrentUser(message.author._id, message.author.nickname, message.author.name, checkUrl(message.author.avatar))
 				}
 			},
 			{
