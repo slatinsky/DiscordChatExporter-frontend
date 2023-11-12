@@ -87,8 +87,13 @@ class AssetProcessor:
 		"""
 		if not local_path_exists:
 			return None
+		try:
+			size = os.path.getsize(path)
+			return size
+		except FileNotFoundError:
+			print("        Warning: Could not get file size of " + path)
+			return 0
 
-		return os.path.getsize(path)
 
 	def get_filename_with_hash(self, path: str, is_remote: bool) -> str:
 		# local path
