@@ -16,6 +16,17 @@ sys.stdout.reconfigure(encoding='utf-8')
 sys.stderr.reconfigure(encoding='utf-8')
 print = functools.partial(print, flush=True)
 
+def rename_config_key(config, old_key: str, new_key: str):
+	"""
+	Renames config key in config collection
+	"""
+	old_config = config.find_one({"key": old_key})
+	if old_config is None:
+		return
+	old_config["key"] = new_key
+	config.update_one({"key": old_key}, {"$set": old_config})
+	print(f"Renamed config key {old_key} --> {new_key}")
+
 
 def wipe_database(database: MongoDatabase):
 	"""
@@ -25,14 +36,18 @@ def wipe_database(database: MongoDatabase):
 	EXPECTED_VERSION = 15    # <---- change this to wipe database
 	config = database.get_collection("config")
 
-	# add empty whitelisted_guild_ids config if it does not exist
-	whitelisted_guild_ids = config.find_one({"key": "whitelisted_guild_ids"})
-	if whitelisted_guild_ids is None:
-		config.insert_one({"key": "whitelisted_guild_ids", "value": []})
+	# migrate config keys to new names
+	rename_config_key(config, "whitelisted_guild_ids", "allowlisted_guild_ids")
+	rename_config_key(config, "blacklisted_user_ids", "denylisted_user_ids")
 
-	blacklisted_user_ids = config.find_one({"key": "blacklisted_user_ids"})
-	if blacklisted_user_ids is None:
-		config.insert_one({"key": "blacklisted_user_ids", "value": []})
+	# add empty allowlisted_guild_ids config if it does not exist
+	allowlisted_guild_ids = config.find_one({"key": "allowlisted_guild_ids"})
+	if allowlisted_guild_ids is None:
+		config.insert_one({"key": "allowlisted_guild_ids", "value": []})
+
+	denylisted_user_ids = config.find_one({"key": "denylisted_user_ids"})
+	if denylisted_user_ids is None:
+		config.insert_one({"key": "denylisted_user_ids", "value": []})
 
 	version = config.find_one({"key": "version"})
 	if version is None:

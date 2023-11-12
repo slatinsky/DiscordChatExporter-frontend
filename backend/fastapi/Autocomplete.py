@@ -2,7 +2,7 @@ from pprint import pprint
 
 import pymongo
 
-from helpers import get_blacklisted_user_ids, get_guild_collection
+from helpers import get_denylisted_user_ids, get_guild_collection
 
 
 def autocomplete_categories(guild_id: str, partial_category: str, limit: int):
@@ -208,7 +208,7 @@ def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 	collection_authors = get_guild_collection(guild_id, "authors")
 	print("collection_authors", collection_authors)
 
-	blacklisted_user_ids = get_blacklisted_user_ids()
+	denylisted_user_ids = get_denylisted_user_ids()
 
 	query = {
 		"$or": [
@@ -224,7 +224,7 @@ def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 			}
 		],
 		"_id": {
-			"$nin": blacklisted_user_ids
+			"$nin": denylisted_user_ids
 		}
 	}
 	cursor = collection_authors.find(query, {
