@@ -533,10 +533,6 @@
 		border-radius: 3px
 	}
 
-	.chatlog__embed-thumbnail-video {
-		max-width: 100%;
-	}
-
 	.chatlog__message-container--pinned {
 		background-color: #444037;
 		border-left: 2px solid #F0B132;

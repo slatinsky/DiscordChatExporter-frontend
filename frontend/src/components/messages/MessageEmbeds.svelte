@@ -18,7 +18,11 @@
 </script>
 
 {#each embeds as embed}
-	{#if tenorId && $online && $gifs}
+	{#if tenorId && embed.hasOwnProperty('video')}
+		<!-- render video gifs locally, video field was added in DCE 2.42.3 -->
+		<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.video)}" autoplay loop muted playsinline/>
+	{:else if tenorId && $online && $gifs && !embed.hasOwnProperty('video')}
+		<!-- workaround for older exports (embed tenor iframe) -->
 		<div class="embed-tenor-container" style="aspect-ratio: {embed.thumbnail?.width ?? 1} / {embed.thumbnail?.height ?? 1};">
 			<iframe class="embed-tenor" src="https://tenor.com/embed/{tenorId}" frameBorder="0" allowfullscreen style="aspect-ratio: {embed.thumbnail?.width ?? 1} / {embed.thumbnail?.height ?? 1};"></iframe>
 		</div>
@@ -195,5 +199,9 @@
 		height: auto;
 		max-width: 100%;
 		max-height: 100%;
+	}
+
+	.chatlog__embed-thumbnail-video {
+		max-width: 100%;
 	}
 </style>

@@ -119,9 +119,20 @@ class JsonProcessor:
 						embed["thumbnail"] = self.asset_processor.process(embed["thumbnail"]["url"], is_searchable=False)
 
 						# restore some fields, because we are losing them in the asset preprocess if url is remote
-						if "originalWidth" in locals():
+						if "original_width" in locals():
 							embed["thumbnail"]["width"] = original_width
 							embed["thumbnail"]["height"] = original_height
+
+					if "video" in embed:
+						if "width" in embed["video"] and "height" in embed["video"]:
+							original_width2 = embed["video"]["width"]
+							original_height2 = embed["video"]["height"]
+						embed["video"] = self.asset_processor.process(embed["video"]["url"], is_searchable=False)
+
+						# restore some fields, because we are losing them in the asset preprocess if url is remote
+						if "original_width2" in locals():
+							embed["video"]["width"] = original_width2
+							embed["video"]["height"] = original_height2
 
 					# embed.image field is redundant - merge with embed.images field and remove duplicate images
 					# note - this field is not always duplicated with the first item in embed.images field - discordless uses only image field without creating embed.images field
