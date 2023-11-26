@@ -21,7 +21,7 @@
 	{#if tenorId && embed.hasOwnProperty('video')}
 		<!-- render video gifs locally, video field was added in DCE 2.42.3 -->
 		<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.video)}" autoplay loop muted playsinline/>
-	{:else if embed.hasOwnProperty('video')}
+	{:else if embed.hasOwnProperty('video') && embed.description === "" && embed.title === ""}
 		<!-- render ordinary embeded video -->
 		<video class="chatlog__embed-thumbnail-video" controls preload="metadata">
 			<source src={checkUrl(embed.video)}>
