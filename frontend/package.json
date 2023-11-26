@@ -16,7 +16,8 @@
 		"axios": "^1.2.6",
 		"identicons": "^0.1.0",
 		"lodash-es": "^4.17.21",
-		"moment": "^2.29.4"
+		"moment": "^2.29.4",
+		"simple-markdown": "^0.7.3"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.30.0",

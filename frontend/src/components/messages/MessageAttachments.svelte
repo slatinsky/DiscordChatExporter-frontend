@@ -14,8 +14,8 @@
 
 	{:else if attachment.type == 'video'}
 	<div class:media-spoiler={attachment.filenameWithoutHash.startsWith('SPOILER')}>
-		<!-- title -->
-		<div class="chatlog__attachment">
+		<!-- video title -->
+		<!-- <div class="chatlog__attachment">
 			<a href={checkUrl(attachment)} target="_blank">
 				<div class="chatlog__attachment-media">
 					<div class="chatlog__attachment-media-title">
@@ -23,7 +23,7 @@
 					</div>
 				</div>
 			</a>
-		</div>
+		</div> -->
 		<video class="chatlog__attachment-media" controls preload="metadata">
 			<source src={checkUrl(attachment)} alt="{attachment.filenameWithoutHash}" title="Video: {attachment.filenameWithoutHash} ({Math.round(attachment.sizeBytes / 1024)} KB)">
 		</video>

@@ -21,6 +21,11 @@
 	{#if tenorId && embed.hasOwnProperty('video')}
 		<!-- render video gifs locally, video field was added in DCE 2.42.3 -->
 		<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.video)}" autoplay loop muted playsinline/>
+	{:else if embed.hasOwnProperty('video')}
+		<!-- render ordinary embeded video -->
+		<video class="chatlog__embed-thumbnail-video" controls preload="metadata">
+			<source src={checkUrl(embed.video)}>
+		</video>
 	{:else if tenorId && $online && $gifs && !embed.hasOwnProperty('video')}
 		<!-- workaround for older exports (embed tenor iframe) -->
 		<div class="embed-tenor-container" style="aspect-ratio: {embed.thumbnail?.width ?? 1} / {embed.thumbnail?.height ?? 1};">
@@ -66,12 +71,12 @@
 								{#if embed.url}
 									<a class="chatlog__embed-title-link" href={embed?.url}>
 										<div class="chatlog__markdown chatlog__markdown-preserve">
-											<MessageMarkdown content={embed.title} {guildId} />
+											<MessageMarkdown content={embed.title} />
 										</div>
 									</a>
 								{:else}
 									<div class="chatlog__markdown chatlog__markdown-preserve">
-										<MessageMarkdown content={embed.title} {guildId} />
+										<MessageMarkdown content={embed.title} />
 									</div>
 								{/if}
 							</div>
@@ -81,7 +86,7 @@
 						{#if embed.description}
 							<div class="chatlog__embed-description">
 								<div class="chatlog__markdown chatlog__markdown-preserve">
-									<MessageMarkdown content={embed.description} {guildId}/>
+									<MessageMarkdown content={embed.description} />
 								</div>
 							</div>
 						{/if}
@@ -94,7 +99,7 @@
 										{#if field.name}
 											<div class="chatlog__embed-field-name">
 												<div class="chatlog__markdown chatlog__markdown-preserve">
-													<MessageMarkdown content={field.name} embed={true} {guildId}/>
+													<MessageMarkdown content={field.name} />
 												</div>
 											</div>
 										{/if}
@@ -102,7 +107,7 @@
 										{#if field.value}
 											<div class="chatlog__embed-field-value">
 												<div class="chatlog__markdown chatlog__markdown-preserve">
-													<MessageMarkdown content={field.value} embed={true} {guildId}/>
+													<MessageMarkdown content={field.value} />
 												</div>
 											</div>
 										{/if}

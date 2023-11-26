@@ -90,22 +90,6 @@ async def get_channels(guild_id: str):
 	return list(cursor)
 
 
-@app.get("/channel")
-async def get_channel(guild_id: str, channel_id: str):
-	"""
-	get only specific channel (used to resolve channel mentions)
-	"""
-	collection_channels = get_guild_collection(guild_id, "channels")
-	channel = collection_channels.find_one(
-		{
-			"_id": channel_id
-		}
-	)
-	if not channel:
-		return {"message": "Not found"}
-	return channel
-
-
 @app.get("/roles")
 async def get_roles(guild_id: str):
 	"""
@@ -114,21 +98,6 @@ async def get_roles(guild_id: str):
 	collection_roles = get_guild_collection(guild_id, "roles")
 	cursor = collection_roles.find().sort([("position", pymongo.DESCENDING)])
 	return list(cursor)
-
-@app.get("/role")
-async def get_role(guild_id: str, role_id: str):
-	"""
-	similar to /roles, but only returns one role
-	"""
-	collection_roles = get_guild_collection(guild_id, "roles")
-	role = collection_roles.find_one(
-		{
-			"_id": role_id
-		}
-	)
-	if not role:
-		return {"message": "Not found"}
-	return role
 
 
 @app.get("/message-ids")
@@ -335,24 +304,41 @@ def extend_reactions(reaction_ids: list, reactions: list, guild_id: str):
 
 
 
-def get_emotes_from_db(emote_names: list, guild_id: str) -> dict:
+def get_emotes_from_db(emotes_ids: list, guild_id: str) -> dict:
 	"""
 	try to find emotes from DB by their name
 	use exact match only
 	"""
 	collection_emojis = get_guild_collection(guild_id, "emojis")
-	if len(emote_names) == 0:
+	if len(emotes_ids) == 0:
 		return {}
 
 	or_ = []
-	for emote_name in emote_names:
-		or_.append({"name": emote_name})
+	for emote_id in emotes_ids:
+		or_.append({"_id": emote_id})
 
 	query = {"$or": or_}
 
-	emotes = collection_emojis.find(query)
-	emotes = {emote["name"]: emote for emote in emotes}
+	emotes = list(collection_emojis.find(query))
 	return emotes
+
+def get_roles_from_db(role_ids: list, guild_id: str) -> dict:
+	"""
+	try to find roles from DB by their name
+	use exact match only
+	"""
+	collection_roles = get_guild_collection(guild_id, "roles")
+	if len(role_ids) == 0:
+		return {}
+
+	or_ = []
+	for role_id in role_ids:
+		or_.append({"_id": role_id})
+
+	query = {"$or": or_}
+
+	roles = list(collection_roles.find(query))
+	return roles
 
 def get_channel_info(channel_id: str, guild_id: str):
 	"""
@@ -379,34 +365,61 @@ def get_channel_info(channel_id: str, guild_id: str):
 
 
 def enrich_messages(list_of_messages: list, guild_id: str) -> list:
-	regex = re.compile(r':([^ ]+):')
+	# /^<(a)?:(\w{2,32}):(\d{17,24})>/
+	regex = re.compile(r'<(a)?:(\w{2,32}):(\d{17,24})>')
 
-	possible_emotes = []
+	# add emotes mentioned in message content to messages
+	messageid_emoteids = {}  # message id -> list of emote ids
+	emotes_ids = []
 	for message in list_of_messages:
 		for content in message["content"]:
 			message_content = content["content"]
 			search = regex.findall(message_content)
-			possible_emotes.extend(search)
+			messageid_emoteids[message["_id"]] = []
+			for emote in search:
+				emotes_ids.append(pad_id(emote[2]))
+				messageid_emoteids[message["_id"]].append(pad_id(emote[2]))
 
-	possible_emotes = list(set(possible_emotes))
+	emotes_ids = list(set(emotes_ids))
 
+	emotes = get_emotes_from_db(emotes_ids=emotes_ids, guild_id=guild_id)
 
-	# get all emotes from db
-	emotes = get_emotes_from_db(emote_names=possible_emotes, guild_id=guild_id)
-
-	# replace emotes in messages
 	for message in list_of_messages:
-		message_emotes = []
+		message["emotes"] = []
+		if message["_id"] in messageid_emoteids:
+			for emote_id in messageid_emoteids[message["_id"]]:
+				for emote in emotes:
+					if emote["_id"] == emote_id:
+						message["emotes"].append(emote)
+	# END add emotes
+
+	# add roles mentioned in message content to messages
+	regex = re.compile(r'<@&(\d{17,24})>')
+	role_ids = []
+	for message in list_of_messages:
 		for content in message["content"]:
 			message_content = content["content"]
 			search = regex.findall(message_content)
-			for emote_name in search:
-				if emote_name in emotes:
-					emote = emotes[emote_name]
-					message_emotes.append(emote)
+			for role_id in search:
+				role_ids.append(pad_id(role_id))
 
-		if len(message_emotes) > 0:
-			message["emotes"] = message_emotes
+	role_ids = list(set(role_ids))
+	roles = get_roles_from_db(role_ids=role_ids, guild_id=guild_id)
+	for message in list_of_messages:
+		message["roles"] = []
+		message_role_ids = []
+		for content in message["content"]:
+			message_content = content["content"]
+			search = regex.findall(message_content)
+			for role_id in search:
+				message_role_ids.append(pad_id(role_id))
+
+		for role_id in message_role_ids:
+			for role in roles:
+				if role["_id"] == role_id:
+					message["roles"].append(role)
+	# END add roles
+
 
 	for message in list_of_messages:
 		if message["type"] == "ThreadCreated":

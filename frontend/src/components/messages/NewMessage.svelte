@@ -400,7 +400,7 @@
 											<span
 												class="chatlog__reference-link"
 												>
-												<MessageMarkdown content={referencedMessage.content[0].content.replace("\n", " ")} guildId={referencedMessage?.guildId} />
+												<MessageMarkdown content={referencedMessage.content[0].content.replace("\n", " ")} />
 												</span
 											>
 										</div>
@@ -436,7 +436,7 @@
 							<div class="chatlog__content chatlog__markdown">
 								<span class="chatlog__markdown-preserve"
 									>
-									<MessageMarkdown content={message.content[0].content} emotes={message?.emotes || undefined} mentions={message?.mentions || undefined} guildId={message?.guildId}/>
+									<MessageMarkdown content={message.content[0].content} emotes={message?.emotes || []} mentions={message?.mentions || []} roles={message?.roles || []} />
 									</span
 								>
 								{#if message.timestampEdited != null}

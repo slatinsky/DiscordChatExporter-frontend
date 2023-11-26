@@ -781,9 +781,9 @@ img {
 	overflow-wrap: break-word
 }
 
-.chatlog__markdown-preserve {
+/* .chatlog__markdown-preserve {
 	white-space: pre-wrap
-}
+} */
 
 .chatlog__markdown-spoiler {
 	background-color: rgba(255, 255, 255, 0.1);
