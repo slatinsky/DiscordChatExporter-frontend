@@ -516,10 +516,24 @@
 		margin: 15px 30px 5px 15px;
 	}
 
-	:global(.chatlog__attachment-media) {
-		max-width: calc(100% - 10px);
+	:global(.message-image),
+	:global(.message-video),
+	:global(.message-videogif) {
+		max-width: 80%;
+		max-height: 500px;
+		vertical-align: top;
+		border-radius: 3px;
 		object-position:left;
+		width: auto;
 		height: auto;
+	}
+
+	:global(.message-video:fullscreen) {
+		object-position:center;
+	}
+	:global(.chatlog__attachment--hidden .message-video),
+	:global(.chatlog__attachment--hidden .message-image) {
+		filter: blur(44px);
 	}
 
 	:global(.chatlog__embed-thumbnail) {

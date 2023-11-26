@@ -9,22 +9,14 @@
 	<!-- unknown because attachment name can be extensionless -->
 	{#if attachment.type == 'image' || attachment.type == 'unknown'}
 		<div class="chatlog__attachment">
-			<ImageGallery asset={attachment} imgclass={"chatlog__attachment-media"} />
+			<ImageGallery asset={attachment} imgclass={"message-image"} />
 		</div>
 
 	{:else if attachment.type == 'video'}
 	<div class:media-spoiler={attachment.filenameWithoutHash.startsWith('SPOILER')}>
 		<!-- video title -->
-		<!-- <div class="chatlog__attachment">
-			<a href={checkUrl(attachment)} target="_blank">
-				<div class="chatlog__attachment-media">
-					<div class="chatlog__attachment-media-title">
-						{attachment.filenameWithoutHash}
-					</div>
-				</div>
-			</a>
-		</div> -->
-		<video class="chatlog__attachment-media" controls preload="metadata">
+		<!-- {attachment.filenameWithoutHash} -->
+		<video class="message-video" controls preload="metadata">
 			<source src={checkUrl(attachment)} alt="{attachment.filenameWithoutHash}" title="Video: {attachment.filenameWithoutHash} ({Math.round(attachment.sizeBytes / 1024)} KB)">
 		</video>
 	</div>

@@ -20,10 +20,10 @@
 {#each embeds as embed}
 	{#if tenorId && embed.hasOwnProperty('video')}
 		<!-- render video gifs locally, video field was added in DCE 2.42.3 -->
-		<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.video)}" autoplay loop muted playsinline/>
+		<video class="message-videogif" src="{checkUrl(embed.video)}" autoplay loop muted playsinline/>
 	{:else if embed.hasOwnProperty('video') && embed.description === "" && embed.title === ""}
 		<!-- render ordinary embeded video -->
-		<video class="chatlog__embed-thumbnail-video" controls preload="metadata">
+		<video class="message-video" controls preload="metadata">
 			<source src={checkUrl(embed.video)}>
 		</video>
 	{:else if tenorId && $online && $gifs && !embed.hasOwnProperty('video')}
@@ -123,9 +123,9 @@
 									<!-- {console.warn(embed.thumbnail.type)} -->
 									{#if embed.thumbnail?.type === 'video'}
 										<a class="chatlog__embed-thumbnail-link" href="{embed.thumbnail?.url}" target="_blank">
-											<video class="chatlog__embed-thumbnail-video" src="{checkUrl(embed.thumbnail)}" autoplay loop muted playsinline
-											width="{embed.thumbnail?.width ?? 16}"
-											height="{embed.thumbnail?.height ?? 16}"/>
+											<video class="message-video" src="{checkUrl(embed.thumbnail)}" autoplay loop muted playsinline
+											width="{embed.thumbnail?.width}"
+											height="{embed.thumbnail?.height}"/>
 										</a>
 									<!-- unknown because embed can be extensionless and image is the most common thumbnail -->
 									{:else if embed.thumbnail?.type === 'image' || embed.thumbnail?.type === 'unknown'}

@@ -518,17 +518,6 @@ img {
 	color: #fff
 }
 
-.chatlog__attachment-media {
-	max-width: 45vw;
-	max-height: 500px;
-	vertical-align: top;
-	border-radius: 3px
-}
-
-.chatlog__attachment--hidden .chatlog__attachment-media {
-	filter: blur(44px)
-}
-
 .chatlog__attachment-generic {
 	max-width: 520px;
 	width: 100%;
@@ -884,19 +873,6 @@ img {
 .postamble__entry {
 	color: #ffffff
 }
-
-
-.chatlog__attachment-media {
-	max-width: 45vw;
-	max-height: 500px;
-	vertical-align: top;
-	border-radius: 3px;
-}
-
-.chatlog__attachment--hidden .chatlog__attachment-media {
-	filter: blur(44px);
-}
-
 
 
 /* custom dark scrollbar - chromium only*/
