@@ -51,19 +51,27 @@ const newRole = {
     parse: function(capture, recurseParse, state) {
         let roleId = capture[1].toString().padStart(24, '0')
         let roleName = "role"
+        let roleColor = "#D4E0FC"
+        let backgroundColor = "#414675"
         for (const role of state.roles) {
             if (role._id == roleId) {
                 roleName = role.name
+                if (role.color !== null) {
+                    roleColor = role.color
+                    backgroundColor = role.color + "15"
+                }
             }
         }
         return {
             type: 'newRole',
             roleId: roleId,
-            roleName: roleName
+            roleName: roleName,
+            roleColor: roleColor,
+            backgroundColor: backgroundColor,
         };
     },
     html: function(node, recurseOutput, state) {
-        return `<span class="message-mention">@${node.roleName}</span>`;
+        return `<span class="message-mention" style="color: ${node.roleColor};background-color: ${node.backgroundColor}">@${node.roleName}</span>`;
     }
 }
 
@@ -305,16 +313,13 @@ const newEmoji = {
     const emojiName = capture[2]
     const emojiId = capture[3]
     const paddedEmojiId = emojiId.toString().padStart(24, '0')
-    console.log("emoji---", isAnimated, emojiName, paddedEmojiId)
     let url = null
     if (!state.onlyOffline) {
         // fallback online url if offline mode is not enforced
         url = `https://cdn.discordapp.com/emojis/${capture[3]}`
     }
     for (const emote of state.emotes) {
-        console.log("emoteoption", emote)
         if (emote._id == paddedEmojiId) {
-            console.log("emote", emote)
             const newUrl = checkUrl(emote.image)
             if (newUrl !== "") {
                 url = newUrl
