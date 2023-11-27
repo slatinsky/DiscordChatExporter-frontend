@@ -32,6 +32,8 @@ function isRegexValid(regex: string) {
 
 const CHANNEL_ICON = `<svg style="width: 1rem;height: 1rem;vertical-align: middle;margin-bottom: .2rem;margin-right:4px" width="24" height="24" viewBox="0 0 24 24" role="img"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M5.88657 21C5.57547 21 5.3399 20.7189 5.39427 20.4126L6.00001 17H2.59511C2.28449 17 2.04905 16.7198 2.10259 16.4138L2.27759 15.4138C2.31946 15.1746 2.52722 15 2.77011 15H6.35001L7.41001 9H4.00511C3.69449 9 3.45905 8.71977 3.51259 8.41381L3.68759 7.41381C3.72946 7.17456 3.93722 7 4.18011 7H7.76001L8.39677 3.41262C8.43914 3.17391 8.64664 3 8.88907 3H9.87344C10.1845 3 10.4201 3.28107 10.3657 3.58738L9.76001 7H15.76L16.3968 3.41262C16.4391 3.17391 16.6466 3 16.8891 3H17.8734C18.1845 3 18.4201 3.28107 18.3657 3.58738L17.76 7H21.1649C21.4755 7 21.711 7.28023 21.6574 7.58619L21.4824 8.58619C21.4406 8.82544 21.2328 9 20.9899 9H17.41L16.35 15H19.7549C20.0655 15 20.301 15.2802 20.2474 15.5862L20.0724 16.5862C20.0306 16.8254 19.8228 17 19.5799 17H16L15.3632 20.5874C15.3209 20.8261 15.1134 21 14.8709 21H13.8866C13.5755 21 13.3399 20.7189 13.3943 20.4126L14 17H8.00001L7.36325 20.5874C7.32088 20.8261 7.11337 21 6.87094 21H5.88657ZM9.41045 9L8.35045 15H14.3504L15.4104 9H9.41045Z"></path></svg>`;
 
+const NO_ACCESS_ICON = `<svg style="width: 1rem;height: 1rem;vertical-align: middle;margin-bottom: .2rem;margin-right:4px" width="24" height="24" viewBox="0 0 24 24" aria-label="No Access" aria-hidden="false" role="img"><path fill="currentColor" d="M17 11V7C17 4.243 14.756 2 12 2C9.242 2 7 4.243 7 7V11C5.897 11 5 11.896 5 13V20C5 21.103 5.897 22 7 22H17C18.103 22 19 21.103 19 20V13C19 11.896 18.103 11 17 11ZM12 18C11.172 18 10.5 17.328 10.5 16.5C10.5 15.672 11.172 15 12 15C12.828 15 13.5 15.672 13.5 16.5C13.5 17.328 12.828 18 12 18ZM15 11H9V7C9 5.346 10.346 4 12 4C13.654 4 15 5.346 15 7V11Z" aria-hidden="true"></path></svg>`
+
 const CHEVRON_ICON = `<svg style="width: 0.5rem;height: 0.5rem;margin-left: 4px;margin-right: 6px;margin-bottom: 1px" role="img" width="24" height="24" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd"><polygon fill="currentColor" fill-rule="nonzero" points="8.47 2 6.12 4.35 13.753 12 6.12 19.65 8.47 22 18.47 12"></polygon><polygon points="0 0 24 0 24 24 0 24"></polygon></g></svg>`;
 
 const MESSAGEBUBBLE_ICON = `<svg style="width:1rem;height:1rem;vertical-align: middle;margin-bottom: 0.2rem;" role="img" width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M4.79805 3C3.80445 3 2.99805 3.8055 2.99805 4.8V15.6C2.99805 16.5936 3.80445 17.4 4.79805 17.4H7.49805V21L11.098 17.4H19.198C20.1925 17.4 20.998 16.5936 20.998 15.6V4.8C20.998 3.8055 20.1925 3 19.198 3H4.79805Z"></path></svg>`;
@@ -139,14 +141,31 @@ const newChannel = {
         return /^<#(\d{17,24})>/.exec(source);
     },
     parse: function(capture, recurseParse, state) {
+        let channelName = "channel"
+        let channelId = capture[1]
+        let paddedChannelId = channelId.toString().padStart(24, '0')
+        let guildId = null
+        for (const channel of state.channels) {
+            if (channel._id == paddedChannelId) {
+                channelName = channel.name
+                guildId = channel.guildId
+            }
+        }
         return {
             type: 'newChannel',
-            channelId: capture[1].toString().padStart(24, '0'),
-            url: capture[0]
+            channelId: channelId,
+            paddedChannelId: paddedChannelId,
+            channelName: channelName,
+            guildId: guildId,
         };
     },
     html: function(node, recurseOutput, state) {
-        return `<a class="message-mention" href="/channels/${node.channelId}">${CHANNEL_ICON} channel</a>`;
+        if (node.guildId == null) {
+            return `<span class="message-mention" data-channelid="${node.channelId}">${NO_ACCESS_ICON} No Access</span>`;
+        }
+        else {
+            return `<a class="message-mention" href="/channels/${node.guildId}/${node.paddedChannelId}">${CHANNEL_ICON} ${node.channelName}</a>`;
+        }
     }
 }
 

@@ -436,7 +436,7 @@
 							<div class="chatlog__content chatlog__markdown">
 								<span class="chatlog__markdown-preserve"
 									>
-									<MessageMarkdown content={message.content[0].content} emotes={message?.emotes || []} mentions={message?.mentions || []} roles={message?.roles || []} />
+									<MessageMarkdown content={message.content[0].content} emotes={message?.emotes || []} mentions={message?.mentions || []} roles={message?.roles || []} channels={message?.channels || []} />
 									</span
 								>
 								{#if message.timestampEdited != null}

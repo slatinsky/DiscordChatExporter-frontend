@@ -340,6 +340,24 @@ def get_roles_from_db(role_ids: list, guild_id: str) -> dict:
 	roles = list(collection_roles.find(query))
 	return roles
 
+def get_channels_from_db(channel_ids: list, guild_id: str) -> dict:
+	"""
+	try to find channels from DB by their name
+	use exact match only
+	"""
+	collection_channels = get_guild_collection(guild_id, "channels")
+	if len(channel_ids) == 0:
+		return {}
+
+	or_ = []
+	for channel_id in channel_ids:
+		or_.append({"_id": channel_id})
+
+	query = {"$or": or_}
+
+	channels = list(collection_channels.find(query))
+	return channels
+
 def get_channel_info(channel_id: str, guild_id: str):
 	"""
 	get channel info by id
@@ -419,6 +437,34 @@ def enrich_messages(list_of_messages: list, guild_id: str) -> list:
 				if role["_id"] == role_id:
 					message["roles"].append(role)
 	# END add roles
+
+	# add channels
+	# <#783097729530200094>
+	regex = re.compile(r'<#(\d{17,24})>')
+	channel_ids = []
+	for message in list_of_messages:
+		for content in message["content"]:
+			message_content = content["content"]
+			search = regex.findall(message_content)
+			for channel_id in search:
+				channel_ids.append(pad_id(channel_id))
+
+	channel_ids = list(set(channel_ids))
+	channels = get_channels_from_db(channel_ids=channel_ids, guild_id=guild_id)
+	for message in list_of_messages:
+		message["channels"] = []
+		message_channel_ids = []
+		for content in message["content"]:
+			message_content = content["content"]
+			search = regex.findall(message_content)
+			for channel_id in search:
+				message_channel_ids.append(pad_id(channel_id))
+
+		for channel_id in message_channel_ids:
+			for channel in channels:
+				if channel["_id"] == channel_id:
+					message["channels"].append(channel)
+	# END add channels
 
 
 	for message in list_of_messages:

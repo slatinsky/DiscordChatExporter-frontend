@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Emoji, Role } from "src/js/interfaces";
+	import type { Channel, Emoji, Role } from "src/js/interfaces";
     import { online } from "src/components/settings/settingsStore";
 	import { searchPrompt } from "../search/searchStores";
 	import { parseMarkdown } from "src/js/markdownParser";
@@ -9,6 +9,7 @@
     export let emotes: Emoji[] = []
     export let mentions: any[] = []
     export let roles: Role[] = []
+    export let channels: Channel[] = []
 
     let hideMessageContent = false
 
@@ -61,6 +62,7 @@
             mentions: mentions,
             emotes: emotes,
             roles: roles,
+            channels: channels,
             onlyOffline: !isOnline,
         })
         processedTree = parsed.tree
