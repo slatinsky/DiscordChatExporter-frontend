@@ -439,7 +439,7 @@ def enrich_messages(list_of_messages: list, guild_id: str) -> list:
 	# END add roles
 
 	# add channels
-	# <#783097729530200094>
+	# <#123>
 	regex = re.compile(r'<#(\d{17,24})>')
 	channel_ids = []
 	for message in list_of_messages:
