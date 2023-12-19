@@ -17,6 +17,7 @@
 		"highlight.js": "^11.9.0",
 		"identicons": "^0.1.0",
 		"lodash-es": "^4.17.21",
+		"lottie-web": "^5.12.2",
 		"moment": "^2.29.4",
 		"simple-markdown": "^0.7.3"
 	},

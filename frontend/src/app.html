@@ -9,8 +9,6 @@
 	<link rel=stylesheet href=/css/github-dark.css>
 	<script src=/js/discord-markdown.min.js></script>
 	<script>document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('.chatlog__markdown-pre--multiline').forEach(e => hljs.highlightBlock(e)); });</script>
-	<script
-		src=/js/lottie.min-99657.js></script>
 	<script>document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('.chatlog__sticker--media[data-source]').forEach(e => { const anim = lottie.loadAnimation({ container: e, renderer: 'svg', loop: true, autoplay: true, path: e.getAttribute('data-source') }); anim.addEventListener('data_failed', () => e.innerHTML = '<strong>[Sticker cannot be rendered]</strong>'); }); });</script>
 	<script>function scrollToMessage(event, id) {
 			const element = document.getElementById('chatlog__message-container-' + id); if (!element)
