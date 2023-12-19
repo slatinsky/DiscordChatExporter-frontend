@@ -604,4 +604,18 @@
 		image-rendering: crisp-edges;
 		background-color: white;  /*For identicons*/
 	}
+
+
+	:global(.hljs-codeblock) {
+		display: block;
+		background-color: #2b2d31;
+		border-radius: 4px;
+		border: 1px solid #232428;
+		margin-right: 150px;
+
+		font-size: 14px;
+		padding: 7px;
+		white-space: pre-wrap;
+		line-height: 18px;
+	}
 </style>

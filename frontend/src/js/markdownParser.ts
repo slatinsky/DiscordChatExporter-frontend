@@ -3,6 +3,7 @@
 import SimpleMarkdown from 'simple-markdown';
 import { renderTimestamp } from 'src/js/time';
 import { checkUrl } from './helpers';
+import hljs from 'highlight.js';
 
 function escapeRegExp(string: string) {
     // https://stackoverflow.com/a/6969486
@@ -408,6 +409,30 @@ parse: function(capture, recurseParse, state) {
   },
 }
 
+// code blocks
+// ```js
+// code
+// ```
+
+const codeBlock = {
+    order: SimpleMarkdown.defaultRules.codeBlock.order - 0.1,
+    match: function(source, state, lookbehind) {
+        return /^```([a-z0-9]*)\n([\s\S]*?)\n```/.exec(source);
+    },
+    parse: function(capture, recurseParse, state) {
+        return {
+            type: 'codeBlock',
+            language: capture[1],
+            content: capture[2],
+        };
+    },
+    html: function(node, recurseOutput, state) {
+        const highlightedCode = hljs.highlight(node.language, node.content).value;
+        return `<pre><code class="hljs-codeblock language-${node.language}">${highlightedCode}</code></pre>`;
+    },
+}
+
+
 export const rules = {
     array: SimpleMarkdown.defaultRules.array,
     customHeading: customHeading,
@@ -415,7 +440,8 @@ export const rules = {
     nptable: SimpleMarkdown.defaultRules.nptable,
     // lheading: SimpleMarkdown.defaultRules.lheading,
     hr: SimpleMarkdown.defaultRules.hr,
-    codeBlock: SimpleMarkdown.defaultRules.codeBlock,
+    codeBlock: codeBlock,
+    // codeBlock: SimpleMarkdown.defaultRules.codeBlock,
     fence: SimpleMarkdown.defaultRules.fence,
     blockQuote: SimpleMarkdown.defaultRules.blockQuote,
     list: SimpleMarkdown.defaultRules.list,

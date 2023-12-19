@@ -104,6 +104,9 @@
 
 
 <style>
+    :global(.message-markdown pre) {
+        margin: 6px 0 0 0;
+    }
     :global(.message-markdown) {
         line-height: 22px;
     }
