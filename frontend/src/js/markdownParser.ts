@@ -39,6 +39,8 @@ const CHEVRON_ICON = `<svg style="width: 0.5rem;height: 0.5rem;margin-left: 4px;
 
 const MESSAGEBUBBLE_ICON = `<svg style="width:1rem;height:1rem;vertical-align: middle;margin-bottom: 0.2rem;" role="img" width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M4.79805 3C3.80445 3 2.99805 3.8055 2.99805 4.8V15.6C2.99805 16.5936 3.80445 17.4 4.79805 17.4H7.49805V21L11.098 17.4H19.198C20.1925 17.4 20.998 16.5936 20.998 15.6V4.8C20.998 3.8055 20.1925 3 19.198 3H4.79805Z"></path></svg>`;
 
+const ASSET_ICON = `<svg style="width:1rem;height:1rem;vertical-align: middle;margin-bottom: 0.2rem;" role="img" width="16" height="16" fill="none" viewBox="0 0 24 24"><path fill="currentColor" d="M10.57 4.01a6.97 6.97 0 0 1 9.86 0l.54.55a6.99 6.99 0 0 1 0 9.88l-7.26 7.27a1 1 0 0 1-1.42-1.42l7.27-7.26a4.99 4.99 0 0 0 0-7.06L19 5.43a4.97 4.97 0 0 0-7.02 0l-8.02 8.02a3.24 3.24 0 1 0 4.58 4.58l6.24-6.24a1.12 1.12 0 0 0-1.58-1.58l-3.5 3.5a1 1 0 0 1-1.42-1.42l3.5-3.5a3.12 3.12 0 1 1 4.42 4.42l-6.24 6.24a5.24 5.24 0 0 1-7.42-7.42l8.02-8.02Z" class=""></path></svg>`
+
 
 
 
@@ -244,6 +246,27 @@ const channelLink = {
   },
 }
 
+// pretty asset links
+// https://cdn.discordapp.com/attachments/12345678900000000/12345678900000000/image.png
+// https://cdn.discordapp.com/attachments/12345678900000000/12345678900000000/image.png?ex=658f3e1d&is=657cc91d&hm=b32dbaf1dc2a47ccc2d547e1ec0aedc1ba51e9a8ce4137acf4fb98c84ede4cb8&
+// https://media.discordapp.net/attachments/12345678900000000/12345678900000000/image.png?ex=658f3e1d&is=657cc91d&hm=b32dbaf1dc2a47ccc2d547e1ec0aedc1ba51e9a8ce4137acf4fb98c84ede4cb8&
+
+const assetLink = {
+  order: SimpleMarkdown.defaultRules.autolink.order - 0.39,
+  match: function(source, state, lookbehind) {
+      return /^https:\/\/(?:media\.discordapp\.net|cdn\.discordapp\.com)\/attachments\/\d{17,24}\/\d{17,24}\/([^ \n\?]+)(?:\?[^ \n]+)?/.exec(source);
+    },
+    parse: function(capture, recurseParse, state) {
+        return {
+            type: 'assetLink',
+            url: capture[0],
+            filename: capture[1]
+        };
+    },
+    html: function(node, recurseOutput, state) {
+        return `<a class="message-mention" href="${node.url}" target="_blank">${ASSET_ICON} ${node.filename}</a>`;
+    }
+}
 
 // headings
 // # Heading
@@ -485,6 +508,7 @@ export const rules = {
     escape: SimpleMarkdown.defaultRules.escape,
     messageLink: messageLink,
     channelLink: channelLink,
+    assetLink: assetLink,
     oldEmoji: oldEmoji,
     newEmoji: newEmoji,
     autolink: SimpleMarkdown.defaultRules.autolink,

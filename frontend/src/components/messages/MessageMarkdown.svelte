@@ -11,8 +11,6 @@
     export let roles: Role[] = []
     export let channels: Channel[] = []
 
-    let hideMessageContent = false
-
     let processedHtml: string = ''
     let processedTree: any = {}
 
@@ -78,29 +76,14 @@
             }
         }
         bigEmojis = bigEmojisTemp
-
-        let hideMessageContentTemp = false
-        for (let node of processedTree) {
-            for (const child of node?.content ?? []) {
-                if (child?.type === 'link') {
-                    hideMessageContentTemp = true
-                }
-                else {
-                    hideMessageContentTemp = false
-                }
-            }
-        }
-        hideMessageContent = hideMessageContentTemp
     }
 
     $: process(content, $online)
 </script>
 
 
-{#if !hideMessageContent}
-    <span class:onlyemojis={bigEmojis} class="message-markdown">{@html processedHtml}</span>
-    <!-- <button on:click={() => console.log(JSON.stringify(processedTree, null, 2))}>debug</button> -->
-{/if}
+<span class:onlyemojis={bigEmojis} class="message-markdown">{@html processedHtml}</span>
+<!-- <button on:click={() => console.log(JSON.stringify(processedTree, null, 2))}>debug</button> -->
 
 
 <style>
@@ -151,6 +134,8 @@
         color: #D4E0FC;
         background-color: #414675;
         font-weight: 500;
+        border-radius: 3px;
+        padding: 0 2px;
     }
     :global(.message-time) {
         color: #d1d4d6;
@@ -183,5 +168,18 @@
     :global(.message-markdown .paragraph) {
     	white-space: pre-wrap
     }
+
+    :global(.hljs-codeblock) {
+		display: block;
+		background-color: #2b2d31;
+		border-radius: 4px;
+		border: 1px solid #232428;
+		margin-right: 10%;
+
+		font-size: 14px;
+		padding: 7px;
+		white-space: pre-wrap;
+		line-height: 18px;
+	}
 
 </style>
