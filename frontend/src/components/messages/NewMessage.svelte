@@ -611,7 +611,7 @@
 		background-color: #2b2d31;
 		border-radius: 4px;
 		border: 1px solid #232428;
-		margin-right: 150px;
+		margin-right: 10%;
 
 		font-size: 14px;
 		padding: 7px;

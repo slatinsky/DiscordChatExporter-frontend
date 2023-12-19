@@ -415,7 +415,7 @@ parse: function(capture, recurseParse, state) {
 // ```
 
 const codeBlock = {
-    order: SimpleMarkdown.defaultRules.codeBlock.order - 0.1,
+    order: SimpleMarkdown.defaultRules.codeBlock.order - 0.2,
     match: function(source, state, lookbehind) {
         return /^```([a-z0-9]*)\n([\s\S]*?)\n```/.exec(source);
     },
@@ -427,8 +427,39 @@ const codeBlock = {
         };
     },
     html: function(node, recurseOutput, state) {
-        const highlightedCode = hljs.highlight(node.language, node.content).value;
-        return `<pre><code class="hljs-codeblock language-${node.language}">${highlightedCode}</code></pre>`;
+        try {
+            const highlightedCode = hljs.highlight(node.language, node.content).value;
+            return `<pre><code class="hljs-codeblock language-${node.language}">${highlightedCode}</code></pre>`;
+        }
+        catch (error) {
+            return `<pre><code class="hljs-codeblock language-${node.language}">${node.content}</code></pre>`;
+        }
+    },
+}
+
+// badly formatted code blocks - without language and code in the first or last line
+// ```private void main() {
+// code
+// }```
+const badlyFormattedCodeBlock = {
+    order: SimpleMarkdown.defaultRules.codeBlock.order - 0.1,
+    match: function(source, state, lookbehind) {
+        return /^```([\s\S]*?\n[\s\S]*?)```/.exec(source);
+    },
+    parse: function(capture, recurseParse, state) {
+        return {
+            type: 'codeBlock',
+            content: capture[1],
+        };
+    },
+    html: function(node, recurseOutput, state) {
+        try {
+            const highlightedCode = hljs.highlight("txt", node.content).value;
+            return `<pre><code class="hljs-codeblock">${highlightedCode}</code></pre>`;
+        }
+        catch (error) {
+            return `<pre><code class="hljs-codeblock">${node.content}</code></pre>`;
+        }
     },
 }
 
@@ -441,6 +472,7 @@ export const rules = {
     // lheading: SimpleMarkdown.defaultRules.lheading,
     hr: SimpleMarkdown.defaultRules.hr,
     codeBlock: codeBlock,
+    badlyFormattedCodeBlock: badlyFormattedCodeBlock,
     // codeBlock: SimpleMarkdown.defaultRules.codeBlock,
     fence: SimpleMarkdown.defaultRules.fence,
     blockQuote: SimpleMarkdown.defaultRules.blockQuote,
