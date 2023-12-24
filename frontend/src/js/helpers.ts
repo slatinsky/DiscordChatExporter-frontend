@@ -92,3 +92,15 @@ export function darkenColor(color: string, amount: number) {
 
     return "#" + redDarker + greenDarker + blueDarker;
 }
+
+export function humanFileSize(bytes: number, decimalPlaces: number) {
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    } else if (bytes < 1024 * 1024) {
+        return `${Math.round(bytes / 1024 * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces)} KB`;
+    } else if (bytes < 1024 * 1024 * 1024) {
+        return `${Math.round(bytes / 1024 / 1024 * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces)} MB`;
+    } else {
+        return `${Math.round(bytes / 1024 / 1024 / 1024 * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces)} GB`;
+    }
+}

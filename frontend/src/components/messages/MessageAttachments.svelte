@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { checkUrl } from "src/js/helpers";
+	import { checkUrl, humanFileSize } from "src/js/helpers";
 	import type { Asset } from "src/js/interfaces";
 	import ImageGallery from "src/routes/channels/[guildId]/[channelId]/ImageGallery.svelte";
 	import IconFilePdf from "../icons/IconFilePdf.svelte";
@@ -7,20 +7,9 @@
 	import IconFIleArchive from "../icons/IconFIleArchive.svelte";
 	import IconFileSpreadsheet from "../icons/IconFileSpreadsheet.svelte";
 	import IconFileUnknown from "../icons/IconFileUnknown.svelte";
+	import MessageAttachmentTxt from "./MessageAttachmentTxt.svelte";
 	export let attachments: Asset[] = [];
 
-
-	function humanFileSize(bytes: number) {
-		if (bytes < 1024) {
-			return `${bytes} B`;
-		} else if (bytes < 1024 * 1024) {
-			return `${Math.round(bytes / 1024 * 100) / 100} KB`;
-		} else if (bytes < 1024 * 1024 * 1024) {
-			return `${Math.round(bytes / 1024 / 1024 * 100) / 100} MB`;
-		} else {
-			return `${Math.round(bytes / 1024 / 1024 / 1024 * 100) / 100} GB`;
-		}
-	}
 </script>
 
 {#each attachments as attachment}
@@ -41,8 +30,10 @@
 		<audio class="" controls preload="metadata">
 			<source src="{checkUrl(attachment)}" alt="{attachment?.filenameWithoutHash ?? 'Audio attachment'}" title="Audio: {attachment.filenameWithoutHash} ({Math.round(attachment.sizeBytes / 1024)} KB)">
 		</audio>
+	{:else if attachment.extension == 'txt'}
+		<MessageAttachmentTxt attachment={attachment} />
 	{:else}
-		<a href={checkUrl(attachment)} target="_blank" class="attachment-wrapper">
+		<a href={checkUrl(attachment)} target="_blank" class="attachment-wrapper" rel="noreferrer">
 			<div class="attachment">
 				{#if attachment?.filenameWithoutHash.toLowerCase().endsWith('.pdf')}
 					<IconFilePdf />
@@ -57,7 +48,7 @@
 				{/if}
 				<div>
 					<div class="attachment-filename">{attachment.filenameWithoutHash}</div>
-					<div class="attachment-filesize">{humanFileSize(attachment.sizeBytes)}</div>
+					<div class="attachment-filesize">{humanFileSize(attachment.sizeBytes, 2)}</div>
 				</div>
 			</div>
 		</a>
