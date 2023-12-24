@@ -1,4 +1,4 @@
-<svg width="18" height="18" viewBox="0 0 24 24" class="icon-channel" role="img">
+<svg width="18" height="18" viewBox="0 0 24 24" class="icon-channel" role="img" style="width: 18px; height: 18px; vertical-align: middle;">
 	<path
 		fill="currentColor"
 		fill-rule="evenodd"
