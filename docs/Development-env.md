@@ -2,7 +2,7 @@
 
 ## Prerequisites
 - Python 3.11
-- Node.js 16.16.0
+- Node.js 18.17.1
 - pyinstaller 5.5 (installed globally from `pip`)
 - nodemon (installed globally from `npm`)
 - wt (windows terminal)
