@@ -1,5 +1,5 @@
 # build sveltekit static app
-FROM node:16.18-alpine3.15 as build
+FROM node:19.2.0-alpine3.15 as build
 WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
