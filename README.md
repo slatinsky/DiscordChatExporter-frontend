@@ -22,10 +22,10 @@ Browse your [Discord chat exports](https://github.com/Tyrrrz/DiscordChatExporter
 4. Move all your [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) exports to `/exports/` folder ([supported exports](#supported-exports)).
 5. Run `dcef.exe`
 
-## Quick start (Linux)
+## Quick start (Linux amd64 / arm64)
 
 
-Docker version is the best way to [host the viewer on a server](docs/Server-hosting.md) for others to use.
+Docker version is the best way to [host the viewer on a server](docs/Server-hosting.md) for others to use. Works also on raspberry pi 5 (thanks [ritiek](https://github.com/slatinsky/DiscordChatExporter-frontend/pull/54) for pull request). To run on raspberry pi 4b, you need to build your own image using provided `Dockerfile.rpi4b`.
 
 1. Export your data using [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter/blob/master/.docs/Getting-started.md#using-the-cli). Use `--media --reuse-media --markdown false --format Json` command line options.
 
@@ -48,8 +48,7 @@ docker run --restart=always --volume "$(pwd):/dcef/exports" --volume dcef_cache:
 
 5. Open `http://127.0.0.1:21011/` in your browser
 
-**Note:** arm based systems like Raspberry Pi or Apple M1 are not officially supported. Pull requests are welcome :)
-
+**Note:** Apple M1 is not supported. Pull requests are welcome :)
 
 ## Edit server configuration
 
