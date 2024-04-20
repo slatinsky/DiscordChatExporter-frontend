@@ -3,7 +3,7 @@
 	import IconChannel from 'src/components/icons/IconChannel.svelte';
 	import SearchFilter from 'src/components/search/SearchFilter.svelte';
 	import HamburgerBtn from 'src/components/menu/HamburgerBtn.svelte';
-	import { doSearch, searchPrompt, searchPromptLarge } from 'src/components/search/searchStores';
+	import { doSearch, searchPrompt, searchPromptLarge, searchTemporarilyHidden } from 'src/components/search/searchStores';
 	import IconPin from 'src/components/icons/IconPin.svelte';
 
 	export let channel: Channel | null = null;
@@ -30,7 +30,7 @@
 		<div class="channel-header__left-wrapper">
 			<HamburgerBtn />
 
-			<div class="channel-header__left" class:searchlarge={$searchPromptLarge}>
+			<div class="channel-header__left" class:searchlarge={$searchPromptLarge && !$searchTemporarilyHidden}>
 				{#if channel !== null}
 					<IconChannel />
 					<a href={`/channels/${guildId}/${channel._id}`}>

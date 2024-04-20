@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Header from './Header.svelte';
-	import SearchResults from '../../../components/search/SearchResults.svelte';
-	import { searchShown, searchResultsMessageIds } from '../../../components/search/searchStores';
+	import SearchResults from 'src/components/search/SearchResults.svelte';
+	import { searchShown, searchResultsMessageIds, searchTemporarilyHidden } from 'src/components/search/searchStores';
 
 	import type { PageServerData } from './$types';
 	export let data: PageServerData;
 
-	import ChannelsMenu from '../../../components/channels/MenuCategories.svelte';
+	import ChannelsMenu from 'src/components/channels/MenuCategories.svelte';
 	import Container from 'src/components/containers/Container.svelte';
 	import { currentUserName1, currentUserName2, currentUserPhoto, settingsShown } from 'src/components/settings/settingsStore';
 	import { isMenuHidden } from 'src/components/menu/menuStore';
@@ -60,11 +60,9 @@
 			<div id="messages">
 				<slot />
 			</div>
-			{#if $searchShown}
-				<div id="search">
-					<SearchResults guildId={currentGuildId} />
-				</div>
-			{/if}
+			<div id="search" class:hidden={$searchTemporarilyHidden || !$searchShown}>
+				<SearchResults guildId={currentGuildId} />
+			</div>
 		</div>
 	{/if}
 {/key}
@@ -72,6 +70,10 @@
 <UserSelectionModal bind:showModal={showUserSelectionModal} guildId={currentGuildId}/>
 
 <style>
+	.hidden {
+		display: none;
+	}
+
 	#guild-layout {
 		display: grid;
 		/* flex-direction: row; */

@@ -13,6 +13,7 @@
 	import identicons from 'identicons'
 	import AuthorModal from 'src/routes/channels/[guildId]/[channelId]/AuthorModal.svelte';
 	import MessageNickname from './MessageNickname.svelte';
+	import { hideSearchOnMobile } from 'src/components/search/searchStores';
 
 	export let message: Message;
 	export let previousMessage: Message | null = null;
@@ -211,7 +212,7 @@
 		</div>
 	{/if}
 
-	<a class="msg-jump" href="/channels/{message.guildId}/{message.channelId}#{message._id}">Jump</a>
+	<a class="msg-jump" href="/channels/{message.guildId}/{message.channelId}#{message._id}" on:click={hideSearchOnMobile}>Jump</a>
 
 	<!-- {#if search && message.searchPrevMessageChannelId && message.searchPrevMessageChannelId !== message.channelId}
 		<div class="channel-name"><a href="/channels/{selectedGuildId}/{message.channelId}/"># {guild.channels[message.channelId]?.name}</a></div>
