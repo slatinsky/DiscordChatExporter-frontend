@@ -19,10 +19,10 @@
     import { settingsshown } from "./js/stores/layoutStore";
     import { debuglayout } from "./js/stores/layoutStore";
     import { position } from "./js/stores/menuStore";
-    
+
     let mobile = false
     let windowWidth = window.innerWidth
-  
+
     function toggleThread() {
       if (!$threadshown && $searchshown) {
         // search and thread can't be shown at the same time
@@ -92,28 +92,26 @@
 </script>
 
 
-
-<main
-  class:mobile class:desktop={!mobile}
-  class:searchshown={$searchshown} class:searchhidden={!$searchshown}
-  class:mobilesidepanelshown={$mobilesidepanelshown} class:mobilesidepanelhidden={!$mobilesidepanelshown}
-  class:threadshown={$threadshown} class:threadhidden={!$threadshown}
-  class:debuglayout={$debuglayout}
-
-  on:mousemove={handleThrottledMousemove}
-  >
- 
+<div class:debuglayout={$debuglayout}>
+  <main
+    class:mobile class:desktop={!mobile}
+    class:searchshown={$searchshown} class:searchhidden={!$searchshown}
+    class:mobilesidepanelshown={$mobilesidepanelshown} class:mobilesidepanelhidden={!$mobilesidepanelshown}
+    class:threadshown={$threadshown} class:threadhidden={!$threadshown}
+    on:mousemove={handleThrottledMousemove}
+    >
+      <div class="guilds"><Guilds /></div>
+      <div class="header-channels"><HeaderChannels /></div>
+      <div class="channels"><Channels /></div>
+      <div class="header-main"><HeaderMain /></div>
+      <div class="channel"><Channel /></div>
+      <div class="search-results"><SearchResults /></div>
+      <div class="header-thread"><HeaderThread /></div>
+      <div class="thread"><Thread /></div>
+    </main>
   <div class="settings" class:settingsshown={$settingsshown}><Settings /></div>
-  <div class="guilds"><Guilds /></div>
-  <div class="header-channels"><HeaderChannels /></div>
-  <div class="channels"><Channels /></div>
-  <div class="header-main"><HeaderMain /></div>
-  <div class="channel"><Channel /></div>
-  <div class="search-results"><SearchResults /></div>
-  <div class="header-thread"><HeaderThread /></div>
-  <div class="thread"><Thread /></div>
-</main>
-<ContextMenu />
+  <ContextMenu />
+</div>
 
 
 
@@ -354,10 +352,10 @@
   }
   main.mobile.searchshown .header-channels {
     display: none;
-  } 
+  }
   main.mobile.searchshown .header-thread {
     display: none;
-  } 
+  }
   main.mobile.searchshown .channels {
     display: none;
   }
@@ -379,31 +377,35 @@
 
 
   /* DEBUG COLORS */
-  main.debuglayout .settings {
+  .debuglayout {
+    width: 100%;
+    height: 100%;
+  }
+  .debuglayout > .settings {
     background-color: rgb(225, 0, 225)
   }
-  main.debuglayout .guilds {
+  .debuglayout > main .guilds {
     background-color: rgb(116, 58, 58)
   }
-  main.debuglayout .header-channels {
+  .debuglayout > main .header-channels {
     background-color: rgb(102, 174, 0)
   }
-  main.debuglayout .channels {
+  .debuglayout > main .channels {
     background-color: blue
   }
-  main.debuglayout .header-main {
+  .debuglayout > main .header-main {
     background-color: rgb(0, 151, 174)
   }
-  main.debuglayout .channel {
+  .debuglayout > main .channel {
     background-color: rgb(30, 0, 0)
   }
-  main.debuglayout .search-results {
+  .debuglayout > main .search-results {
     background-color: lightgreen
   }
-  main.debuglayout .thread {
+  .debuglayout > main .thread {
     background-color: lightblue
   }
-  main.debuglayout .header-thread {
+  .debuglayout > main .header-thread {
     background-color: rgb(0, 57, 171)
   }
 
