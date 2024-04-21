@@ -4,7 +4,6 @@
 
     import Channels from "./lib/Channels.svelte";
     import Guilds from "./lib/Guilds.svelte";
-    import HeaderChannels from "./lib/HeaderChannels.svelte";
     import HeaderMain from "./lib/HeaderMain.svelte";
     import HeaderThread from "./lib/HeaderThread.svelte";
     import SearchResults from "./lib/SearchResults.svelte";
@@ -101,7 +100,6 @@
     on:mousemove={handleThrottledMousemove}
     >
       <div class="guilds"><Guilds /></div>
-      <div class="header-channels"><HeaderChannels /></div>
       <div class="channels"><Channels /></div>
       <div class="header-main"><HeaderMain /></div>
       <div class="channel"><Channel /></div>
@@ -143,10 +141,6 @@
   .guilds {
     grid-area: guilds;
   }
-  .header-channels {
-    grid-area: header-channels;
-    background-color: #2B2D31;
-  }
   .channels {
     grid-area: channels;
     background-color: #2B2D31;
@@ -179,7 +173,7 @@
   /* DESKTOP NO SEARCH, NO THREAD */
   main.desktop.searchhidden.threadhidden {
     grid-template-areas:
-    "guilds header-channels header-main"
+    "guilds channels header-main"
     "guilds channels        channel";
     grid-template-columns: 70px 236px 1fr;
     grid-template-rows: 48px 1fr;
@@ -199,7 +193,7 @@
   /* DESKTOP NO SEARCH, THREAD SHOWN */
   main.desktop.searchhidden.threadshown {
     grid-template-areas:
-    "guilds header-channels header-main header-thread"
+    "guilds channels header-main header-thread"
     "guilds channels        channel     thread";
     grid-template-columns: 70px 236px 1fr 1fr;
     grid-template-rows: 48px 1fr;
@@ -213,7 +207,7 @@
   main.desktop.searchshown.threadhidden,
   main.desktop.searchshown.threadshown {
     grid-template-areas:
-    "guilds header-channels header-main header-main   "
+    "guilds channels header-main header-main   "
     "guilds channels        channel    search-results";
 
     grid-template-columns: 70px 236px 1fr 400px;
@@ -236,7 +230,7 @@
   main.mobile.searchhidden.mobilesidepanelshown.threadhidden {
     width: calc(100vw + 70px + min(236px, 100svw - 100px) + 100vw);
     grid-template-areas:
-    "guilds header-channels header-main"
+    "guilds channels header-main"
     "guilds channels        channel";
     grid-template-columns: 70px min(236px, 100svw - 100px) 100vw;
     grid-template-rows: 48px 1fr;
@@ -250,13 +244,13 @@
   main.mobile.searchhidden.mobilesidepanelshown.threadhidden .header-thread {
     display: none;
   }
-  
+
 
   /* MOBILE SIDEPANEL, WITH THREAD */
   main.mobile.searchhidden.mobilesidepanelshown.threadshown {
     width: calc(70px + min(236px, 100svw - 100px) + 100vw);
     grid-template-areas:
-    "guilds header-channels header-thread"
+    "guilds channels header-thread"
     "guilds channels        thread";
     grid-template-columns: 70px min(236px, 100svw - 100px) 100vw;
     grid-template-rows: 48px 1fr;
@@ -290,9 +284,6 @@
   main.mobile.searchhidden.mobilesidepanelhidden.threadhidden .guilds {
     display: none;
   }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadhidden .header-channels {
-    display: none;
-  } 
   main.mobile.searchhidden.mobilesidepanelhidden.threadhidden .channels {
     display: none;
   }
@@ -316,9 +307,6 @@
     grid-template-rows: 48px 1fr;
   }
   main.mobile.searchhidden.mobilesidepanelhidden.threadshown .guilds {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadshown .header-channels {
     display: none;
   }
   main.mobile.searchhidden.mobilesidepanelhidden.threadshown .header-main {
@@ -348,9 +336,6 @@
     grid-template-rows: 48px 1fr;
   }
   main.mobile.searchshown .guilds {
-    display: none;
-  }
-  main.mobile.searchshown .header-channels {
     display: none;
   }
   main.mobile.searchshown .header-thread {
@@ -386,9 +371,6 @@
   }
   .debuglayout > main .guilds {
     background-color: rgb(116, 58, 58)
-  }
-  .debuglayout > main .header-channels {
-    background-color: rgb(102, 174, 0)
   }
   .debuglayout > main .channels {
     background-color: blue
