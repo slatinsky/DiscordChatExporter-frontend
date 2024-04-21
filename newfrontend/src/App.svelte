@@ -5,7 +5,6 @@
     import Channels from "./lib/Channels.svelte";
     import Guilds from "./lib/Guilds.svelte";
     import HeaderMain from "./lib/HeaderMain.svelte";
-    import HeaderThread from "./lib/HeaderThread.svelte";
     import SearchResults from "./lib/SearchResults.svelte";
     import Channel from "./lib/Channel.svelte";
     import Thread from "./lib/Thread.svelte";
@@ -27,10 +26,10 @@
         // search and thread can't be shown at the same time
         $searchshown = false
       }
-      if (!$threadshown && $mobilesidepanelshown) {
-        // hide mobile side panel on thread show
-        $mobilesidepanelshown = false
-      }
+      // if (!$threadshown && $mobilesidepanelshown) {
+      //   // hide mobile side panel on thread show
+      //   $mobilesidepanelshown = false
+      // }
       $threadshown = !$threadshown
     }
 
@@ -43,15 +42,15 @@
     }
 
     function toggleSidePanel() {
-      if ($mobilesidepanelshown && $searchshown) {
-        // if already shown, just hide search
-        $searchshown = false
-        return
-      }
-      if (!$mobilesidepanelshown && $searchshown) {
-        // search cannot be shown when side panel is hidden
-        $searchshown = false
-      }
+      // if ($mobilesidepanelshown && $searchshown) {
+      //   // if already shown, just hide search
+      //   $searchshown = false
+      //   return
+      // }
+      // if (!$mobilesidepanelshown && $searchshown) {
+      //   // search cannot be shown when side panel is hidden
+      //   $searchshown = false
+      // }
       $mobilesidepanelshown = !$mobilesidepanelshown
     }
 
@@ -91,7 +90,7 @@
 </script>
 
 
-<div class:debuglayout={$debuglayout}>
+<div class:debuglayout={$debuglayout} style="width: 100%;height: 100%;">
   <main
     class:mobile class:desktop={!mobile}
     class:searchshown={$searchshown} class:searchhidden={!$searchshown}
@@ -104,7 +103,6 @@
       <div class="header-main"><HeaderMain /></div>
       <div class="channel"><Channel /></div>
       <div class="search-results"><SearchResults /></div>
-      <div class="header-thread"><HeaderThread /></div>
       <div class="thread"><Thread /></div>
     </main>
   <div class="settings" class:settingsshown={$settingsshown}><Settings /></div>
@@ -113,7 +111,7 @@
 
 
 
-<div style="position: absolute; bottom: 0; right; 0;z-index: 200">
+<div style="position: absolute; bottom: 5px; left: 5px;z-index: 200">
   <button on:click={() => $debuglayout = !$debuglayout}>$debuglayout {$debuglayout}</button>
   <button on:click={toggleSidePanel}>$mobilesidepanelshown {$mobilesidepanelshown}</button>
   <button on:click={toggleThread}>$threadshown {$threadshown}</button>
@@ -184,17 +182,14 @@
   main.desktop.searchhidden.threadhidden .thread {
     display: none;
   }
-  main.desktop.searchhidden.threadhidden .header-thread {
-    display: none;
-  }
 
 
 
   /* DESKTOP NO SEARCH, THREAD SHOWN */
   main.desktop.searchhidden.threadshown {
     grid-template-areas:
-    "guilds channels header-main header-thread"
-    "guilds channels        channel     thread";
+    "guilds channels header-main    thread"
+    "guilds channels        channel thread";
     grid-template-columns: 70px 236px 1fr 1fr;
     grid-template-rows: 48px 1fr;
   }
@@ -207,8 +202,8 @@
   main.desktop.searchshown.threadhidden,
   main.desktop.searchshown.threadshown {
     grid-template-areas:
-    "guilds channels header-main header-main   "
-    "guilds channels        channel    search-results";
+    "guilds channels header-main    header-main   "
+    "guilds channels        channel search-results";
 
     grid-template-columns: 70px 236px 1fr 400px;
     grid-template-rows: 48px 1fr;
@@ -221,134 +216,72 @@
   main.desktop.searchshown.threadhidden .thread {
     display: none;
   }
-  main.desktop.searchshown.threadshown .header-thread,
-  main.desktop.searchshown.threadhidden .header-thread {
+
+
+
+
+
+  /* MOBILE */
+
+  /* hide hidden elements */
+  main.mobile.threadhidden .thread,
+  main.mobile.searchhidden .search-results {
     display: none;
   }
 
-  /* MOBILE SIDEPANEL, NO THREAD */
-  main.mobile.searchhidden.mobilesidepanelshown.threadhidden {
-    width: calc(100vw + 70px + min(236px, 100svw - 100px) + 100vw);
+
+  /* animate side panel */
+  main.mobile .header-main,
+  main.mobile .channel,
+  main.mobile .thread {
+    transition: left 0.2s;
+  }
+
+
+  /* main mobile layout, other elements are positioned absolutely */
+  main.mobile {
+    width: calc(100vw + 70px + min(236px, 100svw - 100px));
     grid-template-areas:
-    "guilds channels header-main"
-    "guilds channels        channel";
-    grid-template-columns: 70px min(236px, 100svw - 100px) 100vw;
-    grid-template-rows: 48px 1fr;
-  }
-  main.mobile.searchhidden.mobilesidepanelshown.threadhidden .search-results {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelshown.threadhidden .thread {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelshown.threadhidden .header-thread {
-    display: none;
+    "guilds channels";
+    grid-template-columns: 70px min(236px, 100svw - 100px);
+    grid-template-rows: 1fr;
   }
 
-
-  /* MOBILE SIDEPANEL, WITH THREAD */
-  main.mobile.searchhidden.mobilesidepanelshown.threadshown {
-    width: calc(70px + min(236px, 100svw - 100px) + 100vw);
-    grid-template-areas:
-    "guilds channels header-thread"
-    "guilds channels        thread";
-    grid-template-columns: 70px min(236px, 100svw - 100px) 100vw;
-    grid-template-rows: 48px 1fr;
+  /* absolute positioning for mobile elements */
+  main.mobile .header-main {
+    position: absolute;
+    width: 100%;
+    height: 48px;
+    top: 0;
+    left: 0;
   }
-  main.mobile.searchhidden.mobilesidepanelshown.threadshown .search-results {
-    display: none;
+  main.mobile .channel {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 48px);
+    top: 48px;
+    left: 0;
   }
-  main.mobile.searchhidden.mobilesidepanelshown.threadshown .channel {
-    display: none;
+  main.mobile .thread {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
   }
-  main.mobile.searchhidden.mobilesidepanelshown.threadshown .header-main {
-    display: none;
-  }
-
-
-
-
-
-
-
-
-   /* MOBILE NO SIDE PANEL, NO THREAD */
-  main.mobile.searchhidden.mobilesidepanelhidden.threadhidden {
-    width: 100vw;
-    grid-template-areas:
-    "header-main"
-    "channel" !important;
-    grid-template-columns: 1fr;
-    grid-template-rows: 48px 1fr;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadhidden .guilds {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadhidden .channels {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadhidden .search-results {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadhidden .thread {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadhidden .header-thread {
-    display: none;
+  main.mobile .search-results {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
   }
 
-  /* MOBILE NO SIDE PANEL, WITH THREAD */
-  main.mobile.searchhidden.mobilesidepanelhidden.threadshown {
-    width: 100vw;
-    grid-template-areas:
-    "header-thread"
-    "thread" !important;
-    grid-template-columns: 1fr;
-    grid-template-rows: 48px 1fr;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadshown .guilds {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadshown .header-main {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadshown .channels {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadshown .search-results {
-    display: none;
-  }
-  main.mobile.searchhidden.mobilesidepanelhidden.threadshown .channel {
-    display: none;
-  }
-
-
-
-
-  /* MOBILE WITH SEARCH */
-  main.mobile.searchshown {
-    width: 100svw;
-    grid-template-areas:
-    "header-main   "
-    "search-results";
-
-    grid-template-columns: 1fr;
-    grid-template-rows: 48px 1fr;
-  }
-  main.mobile.searchshown .guilds {
-    display: none;
-  }
-  main.mobile.searchshown .header-thread {
-    display: none;
-  }
-  main.mobile.searchshown .channels {
-    display: none;
-  }
-  main.mobile.searchshown .channel {
-    display: none;
-  }
-  main.mobile.searchshown .thread {
-    display: none;
+  /* side panel shown */
+  main.mobile.mobilesidepanelshown .channel,
+  main.mobile.mobilesidepanelshown .header-main,
+  main.mobile.mobilesidepanelshown .thread {
+    left: calc(70px + min(236px, 100svw - 100px));
   }
 
 
@@ -362,33 +295,33 @@
 
 
   /* DEBUG COLORS */
-  .debuglayout {
-    width: 100%;
-    height: 100%;
-  }
   .debuglayout > .settings {
-    background-color: rgb(225, 0, 225)
+    background-color: rgb(225, 0, 225);
+    border: 1px solid #ff72ff;
   }
   .debuglayout > main .guilds {
-    background-color: rgb(116, 58, 58)
+    background-color: rgb(116, 58, 58);
+    border: 1px solid red;
   }
   .debuglayout > main .channels {
-    background-color: blue
+    background-color: blue;
+    border: 1px solid #7272ff;
   }
   .debuglayout > main .header-main {
-    background-color: rgb(0, 151, 174)
+    background-color: rgb(0, 151, 174);
+    border: 1px solid #08ffff;
   }
   .debuglayout > main .channel {
-    background-color: rgb(30, 0, 0)
+    background-color: rgb(30, 0, 0);
+    border: 1px solid #ff7272;
   }
   .debuglayout > main .search-results {
-    background-color: lightgreen
+    background-color: lightgreen;
+    border: 1px solid #72ff72;
   }
   .debuglayout > main .thread {
-    background-color: lightblue
-  }
-  .debuglayout > main .header-thread {
-    background-color: rgb(0, 57, 171)
+    background-color: lightblue;
+    border: 1px solid #7272ff;
   }
 
 </style>
