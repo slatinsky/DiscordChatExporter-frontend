@@ -1,4 +1,5 @@
-import { writable } from "svelte/store";
+import { derived, get, writable } from "svelte/store";
+import { threadshown } from "./layoutStore";
 
 
 async function fetch_guilds() {
@@ -14,7 +15,7 @@ async function fetch_guilds() {
 }
 
 
-async function fetch_channels(guildId: string) {
+async function fetch_categories_channels_threads(guildId: string) {
     try {
         const response = await fetch(`/api/channels?guild_id=${guildId}`)
         let json_response = await response.json()
@@ -102,18 +103,68 @@ async function fetch_channels(guildId: string) {
 
 export let guilds = writable([]);
 export let categories = writable([]);
-export const selectedGuildId = writable(null);
+
+// changed externally
+export const selectedGuildId = writable(null);  
 export const selectedChannelId = writable(null);
 export const selectedThreadId = writable(null);
 
-// fetch guilds on startup
-fetch_guilds()
-
-selectedGuildId.subscribe((value) => {
-    if (value) {
-        fetch_channels(value)
+// read only references
+export const selectedGuild = derived(selectedGuildId, ($selectedGuildId) => {
+    let guild = get(guilds).find(g => g._id === $selectedGuildId)
+    if (!guild) {
+        return null
+    }
+    return guild
+});
+selectedGuild.subscribe((newGuild) => {
+    if (newGuild) {
+        fetch_categories_channels_threads(newGuild._id)
     }
     else {
         categories.set([])
     }
+    selectedChannelId.set(null)
 })
+
+
+
+export const selectedChannel = derived(selectedChannelId, ($selectedChannelId) => {
+    let channel = get(categories).flatMap(c => c.channels).find(c => c._id === $selectedChannelId)
+    if (!channel) {
+        return null
+    }
+    return channel
+});
+selectedChannel.subscribe((newChannel) => {
+    if (newChannel && get(selectedThread) && newChannel._id !== get(selectedThread).categoryId) {
+        selectedThreadId.set(null)
+        threadshown.set(false)
+    }
+    else {
+        selectedThreadId.set(null)
+        threadshown.set(false)
+    }
+})
+
+
+
+export const selectedThread = derived(selectedThreadId, ($selectedThreadId) => {
+    let thread = get(categories).flatMap(c => c.channels).flatMap(c => c.threads).find(c => c._id === $selectedThreadId)
+    if (!thread) {
+        return null
+    }
+    return thread
+});
+selectedThread.subscribe((newThread) => {
+    if (newThread) {
+        threadshown.set(true)
+    }
+    else {
+        threadshown.set(false)
+    }
+})
+
+// fetch guilds on startup
+fetch_guilds()
+

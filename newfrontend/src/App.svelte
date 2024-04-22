@@ -143,16 +143,13 @@
   }
   .channels {
     grid-area: channels;
-    background-color: #2B2D31;
   }
   .header-main {
     grid-area: header-main;
-    background-color: #313338;
   }
   .channel {
     grid-area: channel;
     overflow: hidden;
-    background-color: #313338;
   }
   .search-results {
     grid-area: search-results;
@@ -160,14 +157,16 @@
   }
   .thread {
     grid-area: thread;
-    background-color: #313338;
   }
 
   /* COMMON */
   main {
     display: grid;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 7px);
+    background-color: #1E1F22;
+    margin: 7px 0 0 0;
+    box-sizing: border-box;
   }
 
   /* DESKTOP NO SEARCH, NO THREAD */
@@ -176,7 +175,7 @@
     "guilds channels header-main"
     "guilds channels        channel";
     grid-template-columns: 70px 236px 1fr;
-    grid-template-rows: 48px 1fr;
+    grid-template-rows: 47px 1fr;
   }
   main.desktop.searchhidden.threadhidden .search-results {
     display: none;
@@ -193,7 +192,7 @@
     "guilds channels header-main    thread"
     "guilds channels        channel thread";
     grid-template-columns: 70px 236px 1fr 1fr;
-    grid-template-rows: 48px 1fr;
+    grid-template-rows: 47px 1fr;
   }
   main.desktop.searchhidden.threadshown .search-results {
     display: none;
@@ -208,7 +207,7 @@
     "guilds channels        channel search-results";
 
     grid-template-columns: 70px 236px 1fr 400px;
-    grid-template-rows: 48px 1fr;
+    grid-template-rows: 47px 1fr;
   }
   main.desktop.searchshown.threadshown .search-results,
   main.desktop.searchshown.threadhidden .search-results {
@@ -253,15 +252,15 @@
   main.mobile .header-main {
     position: absolute;
     width: 100%;
-    height: 48px;
+    height: 47px;
     top: 0;
     left: 0;
   }
   main.mobile .channel {
     position: absolute;
     width: 100%;
-    height: calc(100% - 48px);
-    top: 48px;
+    height: calc(100% - 47px);
+    top: 47px;
     left: 0;
   }
   main.mobile .thread {

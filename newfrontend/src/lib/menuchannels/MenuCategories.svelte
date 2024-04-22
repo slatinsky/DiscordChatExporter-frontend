@@ -6,13 +6,13 @@
 
 
 
-<div style="height:100svh">
+<div class="categories-col">
     <MenuGuildName />
     <div class="categories-wrapper">
         {#if !$selectedGuildId}
-            <div>Select server</div>
+            <div class="error">Select server</div>
         {:else if $categories.length === 0}
-            <div>No channels found</div>
+            <div class="error">No channels found</div>
         {/if}
         {#each $categories as category}
             <MenuCategory category={category} />
@@ -22,6 +22,21 @@
 
 
 <style>
+
+    .categories-col {
+        height: 100%;
+        border-top-left-radius: 8px;
+        background-color: #2B2D31;
+        overflow: hidden;
+    }
+    .error {
+        padding: 10px 15px;
+        color: #80848E;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.24px;
+        font-weight: 600;
+    }
     .categories-wrapper {
         overflow-y: auto;
         height: 100%;

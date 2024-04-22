@@ -1,13 +1,20 @@
 <script lang="ts">
-
+    import { selectedChannelId } from "../js/stores/guildStore";
+    import { threadshown } from "../js/stores/layoutStore";
 </script>
 
 
-<div class="messages">
-    Channel messages
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Nisi autem natus esse ab suscipit cumque aut quod, minima corrupti hic quam quisquam aliquam, numquam, cum eaque nam labore? Recusandae, voluptatibus?
+<div class="channel" class:threadshown={$threadshown}>
+    {$selectedChannelId}
 </div>
 
 <style>
-  
+    .channel {
+        background-color: #313338;
+        height: 100%;
+    }
+
+    .threadshown {
+        border-bottom-right-radius: 8px;
+    }
 </style>
