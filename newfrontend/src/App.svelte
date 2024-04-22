@@ -2,7 +2,7 @@
     // this file handles app layout
     import {throttle} from 'lodash-es';
 
-    import Channels from "./lib/Channels.svelte";
+    import MenuCategories from "./lib/menuchannels/MenuCategories.svelte";
     import Guilds from "./lib/Guilds.svelte";
     import HeaderMain from "./lib/HeaderMain.svelte";
     import SearchResults from "./lib/SearchResults.svelte";
@@ -20,6 +20,7 @@
 
     let mobile = false
     let windowWidth = window.innerWidth
+    let hidedebug = false
 
     function toggleThread() {
       if (!$threadshown && $searchshown) {
@@ -99,7 +100,7 @@
     on:mousemove={handleThrottledMousemove}
     >
       <div class="guilds"><Guilds /></div>
-      <div class="channels"><Channels /></div>
+      <div class="channels"><MenuCategories /></div>
       <div class="header-main"><HeaderMain /></div>
       <div class="channel"><Channel /></div>
       <div class="search-results"><SearchResults /></div>
@@ -111,7 +112,8 @@
 
 
 
-<div style="position: absolute; bottom: 5px; left: 5px;z-index: 200">
+<div style="position: absolute; bottom: 5px; left: 5px;z-index: 200;{hidedebug ? 'display:none' : ''}">
+  <button on:click={() => hidedebug = !hidedebug}>X</button>
   <button on:click={() => $debuglayout = !$debuglayout}>$debuglayout {$debuglayout}</button>
   <button on:click={toggleSidePanel}>$mobilesidepanelshown {$mobilesidepanelshown}</button>
   <button on:click={toggleThread}>$threadshown {$threadshown}</button>
@@ -134,7 +136,7 @@
   .settings.settingsshown {
     display: block;
   }
-  
+
 
   .guilds {
     grid-area: guilds;

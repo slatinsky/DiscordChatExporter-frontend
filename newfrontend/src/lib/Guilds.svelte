@@ -1,14 +1,9 @@
 <!-- GUILDS MENU -->
 
 <script lang="ts">
-    import { onMount } from "svelte";
-
 	import { checkUrl, copyTextToClipboard } from "../js/helpers"
-    import { selectedGuildId } from "../js/stores/guildStore";
+    import { guilds, selectedGuildId } from "../js/stores/guildStore";
     import { contextMenuItems } from "../js/stores/menuStore";
-	// import type { Guild } from "../js/interfaces";
-	// export let guilds: Guild[] = [];
-	// export let selectedGuildId: string | null = null;
 
 	function onRightClick(e, id) {
         console.log("right click", id);
@@ -22,25 +17,7 @@
 		]
 	}
 
-    // onmount
-
-
     let isMenuHidden = false
-    let guilds = []
-
-    let failed = false
-    onMount(async () => {
-        let response
-        try {
-            response = await fetch('/api/guilds')
-            guilds = await response.json()
-            console.log("guilds", guilds);
-        }
-        catch (e) {
-            failed = true
-        }
-    })
-
     const selectGuild = (id) => {
         $selectedGuildId = id
         console.log("selected guild", id);
@@ -69,7 +46,7 @@
 	<hr>
 
 	{#if guilds}
-		{#each guilds as guild}
+		{#each $guilds as guild}
 			<div class="guild" on:contextmenu|preventDefault={e=>onRightClick(e, guild._id)} class:selected={$selectedGuildId === guild._id} on:click={e => selectGuild(guild._id)}>
 				<div class="guild-selected-indicator" />
 				<img src={checkUrl(guild.icon)} alt={guild.name} on:error={e => (e.target.src = "/favicon.png")} />
@@ -170,6 +147,4 @@
 		width: 10px;
 		transition: height 0.2s ease-in-out;
 	}
-
-
 </style>
