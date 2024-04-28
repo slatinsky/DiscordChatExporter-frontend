@@ -2,11 +2,11 @@
     import type { Author } from '../../js/interfaces';
     import ImageGallery from '../ImageGallery.svelte';
 
-	export let author: Author
-
     let showAuthor = false;
+    let author: Author;
 
-    export function viewAuthor() {
+    export function viewAuthor(inputAuthor: Author) {
+        author = inputAuthor;
         showAuthor = true;
 	}
 </script>

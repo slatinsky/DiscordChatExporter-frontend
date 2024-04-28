@@ -20,8 +20,7 @@
     </div>
     <div>
         <div>
-
-            <MessageAuthorName author={message.author} on:click={authorModal.viewAuthor} />
+            <MessageAuthorName author={message.author} on:click={() => authorModal.viewAuthor(message.author)} />
         </div>
 
         <span on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)} role="button" tabindex="0">

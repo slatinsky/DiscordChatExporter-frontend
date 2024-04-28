@@ -45,7 +45,7 @@
 </div>
 
 {#if message.author}
-    <AuthorModal author={message.author} bind:this={authorModal} />
+    <AuthorModal bind:this={authorModal} />
 {/if}
 
 <style>

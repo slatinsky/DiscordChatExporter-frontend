@@ -7,6 +7,7 @@
     import MessageContent from "./MessageContent.svelte";
     import MessageEmbed from "./MessageEmbed.svelte";
     import MessageReactions from "./MessageReactions.svelte";
+    import MessageReferenced from "./MessageReferenced.svelte";
     import MessageStickers from "./MessageStickers.svelte";
     import MessageTimestamp from "./MessageTimestamp.svelte";
     import { onMessageRightClick } from "./messageRightClick";
@@ -15,10 +16,11 @@
     export let authorModal: AuthorModal;
 
 </script>
+<MessageReferenced referencedMessage={message.referencedMessage} authorModal={authorModal} />
 <div class="avatar-row">
-    <MessageAvatar author={message.author} on:click={authorModal.viewAuthor} />
+    <MessageAvatar author={message.author} on:click={() => authorModal.viewAuthor(message.author)} />
     <div on:click>
-        <div><MessageAuthorName author={message.author} on:click={authorModal.viewAuthor} /> <MessageTimestamp timestamp={message.timestamp} /></div>
+        <div><MessageAuthorName author={message.author} on:click={() => authorModal.viewAuthor(message.author)} /> <MessageTimestamp timestamp={message.timestamp} /></div>
         <div on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)}>
             <div><MessageContent message={message} /></div>
             {#if message.embeds}
