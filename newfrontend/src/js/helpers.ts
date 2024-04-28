@@ -1,14 +1,10 @@
-export function checkUrl(asset: Asset) {
+export function checkUrl(asset) {
 	if (!asset)
 		return "";
 	const url = asset.path;
     if (!url)
         return "";
     if (url.startsWith('https') || url.startsWith('http')) {
-        if (!get(online)){
-            console.warn("url was not allowed to load, because offline mode is enforced", url);
-            return "";
-        }
         console.warn('online url', url);
         return url;
     }
@@ -53,3 +49,17 @@ export function copyTextToClipboard(text) {
 
 // usage
 // copyTextToClipboard("text to copy");
+
+
+
+export function humanFileSize(bytes: number, decimalPlaces: number) {
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    } else if (bytes < 1024 * 1024) {
+        return `${Math.round(bytes / 1024 * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces)} KB`;
+    } else if (bytes < 1024 * 1024 * 1024) {
+        return `${Math.round(bytes / 1024 / 1024 * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces)} MB`;
+    } else {
+        return `${Math.round(bytes / 1024 / 1024 / 1024 * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces)} GB`;
+    }
+}

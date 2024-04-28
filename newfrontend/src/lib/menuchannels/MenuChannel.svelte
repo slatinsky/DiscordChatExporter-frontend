@@ -5,8 +5,11 @@
     import IconChannel from "../icons/IconChannel.svelte";
     import MenuThread from "./MenuThread.svelte";
     import { selectedChannelId, selectedThreadId } from "../../js/stores/guildStore";
+    import { copyTextToClipboard } from "../../js/helpers";
+    import { contextMenuItems } from "../../js/stores/menuStore";
+    import type { Channel } from "../../js/interfaces";
 
-    export let channel
+    export let channel: Channel
     let isOpen = false
 
     function toggle() {
@@ -21,9 +24,26 @@
             isOpen = false
         }
     }
+
+    function onChannelRightClick(e, id: string, name: string) {
+		$contextMenuItems = [
+			{
+				"name": "Copy channel ID",
+				"action": () => {
+					copyTextToClipboard(BigInt(id))
+				}
+			},
+			{
+				"name": "Copy channel name",
+				"action": () => {
+					copyTextToClipboard(name)
+				}
+			}
+		]
+	}
 </script>
 
-<div class="channel" class:selected={$selectedChannelId == channel._id} on:click={toggle}>
+<div class="channel" class:selected={$selectedChannelId == channel._id} on:click={toggle} on:contextmenu|preventDefault={(e) => onChannelRightClick(e, channel._id, channel.name)}>
     <div class="channel-icon">
         {#if channel.threads.length > 0}
             <IconChannelWithThreads />
@@ -35,7 +55,7 @@
             {:else}
             <IconChannel />
         {/if}
-    </div>{channel.name}
+    </div><span title="{channel.msg_count} messages">{channel.name}</span>
 </div>
 {#each channel.threads as thread}
     {#if isOpen || thread._id == $selectedThreadId}
@@ -52,13 +72,14 @@
 		padding: 4px 6px;
 		margin: 1px 8px;
         gap: 5px;
-        color: #80848E;
+        color: #949BA4;
         cursor: pointer;
+        font-weight: 500;
 	}
 
 	.channel:hover,
 	.channel.selected {
-		background-color: #35373C;
+		background-color: #404249;
 		color: white;
 	}
 

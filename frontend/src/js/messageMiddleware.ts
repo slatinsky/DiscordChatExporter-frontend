@@ -17,7 +17,7 @@ let messageid_guildid: Record<string, string> = {}
 
 async function fetchMessages(messageIds: string[]) {
 
-	console.log("fetching " + messageIds.length + " messages");
+	console.log("api - fetching " + messageIds.length + " messages");
 	let guild_id = messageid_guildid[messageIds[0]]  // TODO: this is a hack, fix it
 
 	// fetch messages from server

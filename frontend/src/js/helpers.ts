@@ -33,9 +33,9 @@ export function copyTextToClipboard(text) {
         return;
     }
     navigator.clipboard.writeText(text).then(function () {
-        console.log('Async: Copying to clipboard was successful! Copied text: ' + text);
+        console.log('clipboard - Copying to clipboard was successful! Copied text: ' + text);
     }, function (err) {
-        console.error('Async: Could not copy text: ', err);
+        console.error('clipboard - Could not copy text: ', err);
     });
 }
 
@@ -50,10 +50,10 @@ export function checkUrl(asset: Asset) {
         return "";
     if (url.startsWith('https') || url.startsWith('http')) {
         if (!get(online)){
-            console.warn("url was not allowed to load, because offline mode is enforced", url);
+            console.warn("api - url was not allowed to load, because offline mode is enforced", url);
             return "";
         }
-        console.warn('online url', url);
+        console.warn('api - warning: online url (you should download assets too using DiscordChatExporter)', url);
         return url;
     }
     return "/input/" + url

@@ -19,6 +19,10 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "lottie-web": "^5.12.2",
+		"moment": "^2.29.4",
+    "highlight.js": "^11.9.0",
+    "simple-markdown": "^0.7.3"
   }
 }

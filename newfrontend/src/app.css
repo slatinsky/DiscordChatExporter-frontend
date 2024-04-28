@@ -1,18 +1,129 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  /* line-height: 1.5;
-  font-weight: 400; */
-
-  /* color-scheme: light dark; */
-  /* color: rgba(255, 255, 255, 0.87); */
   color: white;
   background-color: #242424;
-
-  /* font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; */
 }
+
+:root {
+	font-family: Whitney, "gg sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+:root[data-font="ggsans"] {
+	font-family: "gg sans", Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+:root[data-font="arial"] {
+	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+:root[data-font="timesnewroman"] {
+	font-family: "Times New Roman", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+:root[data-font="comicsans"] {
+	font-family: "Comic Sans MS", "Comic Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@font-face {
+	src: url(/fonts/whitney-300.woff);
+	font-family: Whitney;
+	font-weight: 300;
+}
+
+@font-face {
+	src: url(/fonts/whitney-400.woff);
+	font-family: Whitney;
+	font-weight: 400;
+}
+
+@font-face {
+	src: url(/fonts/whitney-500.woff);
+	font-family: Whitney;
+	font-weight: 500;
+}
+
+@font-face {
+	src: url(/fonts/whitney-600.woff);
+	font-family: Whitney;
+	font-weight: 600;
+}
+
+@font-face {
+	src: url(/fonts/whitney-700.woff);
+	font-family: Whitney;
+	font-weight: 700;
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 400;
+	src: url(/data/fonts/ggsans-normal-400.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 400;
+	src: url(/data/fonts/ggsans-italic-400.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 500;
+	src: url(/data/fonts/ggsans-normal-500.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 500;
+	src: url(/data/fonts/ggsans-italic-500.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 600;
+	src: url(/data/fonts/ggsans-normal-600.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 600;
+	src: url(/data/fonts/ggsans-italic-600.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 700;
+	src: url(/data/fonts/ggsans-normal-700.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 700;
+	src: url(/data/fonts/ggsans-italic-700.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: normal;
+	font-weight: 800;
+	src: url(/data/fonts/ggsans-normal-800.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "gg sans";
+	font-style: italic;
+	font-weight: 800;
+	src: url(/data/fonts/ggsans-italic-800.woff2) format("woff2");
+}
+
+
 
 *, *:before, *:after {
   box-sizing: border-box;
@@ -31,4 +142,11 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+/* reset default button styles */
+button,
+input {
+	all: unset;
+	outline: revert; /* add back outline for keyboard navigation */
 }

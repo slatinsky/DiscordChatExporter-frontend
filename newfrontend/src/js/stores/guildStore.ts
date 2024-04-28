@@ -1,8 +1,11 @@
-import { derived, get, writable } from "svelte/store";
+import { derived, get, readable, writable } from "svelte/store";
 import { threadshown } from "./layoutStore";
+import { initRouter } from "./router";
+import type { Channel } from "../interfaces";
 
 
-async function fetch_guilds() {
+
+async function fetchGuilds() {
     try {
         const response = await fetch('/api/guilds')
         const response_json = await response.json()
@@ -12,13 +15,15 @@ async function fetch_guilds() {
     catch (e) {
         console.error("Failed to fetch guilds", e)
     }
+
+    initRouter()
 }
 
 
-async function fetch_categories_channels_threads(guildId: string) {
+async function fetchCategoriesChannelsThreads(guildId: string) {
     try {
         const response = await fetch(`/api/channels?guild_id=${guildId}`)
-        let json_response = await response.json()
+        let json_response: Channel[] = await response.json()
 
         let categories_temp = []
         let channels_temp = []
@@ -33,6 +38,7 @@ async function fetch_categories_channels_threads(guildId: string) {
                         _id: channel.categoryId,
                         name: channel.category,
                         channels: [],
+                        msg_count: 0,
                     }
                     categories_temp.push(category)
                     found_categories_ids.push(channel.categoryId)
@@ -53,6 +59,7 @@ async function fetch_categories_channels_threads(guildId: string) {
             if (channel.type === "GuildPublicThread" || channel.type === "GuildPrivateThread") {
                 let parent_channel = channels_temp.find((c) => c._id === channel.categoryId)
                 if (parent_channel) {
+                    parent_channel.msg_count += channel.msg_count
                     parent_channel.threads.push(channel)
                 }
                 else {
@@ -65,6 +72,7 @@ async function fetch_categories_channels_threads(guildId: string) {
         for (let channel of channels_temp) {
             let category = categories_temp.find((c) => c._id === channel.categoryId)
             if (category) {
+                category.msg_count += channel.msg_count
                 category.channels.push(channel)
             }
             else {
@@ -74,6 +82,7 @@ async function fetch_categories_channels_threads(guildId: string) {
 
         // push threads without parent channel to a separate category so they are shown in the UI
         if (lost_threads.length > 0) {
+            let msg_count = lost_threads.reduce((acc, thread) => acc + thread.msg_count, 0)
             categories_temp.push({
                 _id: '0',
                 name: 'Lost threads / forums',
@@ -85,7 +94,7 @@ async function fetch_categories_channels_threads(guildId: string) {
                     name: 'Lost threads / forums',
                     topic: null,
                     threads: lost_threads,
-                    msg_count: 0,
+                    msg_count: msg_count,
                     guildId: guildId,
                 }]
             })
@@ -93,6 +102,17 @@ async function fetch_categories_channels_threads(guildId: string) {
 
         categories.set(categories_temp)
         console.log("categories", categories_temp);
+
+        // sort categories, channels and threads by message count
+        categories.update((categories) => {
+            categories.forEach((category) => {
+                category.channels.sort((a, b) => b.msg_count - a.msg_count)
+                category.channels.forEach((channel) => {
+                    channel.threads.sort((a, b) => b.msg_count - a.msg_count)
+                })
+            })
+            return categories.sort((a, b) => b.msg_count - a.msg_count)
+        })
     }
     catch (e) {
         console.error("Failed to fetch channels", e)
@@ -100,14 +120,46 @@ async function fetch_categories_channels_threads(guildId: string) {
 }
 
 
+async function fetchMessageIds(guildId: string, channelId: string) {
+    try {
+        let response = await fetch(`/api/message-ids?guild_id=${guildId}&channel_id=${channelId}`)
+        let messageIds = await response.json()
+        return messageIds
+    }
+    catch (e) {
+        console.error("Failed to fetch message ids", e)
+        return []
+    }
+}
+
 
 export let guilds = writable([]);
 export let categories = writable([]);
 
-// changed externally
-export const selectedGuildId = writable(null);  
+
+let selectedGuildId_set: any
+export const selectedGuildId = readable(null, (set) => {
+    selectedGuildId_set = set
+})
 export const selectedChannelId = writable(null);
+export const selectedChannelMessageIds = writable([]);
 export const selectedThreadId = writable(null);
+export const selectedThreadMessageIds = writable([]);
+
+
+export function selectGuild(guildId: string) {
+    if (guildId === get(selectedGuildId)) {
+        return
+    }
+    selectedGuildId_set(guildId)
+    selectedChannelId.set(null)
+    selectedChannelMessageIds.set([])
+    selectedThreadId.set(null)
+    selectedThreadMessageIds.set([])
+}
+
+// TODO: select channel, select thread, history tracking
+
 
 // read only references
 export const selectedGuild = derived(selectedGuildId, ($selectedGuildId) => {
@@ -119,12 +171,13 @@ export const selectedGuild = derived(selectedGuildId, ($selectedGuildId) => {
 });
 selectedGuild.subscribe((newGuild) => {
     if (newGuild) {
-        fetch_categories_channels_threads(newGuild._id)
+        fetchCategoriesChannelsThreads(newGuild._id)
     }
     else {
         categories.set([])
     }
     selectedChannelId.set(null)
+    selectedChannelMessageIds.set([])
 })
 
 
@@ -136,13 +189,18 @@ export const selectedChannel = derived(selectedChannelId, ($selectedChannelId) =
     }
     return channel
 });
-selectedChannel.subscribe((newChannel) => {
+selectedChannel.subscribe(async (newChannel) => {
+    if (newChannel) {
+        selectedChannelMessageIds.set(await fetchMessageIds(newChannel.guildId, newChannel._id))
+    }
     if (newChannel && get(selectedThread) && newChannel._id !== get(selectedThread).categoryId) {
         selectedThreadId.set(null)
+        selectedThreadMessageIds.set([])
         threadshown.set(false)
     }
     else {
         selectedThreadId.set(null)
+        selectedThreadMessageIds.set([])
         threadshown.set(false)
     }
 })
@@ -156,8 +214,9 @@ export const selectedThread = derived(selectedThreadId, ($selectedThreadId) => {
     }
     return thread
 });
-selectedThread.subscribe((newThread) => {
+selectedThread.subscribe(async (newThread) => {
     if (newThread) {
+        selectedThreadMessageIds.set(await fetchMessageIds(newThread.guildId, newThread._id))
         threadshown.set(true)
     }
     else {
@@ -165,6 +224,8 @@ selectedThread.subscribe((newThread) => {
     }
 })
 
+
+
 // fetch guilds on startup
-fetch_guilds()
+fetchGuilds()
 

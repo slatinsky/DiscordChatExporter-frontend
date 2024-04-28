@@ -8,15 +8,16 @@
     import SearchResults from "./lib/SearchResults.svelte";
     import Channel from "./lib/Channel.svelte";
     import Thread from "./lib/Thread.svelte";
-    import Settings from "./lib/Settings.svelte";
+    import Settings from "./lib/settings/Settings.svelte";
     import ContextMenu from "./lib/components/menu/ContextMenu.svelte";
-    import { onDestroy, onMount } from "svelte";
+    import { onMount } from "svelte";
     import { mobilesidepanelshown } from "./js/stores/layoutStore";
     import { searchshown } from "./js/stores/layoutStore";
     import { threadshown } from "./js/stores/layoutStore";
     import { settingsshown } from "./js/stores/layoutStore";
     import { debuglayout } from "./js/stores/layoutStore";
     import { position } from "./js/stores/menuStore";
+    import { font, hideSpoilers, theme } from './js/stores/settingsStore';
 
     let mobile = false
     let windowWidth = window.innerWidth
@@ -72,14 +73,26 @@
 
     onMount(() => {
       window.addEventListener('resize', resize)
+      const unsubscribe1 = theme.subscribe(value => {
+        document.documentElement.setAttribute('data-theme', value);
+      });
+
+      const unsubscribe2 = hideSpoilers.subscribe(value => {
+        document.documentElement.setAttribute('data-hidespoilers', value);
+      });
+
+      const unsubscribe3 = font.subscribe(value => {
+        document.documentElement.setAttribute('data-font', value);
+      });
       resize()
+
+      return () => {
+        window.removeEventListener('resize', resize)
+        unsubscribe1()
+        unsubscribe2()
+        unsubscribe3()
+      }
     })
-    onDestroy(() => {
-      window.removeEventListener('resize', resize)
-    })
-
-
-
 
 
 
@@ -89,6 +102,11 @@
     }
     const handleThrottledMousemove = throttle(handleMousemove, 100, { leading: false, trailing: true });
 </script>
+
+<svelte:head>
+    <title>DCE-Frontend</title>
+    <meta name="description" content="View your JSON DiscordChatExporter exports as if you were using Discord interface"/>
+</svelte:head>
 
 
 <div class:debuglayout={$debuglayout} style="width: 100%;height: 100%;">
@@ -112,13 +130,15 @@
 
 
 
-<div style="position: absolute; bottom: 5px; left: 5px;z-index: 200;{hidedebug ? 'display:none' : ''}">
+<div class="debug-buttons" >
   <button on:click={() => hidedebug = !hidedebug}>X</button>
-  <button on:click={() => $debuglayout = !$debuglayout}>$debuglayout {$debuglayout}</button>
-  <button on:click={toggleSidePanel}>$mobilesidepanelshown {$mobilesidepanelshown}</button>
-  <button on:click={toggleThread}>$threadshown {$threadshown}</button>
-  <button on:click={toggleSearch}>$searchshown {$searchshown}</button>
-  <button on:click={toggleSettings}>$settingsshown {$settingsshown}</button>
+  <span style="{hidedebug ? 'display:none' : ''}">
+    <button on:click={() => $debuglayout = !$debuglayout}>$debuglayout {$debuglayout}</button>
+    <button on:click={toggleSidePanel}>$mobilesidepanelshown {$mobilesidepanelshown}</button>
+    <button on:click={toggleThread}>$threadshown {$threadshown}</button>
+    <button on:click={toggleSearch}>$searchshown {$searchshown}</button>
+    <button on:click={toggleSettings}>$settingsshown {$settingsshown}</button>
+  </span>
 </div>
 
 <style>
@@ -323,6 +343,18 @@
   .debuglayout > main .thread {
     background-color: lightblue;
     border: 1px solid #7272ff;
+  }
+
+  .debug-buttons {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    z-index: 200;
+  }
+  .debug-buttons button {
+    margin: 2px;
+    background-color: #f7f7f7;
+    color: black;
   }
 
 </style>

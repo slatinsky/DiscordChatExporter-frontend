@@ -2,8 +2,9 @@
 
 <script lang="ts">
 	import { checkUrl, copyTextToClipboard } from "../js/helpers"
-    import { guilds, selectedGuildId } from "../js/stores/guildStore";
+    import { guilds, selectGuild, selectedGuildId } from "../js/stores/guildStore";
     import { contextMenuItems } from "../js/stores/menuStore";
+    import IconDCEF2 from "./icons/IconDCEF2.svelte";
 
 	function onRightClick(e, id) {
         console.log("right click", id);
@@ -18,30 +19,12 @@
 	}
 
     let isMenuHidden = false
-    const selectGuild = (id) => {
-        $selectedGuildId = id
-        console.log("selected guild", id);
-
-		if (id === null) {
-			history.pushState({ guild: id }, "", "/")
-			return
-		}
-		else {
-			history.pushState({ guild: id }, "", `/${id}`)
-		}
-    }
-
-
-	// popstate event listener
-	// window.addEventListener("popstate", (e) => {
-	// 	console.log("popstate", e.state);
-	// })
 </script>
 
 <div class="guilds" class:hidden={isMenuHidden}>
 	<div class="guild" class:selected={!$selectedGuildId} on:click={e => selectGuild(null)}>
 		<div class="guild-selected-indicator" />
-		<div class="home-guild">HOME</div>
+		<div class="home-guild"><IconDCEF2 /></div>
 	</div>
 	<hr>
 
@@ -64,7 +47,7 @@
 		overflow-y: auto;
 		position: relative;
 
-		padding: 7px 4px 7px 0;
+		padding: 0 4px 7px 0;
 		scrollbar-width: none; /* hide scrollbar - Firefox */
 
 		transition: left 0.2s ease-in-out;
@@ -100,6 +83,8 @@
 		font-size: small;
 
 		color: #dbdee1;
+
+		padding: 9px;
 	}
 
 	.guild:hover .home-guild,

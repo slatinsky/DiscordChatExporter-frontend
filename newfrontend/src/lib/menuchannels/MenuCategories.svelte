@@ -2,9 +2,8 @@
     import { categories, selectedGuildId } from "../../js/stores/guildStore";
     import MenuCategory from "./MenuCategory.svelte";
     import MenuGuildName from "./MenuGuildName.svelte";
+    import AccountSwitcher from "../accountswitcher/AccountSwitcher.svelte";
 </script>
-
-
 
 <div class="categories-col">
     <MenuGuildName />
@@ -18,12 +17,14 @@
             <MenuCategory category={category} />
         {/each}
     </div>
+    <AccountSwitcher />
 </div>
 
 
 <style>
-
     .categories-col {
+        display: flex;
+        flex-direction: column;
         height: 100%;
         border-top-left-radius: 8px;
         background-color: #2B2D31;
@@ -38,7 +39,7 @@
         font-weight: 600;
     }
     .categories-wrapper {
-        overflow-y: auto;
+        overflow-y: scroll;
         height: 100%;
         box-sizing: border-box;
         margin-right: 11px;

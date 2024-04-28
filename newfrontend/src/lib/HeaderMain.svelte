@@ -8,13 +8,19 @@
 
 
 <div class="header-main" class:threadshown={$threadshown}>
-    <IconChannel />
+    <div class="channel-icon">
+        <IconChannel />
+    </div>
     <div class="channel-name">{$selectedChannel?.name ?? "Select a channel"}</div>
 </div>
 
 
 
 <style>
+    .channel-icon {
+        display: grid;
+        place-items: center;
+    }
     .header-main {
         height: 100%;
         display: flex;

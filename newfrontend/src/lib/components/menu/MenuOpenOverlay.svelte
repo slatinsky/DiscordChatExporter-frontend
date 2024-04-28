@@ -17,7 +17,7 @@
 
 		transition: left 0.2s ease-in-out, background-color 0.2s ease-in-out;
 
-		z-index: 1000;
+		z-index: 99998;
 		display: none;
 	}
 
