@@ -19,7 +19,7 @@
             <img class="referenced-avatar" src={checkUrl(referencedMessage.author.avatar)} alt="avatar" on:click on:contextmenu|preventDefault={e=>onUserRightClick(e, referencedMessage.author)}  />
             <MessageAuthorName author={referencedMessage.author} on:click={() => authorModal.viewAuthor(referencedMessage.author)} />
             <div class="referenced-content">
-                <MessageMarkdown content={referencedMessage.content[0].content.split("\n")[0]} />
+                <MessageMarkdown content={referencedMessage.content[0].content.split("\n")[0]} emotes={referencedMessage?.emotes || []} mentions={referencedMessage?.mentions || []} roles={referencedMessage?.roles || []} channels={referencedMessage?.channels || []} />
             </div>
         {/if}
     </div>
