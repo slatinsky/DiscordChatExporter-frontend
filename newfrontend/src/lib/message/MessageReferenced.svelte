@@ -1,12 +1,14 @@
 <script lang="ts">
     import { checkUrl } from "../../js/helpers";
     import type { Message } from "../../js/interfaces";
+    import IconDeletedReply from "../icons/IconDeletedReply.svelte";
     import AuthorModal from "./AuthorModal.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageMarkdown from "./MessageMarkdown.svelte";
     import { onUserRightClick } from "./messageRightClick";
 
     export let referencedMessage: Message
+    export let referenceMessageId: string | undefined
     export let authorModal: AuthorModal
 </script>
 
@@ -20,6 +22,17 @@
                 <MessageMarkdown content={referencedMessage.content[0].content.split("\n")[0]} />
             </div>
         {/if}
+    </div>
+<!-- if has reference id, but no reference message was found, the message was probably deleted before it was archived -->
+{:else if referenceMessageId}
+    <div class="referenced">
+        <div class="referenced-arrow" />
+        <div class="referenced-avatar">
+            <IconDeletedReply />
+        </div>
+        <div class="referenced-content">
+            <i>Original message was deleted</i>
+        </div>
     </div>
 {/if}
 
@@ -43,6 +56,12 @@
         width: 16px;
         height: 16px;
         border-radius: 50%;
+
+        /*style background for deleted referenced message*/
+        background-color: #1E1F22;
+        color: #909399;
+        display: grid;
+        place-items: center;
     }
 
     .referenced-content {

@@ -16,7 +16,7 @@
     export let authorModal: AuthorModal;
 
 </script>
-<MessageReferenced referencedMessage={message.referencedMessage} authorModal={authorModal} />
+<MessageReferenced referencedMessage={message.referencedMessage} referenceMessageId={message.reference?.messageId} authorModal={authorModal} />
 <div class="avatar-row">
     <MessageAvatar author={message.author} on:click={() => authorModal.viewAuthor(message.author)} />
     <div on:click>
