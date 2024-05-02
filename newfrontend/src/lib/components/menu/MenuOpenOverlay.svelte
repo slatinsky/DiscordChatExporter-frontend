@@ -1,7 +1,10 @@
 <script lang="ts">
     import { isMenuHidden } from "../../../js/stores/menuStore";
+	interface MyProps {
+        leftOffset: number;
+    }
+    let { leftOffset = 322}: MyProps = $props();
 
-    export let leftOffset = 322;
 </script>
 
 <div id="menu-open-overlay" style={"left:" + String(leftOffset) + "px"} class:hidden={$isMenuHidden} on:click={() => $isMenuHidden = true}/>

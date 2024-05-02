@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Message } from "../../js/interfaces";
-    import { guilds } from "../../js/stores/guildStore";
+    import { getGuildState } from "../../js/stores/guildState.svelte";
     import AuthorModal from "./AuthorModal.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageReactions from "./MessageReactions.svelte";
@@ -11,7 +11,8 @@
 
     export let message: Message
     export let authorModal: AuthorModal
-    $: guildName = $guilds.find(guild => guild._id === message.guildId)?.name ?? "this server"
+    const guildState = getGuildState()
+    $: guildName = guildState.guilds.find(guild => guild._id === message.guildId)?.name ?? "this server"
 </script>
 
 <div class="system-message-row">

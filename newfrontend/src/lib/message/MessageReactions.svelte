@@ -15,13 +15,12 @@
 <div class="message-reactions">
     {#each reactions as reaction}
         {@const emojiUsers = reaction?.users?.map(user => user._id) ?? []}
-        <div class="message-reaction" class:me={emojiUsers.includes($currentUserId)} title=":{reaction.emoji.name}:" on:click={reactionsModal.viewReactions(reaction)}>
+        <div class="message-reaction" class:me={emojiUsers.includes($currentUserId)} title=":{reaction.emoji.name}:" on:click={()=>reactionsModal.viewReactions(reaction)}>
             <img
                 src={checkUrl(reaction.emoji?.image)}
                 alt="Avatar"
                 width="100%"
                 height="100%"
-                onerror="this.style.visibility='hidden'"
             />
             <span class="message-reaction-count">{reaction.count}</span>
         </div>

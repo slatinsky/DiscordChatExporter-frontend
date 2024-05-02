@@ -43,7 +43,6 @@ export async function messsageIdsToMessages(guildId: string, messageIds: string[
     if (messageIds.length === 0) {
         return [];
     }
-
     let nonReferenceMessages = await _fetchMessagesFromApi(guildId, messageIds);
 
     let referenceIdsToFetch = [];

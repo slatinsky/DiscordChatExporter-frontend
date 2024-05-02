@@ -1,12 +1,15 @@
 <script lang="ts">
     import { checkUrl } from '../js/helpers';
     import type { Asset } from '../js/interfaces';
-	export let asset: Asset
-	export let imgclass: string = '';
-	export let inline = false;
-	export let alt: string = '';
-	export let width: number | undefined = undefined;
-	export let height: number | undefined = undefined;
+    interface MyProps {
+        asset: Asset;
+        imgclass: string;
+        inline: boolean;
+        alt: string;
+        width: number | undefined;
+        height: number | undefined;
+    }
+    let { asset, imgclass = '', inline = false, alt = '', width = undefined, height = undefined}: MyProps = $props();
 
 	let domImg: HTMLImageElement;
 
@@ -17,9 +20,9 @@
 		}
 	}
 
-	let showGallery = false;
+	let showGallery = $state(false);
 
-	$: isSpoiler = asset?.filenameWithoutHash.startsWith('SPOILER');
+	let isSpoiler = $derived(asset?.filenameWithoutHash.startsWith('SPOILER'));
 </script>
 
 
@@ -33,7 +36,6 @@
 	alt="Attachment"
 	width="{asset?.width ?? undefined}"
 	height="{asset?.height ?? undefined}"
-	onerror="this.style.visibility='hidden'"
 />
 
 

@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { selectedChannel } from "../js/stores/guildStore";
+    import { getGuildState } from "../js/stores/guildState.svelte";
     import { threadshown } from "../js/stores/layoutStore";
     import IconChannel from "./icons/IconChannel.svelte";
 
-
+    const guildState = getGuildState()
 </script>
 
 
@@ -11,7 +11,7 @@
     <div class="channel-icon">
         <IconChannel />
     </div>
-    <div class="channel-name">{$selectedChannel?.name ?? "Select a channel"}</div>
+    <div class="channel-name">{guildState.channel?.name ?? "Select a channel"}</div>
 </div>
 
 

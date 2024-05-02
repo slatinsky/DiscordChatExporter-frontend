@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { tick } from "svelte";
     // --------------------------
     // THIS CODE IS NOT FINISHED
     // TODO: needs backend pagination support to optimize loading
@@ -7,6 +8,7 @@
 
     export let ids
     export let guildId
+    export let selectedMessageId: string | null
 
     let scrollContainer: HTMLDivElement
     let messages = []
@@ -22,13 +24,30 @@
         messages = await messsageIdsToMessages(guildId, loadedIds)
     }
 
-    async function idsChanged(ids) {
+    async function idsChanged(selectedMessageId, ids) {
+        if (ids.length === 0) {
+            console.log('scroller - no messages to load')
+            return
+        }
         watchScroll = false
         // let centerIndex = Math.round(ids.length / 2)
-        let centerIndex = Math.round(ids.length - 1)
+
+        let centerIndex
+        if (selectedMessageId) {
+            centerIndex = ids.indexOf(selectedMessageId)
+            console.log('scroller - selected message index', centerIndex)
+        }
+        else {
+            console.log('scroller - no selected message')
+        }
+
+        if (!centerIndex || centerIndex < 0) {
+            centerIndex = Math.round(ids.length - 1)
+        }
+
         highestLoadedIndex = centerIndex
         lowestLoadedIndex = centerIndex
-        loadedIds = []
+        loadedIds = [ids[centerIndex]]
         for (let i = 1; i < maxMessages; i++) { // TODO: rewrite using slice
             if (centerIndex + i < ids.length) {
                 highestLoadedIndex = centerIndex + i
@@ -41,9 +60,35 @@
         }
 
         await refetchMessages(loadedIds)
-        setTimeout(() => {
+        setTimeout(async() => {
             // scrollContainer.scrollTop = scrollContainer.scrollHeight / 2
-            scrollContainer.scrollTop = scrollContainer.scrollHeight
+            // scrollContainer.scrollTop = scrollContainer.scrollHeight
+
+            // scroll to selected message
+            if (selectedMessageId) {
+                // find selected message index
+                let selectedMessageIndex = loadedIds.indexOf(selectedMessageId)
+                if (selectedMessageIndex !== -1) {
+                    // get n-th child of scrollContainer
+                    let selectedMessageElement = scrollContainer.children[selectedMessageIndex]
+                    if (selectedMessageElement) {
+                        selectedMessageElement.scrollIntoView({ block: "start", behavior: "instant" })
+                        console.log('scroller - selected message scrolled into view')
+                    }
+                    else {
+                        console.log('scroller - selected message not found in loaded messages')
+                    }
+                }
+                else {
+                    console.log('scroller - selected message not found in loaded messages', JSON.stringify(loadedIds), selectedMessageId)
+                }
+            }
+            else {
+                scrollContainer.scrollTop = scrollContainer.scrollHeight
+                console.log('scroller - no selected message to scroll to')
+            }
+
+
         watchScroll = true
         }, 0)
     }
@@ -95,7 +140,7 @@
         watchScroll = true
     }
 
-    $: idsChanged(ids)
+    $: idsChanged(selectedMessageId, ids)
 
 
 
@@ -123,7 +168,9 @@
 <div class="scroll-container" on:scroll={handleScroll} bind:this={scrollContainer}>
     {#if messages}
         {#each messages as message (message._id)}
-            <slot name="item" message={message} />
+            <div>
+                <slot name="item" message={message} />
+            </div>
         {/each}
     {/if}
 </div>

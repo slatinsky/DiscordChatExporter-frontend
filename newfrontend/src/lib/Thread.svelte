@@ -1,24 +1,26 @@
 <script lang="ts">
-    import { selectedGuildId, selectedThread, selectedThreadId, selectedThreadMessageIds } from "../js/stores/guildStore";
+    import { getGuildState } from "../js/stores/guildState.svelte";
     import InfiniteScroll from "./InfiniteScroll.svelte";
     import IconX from "./icons/IconX.svelte";
     import Message from "./message/Message.svelte";
 
     function destroyThreadView() {
-        $selectedThreadId = null
+        guildState.changeThreadId(null)
     }
+
+    const guildState = getGuildState()
 </script>
 
 
 <div class="thread-wrapper">
     <div class="header-main">
-        <div class="thread-name">{$selectedThread?.name ?? "Select a thread"}</div>
+        <div class="thread-name">{guildState.thread?.name ?? "Select a thread"}</div>
         <div on:click={destroyThreadView} style="cursor:pointer; display: grid; place-items: center;">
             <IconX />
         </div>
     </div>
     <div class="thread">
-        <InfiniteScroll ids={$selectedThreadMessageIds} guildId={$selectedGuildId}>
+        <InfiniteScroll ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId}>
             <div slot="item" let:message>
                 <Message message={message} />
             </div>

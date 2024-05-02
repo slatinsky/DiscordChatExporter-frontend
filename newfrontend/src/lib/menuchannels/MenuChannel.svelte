@@ -4,23 +4,25 @@
     import IconNewsChannel from "../icons/IconNewsChannel.svelte";
     import IconChannel from "../icons/IconChannel.svelte";
     import MenuThread from "./MenuThread.svelte";
-    import { selectedChannelId, selectedThreadId } from "../../js/stores/guildStore";
     import { copyTextToClipboard } from "../../js/helpers";
     import { contextMenuItems } from "../../js/stores/menuStore";
     import type { Channel } from "../../js/interfaces";
+    import { getGuildState } from "../../js/stores/guildState.svelte";
 
     export let channel: Channel
     let isOpen = false
 
+    const guildState = getGuildState()
+
     function toggle() {
         isOpen = !isOpen
         if (isOpen) {
-            $selectedChannelId = channel._id
+            guildState.changeChannelId(channel._id)
         }
     }
 
     $: {
-        if ($selectedChannelId !== channel._id) {
+        if (guildState.channelId !== channel._id) {
             isOpen = false
         }
     }
@@ -43,12 +45,11 @@
 	}
 </script>
 
-<div class="channel" class:selected={$selectedChannelId == channel._id} on:click={toggle} on:contextmenu|preventDefault={(e) => onChannelRightClick(e, channel._id, channel.name)}>
+<div class="channel" class:selected={guildState.channelId == channel._id} on:click={toggle} on:contextmenu|preventDefault={(e) => onChannelRightClick(e, channel._id, channel.name)}>
     <div class="channel-icon">
         {#if channel.threads.length > 0}
             <IconChannelWithThreads />
         {:else if channel.type == "GuildVoiceChat"}
-        <!-- Would be nice if DiscordChatExporter also export the nsfw boolean so we can have the other types of channel icons. I will Add forum icon eventually -->
             <IconVoiceChannel />
             {:else if channel.type == "GuildNews"}
             <IconNewsChannel/>
@@ -58,8 +59,8 @@
     </div><span title="{channel.msg_count} messages">{channel.name}</span>
 </div>
 {#each channel.threads as thread}
-    {#if isOpen || thread._id == $selectedThreadId}
-        <MenuThread thread={thread} isLast={!isOpen || thread === channel.threads[channel.threads.length - 1]} />
+    {#if isOpen || thread._id == guildState.threadId}
+        <MenuThread parentChannelId={channel._id} thread={thread} isLast={!isOpen || thread === channel.threads[channel.threads.length - 1]} />
     {/if}
 {/each}
 

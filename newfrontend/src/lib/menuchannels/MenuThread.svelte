@@ -1,15 +1,13 @@
 <script lang="ts">
     import { copyTextToClipboard } from "../../js/helpers";
     import type { Channel } from "../../js/interfaces";
-    import { selectedThreadId } from "../../js/stores/guildStore";
+    import { getGuildState } from "../../js/stores/guildState.svelte";
     import { contextMenuItems } from "../../js/stores/menuStore";
 
     export let thread: Channel
+    export let parentChannelId: string
     export let isLast: boolean
 
-    function selectThread() {
-        $selectedThreadId = thread._id
-    }
 
     function onThreadRightClick(e, id: string, name: string) {
 		$contextMenuItems = [
@@ -27,9 +25,17 @@
 			}
 		]
 	}
+
+    async function changeThread(guildId: string, channelId: string, threadId: string) {
+        await guildState.changeGuildId(guildId)
+        await guildState.changeChannelId(channelId)
+        await guildState.changeThreadId(threadId)
+    }
+
+    const guildState = getGuildState()
 </script>
 
-<div class="thread" class:selected={thread._id == $selectedThreadId} on:click={selectThread} on:contextmenu|preventDefault={(e) => onThreadRightClick(e, thread._id, thread.name)}>
+<div class="thread" class:selected={thread._id == guildState.threadId} on:click={()=>changeThread(thread.guildId, parentChannelId, thread._id)} on:contextmenu|preventDefault={(e) => onThreadRightClick(e, thread._id, thread.name)}>
     <div class="thread-icon">
         {#if isLast}
             <svg class="up" width="12" height="11" viewBox="0 0 12 11" fill="none" aria-hidden="true">
@@ -104,10 +110,6 @@
         font-size: 16px;
         height: 20px;
         overflow: hidden;
-
-        /* white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis; */
     }
     .selected .thread-name {
         color: white;

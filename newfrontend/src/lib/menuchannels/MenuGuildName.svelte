@@ -1,8 +1,9 @@
 <script lang="ts">
-    import { selectedGuild } from "../../js/stores/guildStore";
+    import { getGuildState } from "../../js/stores/guildState.svelte";
+    const guildState = getGuildState()
 </script>
 
-<div class="guild-name">{$selectedGuild?.name ?? "Homepage"}</div>
+<div class="guild-name">{guildState.guild?.name ?? "Homepage"}</div>
 
 <style>
     .guild-name {

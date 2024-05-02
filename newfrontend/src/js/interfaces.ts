@@ -5,6 +5,12 @@ export interface Guild {
 	msg_count: number;
 }
 
+export interface Category {
+	_id: string;
+	name: string;
+	channels: Channel[]
+}
+
 export interface Asset {
 	_id: string;
 	originalPath: string;

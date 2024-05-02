@@ -2,8 +2,8 @@
     import type { Author } from '../../js/interfaces';
     import ImageGallery from '../ImageGallery.svelte';
 
-    let showAuthor = false;
-    let author: Author;
+    let showAuthor = $state(false);
+    let author: Author = $state(null);
 
     export function viewAuthor(inputAuthor: Author) {
         author = inputAuthor;

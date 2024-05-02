@@ -1,24 +1,23 @@
 <script lang="ts">
-    import { selectedChannelId } from "../../js/stores/guildStore";
     import MenuChannel from "./MenuChannel.svelte";
     import IconDropdown from "../icons/IconDropdown.svelte";
     import { contextMenuItems } from "../../js/stores/menuStore";
     import { copyTextToClipboard } from "../../js/helpers";
+    import { getGuildState } from "../../js/stores/guildState.svelte";
 
-    export let category
-    let isOpen = localStorageIsOpen(category._id);
+	let { category } = $props();
 
-    function toggle() {
-        isOpen = !isOpen
-    }
-
-    function localStorageIsOpen(categoryId: string) {
+	let isOpen = $state(function() {
         /** returns true if category is not closed */
 
 		let json = localStorage.getItem('closedCategoryIds') ?? '[]';
 		let closedCategoryIds = JSON.parse(json);
-		return !closedCategoryIds.includes(categoryId);
-	}
+		return !closedCategoryIds.includes(category._id);
+	}())
+
+    function toggle() {
+        isOpen = !isOpen
+    }
 
 	function saveToLocalStorage(isOpen: boolean, categoryId: string) {
 		let json = localStorage.getItem('closedCategoryIds') ?? '[]';
@@ -34,8 +33,10 @@
 		localStorage.setItem('closedCategoryIds', json);
 	}
 
-
-	$: saveToLocalStorage(isOpen, category._id);
+	$effect(() => {
+		console.log('categories - saving to local storage', isOpen, category._id)
+		saveToLocalStorage(isOpen, category._id);
+	})
 
     function onCategoryRightClick(e, id: string, name: string) {
 		$contextMenuItems = [
@@ -59,6 +60,8 @@
 			}
 		]
 	}
+
+	const guildState = getGuildState()
 </script>
 
 
@@ -67,7 +70,7 @@
     <span title="{category.msg_count} messages">{category.name}</span>
 </div>
 {#each category.channels as channel}
-    {#if isOpen || channel._id == $selectedChannelId}
+    {#if isOpen || channel._id == guildState.channelId}
         <MenuChannel channel={channel} />
     {/if}
 {/each}

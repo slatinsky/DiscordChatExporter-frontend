@@ -1,19 +1,21 @@
 <script lang="ts">
-    import { categories, selectedGuildId } from "../../js/stores/guildStore";
     import MenuCategory from "./MenuCategory.svelte";
     import MenuGuildName from "./MenuGuildName.svelte";
     import AccountSwitcher from "../accountswitcher/AccountSwitcher.svelte";
+    import { getGuildState } from "../../js/stores/guildState.svelte";
+
+    const guildState = getGuildState()
 </script>
 
 <div class="categories-col">
     <MenuGuildName />
     <div class="categories-wrapper">
-        {#if !$selectedGuildId}
+        {#if !guildState.guildId}
             <div class="error">Select server</div>
-        {:else if $categories.length === 0}
+        {:else if guildState.categories.length === 0}
             <div class="error">No channels found</div>
         {/if}
-        {#each $categories as category}
+        {#each guildState.categories as category}
             <MenuCategory category={category} />
         {/each}
     </div>

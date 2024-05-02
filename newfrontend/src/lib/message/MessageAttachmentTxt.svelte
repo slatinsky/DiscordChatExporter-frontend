@@ -55,19 +55,19 @@
 			<pre class="message-txt">{messagePreview}</pre>
 		{/if}
 		<div class="footer">
-			<button on:click={()=>isExpanded = !isExpanded}>
+			<div on:click={()=>isExpanded = !isExpanded}>
 				{#if isExpanded}
 					{@html CHEVRON_ICON_UP} Collapse
 				{:else}
 					{@html CHEVRON_ICON_DOWN} Expand
 				{/if}
-			</button>
+			</div>
 
 			<div class="footer-right">
 				<div>{attachment.filenameWithoutHash}</div>
 				<div class="filesize">{humanFileSize(attachment.sizeBytes, 0)}</div>
 				<a href={checkUrl(attachment)} target="_blank" rel="noreferrer">
-					<button>{@html DOWNLOAD_ICON}</button>
+					<div>{@html DOWNLOAD_ICON}</div>
 				</a>
 			</div>
 		</div>

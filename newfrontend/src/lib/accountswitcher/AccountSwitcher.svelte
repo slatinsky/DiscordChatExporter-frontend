@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { selectedGuildId } from "../../js/stores/guildStore";
+    import { getGuildState } from "../../js/stores/guildState.svelte";
     import { settingsshown } from "../../js/stores/layoutStore";
     import { currentUserName1, currentUserPhoto } from "../../js/stores/settingsStore";
     import IconSettings from "../icons/IconSettings.svelte";
@@ -7,6 +7,8 @@
     import UserSelectionModal from "./UserSelectionModal.svelte";
 
     let showUserSelectionModal = false;
+
+    const guildState = getGuildState()
 </script>
 
 <div id="bottom-bar">
@@ -17,7 +19,7 @@
         <IconSettings />
     </div>
 </div>
-<UserSelectionModal bind:showModal={showUserSelectionModal} guildId={$selectedGuildId}/>
+<UserSelectionModal bind:showModal={showUserSelectionModal} guildId={guildState.guildId}/>
 
 <style>
     #settings {

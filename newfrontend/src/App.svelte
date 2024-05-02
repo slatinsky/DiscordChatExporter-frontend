@@ -18,6 +18,8 @@
     import { debuglayout } from "./js/stores/layoutStore";
     import { position } from "./js/stores/menuStore";
     import { font, hideSpoilers, theme } from './js/stores/settingsStore';
+    import { getGuildState } from './js/stores/guildState.svelte';
+
 
     let mobile = false
     let windowWidth = window.innerWidth
@@ -94,7 +96,7 @@
       }
     })
 
-
+    const guildState = getGuildState()
 
     /* capture mouse position for right click context menu */
     function handleMousemove(event) {
@@ -138,6 +140,8 @@
     <button on:click={toggleThread}>$threadshown {$threadshown}</button>
     <button on:click={toggleSearch}>$searchshown {$searchshown}</button>
     <button on:click={toggleSettings}>$settingsshown {$settingsshown}</button>
+    <button >guildId {guildState.guildId}</button>
+    <button >channelId {guildState.channelId}</button>
   </span>
 </div>
 

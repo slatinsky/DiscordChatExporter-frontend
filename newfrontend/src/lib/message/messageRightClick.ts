@@ -3,7 +3,6 @@ import { checkUrl, copyTextToClipboard } from "../../js/helpers"
 import type { Author, Message } from "../../js/interfaces"
 import { contextMenuItems } from "../../js/stores/menuStore"
 import { linkHandler, setCurrentUser } from "../../js/stores/settingsStore"
-import { selectedGuildId } from "../../js/stores/guildStore"
 
 
 export function onUserRightClick(e, author: Author) {
@@ -29,13 +28,13 @@ export function onMessageRightClick(e, message: Message) {
         {
             "name": `Open message in discord ${get(linkHandler) === 'app' ? "app" : "web"}`,
             "action": () => {
-                window.open((get(linkHandler) === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(get(selectedGuildId))}/${BigInt(message.channelId)}/${BigInt(message._id)}`,'_blank')
+                window.open((get(linkHandler) === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(get(message.guildId))}/${BigInt(message.channelId)}/${BigInt(message._id)}`,'_blank')
             }
         },
         {
             "name": "Copy message link",
             "action": () => {
-                copyTextToClipboard(`https://discord.com/channels/${BigInt(get(selectedGuildId))}/${BigInt(message.channelId)}/${BigInt(message._id)}`);
+                copyTextToClipboard(`https://discord.com/channels/${BigInt(get(message.guildId))}/${BigInt(message.channelId)}/${BigInt(message._id)}`);
             }
         },
         {

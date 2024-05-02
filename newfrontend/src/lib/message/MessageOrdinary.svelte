@@ -20,7 +20,7 @@
 <div class="avatar-row">
     <MessageAvatar author={message.author} on:click={() => authorModal.viewAuthor(message.author)} />
     <div on:click>
-        <div><MessageAuthorName author={message.author} on:click={() => authorModal.viewAuthor(message.author)} /> <MessageTimestamp timestamp={message.timestamp} /></div>
+        <div><MessageAuthorName author={message.author} on:click={() => authorModal.viewAuthor(message.author)} /> <MessageTimestamp channelOrThreadId={message.channelId} timestamp={message.timestamp} messageId={message._id} /></div>
         <div on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)}>
             <div><MessageContent message={message} /></div>
             {#if message.embeds}
