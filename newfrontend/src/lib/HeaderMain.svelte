@@ -1,13 +1,14 @@
 <script lang="ts">
     import { getGuildState } from "../js/stores/guildState.svelte";
-    import { threadshown } from "../js/stores/layoutStore";
+    import { getLayoutState } from "../js/stores/layoutState.svelte";
     import IconChannel from "./icons/IconChannel.svelte";
 
     const guildState = getGuildState()
+    const layoutState = getLayoutState()
 </script>
 
 
-<div class="header-main" class:threadshown={$threadshown}>
+<div class="header-main" class:threadshown={layoutState.threadshown}>
     <div class="channel-icon">
         <IconChannel />
     </div>

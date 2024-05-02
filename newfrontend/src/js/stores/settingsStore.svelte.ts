@@ -1,6 +1,4 @@
 import { derived, writable } from "svelte/store";
-import { settingsshown } from "./layoutStore";
-
 
 export const nameRenderer = writable("nickname");
 export const locale = writable('en');  // for date formatting
@@ -32,13 +30,6 @@ export const linkHandler = writable("app");
 export const channelScrollPosition = writable("bottom");
 export const hideSpoilers = writable(true);
 export const font = writable("ggsans");
-
-export const settingsSideMenuShown = writable(false);
-settingsshown.subscribe((newValue) => {
-    if (newValue) {
-        settingsSideMenuShown.set(true);
-    }
-})
 
 function withLocalStorage(store, localstorageKey: string, type = "string") {
     const restoredValue = localStorage.getItem(localstorageKey);

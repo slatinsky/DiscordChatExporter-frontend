@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { settingsSideMenuShown } from "../../js/stores/settingsStore";
-
+    import { getLayoutState } from "../../js/stores/layoutState.svelte";
     export let leftOffset = 322;
+	const layoutState = getLayoutState()
 </script>
 
-<div id="menu-open-overlay" style={"left:" + String(leftOffset) + "px"} class:hidden={!$settingsSideMenuShown} on:click={() => $settingsSideMenuShown = false}/>
+<div id="menu-open-overlay" style={"left:" + String(leftOffset) + "px"} class:hidden={!layoutState.settingssidemenushown} on:click={layoutState.hideSettingsSideMenu}/>
 
 <style>
     #menu-open-overlay {

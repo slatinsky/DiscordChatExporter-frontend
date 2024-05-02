@@ -2,7 +2,7 @@ import { get } from "svelte/store"
 import { checkUrl, copyTextToClipboard } from "../../js/helpers"
 import type { Author, Message } from "../../js/interfaces"
 import { contextMenuItems } from "../../js/stores/menuStore"
-import { linkHandler, setCurrentUser } from "../../js/stores/settingsStore"
+import { linkHandler, setCurrentUser } from "../../js/stores/settingsStore.svelte"
 
 
 export function onUserRightClick(e, author: Author) {

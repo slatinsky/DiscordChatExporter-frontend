@@ -1,5 +1,5 @@
 import { fetchCategoriesChannelsThreads, fetchGuilds, fetchMessageIds } from "./api";
-import { threadshown } from "./layoutStore";
+import { getLayoutState } from "./layoutState.svelte";
 
 let guilds = $state(await fetchGuilds());
 let guildId = $state(null);
@@ -60,13 +60,13 @@ export function getGuildState() {
 			threadMessagesIds = await fetchMessageIds(guildId, newThreadId)
 			threadMessageId = threadMessagesIds.length > 0 ? threadMessagesIds[-1] : null  // last message
 
-			threadshown.set(true)  // TODO: migrate to runes
+			layoutState.showThread()
 		}
 		else {
 			threadMessagesIds = []
 			threadMessageId = null
 
-			threadshown.set(false)  // TODO: migrate to runes
+			layoutState.hideThread()
 		}
 	}
 
@@ -138,6 +138,7 @@ async function restoreGuildState(state) {
 
 // todo: restore from url
 const guildState = getGuildState();
+const layoutState = getLayoutState()
 let urlState = getUrlState();
 await restoreGuildState(urlState);
 

@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Author } from "../../js/interfaces";
-    import { nameRenderer } from "../../js/stores/settingsStore";
+    import { nameRenderer } from "../../js/stores/settingsStore.svelte";
     import { onUserRightClick } from "./messageRightClick";
 
     export let author: Author

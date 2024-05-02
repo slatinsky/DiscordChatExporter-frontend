@@ -1,6 +1,6 @@
 <script lang="ts">
     import { checkUrl } from "../../js/helpers";
-    import { gifs, online } from "../../js/stores/settingsStore";
+    import { gifs, online } from "../../js/stores/settingsStore.svelte";
 
     export let embed
 

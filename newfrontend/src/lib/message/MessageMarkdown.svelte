@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { online } from "../../js/stores/settingsStore";
+    import { online } from "../../js/stores/settingsStore.svelte";
     import type { Channel, Emoji, Role } from "../../js/interfaces";
     import { parseMarkdown } from "../../js/markdownParser";
     import { searchPrompt } from "../../js/stores/searchStores";

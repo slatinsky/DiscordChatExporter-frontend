@@ -1,6 +1,6 @@
 import moment from 'moment/min/moment-with-locales';
 import { get } from 'svelte/store';
-import {dateFormat, locale, timeFormat } from './stores/settingsStore';
+import {dateFormat, locale, timeFormat } from './stores/settingsStore.svelte';
 
 export const browserLocales = [...new Set(['en', ...navigator.languages.map(lang => lang.split('-')[0])])]
 

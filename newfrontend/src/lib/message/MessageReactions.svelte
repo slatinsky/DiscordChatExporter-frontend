@@ -1,7 +1,7 @@
 <script lang="ts">
     import { checkUrl } from "../../js/helpers";
     import type { Reaction } from "../../js/interfaces";
-    import { currentUserId } from "../../js/stores/settingsStore";
+    import { currentUserId } from "../../js/stores/settingsStore.svelte";
     import ReactionsModal from "./ReactionsModal.svelte";
 
     export let reactions: Reaction[];

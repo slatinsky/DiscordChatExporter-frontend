@@ -2,7 +2,7 @@
     import ImageGallery from '../ImageGallery.svelte';
     import { checkUrl, copyTextToClipboard } from '../../js/helpers';
     import { contextMenuItems } from '../../js/stores/menuStore';
-    import { setCurrentUser } from '../../js/stores/settingsStore';
+    import { setCurrentUser } from '../../js/stores/settingsStore.svelte';
     import { onUserRightClick } from './messageRightClick';
 	export let reactions
 

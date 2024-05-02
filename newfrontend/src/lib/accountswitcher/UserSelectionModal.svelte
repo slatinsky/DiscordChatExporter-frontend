@@ -1,6 +1,6 @@
 <script lang="ts">
     import { checkUrl } from '../../js/helpers';
-    import { currentUserId, setCurrentUser } from '../../js/stores/settingsStore';
+    import { currentUserId, setCurrentUser } from '../../js/stores/settingsStore.svelte';
 	import AutocompleteUser from './AutocompleteUser.svelte';
 
     export let showModal = false;

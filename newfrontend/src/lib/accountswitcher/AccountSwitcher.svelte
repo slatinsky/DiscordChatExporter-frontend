@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getGuildState } from "../../js/stores/guildState.svelte";
-    import { settingsshown } from "../../js/stores/layoutStore";
-    import { currentUserName1, currentUserPhoto } from "../../js/stores/settingsStore";
+    import { getLayoutState } from "../../js/stores/layoutState.svelte";
+    import { currentUserName1, currentUserPhoto } from "../../js/stores/settingsStore.svelte";
     import IconSettings from "../icons/IconSettings.svelte";
     import AutocompleteUser from "./AutocompleteUser.svelte";
     import UserSelectionModal from "./UserSelectionModal.svelte";
@@ -9,13 +9,14 @@
     let showUserSelectionModal = false;
 
     const guildState = getGuildState()
+    const layoutState = getLayoutState()
 </script>
 
 <div id="bottom-bar">
     <div style="width: 190px;">
         <AutocompleteUser photo={$currentUserPhoto} name1={$currentUserName1} name2={$currentUserName1} on:click={() => showUserSelectionModal = true}/>
     </div>
-    <div id="settings" on:click={()=>$settingsshown = true}>
+    <div id="settings" on:click={layoutState.showSettings}>
         <IconSettings />
     </div>
 </div>

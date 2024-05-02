@@ -1,25 +1,26 @@
 <script>
-    import { nameRenderer, developerMode, theme, online, gifs, linkHandler, channelScrollPosition, hideSpoilers, font, timestampFormat, dateFormat, timeFormat, locale, settingsSideMenuShown} from '../../js/stores/settingsStore';
+    import { nameRenderer, developerMode, theme, online, gifs, linkHandler, channelScrollPosition, hideSpoilers, font, timestampFormat, dateFormat, timeFormat, locale} from '../../js/stores/settingsStore.svelte';
     import { dateFormats, timeFormats, formatMoment, browserLocales } from '../../js/time';
     import RadioButton from './RadioButton.svelte';
     import RadioGroup from './RadioGroup.svelte';
     import MenuOpenOverlay from './MenuOpenOverlay.svelte';
     import HamburgerBtn from '../icons/IconHamburgerMenu.svelte';
-    import { settingsshown } from '../../js/stores/layoutStore';
+    import { getLayoutState } from '../../js/stores/layoutState.svelte';
     let testDate = '2020-01-16T11:04:47.215+00:00';
     let selectedTab = 'appearance';
 
     function selectTab(tab) {
         selectedTab = tab;
-        $settingsSideMenuShown = false;
+        layoutState.hideSettingsSideMenu()
     }
 
 
     function closeBtn() {
-        $settingsshown = false
-        $settingsSideMenuShown = true
+        layoutState.hideSettings()
+        layoutState.showSettingsSideMenu()
     }
 
+    const layoutState = getLayoutState()
 </script>
 
 <div class="close-btn" on:click={closeBtn}>
@@ -27,7 +28,7 @@
 </div>
 
 
-<div class="container" class:hidden={!$settingsshown} class:mobilemenuhidden={!$settingsSideMenuShown}>
+<div class="container" class:hidden={!layoutState.settingsshown} class:mobilemenuhidden={!layoutState.settingssidemenushown}>
     <div class="tabs">
         <div class="category">App settings</div>
         <div class="tab" class:selected={selectedTab == "appearance"} on:click={() => selectTab("appearance")}>Appearance</div>
@@ -46,7 +47,7 @@
         <div class="settings">
             {#if selectedTab == "appearance"}
                 <div class="title-wrapper">
-                    <div class="hamburger-btn" on:click={e => $settingsSideMenuShown = !$settingsSideMenuShown}>
+                    <div class="hamburger-btn" on:click={layoutState.toggleSettingsSideMenu}>
                         <HamburgerBtn />
                     </div>
                     <div class="title">Appearance</div>

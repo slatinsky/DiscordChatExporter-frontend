@@ -11,70 +11,15 @@
     import Settings from "./lib/settings/Settings.svelte";
     import ContextMenu from "./lib/components/menu/ContextMenu.svelte";
     import { onMount } from "svelte";
-    import { mobilesidepanelshown } from "./js/stores/layoutStore";
-    import { searchshown } from "./js/stores/layoutStore";
-    import { threadshown } from "./js/stores/layoutStore";
-    import { settingsshown } from "./js/stores/layoutStore";
-    import { debuglayout } from "./js/stores/layoutStore";
     import { position } from "./js/stores/menuStore";
-    import { font, hideSpoilers, theme } from './js/stores/settingsStore';
+    import { font, hideSpoilers, theme } from './js/stores/settingsStore.svelte';
     import { getGuildState } from './js/stores/guildState.svelte';
+    import { getLayoutState } from './js/stores/layoutState.svelte';
 
 
-    let mobile = false
-    let windowWidth = window.innerWidth
     let hidedebug = false
 
-    function toggleThread() {
-      if (!$threadshown && $searchshown) {
-        // search and thread can't be shown at the same time
-        $searchshown = false
-      }
-      // if (!$threadshown && $mobilesidepanelshown) {
-      //   // hide mobile side panel on thread show
-      //   $mobilesidepanelshown = false
-      // }
-      $threadshown = !$threadshown
-    }
-
-    function toggleSearch() {
-      if (!$searchshown && $threadshown) {
-        // search and thread can't be shown at the same time
-        $threadshown = false
-      }
-      $searchshown = !$searchshown
-    }
-
-    function toggleSidePanel() {
-      // if ($mobilesidepanelshown && $searchshown) {
-      //   // if already shown, just hide search
-      //   $searchshown = false
-      //   return
-      // }
-      // if (!$mobilesidepanelshown && $searchshown) {
-      //   // search cannot be shown when side panel is hidden
-      //   $searchshown = false
-      // }
-      $mobilesidepanelshown = !$mobilesidepanelshown
-    }
-
-    function toggleSettings() {
-      $settingsshown = !$settingsshown
-    }
-
-
-    function resize() {
-      windowWidth = window.innerWidth
-      if (windowWidth < 800) {
-        mobile = true
-      } else {
-        mobile = false
-      }
-    }
-
-
     onMount(() => {
-      window.addEventListener('resize', resize)
       const unsubscribe1 = theme.subscribe(value => {
         document.documentElement.setAttribute('data-theme', value);
       });
@@ -86,10 +31,8 @@
       const unsubscribe3 = font.subscribe(value => {
         document.documentElement.setAttribute('data-font', value);
       });
-      resize()
 
       return () => {
-        window.removeEventListener('resize', resize)
         unsubscribe1()
         unsubscribe2()
         unsubscribe3()
@@ -97,6 +40,7 @@
     })
 
     const guildState = getGuildState()
+    const layoutState = getLayoutState()
 
     /* capture mouse position for right click context menu */
     function handleMousemove(event) {
@@ -111,12 +55,12 @@
 </svelte:head>
 
 
-<div class:debuglayout={$debuglayout} style="width: 100%;height: 100%;">
+<div class:debuglayout={layoutState.debuglayout} style="width: 100%;height: 100%;">
   <main
-    class:mobile class:desktop={!mobile}
-    class:searchshown={$searchshown} class:searchhidden={!$searchshown}
-    class:mobilesidepanelshown={$mobilesidepanelshown} class:mobilesidepanelhidden={!$mobilesidepanelshown}
-    class:threadshown={$threadshown} class:threadhidden={!$threadshown}
+    class:mobile={layoutState.mobile} class:desktop={!layoutState.mobile}
+    class:searchshown={layoutState.searchshown} class:searchhidden={!layoutState.searchshown}
+    class:mobilesidepanelshown={layoutState.mobilesidepanelshown} class:mobilesidepanelhidden={!layoutState.mobilesidepanelshown}
+    class:threadshown={layoutState.threadshown} class:threadhidden={!layoutState.threadshown}
     on:mousemove={handleThrottledMousemove}
     >
       <div class="guilds"><Guilds /></div>
@@ -126,7 +70,7 @@
       <div class="search-results"><SearchResults /></div>
       <div class="thread"><Thread /></div>
     </main>
-  <div class="settings" class:settingsshown={$settingsshown}><Settings /></div>
+  <div class="settings" class:settingsshown={layoutState.settingsshown}><Settings /></div>
   <ContextMenu />
 </div>
 
@@ -135,13 +79,13 @@
 <div class="debug-buttons" >
   <button on:click={() => hidedebug = !hidedebug}>X</button>
   <span style="{hidedebug ? 'display:none' : ''}">
-    <button on:click={() => $debuglayout = !$debuglayout}>$debuglayout {$debuglayout}</button>
-    <button on:click={toggleSidePanel}>$mobilesidepanelshown {$mobilesidepanelshown}</button>
-    <button on:click={toggleThread}>$threadshown {$threadshown}</button>
-    <button on:click={toggleSearch}>$searchshown {$searchshown}</button>
-    <button on:click={toggleSettings}>$settingsshown {$settingsshown}</button>
-    <button >guildId {guildState.guildId}</button>
-    <button >channelId {guildState.channelId}</button>
+    <button on:click={layoutState.toggleDebugLayout}>debuglayout {layoutState.debuglayout}</button>
+    <button on:click={layoutState.toggleSidePanel}>mobilesidepanelshown {layoutState.mobilesidepanelshown}</button>
+    <button on:click={layoutState.toggleThread}>threadshown {layoutState.threadshown}</button>
+    <button on:click={layoutState.toggleSearch}>searchshown {layoutState.threadshown}</button>
+    <button on:click={layoutState.toggleSettings}>settingsshown {layoutState.settingsshown}</button>
+    <button>guildId {guildState.guildId}</button>
+    <button>channelId {guildState.channelId}</button>
   </span>
 </div>
 

@@ -1,14 +1,15 @@
 <script lang="ts">
     import { getGuildState } from "../js/stores/guildState.svelte";
-    import { threadshown } from "../js/stores/layoutStore";
+    import { getLayoutState } from "../js/stores/layoutState.svelte";
     import InfiniteScroll from "./InfiniteScroll.svelte";
     import Message from "./message/Message.svelte";
 
     const guildState = getGuildState()
+    const layoutState = getLayoutState()
 </script>
 
 
-<div class="channel-wrapper" class:threadshown={$threadshown}>
+<div class="channel-wrapper" class:threadshown={layoutState.threadshown}>
     <div class="channel" >
         <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId}>
             <div slot="item" let:message>
