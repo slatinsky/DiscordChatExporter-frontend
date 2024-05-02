@@ -181,6 +181,18 @@
   }
   .thread {
     grid-area: thread;
+
+
+  }
+
+  /*Grid items have an initial size of min-width: auto and min-height: auto, prevent overflow*/
+  .guilds,
+  .channels,
+  .header-main,
+  .channel,
+  .thread {
+    min-width: 0;
+    min-height: 0;
   }
 
   /* COMMON */
