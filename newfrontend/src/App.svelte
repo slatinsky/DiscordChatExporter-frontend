@@ -50,11 +50,6 @@
     const handleThrottledMousemove = throttle(handleMousemove, 100, { leading: false, trailing: true });
 
 
-    function delimeterLog() {
-      console.log("--------------------------------------------------")
-    }
-
-
     // called from parsed markdown channel and message links
     // window.globalSetGuild = async (guildId: string) => {
     //   await guildState.changeGuildId(guildId)
@@ -106,9 +101,6 @@
     <button on:click={layoutState.toggleThread}>threadshown {layoutState.threadshown}</button>
     <button on:click={layoutState.toggleSearch}>searchshown {layoutState.threadshown}</button>
     <button on:click={layoutState.toggleSettings}>settingsshown {layoutState.settingsshown}</button>
-    <button>guildId {guildState.guildId}</button>
-    <button>channelId {guildState.channelId}</button>
-    <button on:click={delimeterLog}>delimeterLog</button>
   </span>
 </div>
 
@@ -333,6 +325,7 @@
     bottom: 5px;
     left: 5px;
     z-index: 200;
+    font-size: 8px;
   }
   .debug-buttons button {
     margin: 2px;
