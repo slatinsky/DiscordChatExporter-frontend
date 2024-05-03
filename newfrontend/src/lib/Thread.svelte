@@ -20,11 +20,14 @@
         </div>
     </div>
     <div class="thread">
-        <InfiniteScroll ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId}>
-            <div slot="item" let:message>
-                <Message message={message} />
-            </div>
-        </InfiniteScroll>
+        <!-- TODO: support change of threadMessageId without rerender -->
+        {#key guildState.threadMessageId}
+            <InfiniteScroll ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId}>
+                <div slot="item" let:message>
+                    <Message message={message} />
+                </div>
+            </InfiniteScroll>
+        {/key}
     </div>
 </div>
 

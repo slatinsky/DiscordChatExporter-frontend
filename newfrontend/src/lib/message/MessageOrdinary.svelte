@@ -16,7 +16,7 @@
     const viewUserState = getViewUserState()
 
 </script>
-<MessageReferenced referencedMessage={message.referencedMessage} referenceMessageId={message.reference?.messageId} />
+<MessageReferenced message={message} referencedMessage={message.referencedMessage} referenceMessageId={message.reference?.messageId} />
 <div class="avatar-row">
     <MessageAvatar author={message.author} on:click={() => viewUserState.setUser(message.author)} />
     <div on:click>

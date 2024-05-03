@@ -20,10 +20,15 @@
 
     let isMenuHidden = $state(false)
 	const guildState = getGuildState()
+
+	async function changeGuildId(guildId: string | null) {
+		await guildState.changeGuildId(guildId)
+		await guildState.pushState()
+	}
 </script>
 
 <div class="guilds" class:hidden={isMenuHidden}>
-	<div class="guild" class:selected={!guildState.guildId} on:click={e => guildState.changeGuildId(null)}>
+	<div class="guild" class:selected={!guildState.guildId} on:click={e => changeGuildId(null)}>
 		<div class="guild-selected-indicator" />
 		<div class="home-guild"><IconDCEF2 /></div>
 	</div>
@@ -31,7 +36,7 @@
 
 	{#if guildState.guilds}
 		{#each guildState.guilds as guild}
-			<div class="guild" on:contextmenu|preventDefault={e=>onRightClick(e, guild._id)} class:selected={guildState.guildId === guild._id} on:click={e => guildState.changeGuildId(guild._id)}>
+			<div class="guild" on:contextmenu|preventDefault={e=>onRightClick(e, guild._id)} class:selected={guildState.guildId === guild._id} on:click={e => changeGuildId(guild._id)}>
 				<div class="guild-selected-indicator" />
 				<img src={checkUrl(guild.icon)} alt={guild.name} on:error={e => (e.target.src = "/favicon.png")} />
 			</div>

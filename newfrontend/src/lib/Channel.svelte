@@ -11,11 +11,14 @@
 
 <div class="channel-wrapper" class:threadshown={layoutState.threadshown}>
     <div class="channel" >
-        <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId}>
-            <div slot="item" let:message>
-                <Message message={message} />
-            </div>
-        </InfiniteScroll>
+        <!-- TODO: support change of selectedMessageId without rerender -->
+        {#key guildState.channelMessageId}
+            <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId}>
+                <div slot="item" let:message>
+                    <Message message={message} />
+                </div>
+            </InfiniteScroll>
+        {/key}
     </div>
 </div>
 

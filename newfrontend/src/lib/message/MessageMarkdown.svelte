@@ -83,7 +83,6 @@
 
 
 <span class:onlyemojis={bigEmojis} class="message-markdown">{@html processedHtml}</span>
-<!-- <button on:click={() => console.log(JSON.stringify(processedTree, null, 2))}>debug</button> -->
 
 
 <style>

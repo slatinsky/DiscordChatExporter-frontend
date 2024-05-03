@@ -13,7 +13,7 @@
     import { onMount } from "svelte";
     import { position } from "./js/stores/menuStore";
     import { font, hideSpoilers, theme } from './js/stores/settingsStore.svelte';
-    import { getGuildState } from './js/stores/guildState.svelte';
+    import { getGuildState, isChannel } from './js/stores/guildState.svelte';
     import { getLayoutState } from './js/stores/layoutState.svelte';
     import ViewUser from './lib/viewuser/ViewUser.svelte';
 
@@ -48,6 +48,26 @@
       $position = { x: event.clientX, y: event.clientY };
     }
     const handleThrottledMousemove = throttle(handleMousemove, 100, { leading: false, trailing: true });
+
+
+    function delimeterLog() {
+      console.log("--------------------------------------------------")
+    }
+
+
+    // called from parsed markdown channel and message links
+    // window.globalSetGuild = async (guildId: string) => {
+    //   await guildState.changeGuildId(guildId)
+    //   await guildState.pushState()
+    // }
+    window.globalSetChannel = async (guildId: string, channelId: string) => {
+      await guildState.comboSetGuildChannel(guildId, channelId)
+      await guildState.pushState()
+    }
+    window.globalSetMessage = async (guildId: string, channelId: string, messageId: string) => {
+      await guildState.comboSetGuildChannelMessage(guildId, channelId, messageId)
+      await guildState.pushState()
+    }
 </script>
 
 <svelte:head>
@@ -88,6 +108,7 @@
     <button on:click={layoutState.toggleSettings}>settingsshown {layoutState.settingsshown}</button>
     <button>guildId {guildState.guildId}</button>
     <button>channelId {guildState.channelId}</button>
+    <button on:click={delimeterLog}>delimeterLog</button>
   </span>
 </div>
 

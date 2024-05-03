@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { tick } from "svelte";
     // --------------------------
     // THIS CODE IS NOT FINISHED
     // TODO: needs backend pagination support to optimize loading
@@ -25,8 +24,10 @@
     }
 
     async function idsChanged(selectedMessageId, ids) {
+        console.log('scroller - ids changed - selectedMessageId', selectedMessageId, "ids length", ids.length)
         if (ids.length === 0) {
             console.log('scroller - no messages to load')
+            messages = []
             return
         }
         watchScroll = false
@@ -61,8 +62,9 @@
 
         await refetchMessages(loadedIds)
         setTimeout(async() => {
-            // scrollContainer.scrollTop = scrollContainer.scrollHeight / 2
-            // scrollContainer.scrollTop = scrollContainer.scrollHeight
+            if (!scrollContainer) {  // did we destroy the component before the timeout happened?
+                return
+            }
 
             // scroll to selected message
             if (selectedMessageId) {
@@ -87,9 +89,7 @@
                 scrollContainer.scrollTop = scrollContainer.scrollHeight
                 console.log('scroller - no selected message to scroll to')
             }
-
-
-        watchScroll = true
+            watchScroll = true
         }, 0)
     }
 
@@ -143,11 +143,10 @@
     $: idsChanged(selectedMessageId, ids)
 
 
-
-
-
     async function handleScroll(event) {
         if (!watchScroll)
+            return
+        if (messages.length === 0)
             return
 
         const element = event.target

@@ -9,23 +9,30 @@
     import type { Channel } from "../../js/interfaces";
     import { getGuildState } from "../../js/stores/guildState.svelte";
 
-    export let channel: Channel
-    let isOpen = false
+    interface MyProps {
+        channel: Channel;
+    }
+    let { channel }: MyProps = $props();
 
+    let isOpen: boolean = $state(false)
     const guildState = getGuildState()
 
-    function toggle() {
+    async function toggle() {
         isOpen = !isOpen
         if (isOpen) {
-            guildState.changeChannelId(channel._id)
+            await guildState.changeChannelId(channel._id)
+            await guildState.pushState()
         }
     }
 
-    $: {
+    $effect(() => {
         if (guildState.channelId !== channel._id) {
             isOpen = false
         }
-    }
+        if (guildState.channelId === channel._id) {
+            isOpen = true
+        }
+    })
 
     function onChannelRightClick(e, id: string, name: string) {
 		$contextMenuItems = [

@@ -167,7 +167,7 @@ const newChannel = {
             return `<span class="message-mention" data-channelid="${node.channelId}">${NO_ACCESS_ICON} No Access</span>`;
         }
         else {
-            return `<a class="message-mention" href="/channels/${node.guildId}/${node.paddedChannelId}">${CHANNEL_ICON} ${node.channelName}</a>`;
+            return `<a class="message-mention" onclick="window.globalSetChannel('${node.guildId}', '${node.paddedChannelId}')"  href="javascript:void(0)">${CHANNEL_ICON} ${node.channelName}</a>`;
         }
     }
 }
@@ -220,7 +220,7 @@ const messageLink = {
       };
   },
   html: function(node, recurseOutput, state) {
-      return `<a class="message-mention" href="/channels/${node.guildId}/${node.channelId}#${node.messageId}">${CHANNEL_ICON} message link ${CHEVRON_ICON}${MESSAGEBUBBLE_ICON}</a>`;
+      return `<a class="message-mention" onclick="window.globalSetMessage('${node.guildId}', '${node.channelId}', '${node.messageId}')"  href="javascript:void(0)">${CHANNEL_ICON} message link ${CHEVRON_ICON}${MESSAGEBUBBLE_ICON}</a>`;
   },
 }
 
@@ -242,7 +242,7 @@ const channelLink = {
       };
   },
   html: function(node, recurseOutput, state) {
-      return `<a class="message-mention" href="/channels/${node.guildId}/${node.channelId}">${CHANNEL_ICON} channel link</a>`;
+      return `<a class="message-mention" onclick="window.globalSetChannel('${node.guildId}', '${node.channelId}')" href="javascript:void(0)">${CHANNEL_ICON} channel link</a>`;
   },
 }
 

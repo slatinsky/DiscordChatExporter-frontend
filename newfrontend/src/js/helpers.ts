@@ -63,3 +63,7 @@ export function humanFileSize(bytes: number, decimalPlaces: number) {
         return `${Math.round(bytes / 1024 / 1024 / 1024 * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces)} GB`;
     }
 }
+
+export function isObjectEqual(a: any, b: any) {
+	return JSON.stringify(a) === JSON.stringify(b)
+}

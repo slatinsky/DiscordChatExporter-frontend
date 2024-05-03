@@ -30,6 +30,7 @@
         await guildState.changeGuildId(guildId)
         await guildState.changeChannelId(channelId)
         await guildState.changeThreadId(threadId)
+        await guildState.pushState()
     }
 
     const guildState = getGuildState()

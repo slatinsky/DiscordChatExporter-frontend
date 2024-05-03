@@ -9,6 +9,7 @@
     import MessageMarkdown from "./MessageMarkdown.svelte";
     import { onUserRightClick } from "./messageRightClick";
 
+    export let message: Message
     export let referencedMessage: Message
     export let referenceMessageId: string | undefined
 
@@ -16,12 +17,14 @@
 
     const guildState = getGuildState()
 
-    function changeMessageId(messageId: string) {
-        if (isChannel(referencedMessage.channelId)) {
-            guildState.changeChannelMessageId(messageId)
-        } else {
-            guildState.changeThreadMessageId(messageId)
-        }
+    async function changeMessageId() {
+        // save current position
+        await guildState.comboSetGuildChannelMessage(message.guildId, message.channelId, message._id)
+        await guildState.pushState()
+
+        // set new position
+        await guildState.comboSetGuildChannelMessage(referencedMessage.guildId, referencedMessage.channelId, referencedMessage._id)
+        await guildState.pushState()
     }
 </script>
 
