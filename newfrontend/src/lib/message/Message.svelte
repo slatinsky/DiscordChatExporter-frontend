@@ -34,10 +34,19 @@
 
             return systemNotificationTypes.includes(messageType)
         }
+
+        function isInvite(messageContent: string): boolean {
+            const inviteRegex = /(https?:\/\/)?(www\.)?((discordapp\.com\/invite)|(discord\.gg))\/(\w+)/
+            return inviteRegex.test(messageContent)
+        }
+
         return {
             get isSystemNotification(): boolean {
                 return isSystemNotification(message.type)
-            }
+            },
+            get isInvite(): boolean {
+                return isInvite(message.content[0].content)
+            },
         }
     }
 
@@ -49,7 +58,7 @@
     {#if messageState.isSystemNotification}
         <MessageSystemNotification message={message} />
     {:else}
-        <MessageOrdinary message={message} />
+        <MessageOrdinary message={message} messageState={messageState} />
     {/if}
 </div>
 

@@ -28,13 +28,13 @@ export function onMessageRightClick(e, message: Message) {
         {
             "name": `Open message in discord ${get(linkHandler) === 'app' ? "app" : "web"}`,
             "action": () => {
-                window.open((get(linkHandler) === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(get(message.guildId))}/${BigInt(message.channelId)}/${BigInt(message._id)}`,'_blank')
+                window.open((get(linkHandler) === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(message.guildId)}/${BigInt(message.channelId)}/${BigInt(message._id)}`,'_blank')
             }
         },
         {
             "name": "Copy message link",
             "action": () => {
-                copyTextToClipboard(`https://discord.com/channels/${BigInt(get(message.guildId))}/${BigInt(message.channelId)}/${BigInt(message._id)}`);
+                copyTextToClipboard(`https://discord.com/channels/${BigInt(message.guildId)}/${BigInt(message.channelId)}/${BigInt(message._id)}`);
             }
         },
         {
