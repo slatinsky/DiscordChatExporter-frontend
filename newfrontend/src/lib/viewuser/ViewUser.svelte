@@ -1,35 +1,29 @@
 <script lang="ts">
-    import type { Author } from '../../js/interfaces';
     import ImageGallery from '../ImageGallery.svelte';
+    import { getViewUserState } from './viewUserState.svelte';
 
-    let showAuthor = $state(false);
-    let author: Author = $state(null);
-
-    export function viewAuthor(inputAuthor: Author) {
-        author = inputAuthor;
-        showAuthor = true;
-	}
+    const viewUserState = getViewUserState()
 </script>
 
 
 
-{#if showAuthor}
-    <div class="gallery-wrapper" on:click={()=>showAuthor=false}>
-        <div class="gallery-closebtn" on:click={()=>showAuthor=false}>&times;</div>
+{#if viewUserState.shown}
+    <div class="gallery-wrapper" on:click={()=>viewUserState.setUser(null)}>
+        <div class="gallery-closebtn" on:click={()=>viewUserState.setUser(null)}>&times;</div>
         <div id="profile" on:click|stopPropagation>
-            <ImageGallery asset={author?.avatar} imgclass={"profile-avatar"} />
+            <ImageGallery asset={viewUserState.user?.avatar} imgclass={"profile-avatar"} />
             <div class="profile-background"></div>
 
             <div class="profile-inner">
                 <div class="profile-header">
-                    <div class="profile-nickname">{author.nickname}</div>
-                    <div class="profile-name">{author.name}</div>
+                    <div class="profile-nickname">{viewUserState.user.nickname}</div>
+                    <div class="profile-name">{viewUserState.user.name}</div>
                 </div>
                 <div class="profile-scroll">
                     <div class="mini-title">ROLES</div>
                     <div class="roles-wrapper">
-                        {#if author.roles}
-                            {#each author.roles as role}
+                        {#if viewUserState.user.roles}
+                            {#each viewUserState.user.roles as role}
                                 <div class="role">
                                     <div class="role-color" style={`background-color: ${role.color ?? "#c4c9ce"};`}></div>
                                     <div class="role-name">{role.name}</div>

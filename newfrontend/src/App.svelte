@@ -15,6 +15,7 @@
     import { font, hideSpoilers, theme } from './js/stores/settingsStore.svelte';
     import { getGuildState } from './js/stores/guildState.svelte';
     import { getLayoutState } from './js/stores/layoutState.svelte';
+    import ViewUser from './lib/viewuser/ViewUser.svelte';
 
 
     let hidedebug = false
@@ -54,6 +55,7 @@
     <meta name="description" content="View your JSON DiscordChatExporter exports as if you were using Discord interface"/>
 </svelte:head>
 
+<ViewUser />
 
 <div class:debuglayout={layoutState.debuglayout} style="width: 100%;height: 100%;">
   <main

@@ -2,14 +2,15 @@
     import { checkUrl } from "../../js/helpers";
     import type { Message } from "../../js/interfaces";
     import IconDeletedReply from "../icons/IconDeletedReply.svelte";
-    import AuthorModal from "./AuthorModal.svelte";
+    import { getViewUserState } from "../viewuser/viewUserState.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageMarkdown from "./MessageMarkdown.svelte";
     import { onUserRightClick } from "./messageRightClick";
 
     export let referencedMessage: Message
     export let referenceMessageId: string | undefined
-    export let authorModal: AuthorModal
+
+    const viewUserState = getViewUserState()
 </script>
 
 {#if referencedMessage}
@@ -17,7 +18,7 @@
         <div class="referenced-arrow" />
         {#if referencedMessage.author}
             <img class="referenced-avatar" src={checkUrl(referencedMessage.author.avatar)} alt="avatar" on:click on:contextmenu|preventDefault={e=>onUserRightClick(e, referencedMessage.author)}  />
-            <MessageAuthorName author={referencedMessage.author} on:click={() => authorModal.viewAuthor(referencedMessage.author)} />
+            <MessageAuthorName author={referencedMessage.author} on:click={() => viewUserState.setUser(referencedMessage.author)} />
             <div class="referenced-content">
                 <MessageMarkdown content={referencedMessage.content[0].content.split("\n")[0]} emotes={referencedMessage?.emotes || []} mentions={referencedMessage?.mentions || []} roles={referencedMessage?.roles || []} channels={referencedMessage?.channels || []} />
             </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Message } from "../../js/interfaces";
-    import AuthorModal from "./AuthorModal.svelte";
+    import { getViewUserState } from "../viewuser/viewUserState.svelte";
     import MessageAttachments from "./MessageAttachments.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageAvatar from "./MessageAvatar.svelte";
@@ -13,14 +13,14 @@
     import { onMessageRightClick } from "./messageRightClick";
 
     export let message: Message;
-    export let authorModal: AuthorModal;
+    const viewUserState = getViewUserState()
 
 </script>
-<MessageReferenced referencedMessage={message.referencedMessage} referenceMessageId={message.reference?.messageId} authorModal={authorModal} />
+<MessageReferenced referencedMessage={message.referencedMessage} referenceMessageId={message.reference?.messageId} />
 <div class="avatar-row">
-    <MessageAvatar author={message.author} on:click={() => authorModal.viewAuthor(message.author)} />
+    <MessageAvatar author={message.author} on:click={() => viewUserState.setUser(message.author)} />
     <div on:click>
-        <div><MessageAuthorName author={message.author} on:click={() => authorModal.viewAuthor(message.author)} /> <MessageTimestamp channelOrThreadId={message.channelId} timestamp={message.timestamp} messageId={message._id} /></div>
+        <div><MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} /> <MessageTimestamp channelOrThreadId={message.channelId} timestamp={message.timestamp} messageId={message._id} /></div>
         <div on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)}>
             <div><MessageContent message={message} /></div>
             {#if message.embeds}

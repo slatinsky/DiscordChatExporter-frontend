@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Message } from "../../js/interfaces";
     import { getGuildState } from "../../js/stores/guildState.svelte";
-    import AuthorModal from "./AuthorModal.svelte";
+    import { getViewUserState } from "../viewuser/viewUserState.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageReactions from "./MessageReactions.svelte";
     import MessageSystemNotificationIcon from "./MessageSystemNotificationIcon.svelte";
@@ -10,8 +10,8 @@
     import { onMessageRightClick } from "./messageRightClick";
 
     export let message: Message
-    export let authorModal: AuthorModal
     const guildState = getGuildState()
+    const viewUserState = getViewUserState()
     $: guildName = guildState.guilds.find(guild => guild._id === message.guildId)?.name ?? "this server"
 </script>
 
@@ -21,7 +21,7 @@
     </div>
     <div>
         <div>
-            <MessageAuthorName author={message.author} on:click={() => authorModal.viewAuthor(message.author)} />
+            <MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} />
         </div>
 
         <span on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)} role="button" tabindex="0">
