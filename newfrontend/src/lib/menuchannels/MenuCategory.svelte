@@ -17,6 +17,8 @@
 
     function toggle() {
         isOpen = !isOpen
+		console.log('categories - saving to local storage', isOpen, category._id)
+		saveToLocalStorage(isOpen, category._id);
     }
 
 	function saveToLocalStorage(isOpen: boolean, categoryId: string) {
@@ -32,11 +34,6 @@
 		json = JSON.stringify(closedCategoryIds);
 		localStorage.setItem('closedCategoryIds', json);
 	}
-
-	$effect(() => {
-		console.log('categories - saving to local storage', isOpen, category._id)
-		saveToLocalStorage(isOpen, category._id);
-	})
 
     function onCategoryRightClick(e, id: string, name: string) {
 		$contextMenuItems = [
