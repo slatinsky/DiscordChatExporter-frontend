@@ -1,7 +1,9 @@
 <script lang="ts">
     import { checkUrl } from "../../js/helpers";
     import type { Message } from "../../js/interfaces";
-    import IconDeletedReply from "../icons/IconDeletedReply.svelte";
+    import { getGuildState, isChannel } from "../../js/stores/guildState.svelte";
+    import IconReplyAttachment from "../icons/IconReplyAttachment.svelte";
+    import IconReplyDeleted from "../icons/IconReplyDeleted.svelte";
     import { getViewUserState } from "../viewuser/viewUserState.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageMarkdown from "./MessageMarkdown.svelte";
@@ -11,16 +13,30 @@
     export let referenceMessageId: string | undefined
 
     const viewUserState = getViewUserState()
+
+    const guildState = getGuildState()
+
+    function changeMessageId(messageId: string) {
+        if (isChannel(referencedMessage.channelId)) {
+            guildState.changeChannelMessageId(messageId)
+        } else {
+            guildState.changeThreadMessageId(messageId)
+        }
+    }
 </script>
 
 {#if referencedMessage}
-    <div class="referenced">
+    <div class="referenced clickable">
         <div class="referenced-arrow" />
         {#if referencedMessage.author}
             <img class="referenced-avatar" src={checkUrl(referencedMessage.author.avatar)} alt="avatar" on:click on:contextmenu|preventDefault={e=>onUserRightClick(e, referencedMessage.author)}  />
             <MessageAuthorName author={referencedMessage.author} on:click={() => viewUserState.setUser(referencedMessage.author)} />
-            <div class="referenced-content">
-                <MessageMarkdown content={referencedMessage.content[0].content.split("\n")[0]} emotes={referencedMessage?.emotes || []} mentions={referencedMessage?.mentions || []} roles={referencedMessage?.roles || []} channels={referencedMessage?.channels || []} />
+            <div class="referenced-content" on:click={()=>changeMessageId(referencedMessage._id)}>
+                {#if referencedMessage.content[0].content !== ""}
+                    <MessageMarkdown content={referencedMessage.content[0].content.split("\n")[0]} emotes={referencedMessage?.emotes || []} mentions={referencedMessage?.mentions || []} roles={referencedMessage?.roles || []} channels={referencedMessage?.channels || []} />
+                {:else if referencedMessage.attachments.length > 0}
+                    <i>Click to see attachment <IconReplyAttachment /></i>
+                {/if}
             </div>
         {/if}
     </div>
@@ -29,7 +45,7 @@
     <div class="referenced">
         <div class="referenced-arrow" />
         <div class="referenced-avatar">
-            <IconDeletedReply />
+            <IconReplyDeleted />
         </div>
         <div class="referenced-content">
             <i>Original message was deleted</i>
@@ -42,6 +58,10 @@
         display: flex;
         gap: 2px;
         align-items: center;
+    }
+
+    .clickable {
+        cursor: pointer;
     }
 
     .referenced-arrow {
