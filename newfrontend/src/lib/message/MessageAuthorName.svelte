@@ -28,11 +28,28 @@
     {/if}
 </button>
 
+{#if author?.isBot}
+    <span class="tag-bot">APP</span>
+{/if}
+
 <style>
     .username {
         cursor: pointer;
     }
     .hover-underline:hover {
         text-decoration: underline;
+    }
+
+    .tag-bot {
+        position: relative;
+        top: -0.1rem;
+        margin-left: 0.3rem;
+        padding: 0.05rem 0.3rem;
+        border-radius: 3px;
+        background-color: #5865F2;
+        color: #ffffff;
+        font-size: 0.625rem;
+        font-weight: 500;
+        line-height: 1.3;
     }
 </style>
