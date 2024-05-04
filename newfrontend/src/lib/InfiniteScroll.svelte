@@ -28,6 +28,9 @@
     let loadedIds: string[] = $state([])
     let watchScroll: boolean = $state(false)
 
+    let topLoaded = $derived(lowestLoadedIndex === 0)
+    // let bottomLoaded = $derived(highestLoadedIndex === ids.length - 1)   // not used
+
     async function refetchMessages(loadedIds: string[]) {
         messages = await messsageIdsToMessages(guildId, loadedIds)
     }
@@ -187,8 +190,8 @@
 <div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
     {#if messages}
         {#each messages as message, index (message._id)}
-            {#if index === 0}
-                <ChannelStart channelName={message.channelName} isThread={isThread} />
+            {#if topLoaded && index === 0}
+                <ChannelStart channelName={message.channelName} isThread={isThread} messageAuthor={message.author} />
             {/if}
             <div data-messageid={message._id}>
                 {@render renderMessageSnippet(message, messages[index - 1])}

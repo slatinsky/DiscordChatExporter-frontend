@@ -1,9 +1,16 @@
 <script lang="ts">
+    import type { Author } from "../../js/interfaces";
     import IconChannel from "../icons/IconChannel.svelte";
     import IconThread from "../icons/IconThread.svelte";
+    import { getViewUserState } from "../viewuser/viewUserState.svelte";
+    import MessageAuthorName from "./MessageAuthorName.svelte";
+
+    const viewUserState = getViewUserState()
 
     export let isThread: boolean;
     export let channelName: string;
+    export let messageAuthor: Author
+
 </script>
 
 {#if isThread}
@@ -12,8 +19,7 @@
             <IconThread width={30}/>
         </div>
         <div class="title">{channelName}!</div>
-        <!-- TODO: find out who created the thread -->
-        <div class="subtitle">Started by <span class="subtitle-person">Someone</span></div>
+        <div class="subtitle">Started by <span class="subtitle-person"><MessageAuthorName author={messageAuthor} on:click={() => viewUserState.setUser(messageAuthor)} /></span></div>
     </div>
 {:else}
     <div class="wrapper">
