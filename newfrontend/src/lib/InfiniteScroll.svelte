@@ -203,7 +203,21 @@
     .scroll-container {
         height: 100%;
         overflow-y: auto;
+
+        /* Needed for bottom aligment */
+        /* can't use justify-content: flex-end, because that would break scroll */
+        /* https://stackoverflow.com/a/37515194 */
+        display: flex;
+        flex-flow: column nowrap;
+        padding-bottom: 32px;
+        /* - */
     }
+
+    /* align messages to the bottom if there are not enough messages to fill the container height */
+    :global(.scroll-container > :first-child) {
+        margin-top: auto !important;
+    }
+    /* - */
 
     .scroll-container::-webkit-scrollbar-track {
         background-color: #2b2d31;
