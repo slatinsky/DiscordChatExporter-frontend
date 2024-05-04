@@ -1,29 +1,36 @@
 <script lang="ts">
+    import { untrack } from "svelte";
+    import type { Message } from "../js/interfaces";
     // --------------------------
     // THIS CODE IS NOT FINISHED
     // TODO: needs backend pagination support to optimize loading
     // --------------------------
     import { messsageIdsToMessages } from "../js/messages";
 
-    export let ids
-    export let guildId
-    export let selectedMessageId: string | null
+    interface MyProps {
+        ids: string[],
+        guildId: string,
+        selectedMessageId: string | null
 
-    let scrollContainer: HTMLDivElement
-    let messages = []
+    }
+    let { ids, guildId, selectedMessageId = null}: MyProps = $props();
+
     let maxMessages = 120
     let loadIncrement = 30
     let startLoadingPixels = 500
-    let lowestLoadedIndex = null
-    let highestLoadedIndex = null
-    let loadedIds: string[] = []
-    let watchScroll = false
+    let scrollContainer: HTMLDivElement
 
-    async function refetchMessages(loadedIds) {
+    let messages: Message[] = $state([])
+    let lowestLoadedIndex: number | null = $state(null)
+    let highestLoadedIndex: number | null = $state(null)
+    let loadedIds: string[] = $state([])
+    let watchScroll: boolean = $state(false)
+
+    async function refetchMessages(loadedIds: string[]) {
         messages = await messsageIdsToMessages(guildId, loadedIds)
     }
 
-    async function idsChanged(selectedMessageId, ids) {
+    async function idsChanged() {
         console.log('scroller - ids changed - selectedMessageId', selectedMessageId, "ids length", ids.length)
         if (ids.length === 0) {
             console.log('scroller - no messages to load')
@@ -140,8 +147,21 @@
         watchScroll = true
     }
 
-    $: idsChanged(selectedMessageId, ids)
 
+    // https://github.com/sveltejs/svelte/issues/9248#issuecomment-1732246774
+    function explicitEffect(fn, depsFn) {
+        $effect(() => {
+            depsFn();
+            untrack(fn);
+        });
+    }
+    // run idsChanged() only if ids change
+    explicitEffect(
+        () => {
+            idsChanged()
+        },
+        () => [ids]
+    );
 
     async function handleScroll(event) {
         if (!watchScroll)
@@ -164,7 +184,7 @@
     }
 </script>
 
-<div class="scroll-container" on:scroll={handleScroll} bind:this={scrollContainer}>
+<div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
     {#if messages}
         {#each messages as message (message._id)}
             <div>
