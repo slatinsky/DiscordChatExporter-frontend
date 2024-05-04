@@ -9,15 +9,16 @@
 </script>
 
 
+{#snippet renderMessageSnippet(message, previousMessage)}
+    <Message message={message} previousMessage={previousMessage} />
+{/snippet}
+
+
 <div class="channel-wrapper" class:threadshown={layoutState.threadshown}>
     <div class="channel" >
         <!-- TODO: support change of selectedMessageId without rerender -->
         {#key guildState.channelMessageId}
-            <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId} isThread={false}>
-                <div slot="item" let:message let:previousMessage>
-                    <Message message={message} previousMessage={previousMessage} />
-                </div>
-            </InfiniteScroll>
+            <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId} isThread={false} renderMessageSnippet={renderMessageSnippet} />
         {/key}
     </div>
 </div>

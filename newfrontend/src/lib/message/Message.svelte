@@ -11,9 +11,7 @@
     }
     let { message, previousMessage}: MyProps = $props();
 
-    console.log("message", message, "previousMessage", previousMessage)
-
-    function getMessageState(message: Message, previousMessage: Message) {
+    function getMessageState(message: Message, previousMessage: Message | null) {
         function isSystemNotification(messageType: string): boolean {
             // https://github.com/Tyrrrz/DiscordChatExporter/blob/81a6d363d1e503787e1aebc5e30b411ef796ef77/DiscordChatExporter.Core/Discord/Data/MessageKind.cs#L20
             const systemNotificationTypes = [

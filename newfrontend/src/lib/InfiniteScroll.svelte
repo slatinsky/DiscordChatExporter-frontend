@@ -9,12 +9,13 @@
     import ChannelStart from "./message/ChannelStart.svelte";
 
     interface MyProps {
-        ids: string[],
-        guildId: string,
+        ids: string[]
+        guildId: string
         selectedMessageId: string | null
         isThread: boolean
+        renderMessageSnippet: (message: Message, previousMessage: Message) => void
     }
-    let { ids, guildId, selectedMessageId = null, isThread}: MyProps = $props();
+    let { ids, guildId, selectedMessageId = null, isThread, renderMessageSnippet}: MyProps = $props();
 
     let maxMessages = 120
     let loadIncrement = 30
@@ -77,10 +78,8 @@
             // scroll to selected message
             if (selectedMessageId) {
                 // find selected message index
-                let selectedMessageIndex = loadedIds.indexOf(selectedMessageId)
-                if (selectedMessageIndex !== -1) {
-                    // get n-th child of scrollContainer
-                    let selectedMessageElement = scrollContainer.children[selectedMessageIndex]
+                if (loadedIds.includes(selectedMessageId)) {
+                    let selectedMessageElement = scrollContainer.querySelector(`[data-messageid="${selectedMessageId}"]`)
                     if (selectedMessageElement) {
                         selectedMessageElement.scrollIntoView({ block: "start", behavior: "instant" })
                         console.log('scroller - selected message scrolled into view')
@@ -191,8 +190,8 @@
             {#if index === 0}
                 <ChannelStart channelName={message.channelName} isThread={isThread} />
             {/if}
-            <div>
-                <slot name="item" previousMessage={messages[index - 1]} message={messages[index]}  />
+            <div data-messageid={message._id}>
+                {@render renderMessageSnippet(message, messages[index - 1])}
             </div>
         {/each}
     {/if}
