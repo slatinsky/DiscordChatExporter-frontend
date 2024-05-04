@@ -20,9 +20,15 @@
 </script>
 <MessageReferenced message={message} referencedMessage={message.referencedMessage} referenceMessageId={message.reference?.messageId} />
 <div class="avatar-row">
-    <MessageAvatar author={message.author} on:click={() => viewUserState.setUser(message.author)} />
+    {#if !messageState.shouldMerge}
+        <MessageAvatar author={message.author} on:click={() => viewUserState.setUser(message.author)} messageState={messageState} />
+    {:else}
+        <div></div>
+    {/if}
     <div on:click style="width: 100%;">
-        <div><MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} /> <MessageTimestamp channelOrThreadId={message.channelId} timestamp={message.timestamp} messageId={message._id} /></div>
+        {#if !messageState.shouldMerge}
+            <div class="authorline"><MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} /> <MessageTimestamp channelOrThreadId={message.channelId} timestamp={message.timestamp} messageId={message._id} /></div>
+        {/if}
         <div on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)}  style="width: 100%;">
             {#if messageState.isInvite}
                 <MessageInvite messageContent={message.content[0].content} />
@@ -48,9 +54,15 @@
 </div>
 
 <style>
+
+    .authorline {
+        margin-bottom: 2px;
+    }
     .avatar-row {
-        display: flex;
+        display: grid;
         gap: 15px;
+        grid-template-columns: 40px 1fr;
         width: 100%;
     }
+
 </style>

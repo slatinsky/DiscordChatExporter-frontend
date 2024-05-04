@@ -4,6 +4,7 @@
     import { onUserRightClick } from "./messageRightClick";
 
     export let author: Author
+    export let messageState
 </script>
 
 {#if author}

@@ -3,13 +3,17 @@
     import MessageSystemNotification from "./MessageSystemNotification.svelte";
     import MessageOrdinary from "./MessageOrdinary.svelte";
     import { MessageType } from "./messageEnums";
+    import { snowflakeToDate } from "../../js/time";
 
     interface MyProps {
         message: Message;
+        previousMessage: Message | null;
     }
-    let { message}: MyProps = $props();
+    let { message, previousMessage}: MyProps = $props();
 
-    function getMessageState(message: Message) {
+    console.log("message", message, "previousMessage", previousMessage)
+
+    function getMessageState(message: Message, previousMessage: Message) {
         function isSystemNotification(messageType: string): boolean {
             // https://github.com/Tyrrrz/DiscordChatExporter/blob/81a6d363d1e503787e1aebc5e30b411ef796ef77/DiscordChatExporter.Core/Discord/Data/MessageKind.cs#L20
             const systemNotificationTypes = [
@@ -40,6 +44,55 @@
             return inviteRegex.test(messageContent)
         }
 
+        /**
+         * Should this message merge with the previous message?
+         */
+        function shouldMerge(previousMessage: Message | null, message: Message) {
+            // null checks
+            if (!previousMessage) {
+                console.log("should merge - NO PREVIOUS MESSAGE")
+                return false;
+            }
+            if (!message) {
+                return false;
+            }
+
+            // if from different author, don't merge
+            if (previousMessage.author?._id !== message.author._id) {
+                return false;
+            }
+
+            // if from different channel, don't merge
+            if (previousMessage.channelId !== message.channelId) {
+                return false;
+            }
+
+
+            // if more than 5 minutes between messages, don't merge
+            let prevDate = snowflakeToDate(previousMessage._id);
+            let date = snowflakeToDate(message._id);
+            if (date.getTime() - prevDate.getTime() > 7 * 60 * 1000) {
+                return false;
+            }
+
+            // if is reply, don't merge
+            if (message.type === "Reply") {
+                return false;
+            }
+
+            // if is system notification, don't merge
+            if (isSystemNotification(message.type)) {
+                return false;
+            }
+
+            // if nicknames are different, don't merge
+            if (previousMessage.author.nickname !== message.author.nickname) {
+                return false;
+            }
+
+            return true;
+        }
+
         return {
             get isSystemNotification(): boolean {
                 return isSystemNotification(message.type)
@@ -47,14 +100,17 @@
             get isInvite(): boolean {
                 return isInvite(message.content[0].content)
             },
+            get shouldMerge(): boolean {
+                return shouldMerge(previousMessage, message)
+            }
         }
     }
 
-    const messageState = getMessageState(message)
+    const messageState = getMessageState(message, previousMessage)
 </script>
 
 
-<div class="message" data-id={message._id}>
+<div class="message" class:notgrouped={!messageState.shouldMerge} data-id={message._id}>
     {#if messageState.isSystemNotification}
         <MessageSystemNotification message={message} />
     {:else}
@@ -64,7 +120,10 @@
 
 <style>
     .message {
-        margin-top: 17px;
+        margin-top: 5px;
         padding: 0 20px;
+        &.notgrouped {
+            margin-top: 17px;
+        }
     }
 </style>

@@ -56,3 +56,26 @@ export function renderTime(date) {
 export function renderTimestamp(date) {
     return renderDate(date) + ' ' + renderTime(date);
 }
+
+
+// (modified) https://github.com/vegeta897/snow-stamp/blob/4803e7889da524b8c83bc2d72882b82f02622662/src/convert.js#L1-L9
+// Converts a snowflake ID string into a JS Date object using the Discord's epoch (in ms)
+const DISCORD_EPOCH = 1420070400000
+export function snowflakeToDate(snowflake: string) {
+	// Convert snowflake to BigInt to extract timestamp bits
+	// https://discord.com/developers/docs/reference#snowflakes
+	const milliseconds = BigInt(snowflake) >> 22n
+	return new Date(Number(milliseconds) + DISCORD_EPOCH)
+}
+
+export function darkenColor(color: string, amount: number) {
+    let red = parseInt(color.substring(1, 3), 16);
+    let green = parseInt(color.substring(3, 5), 16);
+    let blue = parseInt(color.substring(5, 7), 16);
+
+    let redDarker = Math.round(red * (1 - amount)).toString(16).padStart(2, "0");
+    let greenDarker = Math.round(green * (1 - amount)).toString(16).padStart(2, "0");
+    let blueDarker = Math.round(blue * (1 - amount)).toString(16).padStart(2, "0");
+
+    return "#" + redDarker + greenDarker + blueDarker;
+}

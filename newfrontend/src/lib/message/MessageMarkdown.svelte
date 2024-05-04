@@ -165,7 +165,8 @@
         margin-bottom: 4px;
     }
     :global(.message-markdown .paragraph) {
-    	white-space: pre-wrap
+    	white-space: pre-wrap;
+        color: #DBDEE1;
     }
 
     :global(.hljs-codeblock) {

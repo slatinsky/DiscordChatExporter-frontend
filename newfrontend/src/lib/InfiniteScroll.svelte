@@ -186,9 +186,9 @@
 
 <div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
     {#if messages}
-        {#each messages as message (message._id)}
+        {#each messages as message, index (message._id)}
             <div>
-                <slot name="item" message={message} />
+                <slot name="item" previousMessage={messages[index - 1]} message={messages[index]}  />
             </div>
         {/each}
     {/if}
