@@ -1,7 +1,12 @@
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="2197.000000pt" height="1501.000000pt" viewBox="0 0 2197.000000 1501.000000"
+<script lang="ts">
+	let {width = 32} = $props();
+    let height = $derived(width / 2197 * 1501);
+</script>
+
+<svg
+ width={32} height={height} viewBox="0 0 2197 1501"
  preserveAspectRatio="xMidYMid meet">
-<g transform="translate(0.000000,1501.000000) scale(0.100000,-0.100000)"
+<g transform="translate(0.000000,1501) scale(0.100000,-0.100000)"
 fill="currentColor" stroke="none">
 <path d="M9435 14989 c-654 -19 -1359 -73 -1955 -150 -1270 -163 -1846 -288
 -2700 -584 -495 -172 -948 -364 -1340 -567 -706 -368 -1072 -600 -1465 -933

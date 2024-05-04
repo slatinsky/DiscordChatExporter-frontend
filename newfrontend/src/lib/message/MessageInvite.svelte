@@ -11,7 +11,7 @@
     <div class="invite-title">You've been invited to join a server</div>
     <div class="invite-content-row">
         <div class="invite-guild-icon">
-            <IconDCEF2 />
+            <IconDCEF2 width={30}/>
         </div>
         <div class="text-col">
             <a class="guild-name" target="_blank" href={messageContent}>Unknown Server</a>

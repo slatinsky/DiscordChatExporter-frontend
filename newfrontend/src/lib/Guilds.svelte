@@ -30,7 +30,7 @@
 <div class="guilds" class:hidden={isMenuHidden}>
 	<div class="guild" class:selected={!guildState.guildId} on:click={e => changeGuildId(null)}>
 		<div class="guild-selected-indicator" />
-		<div class="home-guild"><IconDCEF2 /></div>
+		<div class="home-guild"><IconDCEF2 width={30}/></div>
 	</div>
 	<hr>
 
@@ -89,8 +89,6 @@
 		font-size: small;
 
 		color: #dbdee1;
-
-		padding: 9px;
 	}
 
 	.guild:hover .home-guild,
