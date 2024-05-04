@@ -1,6 +1,5 @@
-<svg class="thread-svg-icon" width="12" height="12" viewBox="0 0 12 11" fill="none" aria-hidden="true"
-	><path
-		d="M11 9H4C2.895 9 2 8.104 2 7V1C2 0.4475 1.552 0 1 0C0.4475 0 0 0.4475 0 1V7C0 9.209 1.790 11 4 11H11C11.5523 11 12 10.5523 12 10C12 9.447 11.5523 9 11 9Z"
-		fill="currentColor"
-	/></svg
->
+<script lang="ts">
+	let {width = 24} = $props();
+</script>
+
+<svg width={width} height={width} viewBox="0 0 24 24" fill="none"><path d="M12 2.81a1 1 0 0 1 0-1.41l.36-.36a1 1 0 0 1 1.41 0l9.2 9.2a1 1 0 0 1 0 1.4l-.7.7a1 1 0 0 1-1.3.13l-9.54-6.72a1 1 0 0 1-.08-1.58l1-1L12 2.8ZM12 21.2a1 1 0 0 1 0 1.41l-.35.35a1 1 0 0 1-1.41 0l-9.2-9.19a1 1 0 0 1 0-1.41l.7-.7a1 1 0 0 1 1.3-.12l9.54 6.72a1 1 0 0 1 .07 1.58l-1 1 .35.36ZM15.66 16.8a1 1 0 0 1-1.38.28l-8.49-5.66A1 1 0 1 1 6.9 9.76l8.49 5.65a1 1 0 0 1 .27 1.39ZM17.1 14.25a1 1 0 1 0 1.11-1.66L9.73 6.93a1 1 0 0 0-1.11 1.66l8.49 5.66Z" fill="currentColor" class=""></path></svg>

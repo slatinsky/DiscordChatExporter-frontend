@@ -22,7 +22,7 @@
     <div class="thread">
         <!-- TODO: support change of threadMessageId without rerender -->
         {#key guildState.threadMessageId}
-            <InfiniteScroll ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId}>
+            <InfiniteScroll ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId} isThread={true}>
                 <div slot="item" let:message let:previousMessage>
                     <Message message={message} previousMessage={previousMessage} />
                 </div>

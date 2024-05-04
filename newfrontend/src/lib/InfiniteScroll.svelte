@@ -6,14 +6,15 @@
     // TODO: needs backend pagination support to optimize loading
     // --------------------------
     import { messsageIdsToMessages } from "../js/messages";
+    import ChannelStart from "./message/ChannelStart.svelte";
 
     interface MyProps {
         ids: string[],
         guildId: string,
         selectedMessageId: string | null
-
+        isThread: boolean
     }
-    let { ids, guildId, selectedMessageId = null}: MyProps = $props();
+    let { ids, guildId, selectedMessageId = null, isThread}: MyProps = $props();
 
     let maxMessages = 120
     let loadIncrement = 30
@@ -187,6 +188,9 @@
 <div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
     {#if messages}
         {#each messages as message, index (message._id)}
+            {#if index === 0}
+                <ChannelStart channelName={message.channelName} isThread={isThread} />
+            {/if}
             <div>
                 <slot name="item" previousMessage={messages[index - 1]} message={messages[index]}  />
             </div>

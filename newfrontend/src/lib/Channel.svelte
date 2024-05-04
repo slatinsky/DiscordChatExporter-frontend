@@ -13,7 +13,7 @@
     <div class="channel" >
         <!-- TODO: support change of selectedMessageId without rerender -->
         {#key guildState.channelMessageId}
-            <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId}>
+            <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId} isThread={false}>
                 <div slot="item" let:message let:previousMessage>
                     <Message message={message} previousMessage={previousMessage} />
                 </div>
