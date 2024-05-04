@@ -13,7 +13,7 @@
         </div>
         <div class="title">{channelName}!</div>
         <!-- TODO: find out who created the thread -->
-        <div class="subtitle">Started by <span class="subtitle-person">Someone</span>. </div>
+        <div class="subtitle">Started by <span class="subtitle-person">Someone</span></div>
     </div>
 {:else}
     <div class="wrapper">
@@ -28,7 +28,10 @@
 
 <style>
     .wrapper {
-        margin: 16px;
+        /*can't use margin-top here - it is set by the parent to align the messages to the bottom */
+        margin-left: 16px;
+        margin-right: 16px;
+        margin-bottom: 16px;
     }
     .channel-icon {
         background-color: #41434A;
@@ -37,6 +40,7 @@
         height: 68px;
         display: grid;
         place-items: center;
+        margin-top: 32px;
     }
     .thread-icon {
         background-color: #41434A;
@@ -45,6 +49,7 @@
         height: 64px;
         display: grid;
         place-items: center;
+        margin-top: 16px;
     }
     .title {
         font-size: 32px;
