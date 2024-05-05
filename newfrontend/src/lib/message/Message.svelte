@@ -78,6 +78,11 @@
                 return false;
             }
 
+            // without this, join system message may for example be merged with first user message
+            if (previousMessage.type !== message.type) {
+                return false;
+            }
+
             // if is system notification, don't merge
             if (isSystemNotification(message.type)) {
                 return false;
