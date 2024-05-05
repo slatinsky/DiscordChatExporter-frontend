@@ -19,7 +19,7 @@
     <div class="system-message-icon">
         <MessageSystemNotificationIcon messageType={message.type} />
     </div>
-    <div>
+    <div class="system-message-content">
         <div>
             <MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} />
         </div>
@@ -57,19 +57,18 @@
                 <span>started a thread.</span>
             {:else if message.type == "GuildMemberJoin"}
                 <span>joined the server.</span>
-                {:else if message.type == MessageType.GuildBoost} <!-- Added booster for normal boost -->
+                {:else if message.type == MessageType.GuildBoost} <!-- normal boost -->
                 <span>just boosted the server!</span>
-                {:else if message.type == MessageType.GuildBoostTier1} <!-- Added booster for Boost level 1 -->
+                {:else if message.type == MessageType.GuildBoostTier1} <!-- Boost level 1 -->
                 <span>just boosted the server! {guildName} has achieved <strong>Level 1!</strong></span>
-                {:else if message.type == MessageType.GuildBoostTier2} <!-- Added booster for Boost level 2 -->
+                {:else if message.type == MessageType.GuildBoostTier2} <!-- Boost level 2 -->
                 <span>just boosted the server! {guildName} has achieved <strong>Level 2!</strong></span>
-                {:else if message.type == MessageType.GuildBoostTier3} <!-- Added booster for Boost level 3 -->
+                {:else if message.type == MessageType.GuildBoostTier3} <!-- Boost level 3 -->
                 <span>just boosted the server! {guildName} has achieved <strong>Level 3!</strong> </span>
             {:else}
-                <!-- TODO More system messages needs to be added in the future here -->
                 <span>{message.content[0].content.toLowerCase()}</span>
             {/if}
-            <MessageTimestamp timestamp={message.timestamp} />
+            <MessageTimestamp timestamp={message.timestamp} messageId={message._id} channelOrThreadId={message.channelId} />
         </span>
         {#if message.reactions}
             <MessageReactions reactions={message.reactions} />
@@ -83,11 +82,16 @@
     .system-message-row {
         display: flex;
         gap: 10px;
-    }
 
-    .system-message-icon {
-        width: 44px;
-        display: grid;
-        justify-content: center;
+        .system-message-icon {
+            width: 44px;
+            display: grid;
+            justify-content: center;
+        }
+
+        .system-message-content {
+            display: flex;
+            gap: 5px;
+        }
     }
 </style>
