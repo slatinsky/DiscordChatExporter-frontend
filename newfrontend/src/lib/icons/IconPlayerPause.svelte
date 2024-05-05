@@ -1,0 +1,5 @@
+<script lang="ts">
+	let {width = 24, ...props} = $props();
+</script>
+
+<svg width={width} height={width} {...props} fill="none" viewBox="0 0 24 24"><path fill="currentColor" d="M6 4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H6ZM15 4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3Z"></path></svg>
