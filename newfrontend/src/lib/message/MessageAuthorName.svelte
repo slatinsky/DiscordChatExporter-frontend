@@ -35,6 +35,7 @@
 <style>
     .username {
         cursor: pointer;
+        font-weight: 500;
     }
     .hover-underline:hover {
         text-decoration: underline;

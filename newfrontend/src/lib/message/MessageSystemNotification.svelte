@@ -27,46 +27,46 @@
         <span on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)} role="button" tabindex="0">
             {#if message.type == "RecipientAdd"}
                 {#if message.mentions}
-                    <span>added <a title={message.mentions[0].name}>{message.mentions[0].nickname}</a> to the group</span>
+                    <span class="system-message-text">added <a title={message.mentions[0].name}>{message.mentions[0].nickname}</a> to the group</span>
                 {:else}
-                    <span>added someone to the group</span>
+                    <span class="system-message-text">added someone to the group</span>
                 {/if}
             {:else if message.type == "RecipientRemove"}
                 {#if message.mentions}
                     {#if message.author._id == message.mentions[0]._id}
-                        <span>left the group</span>
+                        <span class="system-message-text">left the group</span>
                     {:else}
-                        <span>removed <a title={message.mentions[0].name}>{message.mentions[0].nickname}</a> from the group</span>
+                        <span class="system-message-text">removed <a title={message.mentions[0].name}>{message.mentions[0].nickname}</a> from the group</span>
                     {/if}
                 {:else}
-                    <span>Someone left the group</span>
+                    <span class="system-message-text">Someone left the group</span>
                 {/if}
             {:else if message.type == "Call"}
-                <span>started a call that lasted {Math.floor((Date.parse(message.callEndedTimestamp ?? message.timestamp) - Date.parse(message.timestamp)) / 60000)} minutes</span>
+                <span class="system-message-text">started a call that lasted {Math.floor((Date.parse(message.callEndedTimestamp ?? message.timestamp) - Date.parse(message.timestamp)) / 60000)} minutes</span>
             {:else if message.type == "ChannelNameChange"}
-                <span>{message.content[0].content[0].toLowerCase()}{message.content[0].content.slice(1)}</span>
+                <span class="system-message-text">{message.content[0].content[0].toLowerCase()}{message.content[0].content.slice(1)}</span>
             {:else if message.type == "ChannelIconChange"}
-                <span>changed the channel icon.</span>
+                <span class="system-message-text">changed the channel icon.</span>
             {:else if message.type == "ChannelPinnedMessage"}
                 {#if message?.reference?.messageId}
-                    <span>pinned a message {message.reference.messageId} to this channel.</span>
+                    <span class="system-message-text">pinned a message {message.reference.messageId} to this channel.</span>
                 {:else}
-                    <span>pinned a message to this channel.</span>
+                    <span class="system-message-text">pinned a message to this channel.</span>
                 {/if}
             {:else if message.type == "ThreadCreated"}
-                <span>started a thread.</span>
+                <span class="system-message-text">started a thread.</span>
             {:else if message.type == "GuildMemberJoin"}
-                <span>joined the server.</span>
+                <span class="system-message-text">joined the server.</span>
                 {:else if message.type == MessageType.GuildBoost} <!-- normal boost -->
-                <span>just boosted the server!</span>
+                <span class="system-message-text">just boosted the server!</span>
                 {:else if message.type == MessageType.GuildBoostTier1} <!-- Boost level 1 -->
-                <span>just boosted the server! {guildName} has achieved <strong>Level 1!</strong></span>
+                <span class="system-message-text">just boosted the server! {guildName} has achieved <strong>Level 1!</strong></span>
                 {:else if message.type == MessageType.GuildBoostTier2} <!-- Boost level 2 -->
-                <span>just boosted the server! {guildName} has achieved <strong>Level 2!</strong></span>
+                <span class="system-message-text">just boosted the server! {guildName} has achieved <strong>Level 2!</strong></span>
                 {:else if message.type == MessageType.GuildBoostTier3} <!-- Boost level 3 -->
-                <span>just boosted the server! {guildName} has achieved <strong>Level 3!</strong> </span>
+                <span class="system-message-text">just boosted the server! {guildName} has achieved <strong>Level 3!</strong> </span>
             {:else}
-                <span>{message.content[0].content.toLowerCase()}</span>
+                <span class="system-message-text">{message.content[0].content.toLowerCase()}</span>
             {/if}
             <MessageTimestamp timestamp={message.timestamp} messageId={message._id} channelOrThreadId={message.channelId} />
         </span>
@@ -92,6 +92,9 @@
         .system-message-content {
             display: flex;
             gap: 5px;
+            .system-message-text {
+                color: #949ba4;
+            }
         }
     }
 </style>
