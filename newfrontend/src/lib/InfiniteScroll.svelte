@@ -7,6 +7,8 @@
     // --------------------------
     import { messsageIdsToMessages } from "../js/messages";
     import ChannelStart from "./message/ChannelStart.svelte";
+    import DateSeparator from "./DateSeparator.svelte";
+    import { snowflakeToDate } from "../js/time";
 
     interface MyProps {
         ids: string[]
@@ -185,6 +187,20 @@
             loadHighUnloadLow()
         }
     }
+
+    function isDateDifferent(previousMessage: Message | null, message: Message) {
+        if (!previousMessage) {
+            return true;
+        }
+        if (!message) {
+            return true;
+        }
+
+        let prevDate = snowflakeToDate(previousMessage._id);
+        let date = snowflakeToDate(message._id);
+
+        return prevDate.getDate() !== date.getDate() || prevDate.getMonth() !== date.getMonth() || prevDate.getFullYear() !== date.getFullYear()
+    }
 </script>
 
 <div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
@@ -193,6 +209,11 @@
             {#if topLoaded && index === 0}
                 <ChannelStart channelName={message.channelName} isThread={isThread} messageAuthor={message.author} />
             {/if}
+
+            {#if isDateDifferent(messages[index - 1], message)}
+                <DateSeparator messageId={message._id} />
+            {/if}
+
             <div data-messageid={message._id}>
                 {@render renderMessageSnippet(message, messages[index - 1])}
             </div>
