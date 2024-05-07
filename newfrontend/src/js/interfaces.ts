@@ -128,7 +128,7 @@ export interface MessageContent {
 
 export interface Message {
 	_id: string;
-	type: "Default" | "RecipientAdd" | "RecipientRemove" | "Call" | "ChannelNameChange" | "ChannelIconChange" | "ChannelPinnedMessage" | "GuildMemberJoin" | "ThreadCreated" | "Reply";
+	type: "Default" | "RecipientAdd" | "RecipientRemove" | "Call" | "ChannelNameChange" | "ChannelIconChange" | "ChannelPinnedMessage" | "GuildMemberJoin" | "ThreadCreated" | "Reply" | "24";
 	timestamp: string;
 	timestampEdited: string | null;
 	callEndedTimestamp: string | null;
@@ -140,7 +140,7 @@ export interface Message {
 	emotes: Reaction[] | null;   // emotes in the message
 	mentions: Mention[] | null;
 	attachments: Asset[] | null;
-	embeds: Asset[] | null;
+	embeds: Embed[] | null;
 	reference: {
 		messageId: string;
 		channelId: string;

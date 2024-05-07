@@ -271,6 +271,22 @@ export function getGuildState() {
 }
 
 
+export function channelOrThreadIdToName(channelId: string) {
+	if (!channelId) {
+		return null
+	}
+	const channel = categories.flatMap(c => c.channels).find(c => c._id === channelId)
+	if (channel) {
+		return channel.name
+	}
+	const thread = categories.flatMap(c => c.channels).flatMap(c => c.threads).find(t => t._id === channelId)
+	if (thread) {
+		return thread.name
+	}
+	return null
+}
+
+
 async function restoreGuildState(state) {
 	await guildState.changeGuildId(state.guild);
 	await guildState.changeChannelId(state.channel);

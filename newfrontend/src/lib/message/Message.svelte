@@ -4,6 +4,7 @@
     import MessageOrdinary from "./MessageOrdinary.svelte";
     import { MessageType } from "./messageEnums";
     import { snowflakeToDate } from "../../js/time";
+    import MessageAutoModerationAction from "./MessageAutoModerationAction.svelte";
 
     interface MyProps {
         message: Message;
@@ -122,7 +123,9 @@
 
 
 <div class="message" class:notgrouped={!messageState.shouldMerge} data-id={message._id}>
-    {#if messageState.isSystemNotification}
+    {#if message.type == "24"}
+        <MessageAutoModerationAction message={message} messageState={messageState} />
+    {:else if messageState.isSystemNotification}
         <MessageSystemNotification message={message} />
     {:else}
         <MessageOrdinary message={message} messageState={messageState} />

@@ -139,14 +139,21 @@
     }
 
 
+
     :global(.message-mention),
     :global(a.message-mention) {
-        color: #D4E0FC;
-        background-color: #414675;
+        color: #cacef9;
+        background-color: #3e446e;
         font-weight: 500;
         border-radius: 3px;
         padding: 0 2px;
         word-break: break-all;
+        text-decoration: none !important;
+    }
+    :global(.message-mention:hover),
+    :global(a.message-mention:hover) {
+        background-color: #5462d9;
+        color: #f6f6f6;
     }
     :global(.message-time) {
         color: #d1d4d6;
