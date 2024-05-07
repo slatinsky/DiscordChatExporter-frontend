@@ -5,8 +5,9 @@
 
     interface MyProps {
         images: Asset[];
+        isAttachment: boolean;
     }
-    let { images }: MyProps = $props();
+    let { images, isAttachment}: MyProps = $props();
 
 	const imagegalleryState = getImagegalleryState();
     let groupedImageAttachments = $derived.by(() => {
@@ -65,7 +66,7 @@
     />
 {/snippet}
 
-<div class="images" class:images3={images.length == 3}>
+<div class="images" class:images3={images.length == 3} class:inline={images.length == 1 && isAttachment}>
     {#each groupedImageAttachments as imageGroup}
         <div class="image-row" >
             {#each imageGroup as image}
@@ -130,5 +131,11 @@
         .image-row:nth-child(2) {
             width: 33%;
         }
+    }
+
+    /* render image inline if it is the only image and it is an attachment */
+    .inline :global(img) {
+        max-width: 100%;
+        width: auto;
     }
 </style>

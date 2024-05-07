@@ -145,7 +145,7 @@
 
             {#if embed.images.length > 0}
                 <div class="image-embeds-wrapper">
-                    <MessageTiledImages images={embed.images} />
+                    <MessageTiledImages images={embed.images} isAttachment={false} />
                 </div>
             {/if}
 

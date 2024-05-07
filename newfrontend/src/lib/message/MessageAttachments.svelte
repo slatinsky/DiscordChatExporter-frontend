@@ -24,7 +24,7 @@
 
 {#if imageAttachments.length > 0}
 	<div class="image-attachments-wrapper">
-		<MessageTiledImages images={imageAttachments} />
+		<MessageTiledImages images={imageAttachments} isAttachment={true}/>
 	</div>
 {/if}
 
