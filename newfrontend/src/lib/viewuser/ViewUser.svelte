@@ -1,5 +1,5 @@
 <script lang="ts">
-    import ImageGallery from '../ImageGallery.svelte';
+    import ImageGallery from '../imagegallery/ImageGalleryLegacy.svelte';
     import { getViewUserState } from './viewUserState.svelte';
 
     const viewUserState = getViewUserState()

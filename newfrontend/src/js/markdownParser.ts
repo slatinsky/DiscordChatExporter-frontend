@@ -440,13 +440,13 @@ parse: function(capture, recurseParse, state) {
 const codeBlock = {
     order: SimpleMarkdown.defaultRules.codeBlock.order - 0.2,
     match: function(source, state, lookbehind) {
-        return /^```([a-z0-9]*)\n([\s\S]*?)\n```/.exec(source);
+        return /^```([a-z0-9]*)\n([\s\S]*?)\n?```/.exec(source);
     },
     parse: function(capture, recurseParse, state) {
         return {
             type: 'codeBlock',
             language: capture[1],
-            content: capture[2],
+            content: capture[2].trim(),
         };
     },
     html: function(node, recurseOutput, state) {
@@ -472,7 +472,7 @@ const badlyFormattedCodeBlock = {
     parse: function(capture, recurseParse, state) {
         return {
             type: 'codeBlock',
-            content: capture[1],
+            content: capture[1].trim(),
         };
     },
     html: function(node, recurseOutput, state) {

@@ -8,7 +8,7 @@ export function checkUrl(asset) {
         console.warn('online url', url);
         return url;
     }
-    return "/input/" + url
+    return "/input/" + encodeURI(url)
 }
 
 

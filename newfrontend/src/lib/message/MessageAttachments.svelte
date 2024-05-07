@@ -1,7 +1,6 @@
 <script lang="ts">
     import { checkUrl, humanFileSize } from "../../js/helpers";
     import type { Asset } from "../../js/interfaces";
-    import ImageGallery from "../ImageGallery.svelte";
     import IconFIleArchive from "../icons/IconFIleArchive.svelte";
     import IconFileDocument from "../icons/IconFileDocument.svelte";
     import IconFilePdf from "../icons/IconFilePdf.svelte";
@@ -11,17 +10,29 @@
     import AudioPlayer from "../audioplayer/AudioPlayer.svelte";
     import IconFileAudio from "../icons/IconFileAudio.svelte";
     import IconAttachmentDownload from "../icons/IconAttachmentDownload.svelte";
+    import MessageTiledImages from "./MessageTiledImages.svelte";
 
-    export let attachments: Asset[]
+	interface MyProps {
+        attachments: Asset[];
+    }
+    let { attachments}: MyProps = $props();
+
+	let imageAttachments = $derived(attachments.filter(a => a.type === 'image' || (a.type === 'unknown' && !a.filenameWithoutHash.includes('.'))));
+	let otherAttachments = $derived(attachments.filter(a => a.type !== 'image' && (a.type !== 'unknown' || a.filenameWithoutHash.includes('.'))));
+
 </script>
+
+{#if imageAttachments.length > 0}
+	<div class="image-attachments-wrapper">
+		<MessageTiledImages images={imageAttachments} />
+	</div>
+{/if}
 
 <!-- unknown because attachment name can be extensionless -->
 <div class="attachment-container">
-	{#each attachments as attachment}
+	{#each otherAttachments as attachment}
 		{@const attachmentExtension: string = attachment?.filenameWithoutHash.toLowerCase().split('.').pop() ?? 'invalid-fileextension'}
-		{#if attachment.type == 'image' || (attachment.type == 'unknown' && !attachment.filenameWithoutHash.includes('.'))}
-			<ImageGallery asset={attachment} imgclass={"message-image"} />
-		{:else if attachment.type == 'video'}
+		{#if attachment.type == 'video'}
 			<div class:media-spoiler={attachment.filenameWithoutHash.startsWith('SPOILER')}>
 			<!-- video title -->
 			<!-- {attachment.filenameWithoutHash} -->
@@ -70,6 +81,10 @@
 </div>
 
 <style>
+	.image-attachments-wrapper {
+		max-width: 550px;
+		width: 100%;
+	}
 	.attachment-container {
 		display: flex;
 		flex-direction: column;
@@ -138,11 +153,11 @@
 		font-weight: 400px;
 	}
 
-	:global(.message-image) {
+	.message-video {
 		max-width: 80%;
 		max-height: 500px;
 		vertical-align: top;
-		border-radius: 8px;
+		border-radius: 3px;
 		object-position:left;
 		width: auto;
 		height: auto;

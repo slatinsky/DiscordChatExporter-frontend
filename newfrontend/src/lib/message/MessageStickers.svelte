@@ -1,7 +1,7 @@
 <script lang="ts">
     import MessageStickerLottie from "./MessageStickerLottie.svelte";
     import type { Sticker } from "../../js/interfaces";
-    import ImageGallery from "../ImageGallery.svelte";
+    import ImageGallery from "../imagegallery/ImageGalleryLegacy.svelte";
 
     export let stickers: Sticker[];
 </script>

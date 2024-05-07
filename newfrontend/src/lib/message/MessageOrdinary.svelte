@@ -31,6 +31,9 @@
         {/if}
         <div on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)}  style="width: 100%;">
             {#if messageState.isInvite}
+                {#if !messageState.messageContentIsLink}
+                    <MessageContent message={message} />
+                {/if}
                 <MessageInvite messageContent={message.content[0].content} />
             {:else}
                 <div><MessageContent message={message} /></div>

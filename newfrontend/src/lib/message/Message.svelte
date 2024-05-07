@@ -96,6 +96,11 @@
             return true;
         }
 
+        function messageContentIsLink(messageContent: string): boolean {
+            const regex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/g
+            return regex.test(messageContent)
+        }
+
         return {
             get isSystemNotification(): boolean {
                 return isSystemNotification(message.type)
@@ -105,6 +110,9 @@
             },
             get shouldMerge(): boolean {
                 return shouldMerge(previousMessage, message)
+            },
+            get messageContentIsLink(): boolean {
+                return messageContentIsLink(message.content[0].content)
             }
         }
     }

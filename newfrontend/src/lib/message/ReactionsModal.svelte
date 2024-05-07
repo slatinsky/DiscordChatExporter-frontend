@@ -1,5 +1,5 @@
 <script lang="ts">
-    import ImageGallery from '../ImageGallery.svelte';
+    import ImageGallery from '../imagegallery/ImageGalleryLegacy.svelte';
     import { checkUrl, copyTextToClipboard } from '../../js/helpers';
     import { contextMenuItems } from '../../js/stores/menuStore';
     import { setCurrentUser } from '../../js/stores/settingsStore.svelte';

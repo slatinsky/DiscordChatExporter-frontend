@@ -89,8 +89,18 @@
     :global(.message-markdown pre) {
         margin: 6px 0 0 0;
     }
-    :global(.message-markdown) {
-        line-height: 22px;
+    :global(.message-markdown a) {
+        color: #53a8f9;
+        text-decoration: none;
+    }
+    :global(.message-markdown a:hover) {
+        text-decoration: underline;
+    }
+    :global(.message-markdown code) {
+        background-color: #1E1F22;
+        font-family: 'gg mono', monospace;
+        padding: 2.4px;
+        border-radius: 3px;
     }
 
     :global(.message-heading) {
@@ -129,12 +139,14 @@
     }
 
 
-    :global(.message-mention) {
+    :global(.message-mention),
+    :global(a.message-mention) {
         color: #D4E0FC;
         background-color: #414675;
         font-weight: 500;
         border-radius: 3px;
         padding: 0 2px;
+        word-break: break-all;
     }
     :global(.message-time) {
         color: #d1d4d6;
@@ -177,9 +189,15 @@
 		margin-right: 10%;
 
 		font-size: 14px;
-		padding: 7px;
+		padding: 7px !important;
 		white-space: pre-wrap;
 		line-height: 18px;
+        width: 100%;
+
+        font-family: 'gg mono', monospace;
+
+        overflow-wrap: break-word;
+        text-wrap: wrap;
 	}
 
 </style>

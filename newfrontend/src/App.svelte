@@ -16,6 +16,7 @@
     import { getGuildState, isChannel } from './js/stores/guildState.svelte';
     import { getLayoutState } from './js/stores/layoutState.svelte';
     import ViewUser from './lib/viewuser/ViewUser.svelte';
+    import ImageGallery from './lib/imagegallery/ImageGallery.svelte';
 
 
     let hidedebug = false
@@ -71,6 +72,7 @@
 </svelte:head>
 
 <ViewUser />
+<ImageGallery />
 
 <div class:debuglayout={layoutState.debuglayout} style="width: 100%;height: 100%;">
   <main

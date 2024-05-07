@@ -102,6 +102,7 @@ export interface Embed {
 	thumbnail: Asset;
 	images: Asset[];
 	image?: Asset;
+	video?: Asset;
 	fields: {
 		name: string;
 		value: string;
