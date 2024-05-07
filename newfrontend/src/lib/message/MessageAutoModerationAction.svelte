@@ -5,7 +5,6 @@
     import { getViewUserState } from "../viewuser/viewUserState.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageAvatar from "./MessageAvatar.svelte";
-    import MessageMarkdown from "./MessageMarkdown.svelte";
     import MessageReactions from "./MessageReactions.svelte";
     import MessageTimestamp from "./MessageTimestamp.svelte";
 
@@ -89,7 +88,9 @@
                         <div style="width: 100%;">
                             <div class="authorline"><MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} /> <MessageTimestamp channelOrThreadId={message.channelId} timestamp={message.timestamp} messageId={message._id} /></div>
                             <div style="width: 100%;">
-                                <MessageMarkdown content={automodValues.messageContent} />
+                                <div class="message-content">
+                                    {automodValues.messageContent}
+                                </div>
                                 <div class="rule-row">
                                     <div>Keyword: {automodValues.keyword}</div>
                                     <div class="separator"></div>
@@ -136,6 +137,12 @@
     .content {
         max-width: 550px;
         width: 100%;
+    }
+
+    .message-content {
+        font-size: 16px;
+        font-weight: 400;
+        color: #dcdee1;
     }
 
     .blocker-message {
