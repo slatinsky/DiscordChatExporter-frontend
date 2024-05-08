@@ -1,5 +1,5 @@
 <script lang="ts">
-    import ImageGallery from '../imagegallery/ImageGalleryLegacy.svelte';
+    import Image from '../imagegallery/Image.svelte';
     import { getViewUserState } from './viewUserState.svelte';
 
     const viewUserState = getViewUserState()
@@ -11,7 +11,7 @@
     <div class="gallery-wrapper" on:click={()=>viewUserState.setUser(null)}>
         <div class="gallery-closebtn" on:click={()=>viewUserState.setUser(null)}>&times;</div>
         <div id="profile" on:click|stopPropagation>
-            <ImageGallery asset={viewUserState.user?.avatar} imgclass={"profile-avatar"} />
+            <Image asset={viewUserState.user?.avatar} class="profile-avatar" />
             <div class="profile-background"></div>
 
             <div class="profile-inner">

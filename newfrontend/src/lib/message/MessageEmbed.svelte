@@ -7,11 +7,13 @@
     import MessageMarkdown from "./MessageMarkdown.svelte";
     import { renderTimestamp } from "../../js/time";
     import MessageTiledImages from "./MessageTiledImages.svelte";
+    import Image from "../imagegallery/Image.svelte";
 
     interface MyProps {
         embed: Embed;
+        messageState: any;
     }
-    let { embed }: MyProps = $props();
+    let { embed, messageState }: MyProps = $props();
 
     let playingVideo: boolean = $state(false)
 
@@ -39,7 +41,11 @@
             return false
         }
 
-        return true
+        if (embed.fields && embed.fields.length > 0) {
+            return true
+        }
+
+        return false
     })
 
     function playVideo() {
@@ -108,27 +114,33 @@
                             {#if thumbnailFailedToLoad}
                                 <IconPoop width={smallThumbnail ? 80 : 200} />
                             {:else}
-                                <img src={checkUrl(embed.thumbnail)} alt="" onerror={onThumbnailError} />
-                                <div class="pill">
-                                    <button class="icon" onclick={playVideo}>
-                                        <IconPlayerPlay width={24} />
-                                    </button>
-                                    <a class="icon" href={embed.url} target="_blank" rel="noopener noreferrer">
-                                        <IconOpenLink width={24} />
-                                    </a>
-                                </div>
+                                <Image asset={embed.thumbnail} onerror={onThumbnailError} forceSpoiler={messageState.messageContentLinkIsSpoilered} class="global-embedthumb" />
+                                {#if embed.video}
+                                    <div class="pill">
+                                        {#if twitchClipId}
+                                            <button class="icon" onclick={playVideo}>
+                                                <IconPlayerPlay width={24} />
+                                            </button>
+                                        {/if}
+                                        <a class="icon" href={embed.url} target="_blank" rel="noopener noreferrer">
+                                            <IconOpenLink width={24} />
+                                        </a>
+                                    </div>
+                                {/if}
                             {/if}
                         </div>
                     </div>
                 {/if}
 
                 {#if playingVideo}
-                    <iframe
-                        class="twitch-iframe"
-                        allow="autoplay" frameborder="0" scrolling="no" sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" provider="Twitch"
-                        src="https://clips.twitch.tv/embed?clip={twitchClipId}&parent={window.location.hostname}"
-                        width="400" height="232" allowfullscreen="">
-                    </iframe>
+                    {#if twitchClipId}
+                        <iframe
+                            class="twitch-iframe"
+                            allow="autoplay" frameborder="0" scrolling="no" sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" provider="Twitch"
+                            src="https://clips.twitch.tv/embed?clip={twitchClipId}&parent={window.location.hostname}"
+                            width="400" height="232" allowfullscreen="">
+                        </iframe>
+                    {/if}
                 {/if}
             </div>
 
@@ -256,12 +268,6 @@
                 width: 100%;
                 max-width: 400px;
 
-
-                img {
-                    width: 100%;
-                    border-radius: 3px;
-                }
-
                 .pill {
                     position: absolute;
 
@@ -273,7 +279,6 @@
                     left: 50%;
                     transform: translate(-50%, -50%);
 
-                    width: 54px;
                     height: 24px;
                     padding: 12px;
                     border-radius: 24px;
@@ -351,5 +356,10 @@
                 }
             }
         }
+    }
+
+
+    :global(.global-embedthumb) {
+        border-radius: 3px;
     }
 </style>

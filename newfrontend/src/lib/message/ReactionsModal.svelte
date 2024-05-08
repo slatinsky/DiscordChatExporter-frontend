@@ -1,8 +1,5 @@
 <script lang="ts">
-    import ImageGallery from '../imagegallery/ImageGalleryLegacy.svelte';
-    import { checkUrl, copyTextToClipboard } from '../../js/helpers';
-    import { contextMenuItems } from '../../js/stores/menuStore';
-    import { setCurrentUser } from '../../js/stores/settingsStore.svelte';
+    import Image from '../imagegallery/Image.svelte';
     import { onUserRightClick } from './messageRightClick';
 	export let reactions
 
@@ -26,23 +23,12 @@
             <div class="reactions-list">
                 {#each reactions as reaction}
                     <div class="reaction" title=":{reaction.emoji.name}:" on:click={()=>viewReactions(reaction)} class:active={reaction.emoji._id == activeReaction?.emoji._id}>
-                        {#if reaction.emoji._id == activeReaction?.emoji._id}
-                            <ImageGallery
-                                imgclass="reaction-emoji-img"
-                                alt={reaction.emoji.name}
-                                asset={reaction.emoji?.image}
-                                width="100%"
-                                height="100%"
-                            />
-                        {:else}
-                            <img
-                                class='reaction-emoji-img'
-                                src={checkUrl(reaction.emoji?.image)}
-                                alt={reaction.emoji.name}
-                                width="100%"
-                                height="100%"
-                            />
-                        {/if}
+                        <Image
+                            class="global-reaction-emoji-img"
+                            alt={reaction.emoji.name}
+                            asset={reaction.emoji?.image}
+                            clickable={reaction.emoji._id == activeReaction?.emoji._id}
+                        />
                         <span class="reaction-count">{reaction.count}</span>
                     </div>
                 {/each}
@@ -53,12 +39,10 @@
                 {#if activeReaction.users}
                     {#each activeReaction.users as user}
                         <div class="reaction-user" on:contextmenu|preventDefault|preventDefault={e=>onUserRightClick(e, user)}>
-                            <ImageGallery
-                                imgclass="reaction-user-img"
+                            <Image
+                                class="global-reaction-user-img"
                                 alt={user.name}
                                 asset={user.avatar}
-                                width={user.avatar?.width ?? 24}
-                                height={user.avatar?.height ?? 24}
                             />
                             <span class="reaction-user-nickname">{user.nickname}</span>
                             <span class="reaction-user-name">{user.name}</span>
@@ -153,7 +137,7 @@
     }
 
 
-    :global(.reactions-list .reaction-emoji-img) {
+    :global(.reactions-list .global-reaction-emoji-img) {
         padding: 0 8px 0 4px;
         width: 24px;
         height: auto;
@@ -201,7 +185,7 @@
         font-weight: 500;
     }
 
-    :global(.reaction-users .reaction-user-img) {
+    :global(.reaction-users .global-reaction-user-img) {
         width: 24px;
         height: 24px;
         border-radius: 50%;

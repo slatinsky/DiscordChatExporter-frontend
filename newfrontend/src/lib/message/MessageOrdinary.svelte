@@ -39,7 +39,7 @@
                 <div><MessageContent message={message} /></div>
                 {#if message.embeds}
                     {#each message.embeds as embed}
-                        <div><MessageEmbed embed={embed} /></div>
+                        <div><MessageEmbed embed={embed} messageState={messageState} /></div>
                     {/each}
                 {/if}
                 {#if message.attachments}

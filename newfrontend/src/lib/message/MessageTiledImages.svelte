@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { checkUrl } from '../../js/helpers';
     import type { Asset } from '../../js/interfaces';
-    import { getImagegalleryState } from '../imagegallery/imagegalleryState.svelte';
+    import Image from '../imagegallery/Image.svelte';
 
     interface MyProps {
         images: Asset[];
@@ -9,7 +8,6 @@
     }
     let { images, isAttachment}: MyProps = $props();
 
-	const imagegalleryState = getImagegalleryState();
     let groupedImageAttachments = $derived.by(() => {
 		if (images.length == 0) {
 			return [];
@@ -55,22 +53,11 @@
 	});
 </script>
 
-{#snippet imageSnippet(allImages, image, aspectRatio)}
-    <img
-        class:setaspectratio={aspectRatio}
-        on:click={()=>imagegalleryState.showMultipleAssets(allImages, image)}
-        src={checkUrl(image)}
-        alt={image.caption}
-        width={image?.width ?? undefined}
-        height={image?.height ?? undefined}
-    />
-{/snippet}
-
 <div class="images" class:images3={images.length == 3} class:inline={images.length == 1 && isAttachment}>
     {#each groupedImageAttachments as imageGroup}
         <div class="image-row" >
             {#each imageGroup as image}
-                {@render imageSnippet(images, image, imageGroup.length > 1 || images.length == 3)}
+                <Image assets={images} asset={image} class="global-tiledimage {(imageGroup.length > 1 || images.length == 3) ? 'global-setaspectratio' : ''}" />
             {/each}
         </div>
     {/each}
@@ -78,6 +65,7 @@
 
 
 <style>
+
     .images {
         border-radius: 8px;
         .image-row {
@@ -90,14 +78,14 @@
         }
     }
 
-    img {
+    .images > .image-row > :global(.global-tiledimage) {
         object-fit: cover;
         width: 100%;
         height: auto;
         border-radius: 3px;
     }
 
-    img.setaspectratio {
+    .images > .image-row > :global(.global-tiledimage.global-setaspectratio) {
         aspect-ratio: 1 / 1;
     }
 

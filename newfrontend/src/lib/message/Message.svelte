@@ -5,6 +5,8 @@
     import { MessageType } from "./messageEnums";
     import { snowflakeToDate } from "../../js/time";
     import MessageAutoModerationAction from "./MessageAutoModerationAction.svelte";
+    import MesssageSpoilerHandler from "../MesssageSpoilerHandler.svelte";
+    import { get } from "svelte/store";
 
     interface MyProps {
         message: Message;
@@ -102,6 +104,11 @@
             return regex.test(messageContent)
         }
 
+        function messageContentLinkIsSpoilered(messageContent: string): boolean {
+            const regex = /\|\|.*?https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*).*?\|\|/g
+            return regex.test(messageContent)
+        }
+
         return {
             get isSystemNotification(): boolean {
                 return isSystemNotification(message.type)
@@ -114,6 +121,9 @@
             },
             get messageContentIsLink(): boolean {
                 return messageContentIsLink(message.content[0].content)
+            },
+            get messageContentLinkIsSpoilered(): boolean {
+                return messageContentLinkIsSpoilered(message.content[0].content)
             }
         }
     }
@@ -122,15 +132,18 @@
 </script>
 
 
-<div class="message" class:notgrouped={!messageState.shouldMerge} data-id={message._id}>
-    {#if message.type == "24"}
-        <MessageAutoModerationAction message={message} messageState={messageState} />
-    {:else if messageState.isSystemNotification}
-        <MessageSystemNotification message={message} />
-    {:else}
-        <MessageOrdinary message={message} messageState={messageState} />
-    {/if}
-</div>
+<MesssageSpoilerHandler>
+
+    <div class="message" class:notgrouped={!messageState.shouldMerge} data-id={message._id}>
+        {#if message.type == "24"}
+            <MessageAutoModerationAction message={message} messageState={messageState} />
+        {:else if messageState.isSystemNotification}
+            <MessageSystemNotification message={message} />
+        {:else}
+            <MessageOrdinary message={message} messageState={messageState} />
+        {/if}
+    </div>
+</MesssageSpoilerHandler>
 
 <style>
     .message {

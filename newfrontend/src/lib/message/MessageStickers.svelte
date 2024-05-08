@@ -1,7 +1,7 @@
 <script lang="ts">
     import MessageStickerLottie from "./MessageStickerLottie.svelte";
     import type { Sticker } from "../../js/interfaces";
-    import ImageGallery from "../imagegallery/ImageGalleryLegacy.svelte";
+    import Image from "../imagegallery/Image.svelte";
 
     export let stickers: Sticker[];
 </script>
@@ -12,7 +12,7 @@
             <MessageStickerLottie asset={sticker.source} />
         {:else}
             <div class="chatlog__sticker">
-                <ImageGallery asset={sticker.source} imgclass={"chatlog__sticker-image"} />
+                <Image asset={sticker.source} class="chatlog__sticker-image" />
             </div>
         {/if}
     {/each}
