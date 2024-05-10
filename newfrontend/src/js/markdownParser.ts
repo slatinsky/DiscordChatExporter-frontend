@@ -4,8 +4,10 @@ import SimpleMarkdown from 'simple-markdown';
 import { renderTimestamp } from './time';
 import { checkUrl } from './helpers';
 import hljs from 'highlight.js';
+import { twemojiToFilename } from './emojis/twemojiToFilename';
+import type { Asset } from './interfaces';
 
-function escapeRegExp(string: string) {
+export function escapeRegExp(string: string) {
     // https://stackoverflow.com/a/6969486
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
@@ -341,6 +343,13 @@ const oldEmoji = {
 }
 
 
+// TODO: there HAS to be a better way to do this
+function openInGalleryTemplate(asset: Asset) {
+    if (asset == null) {
+        return "javascript:void(0)";
+    }
+    return `globalShowSingleAsset(JSON.parse(decodeURIComponent(escape(atob('${btoa(unescape(encodeURIComponent(JSON.stringify(asset))))}')))))`;
+}
 
 // new emojis
 // <:kekw:782589696621805568>
@@ -355,6 +364,7 @@ const newEmoji = {
     const isAnimated = capture[1] === 'a'
     const emojiName = capture[2]
     const emojiId = capture[3]
+    let imageObj = null
     const paddedEmojiId = emojiId.toString().padStart(24, '0')
     let url = null
     if (!state.onlyOffline) {
@@ -367,6 +377,7 @@ const newEmoji = {
             if (newUrl !== "") {
                 url = newUrl
             }
+            imageObj = emote.image
         }
     }
     return {
@@ -374,6 +385,7 @@ const newEmoji = {
         animated: isAnimated,
         name: emojiName,
         url: url,
+        imageObj: imageObj
     };
   },
   html: function(node, recurseOutput, state) {
@@ -381,7 +393,7 @@ const newEmoji = {
         return `<span class="message-emoji">:${node.name}:</span>`;
     }
     else {
-        return `<img class="message-emoji" src="${node.url}" alt="${node.name}">`;
+        return `<img class="message-emoji" src="${node.url}" alt="${node.name}" onclick="${openInGalleryTemplate(node.imageObj)}" >`;
     }
   },
 }
@@ -397,13 +409,35 @@ const textSpoiler = {
   },
   parse: function(capture, recurseParse, state) {
       return {
-          type: 'textSpoiler',
+          type: 'twemoji',
           content: capture[1],
       };
   },
   html: function(node, recurseOutput, state) {
-      return `<span class="d-spoiler">${node.content}</span>`;
+      return `<span class="twemoji">${node.content}</span>`;
   },
+}
+
+
+
+const twemoji = {
+    order: SimpleMarkdown.defaultRules.text.order - 0.15,
+    match: function(source, state, lookbehind) {
+        return /^(:[a-zA-Z0-9_]+:)/.exec(source);
+    },
+    parse: function(capture, recurseParse, state) {
+        return {
+            type: 'twemoji',
+            content: capture[1],
+            twemojiFilename: twemojiToFilename[capture[1]],  // twemojiToFilename - key is :emojiname:, value is filename without `.svg`
+        };
+    },
+    html: function(node, recurseOutput, state) {
+        if (node.twemojiFilename == null) {  // emoji file not found
+            return `<span class="twemoji">${node.content}</span>`;
+        }
+        return `<img src="/twemoji-svg/${node.twemojiFilename}.svg" alt="${node.content}" class="twemoji" width="22" height="22" title="${node.content}">`;
+    },
 }
 
 
@@ -487,6 +521,9 @@ const badlyFormattedCodeBlock = {
 }
 
 
+
+
+
 export const rules = {
     array: SimpleMarkdown.defaultRules.array,
     customHeading: customHeading,
@@ -530,6 +567,7 @@ export const rules = {
     newMention: newMention,
     newChannel: newChannel,
     highlightSearchTerms: highlightSearchTerms,
+    twemoji: twemoji,
     textSpoiler: textSpoiler,
     text: SimpleMarkdown.defaultRules.text,
 };
@@ -538,10 +576,12 @@ const parse = SimpleMarkdown.parserFor(rules);
 var htmlOutput = SimpleMarkdown.outputFor(rules, 'html');
 
 
+
+
 export function parseMarkdown(input: string, state: any) {
-  let tree = parse(input, state);
-  return {
-    tree: tree,
-    html: htmlOutput(tree)
-  }
+    let tree = parse(input, state);
+    return {
+        tree: tree,
+        html: htmlOutput(tree)
+    }
 }

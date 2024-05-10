@@ -12,6 +12,7 @@ export function getImagegalleryState() {
         assets = [newAsset];
         shownAssetIndex = 0;
         isGalleryShown = true;
+        console.log("imagegallery - showSingleAsset", $state.snapshot(newAsset));
     }
 
     function showMultipleAssets(newAssets: Asset[], assetToShow: Asset) {

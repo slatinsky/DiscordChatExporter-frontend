@@ -32,6 +32,12 @@ export function onMessageRightClick(e, message: Message) {
             }
         },
         {
+            "name": "Copy text",
+            "action": () => {
+                copyTextToClipboard(message.content[0].content);
+            }
+        },
+        {
             "name": "Copy message link",
             "action": () => {
                 copyTextToClipboard(`https://discord.com/channels/${BigInt(message.guildId)}/${BigInt(message.channelId)}/${BigInt(message._id)}`);

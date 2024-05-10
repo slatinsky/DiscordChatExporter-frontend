@@ -1,4 +1,6 @@
+import { dceToTwemoji } from "./emojis/dceToTwemoji";
 import type { Message } from "./interfaces";
+import { escapeRegExp } from "./markdownParser";
 
 interface MessageCache {
     [messageId: string]: Message;
@@ -44,6 +46,15 @@ export async function messsageIdsToMessages(guildId: string, messageIds: string[
         return [];
     }
     let nonReferenceMessages = await _fetchMessagesFromApi(guildId, messageIds);
+
+    // replace unicode emojis with twemojis - TODO: move to preprocessor step
+    for (const message of nonReferenceMessages) {
+        for (const [key, value] of Object.entries(dceToTwemoji)) {
+            const messageContent = message.content[0].content
+            message.content[0].content = messageContent.replace(new RegExp(escapeRegExp(key), 'g'), value);
+        }
+    }
+    // -
 
     let referenceIdsToFetch = [];
     for (const message of nonReferenceMessages) {

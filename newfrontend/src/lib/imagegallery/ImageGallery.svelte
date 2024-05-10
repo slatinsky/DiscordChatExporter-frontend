@@ -4,6 +4,7 @@
     import { getImagegalleryState } from './imagegalleryState.svelte';
 
 	const imagegalleryState = getImagegalleryState();
+    window.globalShowSingleAsset = imagegalleryState.showSingleAsset;
 </script>
 
 {#if imagegalleryState.isGalleryShown}

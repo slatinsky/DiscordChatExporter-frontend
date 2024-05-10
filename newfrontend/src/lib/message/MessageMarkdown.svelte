@@ -40,11 +40,18 @@
     $: $searchPrompt, searchPromptChanged($searchPrompt)
 
     function messageContainsOnlyEmojis(content: string): boolean {
-        let regex = /<a?:\w+:\d{17,32}>/g
-        let matches = content.match(regex)
-        if (matches) {
-            return matches.length === content.split(' ').length
+        const emojiRegex = /<a?:\w+:\d{17,24}>/g
+        const emojiRegex2 = /:\w+:/g
+
+        content = content.replaceAll(emojiRegex, "")
+        content = content.replaceAll(emojiRegex2, "")
+        content = content.replaceAll(" ", "")
+        content = content.replaceAll("\n", "")
+
+        if (content.length === 0) {
+            return true
         }
+        console.log(`messageContainsOnlyEmojis - remaining content '${content}''`)
         return false
     }
 
@@ -65,24 +72,13 @@
         })
         processedTree = parsed.tree
         processedHtml = parsed.html
-
-        // loop tree
-        let bigEmojisTemp = true
-        for (let node of processedTree) {
-            for (const child of node?.content ?? []) {
-                if (child?.type !== 'newEmoji') {
-                    bigEmojisTemp = false
-                }
-            }
-        }
-        bigEmojis = bigEmojisTemp
     }
 
     $: process(content, $online)
 </script>
 
 
-<span class:onlyemojis={bigEmojis} class="message-markdown">{@html processedHtml}</span>
+<span class:onlyemojis={bigEmojis} class:smallemojis={!bigEmojis} class="message-markdown">{@html processedHtml}</span>
 
 
 <style>
@@ -132,6 +128,7 @@
         transform: translate(0px, 2px);
     }
 
+    :global(.onlyemojis .twemoji),
     :global(.onlyemojis .message-emoji),
     :global(.onlyemojis .d-emoji) {
         width: 50px;
