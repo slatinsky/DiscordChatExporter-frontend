@@ -155,5 +155,9 @@
 		object-position:left;
 		width: auto;
 		height: auto;
+
+		&:fullscreen {
+            object-position:center;
+        }
 	}
 </style>
