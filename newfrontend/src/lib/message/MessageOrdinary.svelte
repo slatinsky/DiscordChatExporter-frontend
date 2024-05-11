@@ -18,7 +18,7 @@
     const viewUserState = getViewUserState()
 
 </script>
-<MessageReferenced message={message} referencedMessage={message.referencedMessage} referenceMessageId={message.reference?.messageId} />
+<MessageReferenced message={message} referencedMessage={message.referencedMessage} messageState={messageState} />
 <div class="avatar-row">
     {#if !messageState.shouldMerge}
         <MessageAvatar author={message.author} on:click={() => viewUserState.setUser(message.author)} messageState={messageState} />
@@ -27,7 +27,7 @@
     {/if}
     <div on:click style="width: 100%;">
         {#if !messageState.shouldMerge}
-            <div class="authorline"><MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} /> <MessageTimestamp channelOrThreadId={message.channelId} timestamp={message.timestamp} messageId={message._id} /></div>
+            <div class="authorline"><MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} messageState={messageState} /> <MessageTimestamp channelOrThreadId={message.channelId} timestamp={message.timestamp} messageId={message._id} /></div>
         {/if}
         <div on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)}  style="width: 100%;">
             {#if messageState.isInvite}

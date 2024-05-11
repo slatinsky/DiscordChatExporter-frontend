@@ -6,10 +6,9 @@
 
     interface MyProps {
         author: Author
+        messageState?: any
     }
-    let { author}: MyProps = $props();
-
-    let isVerified: boolean = $derived(author?._id === "automod")
+    let { author, messageState}: MyProps = $props();
 
     function full_name(author: Author) {
         return author.name
@@ -17,10 +16,22 @@
 	function nickname_only(author: Author) {
 		return author?.nickname ?? full_name(author);
 	}
+
+    let tag = $derived.by(() => {
+        if (messageState && messageState.messageIsFromDifferentGuild) {
+            return "SERVER"
+        }
+        else if (author?._id === "automod" || author.name === "discord") {
+            return "SYSTEM"
+        } else if (author?.isBot) {
+            return "BOT"
+        }
+        return null
+    })
 </script>
 
 
-<button class="username" class:verified={isVerified} title={nickname_only(author)} data-user-id={author._id} on:click on:contextmenu|preventDefault={e=>onUserRightClick(e, author)}>
+<button class="username" class:verified={tag === "SYSTEM"} title={nickname_only(author)} data-user-id={author._id} on:click on:contextmenu|preventDefault={e=>onUserRightClick(e, author)}>
     {#if $nameRenderer === 'handle' }
         <span class="hover-underline" style="color:{author.color}">{full_name(author)}</span>
     {:else if $nameRenderer === 'nickname' }
@@ -33,13 +44,15 @@
     {/if}
 </button>
 
-{#if isVerified}
+{#if tag}
     <span class="tag-bot">
-        <div class="tick">
-            <Icon name="other/verified" width={16} />
-        </div>SYSTEM</span>
-{:else if author?.isBot}
-    <span class="tag-bot">BOT</span>
+        {#if tag === "SYSTEM"}
+            <div class="tick">
+                <Icon name="other/verified" width={16} />
+            </div>
+        {/if}
+        {tag}
+    </span>
 {/if}
 
 <style>

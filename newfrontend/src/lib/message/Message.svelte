@@ -109,6 +109,13 @@
             return regex.test(messageContent)
         }
 
+        function messageIsFromDifferentGuild(message: Message): boolean {
+            if (!message.reference) {
+                return false
+            }
+            return message.reference.guildId !== message.guildId
+        }
+
         return {
             get isSystemNotification(): boolean {
                 return isSystemNotification(message.type)
@@ -124,6 +131,9 @@
             },
             get messageContentLinkIsSpoilered(): boolean {
                 return messageContentLinkIsSpoilered(message.content[0].content)
+            },
+            get messageIsFromDifferentGuild(): boolean {
+                return messageIsFromDifferentGuild(message)
             }
         }
     }
