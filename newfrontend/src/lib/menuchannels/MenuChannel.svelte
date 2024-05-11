@@ -5,6 +5,7 @@
     import type { Channel } from "../../js/interfaces";
     import { getGuildState } from "../../js/stores/guildState.svelte";
     import Icon from "../icons/Icon.svelte";
+    import { linkHandler } from "../../js/stores/settingsStore.svelte";
 
     interface MyProps {
         channel: Channel;
@@ -33,6 +34,12 @@
 
     function onChannelRightClick(e, id: string, name: string) {
 		$contextMenuItems = [
+            {
+				"name": `Open channel in discord ${$linkHandler === 'app' ? "app" : "web"}`,
+				"action": () => {
+					window.open(($linkHandler === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(guildState.guildId)}/${BigInt(id)}`,'_blank')
+				}
+			},
 			{
 				"name": "Copy channel ID",
 				"action": () => {

@@ -3,6 +3,7 @@
     import type { Channel } from "../../js/interfaces";
     import { getGuildState } from "../../js/stores/guildState.svelte";
     import { contextMenuItems } from "../../js/stores/menuStore";
+    import { linkHandler } from "../../js/stores/settingsStore.svelte";
 
     export let thread: Channel
     export let parentChannelId: string
@@ -11,6 +12,12 @@
 
     function onThreadRightClick(e, id: string, name: string) {
 		$contextMenuItems = [
+            {
+				"name": `Open thread in discord ${$linkHandler === 'app' ? "app" : "web"}`,
+				"action": () => {
+					window.open(($linkHandler === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(guildState.guildId)}/${BigInt(id)}`,'_blank')
+				}
+			},
 			{
 				"name": "Copy thread ID",
 				"action": () => {

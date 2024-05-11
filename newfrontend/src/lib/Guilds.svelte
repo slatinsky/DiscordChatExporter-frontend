@@ -4,13 +4,20 @@
 	import { checkUrl, copyTextToClipboard } from "../js/helpers"
     import { getGuildState } from "../js/stores/guildState.svelte";
     import { contextMenuItems } from "../js/stores/menuStore";
+    import { linkHandler } from "../js/stores/settingsStore.svelte";
     import Icon from "./icons/Icon.svelte";
 
 	function onRightClick(e, id) {
         console.log("right click", id);
 		$contextMenuItems = [
 			{
-				"name": "Copy guild ID",
+				"name": `Open guild in discord ${$linkHandler === 'app' ? "app" : "web"}`,
+				"action": () => {
+					window.open(($linkHandler === "app" ? "discord://" : "") + `https://discord.com/channels/${BigInt(id)}`,'_blank')
+				}
+			},
+			{
+				"name": "Copy server ID",
 				"action": () => {
 					copyTextToClipboard(BigInt(id))
 				}
