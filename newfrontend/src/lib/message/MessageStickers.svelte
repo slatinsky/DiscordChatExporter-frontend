@@ -6,20 +6,20 @@
     export let stickers: Sticker[];
 </script>
 
-<div class="chatlog__reactions">
+<div>
     {#each stickers as sticker}
         {#if sticker?.format === "Lottie"}
             <MessageStickerLottie asset={sticker.source} />
         {:else}
-            <div class="chatlog__sticker">
-                <Image asset={sticker.source} class="chatlog__sticker-image" />
+            <div class="image-sticker">
+                <Image asset={sticker.source} />
             </div>
         {/if}
     {/each}
 </div>
 
 <style>
-    :global(.chatlog__sticker-image) {
+    .image-sticker {
         max-width: 200px;
         height: auto;
     }
