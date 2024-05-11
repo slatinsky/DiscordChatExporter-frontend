@@ -48,7 +48,7 @@
         return false
     })
 
-    function playTwitchVideo() {
+    function playVideo() {
         playingVideo = true
     }
 
@@ -124,8 +124,8 @@
                                 <Image asset={embed.thumbnail} onerror={onThumbnailError} forceSpoiler={messageState.messageContentLinkIsSpoilered} class="global-embedthumb" />
                                 {#if embed.video}
                                     <div class="pill">
-                                        {#if twitchClipId}
-                                            <button class="icon" onclick={playTwitchVideo}>
+                                        {#if twitchClipId || youtubeId}
+                                            <button class="icon" onclick={playVideo}>
                                                 <Icon name="player/play" width={24} />
                                             </button>
                                         {/if}
@@ -139,7 +139,7 @@
                     </div>
                 {/if}
 
-                {#if embed.video}
+                {#if !embed.thumbnail && embed.video}
                     <div class="embed-video-2">
                         <MessageVideo attachment={embed.video} />
                     </div>
@@ -153,6 +153,11 @@
                             src="https://clips.twitch.tv/embed?clip={twitchClipId}&parent={window.location.hostname}"
                             width="400" height="232" allowfullscreen="">
                         </iframe>
+                    {:else if youtubeId}
+                        <!-- won't autoplay with sponsorblock browser extension for some reason -->
+                        <div class="youtube-video-container">
+                            <iframe class="chatlog__embed-youtube" src="http://www.youtube.com/embed/{youtubeId}?rel=0&modestbranding=1&autohide=1&mute=0&showinfo=0&controls=1&autoplay=1" width="400" height="225" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen frameborder="0" scrolling="no" sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+                        </div>
                     {/if}
                 {/if}
             </div>
@@ -190,6 +195,21 @@
 </div>
 
 <style>
+    .youtube-video-container {
+        margin-top: 16px;
+		position: relative;
+		width: 100%;
+		height: 0;
+		padding-bottom: 56.25%;
+	}
+
+	.youtube-video-container iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
     .videogif {
         max-width: 550px;
         width: 100%;
