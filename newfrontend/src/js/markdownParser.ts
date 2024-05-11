@@ -485,7 +485,13 @@ const codeBlock = {
     },
     html: function(node, recurseOutput, state) {
         try {
-            const highlightedCode = hljs.highlight(node.language, node.content).value;
+            let highlightedCode = ''
+            if (node.language === '') {
+                highlightedCode = node.content;
+            }
+            else {
+                highlightedCode = hljs.highlight(node.language, node.content).value;
+            }
             return `<pre><code class="hljs-codeblock language-${node.language}">${highlightedCode}</code></pre>`;
         }
         catch (error) {
