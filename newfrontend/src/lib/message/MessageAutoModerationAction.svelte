@@ -7,6 +7,7 @@
     import MessageAvatar from "./MessageAvatar.svelte";
     import MessageReactions from "./MessageReactions.svelte";
     import MessageTimestamp from "./MessageTimestamp.svelte";
+    import { onMessageRightClick } from "./messageRightClick";
 
     interface MyProps {
         message: Message;
@@ -76,7 +77,10 @@
     }
 </script>
 
-<div class="wrapper">
+<div class="wrapper" oncontextmenu={e=>{
+        e.preventDefault()
+        onMessageRightClick(e, message)
+    }}>
     <div class="avatar-row">
         <MessageAvatar author={automodAuthorMock} messageState={messageState} />
         <div style="width: 100%;">
