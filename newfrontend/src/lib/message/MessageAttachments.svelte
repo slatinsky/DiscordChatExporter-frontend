@@ -5,6 +5,7 @@
     import AudioPlayer from "../audioplayer/AudioPlayer.svelte";
     import MessageTiledImages from "./MessageTiledImages.svelte";
     import Icon from "../icons/Icon.svelte";
+    import MessageVideo from "./MessageVideo.svelte";
 
 	interface MyProps {
         attachments: Asset[];
@@ -27,13 +28,7 @@
 	{#each otherAttachments as attachment}
 		{@const attachmentExtension: string = attachment?.filenameWithoutHash.toLowerCase().split('.').pop() ?? 'invalid-fileextension'}
 		{#if attachment.type == 'video'}
-			<div class:media-spoiler={attachment.filenameWithoutHash.startsWith('SPOILER')}>
-			<!-- video title -->
-			<!-- {attachment.filenameWithoutHash} -->
-			<video class="message-video" controls preload="metadata">
-				<source src={checkUrl(attachment)} alt="{attachment.filenameWithoutHash}" title="Video: {attachment.filenameWithoutHash} ({Math.round(attachment.sizeBytes / 1024)} KB)">
-			</video>
-			</div>
+			<MessageVideo attachment={attachment} />
 		{:else if ['txt'].includes(attachmentExtension)}
 			<MessageAttachmentTxt attachment={attachment} />
 		{:else}
@@ -145,19 +140,5 @@
 		color: #80848e;
 		font-size: 12px;
 		font-weight: 400px;
-	}
-
-	.message-video {
-		max-width: 80%;
-		max-height: 500px;
-		vertical-align: top;
-		border-radius: 3px;
-		object-position:left;
-		width: auto;
-		height: auto;
-
-		&:fullscreen {
-            object-position:center;
-        }
 	}
 </style>

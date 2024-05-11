@@ -6,6 +6,7 @@
     import MessageTiledImages from "./MessageTiledImages.svelte";
     import Image from "../imagegallery/Image.svelte";
     import Icon from "../icons/Icon.svelte";
+    import MessageVideo from "./MessageVideo.svelte";
 
     interface MyProps {
         embed: Embed;
@@ -47,7 +48,7 @@
         return false
     })
 
-    function playVideo() {
+    function playTwitchVideo() {
         playingVideo = true
     }
 
@@ -80,9 +81,7 @@
     {:else if spotifyId}
         <iframe src={`https://open.spotify.com/embed/track/${spotifyId}`} frameborder="0" sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="width: 400px; height: 80px;"></iframe>
     {:else if embed.video && embed.title === "" && embed.description === ""}
-        <video class="embed-video" controls preload="metadata" style="aspect-ratio: {embed.video.width} / {embed.video.height}">
-            <source src={checkUrl(embed.video)}>
-        </video>
+        <MessageVideo attachment={embed.video} />
     {:else}
         <div class="embed" class:smallthumbnail={smallThumbnail} style="border-left: {embed.color} 4px solid;">
             <div class="header-row">
@@ -126,7 +125,7 @@
                                 {#if embed.video}
                                     <div class="pill">
                                         {#if twitchClipId}
-                                            <button class="icon" onclick={playVideo}>
+                                            <button class="icon" onclick={playTwitchVideo}>
                                                 <Icon name="player/play" width={24} />
                                             </button>
                                         {/if}
@@ -137,6 +136,12 @@
                                 {/if}
                             {/if}
                         </div>
+                    </div>
+                {/if}
+
+                {#if embed.video}
+                    <div class="embed-video-2">
+                        <MessageVideo attachment={embed.video} />
                     </div>
                 {/if}
 
@@ -202,13 +207,6 @@
 
     .main-wrapper {
         padding: 2px 0;
-
-        .embed-video {
-            width: 100%;
-            max-width: 400px;
-            height: auto;
-            border-radius: 3px;
-        }
     }
 
     .embed {
@@ -365,6 +363,9 @@
             margin-top: 16px;
         }
 
+        .embed-video-2 {
+            margin-top: 16px;
+        }
 
         .footer {
             margin-top: 8px;
