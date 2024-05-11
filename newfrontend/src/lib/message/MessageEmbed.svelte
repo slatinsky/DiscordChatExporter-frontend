@@ -73,7 +73,7 @@
             <video class="videogif" src="{checkUrl(embed.video)}" autoplay loop muted playsinline/>
         {:else}
             <!-- workaround for older exports (embed tenor iframe) -->
-            <div class="embed-tenor-container" style="aspect-ratio: {embed.thumbnail?.width ?? 1} / {embed.thumbnail?.height ?? 1};">
+            <div class="embed-tenor-container">
                 <iframe class="embed-tenor" src="https://tenor.com/embed/{tenorId}" frameBorder="0" allowfullscreen style="aspect-ratio: {embed.thumbnail?.width ?? 1} / {embed.thumbnail?.height ?? 1};"></iframe>
             </div>
         {/if}

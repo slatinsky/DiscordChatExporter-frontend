@@ -51,7 +51,6 @@
         if (content.length === 0) {
             return true
         }
-        console.log(`messageContainsOnlyEmojis - remaining content '${content}''`)
         return false
     }
 
