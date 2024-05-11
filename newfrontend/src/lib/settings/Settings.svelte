@@ -179,7 +179,9 @@
 
             {#if selectedTab == "privacy"}
                 <div class="title-wrapper">
-                    <HamburgerBtn />
+                    <div class="hamburger-btn" on:click={layoutState.toggleSettingsSideMenu}>
+                        <Icon name="other/hamburger" width={37*.5} height={32*.5} />
+                    </div>
                     <div class="title">Privacy & Safety</div>
                 </div>
 
@@ -245,7 +247,9 @@
 
             {#if selectedTab == "accessibility"}
                 <div class="title-wrapper">
-                    <HamburgerBtn />
+                    <div class="hamburger-btn" on:click={layoutState.toggleSettingsSideMenu}>
+                        <Icon name="other/hamburger" width={37*.5} height={32*.5} />
+                    </div>
                     <div class="title">Accessibility</div>
                 </div>
 
@@ -292,7 +296,9 @@
 
             {#if selectedTab == "advanced"}
                 <div class="title-wrapper">
-                    <HamburgerBtn />
+                    <div class="hamburger-btn" on:click={layoutState.toggleSettingsSideMenu}>
+                        <Icon name="other/hamburger" width={37*.5} height={32*.5} />
+                    </div>
                     <div class="title">Advanced</div>
                 </div>
 
