@@ -1,9 +1,9 @@
 <script lang="ts">
     import MenuChannel from "./MenuChannel.svelte";
-    import IconDropdown from "../icons/IconDropdown.svelte";
     import { contextMenuItems } from "../../js/stores/menuStore";
     import { copyTextToClipboard } from "../../js/helpers";
     import { getGuildState } from "../../js/stores/guildState.svelte";
+    import Icon from "../icons/Icon.svelte";
 
 	let { category } = $props();
 
@@ -63,7 +63,9 @@
 
 
 <div class="category" on:click={toggle} on:contextmenu|preventDefault={(e) => onCategoryRightClick(e, category._id, category.name)}>
-    <div  class="icon-dropdown {isOpen? '' : 'rotate'}"><IconDropdown size={13}/></div>
+    <div  class="icon-dropdown {isOpen? '' : 'rotate'}">
+		<Icon name="other/dropdown" width={13} />
+	</div>
     <span title="{category.msg_count} messages">{category.name}</span>
 </div>
 {#each category.channels as channel}
@@ -91,7 +93,7 @@
         color: #DBDEE1;
     }
     .icon-dropdown {
-		margin: 2px 2px 0 0;
+		margin-right: 2px;
         transition: transform 0.2s ease-in-out;
     }
 	.icon-dropdown.rotate {

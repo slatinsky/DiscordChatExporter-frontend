@@ -1,16 +1,10 @@
 <script lang="ts">
     import { checkUrl, humanFileSize } from "../../js/helpers";
     import type { Asset } from "../../js/interfaces";
-    import IconFIleArchive from "../icons/IconFIleArchive.svelte";
-    import IconFileDocument from "../icons/IconFileDocument.svelte";
-    import IconFilePdf from "../icons/IconFilePdf.svelte";
-    import IconFileSpreadsheet from "../icons/IconFileSpreadsheet.svelte";
-    import IconFileUnknown from "../icons/IconFileUnknown.svelte";
     import MessageAttachmentTxt from "./MessageAttachmentTxt.svelte";
     import AudioPlayer from "../audioplayer/AudioPlayer.svelte";
-    import IconFileAudio from "../icons/IconFileAudio.svelte";
-    import IconAttachmentDownload from "../icons/IconAttachmentDownload.svelte";
     import MessageTiledImages from "./MessageTiledImages.svelte";
+    import Icon from "../icons/Icon.svelte";
 
 	interface MyProps {
         attachments: Asset[];
@@ -46,17 +40,17 @@
 			<div class="attachment-wrapper">
 				<div class="attachment" style="width: 100%;">
 					{#if ['pdf'].includes(attachmentExtension)}
-						<IconFilePdf />
+						<Icon name="filetype/pdf" width={24} height={32} />
 					{:else if ['zip', 'rar', '7z'].includes(attachmentExtension)}
-						<IconFIleArchive />
+						<Icon name="filetype/archive" width={24} height={32} />
 					{:else if ['xls', 'xlsx', 'ods'].includes(attachmentExtension)}
-						<IconFileSpreadsheet />
+						<Icon name="filetype/spreadsheet" width={24} height={32} />
 					{:else if ['ppt', 'pptx', 'doc', 'docx'].includes(attachmentExtension)}
-						<IconFileDocument />
+						<Icon name="filetype/document" width={24} height={32} />
 					{:else if ['mp3', 'wav', 'flac', 'ogg'].includes(attachmentExtension)}
-						<IconFileAudio />
+						<Icon name="filetype/audio" width={24} height={32} />
 					{:else}
-						<IconFileUnknown />
+						<Icon name="filetype/unknown" width={24} height={32} />
 					{/if}
 
 					<div>
@@ -73,7 +67,7 @@
 				{/if}
 
 				<a class="download-attachment" href={checkUrl(attachment)} target="_blank" rel="noreferrer">
-					<IconAttachmentDownload width={20}/>
+					<Icon name="other/download" width={20}/>
 				</a>
 			</div>
 		{/if}

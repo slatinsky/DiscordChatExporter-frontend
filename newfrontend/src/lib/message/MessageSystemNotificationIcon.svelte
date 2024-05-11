@@ -1,33 +1,31 @@
 <script lang="ts">
-    import ChannelPinnedMessage from "../icons/ChannelPinnedMessage.svelte";
-    import IconCall from "../icons/IconCall.svelte";
-    import IconChannelIconNameChange from "../icons/IconChannelIconNameChange.svelte";
-    import IconGuildBoosted from "../icons/IconGuildBoosted.svelte";
-
-
-    import IconGuildJoin from "../icons/IconGuildJoin.svelte";
-    import IconGuildLeave from "../icons/IconGuildLeave.svelte";
-    import IconThreadCreated from "../icons/IconThreadCreated.svelte";
     import { MessageType } from "./messageEnums";
+    import Icon from "../icons/Icon.svelte";
 
     export let messageType: string;
 </script>
 <div>
     {#if messageType == "RecipientAdd"}
-        <IconGuildJoin />
+        <Icon name="systemmessage/join" width={16} />
     {:else if messageType == "RecipientRemove"}
-        <IconGuildLeave />
+        <Icon name="systemmessage/leave" width={16} />
     {:else if messageType == "Call"}
-        <IconCall />
+        <Icon name="systemmessage/call" width={16} />
     {:else if messageType == "ChannelNameChange" || messageType == "ChannelIconChange"}
-        <IconChannelIconNameChange />
+        <Icon name="systemmessage/edit" width={16} />
     {:else if messageType == "ChannelPinnedMessage"}
-        <ChannelPinnedMessage />
+        <Icon name="systemmessage/pinned" width={16} />
     {:else if messageType == "GuildMemberJoin"}
-        <IconGuildJoin />
+        <Icon name="systemmessage/join" width={16} />
     {:else if messageType == "ThreadCreated"}
-        <IconThreadCreated />
+        <Icon name="channeltype/thread" width={16} />
     {:else if messageType == MessageType.GuildBoost || messageType == MessageType.GuildBoostTier1 || messageType == MessageType.GuildBoostTier2 || messageType == MessageType.GuildBoostTier3}
-        <IconGuildBoosted />
+        <Icon name="systemmessage/boost" width={16} />
     {/if}
 </div>
+
+<style>
+    div {
+        color: #949ba4;
+    }
+</style>

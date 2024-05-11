@@ -1,6 +1,6 @@
 <script lang="ts">
-    import IconDCEF2 from "../icons/IconDCEF2.svelte";
     import { getLayoutState } from "../../js/stores/layoutState.svelte";
+    import Icon from "../icons/Icon.svelte";
 
     export let messageContent: string;
     const layoutState = getLayoutState()
@@ -11,7 +11,7 @@
     <div class="invite-title">You've been invited to join a server</div>
     <div class="invite-content-row">
         <div class="invite-guild-icon">
-            <IconDCEF2 width={30}/>
+            <Icon name="dcef/filled" width={30} />
         </div>
         <div class="text-col">
             <a class="guild-name" target="_blank" href={messageContent}>Unknown Server</a>

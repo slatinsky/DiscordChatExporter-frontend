@@ -2,12 +2,11 @@
     import { checkUrl } from "../../js/helpers";
     import type { Message } from "../../js/interfaces";
     import { getGuildState, isChannel } from "../../js/stores/guildState.svelte";
-    import IconReplyAttachment from "../icons/IconReplyAttachment.svelte";
-    import IconReplyDeleted from "../icons/IconReplyDeleted.svelte";
     import { getViewUserState } from "../viewuser/viewUserState.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageMarkdown from "./MessageMarkdown.svelte";
     import { onUserRightClick } from "./messageRightClick";
+    import Icon from "../icons/Icon.svelte";
 
     export let message: Message
     export let referencedMessage: Message
@@ -38,7 +37,7 @@
                 {#if referencedMessage.content[0].content !== ""}
                     <MessageMarkdown content={referencedMessage.content[0].content.split("\n")[0]} emotes={referencedMessage?.emotes || []} mentions={referencedMessage?.mentions || []} roles={referencedMessage?.roles || []} channels={referencedMessage?.channels || []} />
                 {:else if referencedMessage.attachments.length > 0}
-                    <i>Click to see attachment <IconReplyAttachment /></i>
+                    <i class="click-attachment"><span>Click to see attachment</span><Icon name="reply/attachment" width={20} /></i>
                 {/if}
             </div>
         {/if}
@@ -48,7 +47,7 @@
     <div class="referenced">
         <div class="referenced-arrow" />
         <div class="referenced-avatar">
-            <IconReplyDeleted />
+            <Icon name="reply/deleted" width={12} />
         </div>
         <div class="referenced-content">
             <i>Original message was deleted</i>

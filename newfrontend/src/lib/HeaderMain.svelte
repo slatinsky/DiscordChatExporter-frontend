@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getGuildState } from "../js/stores/guildState.svelte";
     import { getLayoutState } from "../js/stores/layoutState.svelte";
-    import IconChannel from "./icons/IconChannel.svelte";
+    import Icon from "./icons/Icon.svelte";
 
     const guildState = getGuildState()
     const layoutState = getLayoutState()
@@ -10,7 +10,7 @@
 
 <div class="header-main" class:threadshown={layoutState.threadshown}>
     <div class="channel-icon">
-        <IconChannel />
+        <Icon name="channeltype/channel" width={20} />
     </div>
     <div class="channel-name">{guildState.channel?.name ?? "Select a channel"}</div>
 </div>

@@ -1,12 +1,7 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
-    import IconPlayerPlay from '../icons/IconPlayerPlay.svelte';
-    import IconPlayerPause from '../icons/IconPlayerPause.svelte';
-    import IconPlayerVolumeMuted from '../icons/IconPlayerVolumeMuted.svelte';
-    import IconPlayerVolumeLow from '../icons/IconPlayerVolumeLow.svelte';
-    import IconPlayerVolumeHigh from '../icons/IconPlayerVolumeHigh.svelte';
-    import IconPlayerRestart from '../icons/IconPlayerRestart.svelte';
     import { getAudioplayerState } from './audioplayerState.svelte';
+    import Icon from '../icons/Icon.svelte';
 
 	interface MyProps {
         src: string;
@@ -140,11 +135,11 @@
         class="icon handlePlayPause-btn"
         onclick={handlePlayPause}>
         {#if ended}
-            <IconPlayerRestart />
+            <Icon name="player/restart" width={24} />
         {:else if paused}
-            <IconPlayerPlay />
+            <Icon name="player/play" width={24} />
         {:else}
-            <IconPlayerPause />
+            <Icon name="player/pause" width={24} />
         {/if}
     </button>
     <div class="time">
@@ -193,11 +188,11 @@
         onmouseleave={() => mouseOverVolumeIcon = false}
     >
         {#if muted || audioplayerState.volume < .01}
-            <IconPlayerVolumeMuted />
+            <Icon name="player/volumeMuted" width={24} />
         {:else if audioplayerState.volume < .5}
-            <IconPlayerVolumeLow />
+            <Icon name="player/volumeLow" width={24} />
         {:else}
-            <IconPlayerVolumeHigh />
+            <Icon name="player/volumeHigh" width={24} />
         {/if}
     </button>
     <div

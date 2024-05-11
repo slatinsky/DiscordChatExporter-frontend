@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Author } from "../../js/interfaces";
     import { nameRenderer } from "../../js/stores/settingsStore.svelte";
-    import IconNameTagVerified from "../icons/IconNameTagVerified.svelte";
+    import Icon from "../icons/Icon.svelte";
     import { onUserRightClick } from "./messageRightClick";
 
     interface MyProps {
@@ -35,7 +35,9 @@
 
 {#if isVerified}
     <span class="tag-bot">
-        <div class="tick"><IconNameTagVerified /></div>SYSTEM</span>
+        <div class="tick">
+            <Icon name="other/verified" width={16} />
+        </div>SYSTEM</span>
 {:else if author?.isBot}
     <span class="tag-bot">BOT</span>
 {/if}

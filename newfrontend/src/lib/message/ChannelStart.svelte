@@ -1,7 +1,6 @@
 <script lang="ts">
     import type { Author } from "../../js/interfaces";
-    import IconChannel from "../icons/IconChannel.svelte";
-    import IconThread from "../icons/IconThread.svelte";
+    import Icon from "../icons/Icon.svelte";
     import { getViewUserState } from "../viewuser/viewUserState.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
 
@@ -16,7 +15,7 @@
 {#if isThread}
     <div class="wrapper">
         <div class="thread-icon">
-            <IconThread width={30}/>
+            <Icon name="channeltype/thread" width={30} />
         </div>
         <div class="title">{channelName}!</div>
         <div class="subtitle">Started by <span class="subtitle-person"><MessageAuthorName author={messageAuthor} on:click={() => viewUserState.setUser(messageAuthor)} /></span></div>
@@ -24,7 +23,7 @@
 {:else}
     <div class="wrapper">
         <div class="channel-icon">
-            <IconChannel width={42}/>
+            <Icon name="channeltype/channel" width={42} />
         </div>
         <div class="title">Welcome to #{channelName}!</div>
         <div class="subtitle">This is the start of the #{channelName} channel. </div>

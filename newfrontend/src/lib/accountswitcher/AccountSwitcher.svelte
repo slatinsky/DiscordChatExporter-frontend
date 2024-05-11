@@ -2,7 +2,7 @@
     import { getGuildState } from "../../js/stores/guildState.svelte";
     import { getLayoutState } from "../../js/stores/layoutState.svelte";
     import { currentUserName1, currentUserPhoto } from "../../js/stores/settingsStore.svelte";
-    import IconSettings from "../icons/IconSettings.svelte";
+    import Icon from "../icons/Icon.svelte";
     import AutocompleteUser from "./AutocompleteUser.svelte";
     import UserSelectionModal from "./UserSelectionModal.svelte";
 
@@ -17,7 +17,7 @@
         <AutocompleteUser photo={$currentUserPhoto} name1={$currentUserName1} name2={$currentUserName1} on:click={() => showUserSelectionModal = true}/>
     </div>
     <div id="settings" on:click={layoutState.showSettings}>
-        <IconSettings />
+        <Icon name="other/settings" width={20} />
     </div>
 </div>
 <UserSelectionModal bind:showModal={showUserSelectionModal} guildId={guildState.guildId}/>

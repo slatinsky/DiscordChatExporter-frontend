@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Author, Embed, Message } from "../../js/interfaces";
     import { channelOrThreadIdToName, getGuildState } from "../../js/stores/guildState.svelte";
-    import IconAutomodShield from "../icons/IconAutomodShield.svelte";
+    import Icon from "../icons/Icon.svelte";
     import { getViewUserState } from "../viewuser/viewUserState.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageAvatar from "./MessageAvatar.svelte";
@@ -103,7 +103,7 @@
                     </div>
                 </div>
                 <div class="actions">
-                    <IconAutomodShield />
+                    <Icon name="other/shield" width={16} />
                     <a>Actions</a>
                     <div class="separator"></div>
                     <a href="https://github.com/slatinsky/DiscordChatExporter-frontend/issues" target="_blank">Report Issues</a>

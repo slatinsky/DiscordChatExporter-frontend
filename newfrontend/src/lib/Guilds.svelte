@@ -4,7 +4,7 @@
 	import { checkUrl, copyTextToClipboard } from "../js/helpers"
     import { getGuildState } from "../js/stores/guildState.svelte";
     import { contextMenuItems } from "../js/stores/menuStore";
-    import IconDCEF2 from "./icons/IconDCEF2.svelte";
+    import Icon from "./icons/Icon.svelte";
 
 	function onRightClick(e, id) {
         console.log("right click", id);
@@ -30,7 +30,7 @@
 <div class="guilds" class:hidden={isMenuHidden}>
 	<div class="guild" class:selected={!guildState.guildId} on:click={e => changeGuildId(null)}>
 		<div class="guild-selected-indicator" />
-		<div class="home-guild"><IconDCEF2 width={30}/></div>
+		<div class="home-guild"><Icon name="dcef/filled" width={30} /></div>
 	</div>
 	<hr>
 

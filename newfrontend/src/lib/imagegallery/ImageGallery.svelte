@@ -1,6 +1,6 @@
 <script lang="ts">
     import { checkUrl } from '../../js/helpers';
-    import IconGalleryUpArrow from '../icons/IconGalleryUpArrow.svelte';
+    import Icon from '../icons/Icon.svelte';
     import { getImagegalleryState } from './imagegalleryState.svelte';
 
 	const imagegalleryState = getImagegalleryState();
@@ -10,8 +10,12 @@
 {#if imagegalleryState.isGalleryShown}
 	<div class="gallery-wrapper" on:click={imagegalleryState.closeGallery}>
         {#if imagegalleryState.assetsCount > 1}
-            <button class="prevbtn" on:click|stopPropagation={imagegalleryState.previousAsset}><IconGalleryUpArrow width={26} /></button>
-            <button class="nextbtn" on:click|stopPropagation={imagegalleryState.nextAsset}><IconGalleryUpArrow width={26} /></button>
+            <button class="prevbtn" on:click|stopPropagation={imagegalleryState.previousAsset}>
+                <Icon name="modal/arrowUp" width={26} />
+            </button>
+            <button class="nextbtn" on:click|stopPropagation={imagegalleryState.nextAsset}>
+                <Icon name="modal/arrowUp" width={26} />
+            </button>
         {/if}
 		<button class="closebtn" on:click={imagegalleryState.closeGallery}>&times;</button>
 		<div class="imgbox" on:click|stopPropagation>

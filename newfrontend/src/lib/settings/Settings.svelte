@@ -4,8 +4,8 @@
     import RadioButton from './RadioButton.svelte';
     import RadioGroup from './RadioGroup.svelte';
     import MenuOpenOverlay from './MenuOpenOverlay.svelte';
-    import HamburgerBtn from '../icons/IconHamburgerMenu.svelte';
     import { getLayoutState } from '../../js/stores/layoutState.svelte';
+    import Icon from '../icons/Icon.svelte';
     let testDate = '2020-01-16T11:04:47.215+00:00';
     let selectedTab = 'appearance';
 
@@ -48,7 +48,7 @@
             {#if selectedTab == "appearance"}
                 <div class="title-wrapper">
                     <div class="hamburger-btn" on:click={layoutState.toggleSettingsSideMenu}>
-                        <HamburgerBtn />
+                        <Icon name="other/hamburger" width={37*.5} height={32*.5} />
                     </div>
                     <div class="title">Appearance</div>
                 </div>

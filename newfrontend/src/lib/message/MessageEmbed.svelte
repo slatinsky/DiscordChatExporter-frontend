@@ -1,13 +1,11 @@
 <script lang="ts">
     import { checkUrl } from "../../js/helpers";
     import type { Embed } from "../../js/interfaces";
-    import IconPlayerPlay from "../icons/IconPlayerPlay.svelte";
-    import IconOpenLink from "../icons/IconOpenLink.svelte";
-    import IconPoop from "../icons/IconPoop.svelte";
     import MessageMarkdown from "./MessageMarkdown.svelte";
     import { renderTimestamp } from "../../js/time";
     import MessageTiledImages from "./MessageTiledImages.svelte";
     import Image from "../imagegallery/Image.svelte";
+    import Icon from "../icons/Icon.svelte";
 
     interface MyProps {
         embed: Embed;
@@ -112,18 +110,18 @@
                     <div class="thumb-col">
                         <div class="thumbnail-wrapper">
                             {#if thumbnailFailedToLoad}
-                                <IconPoop width={smallThumbnail ? 80 : 200} />
+                                <Icon name="placeholder/poop" width={smallThumbnail ? 80 : 200} height={smallThumbnail ? 42 : 104} />
                             {:else}
                                 <Image asset={embed.thumbnail} onerror={onThumbnailError} forceSpoiler={messageState.messageContentLinkIsSpoilered} class="global-embedthumb" />
                                 {#if embed.video}
                                     <div class="pill">
                                         {#if twitchClipId}
                                             <button class="icon" onclick={playVideo}>
-                                                <IconPlayerPlay width={24} />
+                                                <Icon name="player/play" width={24} />
                                             </button>
                                         {/if}
                                         <a class="icon" href={embed.url} target="_blank" rel="noopener noreferrer">
-                                            <IconOpenLink width={24} />
+                                            <Icon name="player/openLink" width={24} />
                                         </a>
                                     </div>
                                 {/if}

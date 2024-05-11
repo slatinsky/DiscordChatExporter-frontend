@@ -1,13 +1,10 @@
 <script lang="ts">
-    import IconChannelWithThreads from "../icons/IconChannelWithThreads.svelte";
-    import IconVoiceChannel from "../icons/IconVoiceChannel.svelte";
-    import IconNewsChannel from "../icons/IconNewsChannel.svelte";
-    import IconChannel from "../icons/IconChannel.svelte";
     import MenuThread from "./MenuThread.svelte";
     import { copyTextToClipboard } from "../../js/helpers";
     import { contextMenuItems } from "../../js/stores/menuStore";
     import type { Channel } from "../../js/interfaces";
     import { getGuildState } from "../../js/stores/guildState.svelte";
+    import Icon from "../icons/Icon.svelte";
 
     interface MyProps {
         channel: Channel;
@@ -55,13 +52,13 @@
 <div class="channel" class:selected={guildState.channelId == channel._id} on:click={toggle} on:contextmenu|preventDefault={(e) => onChannelRightClick(e, channel._id, channel.name)}>
     <div class="channel-icon">
         {#if channel.threads.length > 0}
-            <IconChannelWithThreads />
+            <Icon name="channeltype/channelWithThreads" width={20} />
         {:else if channel.type == "GuildVoiceChat"}
-            <IconVoiceChannel />
-            {:else if channel.type == "GuildNews"}
-            <IconNewsChannel/>
-            {:else}
-            <IconChannel />
+            <Icon name="channeltype/voice" width={20} />
+        {:else if channel.type == "GuildNews"}
+            <Icon name="channeltype/news" width={20} />
+        {:else}
+            <Icon name="channeltype/channel" width={20} />
         {/if}
     </div><span title="{channel.msg_count} messages">{channel.name}</span>
 </div>

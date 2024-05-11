@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getGuildState } from "../js/stores/guildState.svelte";
     import InfiniteScroll from "./InfiniteScroll.svelte";
-    import IconX from "./icons/IconX.svelte";
+    import Icon from "./icons/Icon.svelte";
     import Message from "./message/Message.svelte";
 
     function destroyThreadView() {
@@ -20,7 +20,7 @@
     <div class="header-main">
         <div class="thread-name">{guildState.thread?.name ?? "Select a thread"}</div>
         <div on:click={destroyThreadView} style="cursor:pointer; display: grid; place-items: center;">
-            <IconX />
+            <Icon name="modal/x" width={24} />
         </div>
     </div>
     <div class="thread">
