@@ -36,7 +36,9 @@
                 {/if}
                 <MessageInvite messageContent={message.content[0].content} />
             {:else}
-                <div><MessageContent message={message} /></div>
+                {#if !messageState.messageContentIsLink || !message.content[0].content.includes("https://tenor.com/view/")}
+                    <div><MessageContent message={message} /></div>
+                {/if}
                 {#if message.embeds}
                     {#each message.embeds as embed}
                         <div><MessageEmbed embed={embed} messageState={messageState} /></div>

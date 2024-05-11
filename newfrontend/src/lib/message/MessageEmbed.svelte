@@ -20,15 +20,16 @@
     let footerIconFailedToLoad: boolean = $state(false)
 
     const spotifyRegex = /https:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)/
-    let spotifyMatch = $derived(embed.url?.match(spotifyRegex))
-    let spotifyId = $derived(spotifyMatch ? spotifyMatch[1] : null)
+    let spotifyId = $derived(embed.url?.match(spotifyRegex)?.[1] ?? null)
 
     const youtubeRegex = /^(?:https?:)?\/\/(?:www|m)\.(?:youtube(?:-nocookie)?\.com|youtu.be)\/(?:[\w\-]+\?v=|embed\/|live\/|v\/)?[\w\-]+/
 	let youtubeId = $derived(embed.url?.match(youtubeRegex)?.[0]?.split('v=')?.[1]?.split('&')?.[0] ?? null);
 
     const twitchClipRegex = /(?:https:\/\/)?clips\.twitch\.tv\/(\S+)/i
-    let twitchClipMatch = $derived(embed.url?.match(twitchClipRegex))
-    let twitchClipId = $derived(twitchClipMatch ? twitchClipMatch[1] : null)
+    let twitchClipId = $derived(embed.url?.match(twitchClipRegex)?.[1] ?? null)
+
+    const tenorRegex = /(?:https?:)?\/\/(?:www\.)?(?:tenor\.com)\/(?:view|watch)\/[%\w\-]+-(\d+)/
+    let tenorId = $derived(embed.url?.match(tenorRegex)?.[1] ?? null)
 
     let smallThumbnail: boolean = $derived.by(() => {
         if (spotifyId) {
@@ -67,7 +68,16 @@
 </script>
 
 <div class="main-wrapper">
-    {#if spotifyId}
+    {#if tenorId}
+        {#if embed.hasOwnProperty('video')}
+            <video class="videogif" src="{checkUrl(embed.video)}" autoplay loop muted playsinline/>
+        {:else}
+            <!-- workaround for older exports (embed tenor iframe) -->
+            <div class="embed-tenor-container" style="aspect-ratio: {embed.thumbnail?.width ?? 1} / {embed.thumbnail?.height ?? 1};">
+                <iframe class="embed-tenor" src="https://tenor.com/embed/{tenorId}" frameBorder="0" allowfullscreen style="aspect-ratio: {embed.thumbnail?.width ?? 1} / {embed.thumbnail?.height ?? 1};"></iframe>
+            </div>
+        {/if}
+    {:else if spotifyId}
         <iframe src={`https://open.spotify.com/embed/track/${spotifyId}`} frameborder="0" sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="width: 400px; height: 80px;"></iframe>
     {:else if embed.video && embed.title === "" && embed.description === ""}
         <video class="embed-video" controls preload="metadata" style="aspect-ratio: {embed.video.width} / {embed.video.height}">
@@ -175,6 +185,21 @@
 </div>
 
 <style>
+    .videogif {
+        max-width: 550px;
+        width: 100%;
+    }
+    .embed-tenor-container {
+		pointer-events: none;
+
+        .embed-tenor {
+            width: 300px;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+	}
+
     .main-wrapper {
         padding: 2px 0;
 
