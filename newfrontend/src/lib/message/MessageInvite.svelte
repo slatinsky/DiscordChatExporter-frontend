@@ -2,7 +2,12 @@
     import { getLayoutState } from "../../js/stores/layoutState.svelte";
     import Icon from "../icons/Icon.svelte";
 
-    export let messageContent: string;
+	interface MyProps {
+        inviteId: string;
+    }
+    let { inviteId }: MyProps = $props();
+    let inviteLink = `https://discord.gg/${inviteId}`;
+
     const layoutState = getLayoutState()
 </script>
 
@@ -14,7 +19,7 @@
             <Icon name="dcef/filled" width={30} />
         </div>
         <div class="text-col">
-            <a class="guild-name" target="_blank" href={messageContent}>Unknown Server</a>
+            <a class="guild-name" target="_blank" href={inviteLink}>Unknown Server</a>
             <div class="invite-status-wrapper">
                 <div class="green-circle"></div>
                 <div class="status-text" style="margin-right: 7px;">N/A Online</div>
@@ -24,11 +29,11 @@
         </div>
         {#if !layoutState.mobile}
             <div class="spacer"></div>
-            <a class="join-btn" target="_blank" href={messageContent}>Join</a>
+            <a class="join-btn" target="_blank" href={inviteLink}>Join</a>
         {/if}
     </div>
     {#if layoutState.mobile}
-        <a class="join-btn join-btn-mobile" target="_blank" href={messageContent}>Join</a>
+        <a class="join-btn join-btn-mobile" target="_blank" href={inviteLink}>Join</a>
     {/if}
 
 </div>

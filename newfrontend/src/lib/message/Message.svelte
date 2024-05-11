@@ -40,9 +40,16 @@
             return systemNotificationTypes.includes(messageType)
         }
 
-        function isInvite(messageContent: string): boolean {
+        function inviteIds(messageContent: string): string[] {
             const inviteRegex = /(https?:\/\/)?(www\.)?((discordapp\.com\/invite)|(discord\.gg))\/(\w+)/
-            return inviteRegex.test(messageContent)
+            let ids = []
+            let match = messageContent.match(inviteRegex)
+            while (match) {
+                ids.push(match[6])
+                messageContent = messageContent.replace(match[0], "")
+                match = messageContent.match(inviteRegex)
+            }
+            return ids
         }
 
         /**
@@ -120,8 +127,8 @@
             get isSystemNotification(): boolean {
                 return isSystemNotification(message.type)
             },
-            get isInvite(): boolean {
-                return isInvite(message.content[0].content)
+            get inviteIds(): string[] {
+                return inviteIds(message.content[0].content)
             },
             get shouldMerge(): boolean {
                 return shouldMerge(previousMessage, message)

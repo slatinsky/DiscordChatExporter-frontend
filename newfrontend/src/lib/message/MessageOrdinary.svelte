@@ -29,28 +29,25 @@
         {#if !messageState.shouldMerge}
             <div class="authorline"><MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} messageState={messageState} /> <MessageTimestamp channelOrThreadId={message.channelId} timestamp={message.timestamp} messageId={message._id} /></div>
         {/if}
-        <div on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)}  style="width: 100%;">
-            {#if messageState.isInvite}
-                {#if !messageState.messageContentIsLink}
-                    <MessageContent message={message} />
-                {/if}
-                <MessageInvite messageContent={message.content[0].content} />
-            {:else}
-                {#if !messageState.messageContentIsLink || !message.content[0].content.includes("https://tenor.com/view/")}
-                    <div><MessageContent message={message} /></div>
-                {/if}
-                {#if message.embeds}
-                    {#each message.embeds as embed}
-                        <div><MessageEmbed embed={embed} messageState={messageState} /></div>
-                    {/each}
-                {/if}
-                {#if message.attachments}
-                    <div><MessageAttachments attachments={message.attachments} /></div>
-                {/if}
-                {#if message.stickers}
-                    <MessageStickers stickers={message.stickers} />
-                {/if}
+        <div class="message-accessories" on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)}>
+            {#if !messageState.messageContentIsLink || !message.content[0].content.includes("https://tenor.com/view/")}
+                <div><MessageContent message={message} /></div>
             {/if}
+            {#each messageState.inviteIds as inviteId}
+                <MessageInvite inviteId={inviteId} />
+            {/each}
+            {#if message.embeds}
+                {#each message.embeds as embed}
+                    <div><MessageEmbed embed={embed} messageState={messageState} /></div>
+                {/each}
+            {/if}
+            {#if message.attachments}
+                <div><MessageAttachments attachments={message.attachments} /></div>
+            {/if}
+            {#if message.stickers}
+                <MessageStickers stickers={message.stickers} />
+            {/if}
+            <!-- {/if} -->
         </div>
         {#if message.reactions}
             <MessageReactions reactions={message.reactions} />
@@ -68,6 +65,13 @@
         gap: 15px;
         grid-template-columns: 40px 1fr;
         width: 100%;
+    }
+
+    .message-accessories {
+        width: 100%;
+        display:flex;
+        flex-direction:column;
+        gap:4px;
     }
 
 </style>
