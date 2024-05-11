@@ -45,7 +45,7 @@
             <div class="referenced-content" on:click={changeMessageId}>
                 {#if referencedMessage.content[0].content !== ""}
                     <MessageMarkdown content={referencedMessage.content[0].content.split("\n")[0]} emotes={referencedMessage?.emotes || []} mentions={referencedMessage?.mentions || []} roles={referencedMessage?.roles || []} channels={referencedMessage?.channels || []} />
-                {:else if referencedMessage.attachments.length > 0}
+                {:else if referencedMessage.attachments && referencedMessage.attachments.length > 0}
                     <i class="click-attachment"><span>Click to see attachment</span><Icon name="reply/attachment" width={20} /></i>
                 {/if}
             </div>
