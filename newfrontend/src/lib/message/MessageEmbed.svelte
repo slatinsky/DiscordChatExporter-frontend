@@ -155,7 +155,7 @@
             {#if embed.fields.length > 0}
                 <div class="fields">
                     {#each embed.fields as field}
-                        <div class="field">
+                        <div class="field" class:inlinefield={field.isInline}>
                             <div class="field-name">{field.name}</div>
                             <div class="field-value"><MessageMarkdown content={field.value} /></div>
                         </div>
@@ -339,7 +339,12 @@
             margin-top: 8px;
 
             .field {
-                width: calc(33.33% - 8px);
+                width: 100%;
+
+                &.inlinefield {
+                    width: calc(33.33% - 8px);
+                }
+
                 .field-name {
                     font-size: 14px;
                     font-weight: 600;
