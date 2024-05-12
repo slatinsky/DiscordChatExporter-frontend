@@ -10,6 +10,9 @@ let windowWidth = $state(window.innerWidth);
 let windowHeight = $state(window.innerHeight);
 let mobile = $derived(windowWidth < 800);
 
+let channelpinnedshown = $state(false);
+let threadpinnedshown = $state(false);
+
 
 export function getLayoutState() {
     function toggleSidePanel() {
@@ -81,6 +84,13 @@ export function getLayoutState() {
         }
     }
 
+    function toggleChannelPinned() {
+        channelpinnedshown = !channelpinnedshown;
+    }
+    function toggleThreadPinned() {
+        threadpinnedshown = !threadpinnedshown;
+    }
+
     return {
         get mobilesidepanelshown() {
             return mobilesidepanelshown;
@@ -109,6 +119,12 @@ export function getLayoutState() {
         get settingssidemenushown() {
             return settingssidemenushown;
         },
+        get channelpinnedshown() {
+            return channelpinnedshown;
+        },
+        get threadpinnedshown() {
+            return threadpinnedshown;
+        },
 
         showThread,
         hideThread,
@@ -122,6 +138,8 @@ export function getLayoutState() {
         showSettingsSideMenu,
         hideSettingsSideMenu,
         toggleSettingsSideMenu,
+        toggleChannelPinned,
+        toggleThreadPinned,
     };
 }
 

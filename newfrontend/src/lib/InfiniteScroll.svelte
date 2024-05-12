@@ -6,21 +6,15 @@
     // TODO: needs backend pagination support to optimize loading
     // --------------------------
     import { messsageIdsToMessages } from "../js/messages";
-    import ChannelStart from "./message/ChannelStart.svelte";
-    import DateSeparator from "./DateSeparator.svelte";
-    import { snowflakeToDate } from "../js/time";
 
     interface MyProps {
         ids: string[]
         guildId: string
         selectedMessageId: string | null
-        isThread: boolean
-        isPinned?: boolean
-        showWelcome?: boolean
-        showSeparators?: boolean
-        renderMessageSnippet: (message: Message, previousMessage: Message) => void
+        bottomAligned: boolean
+        renderMessageSnippet: (index: number, message: Message, previousMessage: Message) => void
     }
-    let { ids, guildId, selectedMessageId = null, isThread, renderMessageSnippet, showWelcome = true, showSeparators = true}: MyProps = $props();
+    let { ids, guildId, selectedMessageId = null, renderMessageSnippet, bottomAligned}: MyProps = $props();
 
     let maxMessages = 120
     let loadIncrement = 30
@@ -190,36 +184,12 @@
             loadHighUnloadLow()
         }
     }
-
-    function isDateDifferent(previousMessage: Message | null, message: Message) {
-        if (!previousMessage) {
-            return true;
-        }
-        if (!message) {
-            return true;
-        }
-
-        let prevDate = snowflakeToDate(previousMessage._id);
-        let date = snowflakeToDate(message._id);
-
-        return prevDate.getDate() !== date.getDate() || prevDate.getMonth() !== date.getMonth() || prevDate.getFullYear() !== date.getFullYear()
-    }
 </script>
 
-<div class="scroll-container" class:bottompadded={showWelcome} onscroll={handleScroll} bind:this={scrollContainer}>
+<div class="scroll-container" class:bottomaligned={bottomAligned} onscroll={handleScroll} bind:this={scrollContainer}>
     {#if messages}
         {#each messages as message, index (message._id)}
-            {#if showWelcome && topLoaded && index === 0}
-                <ChannelStart channelName={message.channelName} isThread={isThread} messageAuthor={message.author} />
-            {/if}
-
-            {#if showSeparators && isDateDifferent(messages[index - 1], message)}
-                <DateSeparator messageId={message._id} />
-            {/if}
-
-            <div data-messageid={message._id}>
-                {@render renderMessageSnippet(message, messages[index - 1])}
-            </div>
+            {@render renderMessageSnippet(lowestLoadedIndex + index, message, messages[index - 1])}
         {/each}
     {/if}
 </div>
@@ -229,22 +199,19 @@
     .scroll-container {
         height: 100%;
         overflow-y: auto;
+    }
 
-        /* Needed for bottom aligment */
-        /* can't use justify-content: flex-end, because that would break scroll */
-        /* https://stackoverflow.com/a/37515194 */
+    /* Needed for bottom aligment */
+    /* can't use justify-content: flex-end, because that would break scroll */
+    /* https://stackoverflow.com/a/37515194 */
+    .scroll-container.bottomaligned {
         display: flex;
         flex-flow: column nowrap;
-        padding-bottom: 1px;
-        /* - */
-
-        &.bottompadded {
-            padding-bottom: 32px;
-        }
+        padding-bottom: 32px;
     }
 
     /* align messages to the bottom if there are not enough messages to fill the container height */
-    :global(.scroll-container > :first-child) {
+    :global(.scroll-container.bottomaligned > :first-child) {
         margin-top: auto !important;
     }
     /* - */

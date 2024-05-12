@@ -1,3 +1,6 @@
+import type { Message } from "./interfaces";
+import { snowflakeToDate } from "./time";
+
 export function checkUrl(asset) {
 	if (!asset)
 		return "";
@@ -66,4 +69,18 @@ export function humanFileSize(bytes: number, decimalPlaces: number) {
 
 export function isObjectEqual(a: any, b: any) {
 	return JSON.stringify(a) === JSON.stringify(b)
+}
+
+export function isDateDifferent(previousMessage: Message | null, message: Message) {
+    if (!previousMessage) {
+        return true;
+    }
+    if (!message) {
+        return true;
+    }
+
+    let prevDate = snowflakeToDate(previousMessage._id);
+    let date = snowflakeToDate(message._id);
+
+    return prevDate.getDate() !== date.getDate() || prevDate.getMonth() !== date.getMonth() || prevDate.getFullYear() !== date.getFullYear()
 }

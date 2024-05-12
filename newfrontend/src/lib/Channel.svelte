@@ -1,7 +1,10 @@
 <script lang="ts">
+    import { isDateDifferent } from "../js/helpers";
     import { getGuildState } from "../js/stores/guildState.svelte";
     import { getLayoutState } from "../js/stores/layoutState.svelte";
+    import DateSeparator from "./DateSeparator.svelte";
     import InfiniteScroll from "./InfiniteScroll.svelte";
+    import ChannelStart from "./message/ChannelStart.svelte";
     import Message from "./message/Message.svelte";
 
     const guildState = getGuildState()
@@ -9,8 +12,18 @@
 </script>
 
 
-{#snippet renderMessageSnippet(message, previousMessage)}
-    <Message message={message} previousMessage={previousMessage} />
+{#snippet renderMessageSnippet(index, message, previousMessage)}
+    {#if index === 0}
+        <ChannelStart channelName={message.channelName} isThread={false} messageAuthor={message.author} />
+    {/if}
+
+    {#if isDateDifferent(previousMessage, message)}
+        <DateSeparator messageId={message._id} />
+    {/if}
+
+    <div data-messageid={message._id}>
+        <Message message={message} previousMessage={previousMessage} />
+    </div>
 {/snippet}
 
 
@@ -18,7 +31,7 @@
     <div class="channel" >
         <!-- TODO: support change of selectedMessageId without rerender -->
         {#key guildState.channelMessageId}
-            <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId} isThread={false} renderMessageSnippet={renderMessageSnippet} />
+            <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId} renderMessageSnippet={renderMessageSnippet} bottomaligned={true} />
         {/key}
     </div>
 </div>

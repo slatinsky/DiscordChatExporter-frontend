@@ -6,19 +6,23 @@
     import Message from "./message/Message.svelte";
 
     const guildState = getGuildState()
-    const layoutState = getLayoutState()
+
+	interface MyProps {
+        messageIds: string[];
+    }
+    let { messageIds }: MyProps = $props();
 </script>
 
 
-{#snippet renderMessageSnippet(message, previousMessage)}
-    <div class="pinned-message-wrapper">
-        <Message message={message} previousMessage={previousMessage} mergeMessages={false} />
+{#snippet renderMessageSnippet(index, message, previousMessage)}
+    <div class="pinned-message-wrapper" data-messageid={message._id}>
+        <Message message={message} previousMessage={previousMessage} />
     </div>
 {/snippet}
 
 
-{#if guildState.channelPinnedMessagesIds.length === 0}
-    <div class="channel-wrapper" class:threadshown={layoutState.threadshown}>
+{#if messageIds.length === 0}
+    <div class="channel-wrapper">
         <div class="pinned-header">
             <div class="header-txt">Pinned Messages</div>
         </div>
@@ -32,14 +36,12 @@
         </div>
     </div>
 {:else}
-    <div class="channel-wrapper" class:threadshown={layoutState.threadshown}>
+    <div class="channel-wrapper">
         <div class="pinned-header">
             <div class="header-txt">Pinned Messages</div>
         </div>
         <div class="channel" >
-            {#key guildState.channelMessageId}
-                <InfiniteScroll ids={guildState.channelPinnedMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId} isThread={false} showWelcome={false} showSeparators={false} renderMessageSnippet={renderMessageSnippet} />
-            {/key}
+            <InfiniteScroll ids={messageIds} guildId={guildState.guildId} selectedMessageId={messageIds[0]} renderMessageSnippet={renderMessageSnippet} bottomaligned={false} />
         </div>
     </div>
 {/if}
@@ -90,7 +92,12 @@
     }
 
     .channel-wrapper {
-        height: calc(100vh - 100px);
+        /* max-height: calc(100vh - 120px); */
+        /* height: min-content; */
+        /* height: calc(100vh - 120px);
+         */
+         border: 1px solid #25262a;
+         border-radius: 4px;
         .pinned-header {
             width: 100%;
             height: 52px;
@@ -109,17 +116,13 @@
                 padding: 16px;
             }
         }
-    }
+        .channel {
+            background-color: #2b2d31;
+            height: calc(100vh - 120px);
 
-    .threadshown {
-        border-bottom-right-radius: 8px;
-    }
-    .channel {
-        background-color: #2b2d31;
-        height: 100%;
-
-        border-bottom-left-radius: 4px;
-        border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
     }
 
 

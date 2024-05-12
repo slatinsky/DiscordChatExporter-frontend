@@ -6,11 +6,6 @@
 
     const guildState = getGuildState()
     const layoutState = getLayoutState()
-
-    let pinnedShown = $state(false)
-    const togglePinnedMessages = () => {
-        pinnedShown = !pinnedShown
-    }
 </script>
 
 
@@ -20,16 +15,20 @@
     </div>
     <div class="channel-name">{guildState.channel?.name ?? "Select a channel"}</div>
     <div style="display: flex;">
-        <div class="show-pinned">
-            <div class="show-pinned-btn" class:active={pinnedShown} onclick={togglePinnedMessages}>
-                <Icon name="systemmessage/pinned" width={24} />
-            </div>
-            {#if pinnedShown}
-                <div class="pinned-messages">
-                    <Pinned />
+        {#if guildState.channelId}
+            <div class="pin-wrapper">
+                <div class="pin-btn" class:active={layoutState.channelpinnedshown} onclick={layoutState.toggleChannelPinned}>
+                    <Icon name="systemmessage/pinned" width={24} />
                 </div>
-            {/if}
-        </div>
+                {#if layoutState.channelpinnedshown}
+                    <div class="pin-messages">
+                        {#key guildState.channelMessageId}
+                            <Pinned messageIds={guildState.channelPinnedMessagesIds} />
+                        {/key}
+                    </div>
+                {/if}
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -41,9 +40,9 @@
         place-items: center;
     }
 
-    .show-pinned {
+    .pin-wrapper {
         position: relative;
-        .show-pinned-btn {
+        .pin-btn {
             cursor: pointer;
             color: #b5bac1;
             &:hover {
@@ -53,19 +52,17 @@
                 color: white;
             }
         }
+        .pin-messages {
+            position: absolute;
+            top: 30px;
+            right: 0px;
+
+            width: 400px;
+            z-index: 500;
+        }
     }
 
-    .pinned-messages {
-        position: absolute;
-        top: 30px;
-        right: 0px;
 
-        width: 400px;
-        height: 400px;
-        max-width: 420px;
-        max-height: calc(100vh - 76px);
-        z-index: 500;
-    }
     .header-main {
         height: 100%;
         display: flex;

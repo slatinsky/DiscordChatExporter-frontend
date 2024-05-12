@@ -1,7 +1,12 @@
 <script lang="ts">
+    import { isDateDifferent } from "../js/helpers";
     import { getGuildState } from "../js/stores/guildState.svelte";
+    import { getLayoutState } from "../js/stores/layoutState.svelte";
+    import DateSeparator from "./DateSeparator.svelte";
     import InfiniteScroll from "./InfiniteScroll.svelte";
+    import Pinned from "./Pinned.svelte";
     import Icon from "./icons/Icon.svelte";
+    import ChannelStart from "./message/ChannelStart.svelte";
     import Message from "./message/Message.svelte";
 
     function destroyThreadView() {
@@ -9,30 +14,75 @@
     }
 
     const guildState = getGuildState()
+    const layoutState = getLayoutState()
 </script>
 
-{#snippet renderMessageSnippet(message, previousMessage)}
-    <Message message={message} previousMessage={previousMessage} />
+{#snippet renderMessageSnippet(index, message, previousMessage)}
+    {#if index === 0}
+        <ChannelStart channelName={message.channelName} isThread={true} messageAuthor={message.author} />
+    {/if}
+
+    {#if isDateDifferent(previousMessage, message)}
+        <DateSeparator messageId={message._id} />
+    {/if}
+
+    <div data-messageid={message._id}>
+        <Message message={message} previousMessage={previousMessage} />
+    </div>
 {/snippet}
 
 
 <div class="thread-wrapper">
     <div class="header-main">
         <div class="thread-name">{guildState.thread?.name ?? "Select a thread"}</div>
-        <div on:click={destroyThreadView} style="cursor:pointer; display: grid; place-items: center;">
+        <div class="pin-wrapper">
+            <div class="pin-btn" class:active={layoutState.threadpinnedshown} onclick={layoutState.toggleThreadPinned}>
+                <Icon name="systemmessage/pinned" width={24} />
+            </div>
+            {#if layoutState.threadpinnedshown}
+                <div class="pin-messages">
+                    {#key guildState.threadMessageId}
+                        <Pinned messageIds={guildState.threadPinnedMessagesIds} />
+                    {/key}
+                </div>
+            {/if}
+        </div>
+        <div onclick={destroyThreadView} style="cursor:pointer; display: grid; place-items: center;">
             <Icon name="modal/x" width={24} />
         </div>
     </div>
     <div class="thread">
         <!-- TODO: support change of threadMessageId without rerender -->
         {#key guildState.threadMessageId}
-            <InfiniteScroll ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId} isThread={true} renderMessageSnippet={renderMessageSnippet} />
+            <InfiniteScroll ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId} renderMessageSnippet={renderMessageSnippet} bottomaligned={true} />
         {/key}
     </div>
 </div>
 
 
 <style>
+    .pin-wrapper {
+        position: relative;
+        .pin-btn {
+            cursor: pointer;
+            color: #b5bac1;
+            &:hover {
+                color: #dbdee1;
+            }
+            &.active {
+                color: white;
+            }
+        }
+        .pin-messages {
+            position: absolute;
+            top: 30px;
+            right: 0px;
+
+            width: 400px;
+            z-index: 500;
+        }
+    }
+
     .thread-wrapper {
         height: 100%;
         margin-left: 7px;
