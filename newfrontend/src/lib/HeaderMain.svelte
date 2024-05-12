@@ -1,10 +1,16 @@
 <script lang="ts">
     import { getGuildState } from "../js/stores/guildState.svelte";
     import { getLayoutState } from "../js/stores/layoutState.svelte";
+    import Pinned from "./Pinned.svelte";
     import Icon from "./icons/Icon.svelte";
 
     const guildState = getGuildState()
     const layoutState = getLayoutState()
+
+    let pinnedShown = $state(false)
+    const togglePinnedMessages = () => {
+        pinnedShown = !pinnedShown
+    }
 </script>
 
 
@@ -13,6 +19,18 @@
         <Icon name="channeltype/channel" width={20} />
     </div>
     <div class="channel-name">{guildState.channel?.name ?? "Select a channel"}</div>
+    <div style="display: flex;">
+        <div class="show-pinned">
+            <div class="show-pinned-btn" class:active={pinnedShown} onclick={togglePinnedMessages}>
+                <Icon name="systemmessage/pinned" width={24} />
+            </div>
+            {#if pinnedShown}
+                <div class="pinned-messages">
+                    <Pinned />
+                </div>
+            {/if}
+        </div>
+    </div>
 </div>
 
 
@@ -21,6 +39,32 @@
     .channel-icon {
         display: grid;
         place-items: center;
+    }
+
+    .show-pinned {
+        position: relative;
+        .show-pinned-btn {
+            cursor: pointer;
+            color: #b5bac1;
+            &:hover {
+                color: #dbdee1;
+            }
+            &.active {
+                color: white;
+            }
+        }
+    }
+
+    .pinned-messages {
+        position: absolute;
+        top: 30px;
+        right: 0px;
+
+        width: 400px;
+        height: 400px;
+        max-width: 420px;
+        max-height: calc(100vh - 76px);
+        z-index: 500;
     }
     .header-main {
         height: 100%;

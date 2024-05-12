@@ -15,9 +15,12 @@
         guildId: string
         selectedMessageId: string | null
         isThread: boolean
+        isPinned?: boolean
+        showWelcome?: boolean
+        showSeparators?: boolean
         renderMessageSnippet: (message: Message, previousMessage: Message) => void
     }
-    let { ids, guildId, selectedMessageId = null, isThread, renderMessageSnippet}: MyProps = $props();
+    let { ids, guildId, selectedMessageId = null, isThread, renderMessageSnippet, showWelcome = true, showSeparators = true}: MyProps = $props();
 
     let maxMessages = 120
     let loadIncrement = 30
@@ -203,14 +206,14 @@
     }
 </script>
 
-<div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
+<div class="scroll-container" class:bottompadded={showWelcome} onscroll={handleScroll} bind:this={scrollContainer}>
     {#if messages}
         {#each messages as message, index (message._id)}
-            {#if topLoaded && index === 0}
+            {#if showWelcome && topLoaded && index === 0}
                 <ChannelStart channelName={message.channelName} isThread={isThread} messageAuthor={message.author} />
             {/if}
 
-            {#if isDateDifferent(messages[index - 1], message)}
+            {#if showSeparators && isDateDifferent(messages[index - 1], message)}
                 <DateSeparator messageId={message._id} />
             {/if}
 
@@ -232,8 +235,12 @@
         /* https://stackoverflow.com/a/37515194 */
         display: flex;
         flex-flow: column nowrap;
-        padding-bottom: 32px;
+        padding-bottom: 1px;
         /* - */
+
+        &.bottompadded {
+            padding-bottom: 32px;
+        }
     }
 
     /* align messages to the bottom if there are not enough messages to fill the container height */

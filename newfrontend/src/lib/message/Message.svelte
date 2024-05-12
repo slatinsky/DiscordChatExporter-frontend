@@ -6,13 +6,13 @@
     import { snowflakeToDate } from "../../js/time";
     import MessageAutoModerationAction from "./MessageAutoModerationAction.svelte";
     import MesssageSpoilerHandler from "../MesssageSpoilerHandler.svelte";
-    import { get } from "svelte/store";
 
     interface MyProps {
         message: Message;
         previousMessage: Message | null;
+        mergeMessages?: boolean;
     }
-    let { message, previousMessage}: MyProps = $props();
+    let { message, previousMessage, mergeMessages=true}: MyProps = $props();
 
     function getMessageState(message: Message, previousMessage: Message | null) {
         function isSystemNotification(messageType: string): boolean {
@@ -56,6 +56,9 @@
          * Should this message merge with the previous message?
          */
         function shouldMerge(previousMessage: Message | null, message: Message) {
+            if (!mergeMessages) {
+                return false;
+            }
             // null checks
             if (!previousMessage) {
                 console.log("should merge - NO PREVIOUS MESSAGE")

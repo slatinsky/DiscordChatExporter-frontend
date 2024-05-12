@@ -81,6 +81,9 @@
 
 
 <style>
+    :global(.message-markdown) {
+        word-break: break-all;
+    }
     :global(.message-markdown pre) {
         margin: 6px 0 0 0;
     }

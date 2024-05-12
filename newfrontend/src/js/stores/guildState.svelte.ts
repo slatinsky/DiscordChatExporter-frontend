@@ -1,5 +1,5 @@
 import { isObjectEqual } from "../helpers";
-import { fetchCategoriesChannelsThreads, fetchGuilds, fetchMessageIds } from "./api";
+import { fetchCategoriesChannelsThreads, fetchGuilds, fetchMessageIds, fetchPinnedMessageIds } from "./api";
 import { getLayoutState } from "./layoutState.svelte";
 
 let guilds = $state(await fetchGuilds());
@@ -11,11 +11,13 @@ let categories = $state([]);
 let channel = $derived(categories.flatMap(c => c.channels).find(c => c._id === channelId) || null);
 let channelMessageId = $state(null);
 let channelMessagesIds = $state([]);
+let channelPinnedMessagesIds = $state([]);
 
 let threadId = $state(null);
 let thread = $derived(categories.flatMap(c => c.channels).flatMap(c => c.threads).find(t => t._id === threadId) || null);
 let threadMessageId = $state(null);
 let threadMessagesIds = $state([]);
+let threadPinnedMessagesIds = $state([]);
 
 
 export function isChannel(channelId: string) {
@@ -120,10 +122,12 @@ export function getGuildState() {
 		if (newChannelId && guildId) {
 			channelMessagesIds = await fetchMessageIds(guildId, newChannelId)
 			channelMessageId = channelMessagesIds.length > 0 ? channelMessagesIds[-1] : null  // last message
+			channelPinnedMessagesIds = await fetchPinnedMessageIds(guildId, newChannelId)
 		}
 		else {
 			channelMessagesIds = []
 			channelMessageId = null
+			channelPinnedMessagesIds = []
 		}
 		console.log("router - changed channelId", channelId);
 	}
@@ -136,12 +140,14 @@ export function getGuildState() {
 		if (newThreadId && guildId) {
 			threadMessagesIds = await fetchMessageIds(guildId, newThreadId)
 			threadMessageId = threadMessagesIds.length > 0 ? threadMessagesIds[-1] : null  // last message
+			threadPinnedMessagesIds = await fetchPinnedMessageIds(guildId, newThreadId)
 
 			layoutState.showThread()
 		}
 		else {
 			threadMessagesIds = []
 			threadMessageId = null
+			threadPinnedMessagesIds = []
 
 			layoutState.hideThread()
 		}
@@ -251,11 +257,17 @@ export function getGuildState() {
 		get channelMessageId() {
 			return channelMessageId;
 		},
+		get channelPinnedMessagesIds() {
+			return channelPinnedMessagesIds;
+		},
 		get threadMessagesIds() {
 			return threadMessagesIds;
 		},
 		get threadMessageId() {
 			return threadMessageId;
+		},
+		get threadPinnedMessagesIds() {
+			return threadPinnedMessagesIds;
 		},
 		changeGuildId,
 		changeChannelId,

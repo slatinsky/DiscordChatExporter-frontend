@@ -2,12 +2,25 @@ import type { Category, Channel } from "../interfaces";
 
 export async function fetchMessageIds(guildId: string, channelId: string) {
     try {
-        let response = await fetch(`/api/message-ids?guild_id=${guildId}&channel_id=${channelId}`)
+        let response = await fetch(`/api/message-ids?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}`)
         let messageIds = await response.json()
         return messageIds
     }
     catch (e) {
         console.error("Failed to fetch message ids", e)
+        return []
+    }
+}
+
+export async function fetchPinnedMessageIds(guildId: string, channelId: string) {
+    try {
+        const prompt = `pinned:true in_id:${encodeURIComponent(channelId)}`
+        let response = await fetch(`/api/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}`);
+        let messageIds = await response.json();
+        return messageIds
+    }
+    catch (e) {
+        console.error("Failed to fetch pinned message ids", e)
         return []
     }
 }

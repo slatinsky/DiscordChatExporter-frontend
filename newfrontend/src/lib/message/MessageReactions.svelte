@@ -42,6 +42,7 @@
         border-radius: 8px;
         background-color: #2b2d31;
         align-items: center;
+        cursor: pointer;
     }
 
     .message-reaction.me {

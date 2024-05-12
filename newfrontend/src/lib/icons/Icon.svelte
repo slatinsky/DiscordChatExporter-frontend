@@ -28,6 +28,7 @@
     import voice from "./channeltype/voice.svg?raw"
     import thread from "./channeltype/thread.svg?raw"
     import poop from "./placeholder/poop.svg?raw"
+    import noPins from "./placeholder/no-pins.svg?raw"
 
     import download from "./other/download.svg?raw"
     import dropdown from "./other/dropdown.svg?raw"
@@ -68,6 +69,7 @@
                         "channeltype/voice" |
                         "channeltype/thread" |
                         "placeholder/poop" |
+                        "placeholder/no-pins" |
                         "other/download" |
                         "other/dropdown" |
                         "other/hamburger" |
@@ -145,6 +147,8 @@
         {@html thread}
     {:else if name === "placeholder/poop"}
         {@html poop}
+    {:else if name === "placeholder/no-pins"}
+        {@html noPins}
     {:else if name === "other/download"}
         {@html download}
     {:else if name === "other/dropdown"}
