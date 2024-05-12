@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { Message } from "../../js/interfaces";
-    import { getGuildState } from "../../js/stores/guildState.svelte";
+    import { changeMessageId, getGuildState } from "../../js/stores/guildState.svelte";
+    import { getLayoutState } from "../../js/stores/layoutState.svelte";
     import { getViewUserState } from "../viewuser/viewUserState.svelte";
     import MessageAuthorName from "./MessageAuthorName.svelte";
     import MessageReactions from "./MessageReactions.svelte";
@@ -11,6 +12,8 @@
 
     export let message: Message
     const guildState = getGuildState()
+    const layoutState = getLayoutState()
+
     const viewUserState = getViewUserState()
     $: guildName = guildState.guilds.find(guild => guild._id === message.guildId)?.name ?? "this server"
 </script>
@@ -49,9 +52,10 @@
                 <span class="system-message-text">changed the channel icon.</span>
             {:else if message.type == "ChannelPinnedMessage"}
                 {#if message?.reference?.messageId}
-                    <span class="system-message-text">pinned a message {message.reference.messageId} to this channel.</span>
+                    <!-- TODO: this assumes the message was pinned in a channel. But message can be pinned in a thread too  -->
+                    <span class="system-message-text">pinned <span class="link" on:click={()=>changeMessageId(message.reference.channelId, message.reference.messageId)}>a message</span> to this channel. See all <span class="link" on:click={layoutState.toggleChannelPinned}>pinned messages</span>.</span>
                 {:else}
-                    <span class="system-message-text">pinned a message to this channel.</span>
+                    <span class="system-message-text">pinned a message to this channel. See all <span class="link" on:click={layoutState.toggleChannelPinned}>pinned messages</span>.</span>
                 {/if}
             {:else if message.type == "ThreadCreated"}
                 <span class="system-message-text">started a thread.</span>
@@ -79,6 +83,15 @@
 
 
 <style>
+    .link {
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    .link:hover {
+        text-decoration: underline;
+    }
+
     .system-message-row {
         display: flex;
         gap: 10px;

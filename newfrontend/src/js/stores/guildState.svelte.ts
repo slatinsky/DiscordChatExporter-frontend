@@ -330,3 +330,18 @@ window.addEventListener("popstate", async (e) => {
 		await restoreGuildState(e.state);
 	}
 })
+
+
+export function changeMessageId(channelOrThreadId: string, messageId: string) {
+	if (isChannel(channelOrThreadId)) {
+		guildState.changeChannelMessageId(messageId)
+		guildState.pushState()
+	}
+	else if (isThread(channelOrThreadId)) {
+		guildState.changeThreadMessageId(messageId)
+		guildState.pushState()
+	}
+	else {
+		console.warn('MessageTimestamp - unknown channel or thread id', channelOrThreadId)
+	}
+}
