@@ -6,13 +6,15 @@
     import { snowflakeToDate } from "../../js/time";
     import MessageAutoModerationAction from "./MessageAutoModerationAction.svelte";
     import MesssageSpoilerHandler from "../MesssageSpoilerHandler.svelte";
+    import { getGuildState } from "../../js/stores/guildState.svelte";
 
     interface MyProps {
         message: Message;
         previousMessage: Message | null;
         mergeMessages?: boolean;
+        showJump?: boolean;
     }
-    let { message, previousMessage, mergeMessages=true}: MyProps = $props();
+    let { message, previousMessage, mergeMessages=true, showJump=false}: MyProps = $props();
 
     function getMessageState(message: Message, previousMessage: Message | null) {
         function isSystemNotification(messageType: string): boolean {
@@ -148,13 +150,20 @@
         }
     }
 
+    const guildState = getGuildState()
+    async function jumpToMessage(){
+        await guildState.comboSetGuildChannelMessage(message.guildId, message.channelId, message._id)
+        await guildState.pushState()
+    }
+
     const messageState = getMessageState(message, previousMessage)
 </script>
 
 
 <MesssageSpoilerHandler>
 
-    <div class="message" class:notgrouped={!messageState.shouldMerge} data-id={message._id}>
+    <div class="message" class:jumpable={showJump} class:notgrouped={!messageState.shouldMerge} data-id={message._id}>
+        <button class="jump-btn" on:click={jumpToMessage}>Jump</button>
         {#if message.type == "24"}
             <MessageAutoModerationAction message={message} messageState={messageState} />
         {:else if messageState.isSystemNotification}
@@ -169,8 +178,34 @@
     .message {
         margin-top: 5px;
         padding: 0 20px;
+        position: relative;
+
         &.notgrouped {
             margin-top: 17px;
+        }
+
+        .jump-btn {
+            display: none;
+        }
+    }
+
+    .message.jumpable {
+        cursor: pointer;
+        .jump-btn {
+            display: none;
+            position: absolute;
+            top: -10px;
+            right: 5px;
+            padding: 4px;
+
+            background-color: #1e1f22;
+            color: #b5bac1;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 3px;
+        }
+        &:hover .jump-btn {
+            display: block;
         }
     }
 </style>

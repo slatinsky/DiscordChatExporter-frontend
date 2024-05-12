@@ -1,6 +1,5 @@
 <script lang="ts">
     import { getGuildState } from "../js/stores/guildState.svelte";
-    import { getLayoutState } from "../js/stores/layoutState.svelte";
     import InfiniteScroll from "./InfiniteScroll.svelte";
     import Icon from "./icons/Icon.svelte";
     import Message from "./message/Message.svelte";
@@ -16,7 +15,7 @@
 
 {#snippet renderMessageSnippet(index, message, previousMessage)}
     <div class="pinned-message-wrapper" data-messageid={message._id}>
-        <Message message={message} previousMessage={previousMessage} />
+        <Message message={message} previousMessage={previousMessage} showJump={true} mergeMessages={false} />
     </div>
 {/snippet}
 
