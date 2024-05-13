@@ -125,6 +125,11 @@
             if (!message.reference) {
                 return false
             }
+            if (message.reference.guildId === null) {
+                // bug in older exports where guildId is null in referenced messages, but message.reference.channelId and message.reference.messageId is set correctly
+                // assume it's from the same guild, so return false
+                return false
+            }
             return message.reference.guildId !== message.guildId
         }
 
