@@ -56,7 +56,7 @@
 	}
 
 	:global([data-hidespoilers="true"] .media-spoiler) {
-		filter: blur(15px);
+		filter: blur(100px);
 		cursor: pointer;
 	}
 	:global([data-hidespoilers="true"] .media-spoiler > *) {
