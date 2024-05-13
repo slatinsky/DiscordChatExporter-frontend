@@ -393,7 +393,7 @@ const newEmoji = {
         return `<span class="message-emoji">:${node.name}:</span>`;
     }
     else {
-        return `<img class="message-emoji" src="${node.url}" alt="${node.name}" onclick="${openInGalleryTemplate(node.imageObj)}" style="cursor:pointer" >`;
+        return `<img class="message-emoji" src="${node.url}" title=":${node.name}:" alt="${node.name}" onclick="${openInGalleryTemplate(node.imageObj)}" style="cursor:pointer" >`;
     }
   },
 }
