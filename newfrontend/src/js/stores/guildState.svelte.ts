@@ -3,7 +3,7 @@ import { fetchCategoriesChannelsThreads, fetchGuilds, fetchMessageIds, fetchPinn
 import { getLayoutState } from "./layoutState.svelte";
 
 let guilds = $state(await fetchGuilds());
-let guildId = $state(null);
+let guildId = $state("nonExistingGuildId");  // will be changed before the first load
 let guild = $derived(guilds.find(g => g._id === guildId) || null);
 
 let channelId = $state(null);
@@ -103,6 +103,9 @@ export function getGuildState() {
 	}
 
 	async function changeGuildId(newGuildId: string | null) {
+		if (newGuildId === "000000000000000000000000") {
+			newGuildId = null
+		}
 		if (guildId === newGuildId) {
 			return;
 		}
@@ -119,7 +122,7 @@ export function getGuildState() {
 		channelId = newChannelId;
 		await changeThreadId(null)
 
-		if (newChannelId && guildId) {
+		if (newChannelId) {
 			channelMessagesIds = await fetchMessageIds(guildId, newChannelId)
 			channelMessageId = channelMessagesIds.length > 0 ? channelMessagesIds[-1] : null  // last message
 			channelPinnedMessagesIds = await fetchPinnedMessageIds(guildId, newChannelId)

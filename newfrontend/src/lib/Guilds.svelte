@@ -43,10 +43,12 @@
 
 	{#if guildState.guilds}
 		{#each guildState.guilds as guild}
-			<div class="guild" on:contextmenu|preventDefault={e=>onRightClick(e, guild._id)} class:selected={guildState.guildId === guild._id} on:click={e => changeGuildId(guild._id)}>
-				<div class="guild-selected-indicator" />
-				<img src={checkUrl(guild.icon)} alt={guild.name} on:error={e => (e.target.src = "/favicon.png")} />
-			</div>
+			{#if guild._id !== "000000000000000000000000"}
+				<div class="guild" on:contextmenu|preventDefault={e=>onRightClick(e, guild._id)} class:selected={guildState.guildId === guild._id} on:click={e => changeGuildId(guild._id)}>
+					<div class="guild-selected-indicator" />
+					<img src={checkUrl(guild.icon)} alt={guild.name} on:error={e => (e.target.src = "/favicon.png")} />
+				</div>
+			{/if}
 		{/each}
 	{/if}
 </div>

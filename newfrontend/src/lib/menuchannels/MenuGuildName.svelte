@@ -3,7 +3,7 @@
     const guildState = getGuildState()
 </script>
 
-<div class="guild-name">{guildState.guild?.name ?? "Homepage"}</div>
+<div class="guild-name">{guildState.guild?.name ?? "Direct Messages"}</div>
 
 <style>
     .guild-name {

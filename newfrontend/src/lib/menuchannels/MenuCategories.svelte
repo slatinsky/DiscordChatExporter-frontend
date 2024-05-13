@@ -10,9 +10,7 @@
 <div class="categories-col">
     <MenuGuildName />
     <div class="categories-wrapper">
-        {#if !guildState.guildId}
-            <div class="error">Select server</div>
-        {:else if guildState.categories.length === 0}
+        {#if guildState.categories.length === 0}
             <div class="error">No channels found</div>
         {/if}
         {#each guildState.categories as category}

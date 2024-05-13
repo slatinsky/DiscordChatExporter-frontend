@@ -1,6 +1,9 @@
 import type { Category, Channel } from "../interfaces";
 
-export async function fetchMessageIds(guildId: string, channelId: string) {
+export async function fetchMessageIds(guildId: string | null, channelId: string) {
+    if (guildId === null) {
+        guildId = "000000000000000000000000"
+    }
     try {
         let response = await fetch(`/api/message-ids?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}`)
         let messageIds = await response.json()
@@ -12,7 +15,10 @@ export async function fetchMessageIds(guildId: string, channelId: string) {
     }
 }
 
-export async function fetchPinnedMessageIds(guildId: string, channelId: string) {
+export async function fetchPinnedMessageIds(guildId: string | null, channelId: string) {
+    if (guildId === null) {
+        guildId = "000000000000000000000000"
+    }
     try {
         const prompt = `pinned:true in_id:${encodeURIComponent(channelId)}`
         let response = await fetch(`/api/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}`);
@@ -41,8 +47,8 @@ export async function fetchGuilds() {
 
 
 export async function fetchCategoriesChannelsThreads(guildId: string): Promise<Category[]> {
-    if (!guildId) {
-        return []
+    if (guildId === null) {
+        guildId = "000000000000000000000000"
     }
     console.log("aaaaaa fetchCategoriesChannelsThreads", guildId);
     try {
@@ -53,19 +59,32 @@ export async function fetchCategoriesChannelsThreads(guildId: string): Promise<C
         let channels_temp = []
         let lost_threads = []
 
+
+
         // create categories
-        let found_categories_ids: string[] = []
-        for (let channel of json_response) {
-            if (channel.type !== "GuildPublicThread" && channel.type !== "GuildPrivateThread") {
-                if (!found_categories_ids.includes(channel.categoryId)) {
-                    let category = {
-                        _id: channel.categoryId,
-                        name: channel.category,
-                        channels: [],
-                        msg_count: 0,
+        if (guildId === "000000000000000000000000") {
+            let category = {
+                _id: '0',
+                name: "Direct Messages",
+                channels: [],
+                msg_count: 0,
+            }
+            categories_temp.push(category)
+        }
+        else {
+            let found_categories_ids: string[] = []
+            for (let channel of json_response) {
+                if (channel.type !== "GuildPublicThread" && channel.type !== "GuildPrivateThread") {
+                    if (!found_categories_ids.includes(channel.categoryId)) {
+                        let category = {
+                            _id: channel.categoryId,
+                            name: channel.category,
+                            channels: [],
+                            msg_count: 0,
+                        }
+                        categories_temp.push(category)
+                        found_categories_ids.push(channel.categoryId)
                     }
-                    categories_temp.push(category)
-                    found_categories_ids.push(channel.categoryId)
                 }
             }
         }
@@ -74,6 +93,9 @@ export async function fetchCategoriesChannelsThreads(guildId: string): Promise<C
         for (let channel of json_response) {
             if (channel.type !== "GuildPublicThread" && channel.type !== "GuildPrivateThread") {
                 channel["threads"] = []
+                if (guildId === "000000000000000000000000") {
+                    channel["categoryId"] = '0'
+                }
                 channels_temp.push(channel)
             }
         }

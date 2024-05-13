@@ -11,10 +11,13 @@ let messageCache: MessageCache = {};
 let messageCacheWithoutReference: MessageCache = {};
 
 
-async function _fetchMessagesFromApi(guildId: string, messageIds: string[]) {
+async function _fetchMessagesFromApi(guildId: string | null, messageIds: string[]) {
     /**
      * Fetch messages from the API that are not already loaded in the cache
      */
+    if (guildId === null) {
+        guildId = "000000000000000000000000"
+    }
     let notInCache = messageIds.filter((messageId) => {
         return !messageCacheWithoutReference[messageId]
     })
