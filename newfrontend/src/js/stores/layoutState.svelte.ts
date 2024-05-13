@@ -1,5 +1,5 @@
 
-let mobilesidepanelshown = $state(true);
+let mobilesidepanelshown = $state(false);
 let searchshown = $state(false);
 let threadshown = $state(false);
 let settingsshown = $state(false);

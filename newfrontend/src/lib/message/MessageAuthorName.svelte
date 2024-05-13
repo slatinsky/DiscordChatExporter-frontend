@@ -59,6 +59,7 @@
     .username {
         cursor: pointer;
         font-weight: 500;
+        white-space: nowrap;
         &.verified {
             font-weight: 600;
         }

@@ -110,7 +110,7 @@
     .referenced-content {
         overflow: hidden;
         text-overflow: ellipsis;
-        max-height: 33px;
+        max-height: 19px;
 
         margin-top: 1px;
         margin-left: 3px;
@@ -126,5 +126,11 @@
             align-items:center;
             gap: 5px;
         }
+    }
+    /* make emojis smaller, so they fit in the small referenced message space */
+    .referenced-content :global(.message-emoji),
+    .referenced-content :global(.twemoji) {
+        width: 13px;
+        height: 13px;
     }
 </style>
