@@ -14,6 +14,32 @@
     }
     let { embed, messageState }: MyProps = $props();
 
+    let fieldGroups = $derived.by(()=> {
+        let groups = []
+        let currentGroup = []
+        for (let i = 0; i < embed.fields.length; i += 1) {
+            let currentField = embed.fields[i]
+            if (!currentField.isInline) {
+                if (currentGroup.length > 0) {
+                    groups.push(currentGroup)
+                    currentGroup = []
+                }
+                groups.push([currentField])
+            }
+            else {
+                if (currentGroup.length === 3) {
+                    groups.push(currentGroup)
+                    currentGroup = []
+                }
+                currentGroup.push(currentField)
+            }
+        }
+        if (currentGroup.length > 0) {
+            groups.push(currentGroup)
+        }
+        return groups
+    })
+
     let playingVideo: boolean = $state(false)
 
     let authorIconFailedToLoad: boolean = $state(false)
@@ -113,6 +139,19 @@
                             <MessageMarkdown content={embed.description} />
                         </div>
                     {/if}
+
+                    {#if embed.fields.length > 0}
+                        <div class="fields">
+                            {#each fieldGroups as group}
+                                {#each group as field}
+                                    <div class="field field-{group.length}" class:inlinefield={field.isInline}>
+                                        <div class="field-name">{field.name}</div>
+                                        <div class="field-value"><MessageMarkdown content={field.value} /></div>
+                                    </div>
+                                {/each}
+                            {/each}
+                        </div>
+                    {/if}
                 </div>
 
                 {#if embed.thumbnail && !playingVideo}
@@ -161,17 +200,6 @@
                     {/if}
                 {/if}
             </div>
-
-            {#if embed.fields.length > 0}
-                <div class="fields">
-                    {#each embed.fields as field}
-                        <div class="field" class:inlinefield={field.isInline}>
-                            <div class="field-name">{field.name}</div>
-                            <div class="field-value"><MessageMarkdown content={field.value} /></div>
-                        </div>
-                    {/each}
-                </div>
-            {/if}
 
             {#if embed.images.length > 0}
                 <div class="image-embeds-wrapper">
@@ -239,8 +267,11 @@
             display: flex;
 
             .thumb-col {
+                display: block;
                 .thumbnail-wrapper {
                     margin: 8px 0 0 16px;
+                    max-width: 80px;
+                    max-height: 80px;
                 }
             }
         }
@@ -356,11 +387,17 @@
             gap: 8px;
             margin-top: 8px;
 
+            position: relative;
+
             .field {
                 width: 100%;
+                box-sizing: content-box;
 
-                &.inlinefield {
-                    width: calc(33.33% - 8px);
+                &.inlinefield.field-3 {
+                    width: calc(33.33% - 6px);
+                }
+                &.inlinefield.field-2 {
+                    width: calc(50% - 4px);
                 }
 
                 .field-name {

@@ -82,7 +82,14 @@
 
 <style>
     :global(.message-markdown) {
-        word-break: break-all;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        -ms-word-break: break-all;
+        word-break: break-word;
+        -ms-hyphens: auto;
+        -moz-hyphens: auto;
+        -webkit-hyphens: auto;
+        hyphens: auto;
     }
     :global(.message-markdown pre) {
         margin: 6px 0 0 0;
@@ -192,7 +199,6 @@
 		background-color: #2b2d31;
 		border-radius: 4px;
 		border: 1px solid #232428;
-		margin-right: 10%;
 
 		font-size: 14px;
 		padding: 7px !important;
