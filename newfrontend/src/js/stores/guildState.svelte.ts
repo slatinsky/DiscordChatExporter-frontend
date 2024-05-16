@@ -1,3 +1,4 @@
+import { getSearchState } from "../../lib/search/searchState.svelte";
 import { isObjectEqual } from "../helpers";
 import { fetchCategoriesChannelsThreads, fetchGuilds, fetchMessageIds, fetchPinnedMessageIds } from "./api";
 import { getLayoutState } from "./layoutState.svelte";
@@ -19,14 +20,47 @@ let threadMessageId = $state(null);
 let threadMessagesIds = $state([]);
 let threadPinnedMessagesIds = $state([]);
 
+// fast lookups:
+// key is channelId, value is channel object
+let channelsLookup = $derived.by(() => categories.flatMap(c => c.channels).reduce((acc, channel) => {
+	acc[channel._id] = channel
+	return acc
+}, {}));
+
+// key is threadId, value is thread object
+let threadsLookup = $derived.by(() => categories.flatMap(c => c.channels).flatMap(c => c.threads).reduce((acc, thread) => {
+	acc[thread._id] = thread
+	return acc
+}, {}));
+
 
 export function isChannel(channelId: string) {
-	return categories.flatMap(c => c.channels).find(c => c._id === channelId) !== undefined
+	return channelsLookup[channelId] !== undefined
 }
 export function isThread(threadId: string) {
-	return categories.flatMap(c => c.channels).flatMap(c => c.threads).find(t => t._id === threadId) !== undefined
+	return threadsLookup[threadId] !== undefined
 }
 
+export function findChannel(channelId: string) {
+	return channelsLookup[channelId]
+}
+
+export function findThread(threadId: string) {
+	return threadsLookup[threadId]
+}
+
+export function findChannelThread(channelOrThreadId: string) {
+	if (isChannel(channelOrThreadId)) {
+		return findChannel(channelOrThreadId)
+	}
+	else if (isThread(channelOrThreadId)) {
+		return findThread(channelOrThreadId)
+	}
+	else {
+		console.warn("findChannelThread - channel or thread not found", channelOrThreadId)
+		return null
+	}
+}
 
 export function getGuildState() {
 	function _getStateObject() {
@@ -35,7 +69,8 @@ export function getGuildState() {
 			channel: channelId || null,
 			thread: threadId || null,
 			channelmessage: channelMessageId || null,
-			threadmessage: threadMessageId || null
+			threadmessage: threadMessageId || null,
+			search: searchState.submittedSearchPrompt || null
 		}
 	}
 
@@ -46,7 +81,8 @@ export function getGuildState() {
 			channel: urlParams.get("channel") || null,
 			thread: urlParams.get("thread") || null,
 			channelmessage: urlParams.get("channelmessage") || null,
-			threadmessage: urlParams.get("threadmessage") || null
+			threadmessage: urlParams.get("threadmessage") || null,
+			search: urlParams.get("search") || null
 		}
 
 		// convert null strings to null values
@@ -110,6 +146,7 @@ export function getGuildState() {
 			return;
 		}
 		guildId = newGuildId;
+		searchState.clearSearch()
 		await changeChannelId(null)
 		categories = await fetchCategoriesChannelsThreads(guildId)
 		console.log("router - changed guildId", guildId);
@@ -308,11 +345,15 @@ async function restoreGuildState(state) {
 	await guildState.changeThreadId(state.thread);
 	await guildState.changeChannelMessageId(state.channelmessage);
 	await guildState.changeThreadMessageId(state.threadmessage);
+
+	await searchState.setSearchPrompt(state.search)
+	await searchState.search(guildState.guildId)
 	console.log("router - restored", state);
 }
 
 const guildState = getGuildState();
 const layoutState = getLayoutState()
+const searchState = getSearchState()
 
 /**
  * Restore the state from the url on initial load

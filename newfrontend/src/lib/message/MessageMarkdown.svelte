@@ -2,8 +2,6 @@
     import { online } from "../../js/stores/settingsStore.svelte";
     import type { Channel, Emoji, Role } from "../../js/interfaces";
     import { parseMarkdown } from "../../js/markdownParser";
-    import { searchPrompt } from "../../js/stores/searchStores";
-
 
     export let content: string
     export let emotes: Emoji[] = []
@@ -17,27 +15,27 @@
 
     // parse search terms from search prompt
     let terms: string[] = []
-    function searchPromptChanged(newValue: string): void {
-        // remove everything with `:` in it, we want to highlight only words
-        // supports removal of values with quotes, like `from:"Deleted User#0000"`
-        newValue = newValue.replaceAll(/\w+:".*?"|\w+:\w+|\w+:/gi, '')
+    // function searchPromptChanged(newValue: string): void {
+    //     // remove everything with `:` in it, we want to highlight only words
+    //     // supports removal of values with quotes, like `from:"Deleted User#0000"`
+    //     newValue = newValue.replaceAll(/\w+:".*?"|\w+:\w+|\w+:/gi, '')
 
-        // remove all double spaces
-        newValue = newValue.replaceAll(/\s{2,}/g, ' ')
+    //     // remove all double spaces
+    //     newValue = newValue.replaceAll(/\s{2,}/g, ' ')
 
-        // remove all spaces at the beginning and end
-        newValue = newValue.trim()
+    //     // remove all spaces at the beginning and end
+    //     newValue = newValue.trim()
 
-        // split by spaces to array
-        let termsTemp = newValue.split(' ')
+    //     // split by spaces to array
+    //     let termsTemp = newValue.split(' ')
 
-        // remove empty strings
-        termsTemp = termsTemp.filter(term => term.length > 0)
+    //     // remove empty strings
+    //     termsTemp = termsTemp.filter(term => term.length > 0)
 
-        // apply highlight
-        terms = termsTemp
-    }
-    $: $searchPrompt, searchPromptChanged($searchPrompt)
+    //     // apply highlight
+    //     terms = termsTemp
+    // }
+    // $: $searchPrompt, searchPromptChanged($searchPrompt)
 
     function messageContainsOnlyEmojis(content: string): boolean {
         const emojiRegex = /<a?:\w+:\d{17,24}>/g

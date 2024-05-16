@@ -5,7 +5,7 @@
     import MenuCategories from "./lib/menuchannels/MenuCategories.svelte";
     import Guilds from "./lib/Guilds.svelte";
     import HeaderMain from "./lib/HeaderMain.svelte";
-    import SearchResults from "./lib/SearchResults.svelte";
+    import SearchResults from "./lib/search/SearchResults.svelte";
     import Channel from "./lib/Channel.svelte";
     import Thread from "./lib/Thread.svelte";
     import Settings from "./lib/settings/Settings.svelte";
@@ -139,6 +139,7 @@
   .search-results {
     grid-area: search-results;
     background-color: #2B2D31;
+    overflow: hidden;
   }
   .thread {
     grid-area: thread;
@@ -203,7 +204,7 @@
     "guilds channels header-main    header-main   "
     "guilds channels        channel search-results";
 
-    grid-template-columns: 70px 236px 1fr 400px;
+    grid-template-columns: 70px 236px 1fr 420px;
     grid-template-rows: 47px 1fr;
   }
   main.desktop.searchshown.threadshown .search-results,

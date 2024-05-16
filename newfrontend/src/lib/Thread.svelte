@@ -6,11 +6,13 @@
     import InfiniteScroll from "./InfiniteScroll.svelte";
     import Pinned from "./Pinned.svelte";
     import Icon from "./icons/Icon.svelte";
+    import ChannelIcon from "./menuchannels/ChannelIcon.svelte";
     import ChannelStart from "./message/ChannelStart.svelte";
     import Message from "./message/Message.svelte";
 
     function destroyThreadView() {
         guildState.changeThreadId(null)
+        guildState.pushState()
     }
 
     const guildState = getGuildState()
@@ -34,7 +36,13 @@
 
 <div class="thread-wrapper">
     <div class="header-main">
-        <div class="thread-name">{guildState.thread?.name ?? "Select a thread"}</div>
+        <div class="thread-name">
+            {#if guildState.thread?.name}
+                <ChannelIcon channel={guildState.thread} width={20} /><span>{guildState.thread.name}</span>
+            {:else}
+                <span>Select a thread</span>
+            {/if}
+        </div>
         <div class="pin-wrapper">
             <div class="pin-btn" class:active={layoutState.threadpinnedshown} onclick={layoutState.toggleThreadPinned}>
                 <Icon name="systemmessage/pinned" width={24} />
@@ -54,7 +62,7 @@
     <div class="thread">
         <!-- TODO: support change of threadMessageId without rerender -->
         {#key guildState.threadMessageId}
-            <InfiniteScroll ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId} renderMessageSnippet={renderMessageSnippet} bottomaligned={true} />
+            <InfiniteScroll debugname="thread" ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId} renderMessageSnippet={renderMessageSnippet} bottomaligned={true} />
         {/key}
     </div>
 </div>
@@ -106,6 +114,8 @@
     }
 
     .thread-name {
+        display: flex;
+        gap: 8px;
         font-size: 16px;
         font-weight: 600;
         color: #F2F3F5;

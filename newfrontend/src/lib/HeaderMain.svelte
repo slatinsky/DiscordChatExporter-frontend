@@ -3,6 +3,8 @@
     import { getLayoutState } from "../js/stores/layoutState.svelte";
     import Pinned from "./Pinned.svelte";
     import Icon from "./icons/Icon.svelte";
+    import ChannelIcon from "./menuchannels/ChannelIcon.svelte";
+    import SearchInput from "./search/SearchInput.svelte";
 
     const guildState = getGuildState()
     const layoutState = getLayoutState()
@@ -10,11 +12,15 @@
 
 
 <div class="header-main" class:threadshown={layoutState.threadshown}>
-    <div class="channel-icon">
-        <Icon name="channeltype/channel" width={20} />
+    <div class="channel-name">
+        {#if guildState.channel?.name}
+            <ChannelIcon channel={guildState.channel} width={20} />
+            <span>{guildState.channel.name}</span>
+        {:else}
+            <span>Select a channel</span>
+        {/if}
     </div>
-    <div class="channel-name">{guildState.channel?.name ?? "Select a channel"}</div>
-    <div style="display: flex;">
+    <div class="other-wrapper">
         {#if guildState.channelId}
             <div class="pin-wrapper">
                 <div class="pin-btn" class:active={layoutState.channelpinnedshown} onclick={layoutState.toggleChannelPinned}>
@@ -29,20 +35,23 @@
                 {/if}
             </div>
         {/if}
+        <SearchInput />
     </div>
 </div>
 
 
 
 <style>
-    .channel-icon {
-        display: grid;
-        place-items: center;
+    .other-wrapper {
+        display: flex;
+        gap: 4px;
     }
 
     .pin-wrapper {
+        display: flex;
         position: relative;
         .pin-btn {
+            margin: 0 10px;
             cursor: pointer;
             color: #b5bac1;
             &:hover {
@@ -80,6 +89,8 @@
     }
 
     .channel-name {
+        display: flex;
+        gap: 8px;
         font-size: 16px;
         font-weight: 600;
         color: #F2F3F5;

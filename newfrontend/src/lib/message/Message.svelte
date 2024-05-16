@@ -195,8 +195,8 @@
     }
 
     .message.jumpable {
-        cursor: pointer;
         .jump-btn {
+            cursor: pointer;
             display: none;
             position: absolute;
             top: -10px;

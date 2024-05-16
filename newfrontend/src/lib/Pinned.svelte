@@ -40,7 +40,7 @@
             <div class="header-txt">Pinned Messages</div>
         </div>
         <div class="channel" >
-            <InfiniteScroll ids={messageIds} guildId={guildState.guildId} selectedMessageId={messageIds[0]} renderMessageSnippet={renderMessageSnippet} bottomaligned={false} />
+            <InfiniteScroll debugname="pinned" ids={messageIds} guildId={guildState.guildId} selectedMessageId={messageIds[0]} renderMessageSnippet={renderMessageSnippet} bottomAligned={false} />
         </div>
     </div>
 {/if}

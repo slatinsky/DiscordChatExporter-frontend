@@ -29,6 +29,7 @@
     import thread from "./channeltype/thread.svg?raw"
     import poop from "./placeholder/poop.svg?raw"
     import noPins from "./placeholder/no-pins.svg?raw"
+    import noSearchResults from "./placeholder/no-search-results.svg?raw"
 
     import download from "./other/download.svg?raw"
     import dropdown from "./other/dropdown.svg?raw"
@@ -36,6 +37,7 @@
     import settings from "./other/settings.svg?raw"
     import shield from "./other/shield.svg?raw"
     import verified from "./other/verified.svg?raw"
+    import magnifyingGlass from "./other/magnifying-glass.svg?raw"
 
     import arrowUp from "./modal/arrowUp.svg?raw"
     import modalX from "./modal/x.svg?raw"
@@ -70,12 +72,14 @@
                         "channeltype/thread" |
                         "placeholder/poop" |
                         "placeholder/no-pins" |
+                        "placeholder/no-search-results" |
                         "other/download" |
                         "other/dropdown" |
                         "other/hamburger" |
                         "other/settings" |
                         "other/shield" |
                         "other/verified" |
+                        "other/magnifying-glass" |
                         "modal/arrowUp" |
                         "modal/x"
 
@@ -149,6 +153,8 @@
         {@html poop}
     {:else if name === "placeholder/no-pins"}
         {@html noPins}
+    {:else if name === "placeholder/no-search-results"}
+        {@html noSearchResults}
     {:else if name === "other/download"}
         {@html download}
     {:else if name === "other/dropdown"}
@@ -161,6 +167,8 @@
         {@html shield}
     {:else if name === "other/verified"}
         {@html verified}
+    {:else if name === "other/magnifying-glass"}
+        {@html magnifyingGlass}
     {:else if name === "modal/arrowUp"}
         {@html arrowUp}
     {:else if name === "modal/x"}

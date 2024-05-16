@@ -4,8 +4,8 @@
     import { contextMenuItems } from "../../js/stores/menuStore";
     import type { Channel } from "../../js/interfaces";
     import { getGuildState } from "../../js/stores/guildState.svelte";
-    import Icon from "../icons/Icon.svelte";
     import { linkHandler } from "../../js/stores/settingsStore.svelte";
+    import ChannelIcon from "./ChannelIcon.svelte";
 
     interface MyProps {
         channel: Channel;
@@ -58,15 +58,7 @@
 
 <div class="channel" class:selected={guildState.channelId == channel._id} on:click={toggle} on:contextmenu|preventDefault={(e) => onChannelRightClick(e, channel._id, channel.name)}>
     <div class="channel-icon">
-        {#if channel.threads.length > 0}
-            <Icon name="channeltype/channelWithThreads" width={20} />
-        {:else if channel.type == "GuildVoiceChat"}
-            <Icon name="channeltype/voice" width={20} />
-        {:else if channel.type == "GuildNews"}
-            <Icon name="channeltype/news" width={20} />
-        {:else}
-            <Icon name="channeltype/channel" width={20} />
-        {/if}
+        <ChannelIcon channel={channel} width={20} />
     </div><span title="{channel.msg_count} messages">{channel.name}</span>
 </div>
 {#each channel.threads as thread}

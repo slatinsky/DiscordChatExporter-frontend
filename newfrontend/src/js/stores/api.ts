@@ -15,20 +15,24 @@ export async function fetchMessageIds(guildId: string | null, channelId: string)
     }
 }
 
-export async function fetchPinnedMessageIds(guildId: string | null, channelId: string) {
+export async function fetchSearch(guildId: string | null, prompt: string) {
     if (guildId === null) {
         guildId = "000000000000000000000000"
     }
     try {
-        const prompt = `pinned:true in_id:${encodeURIComponent(channelId)}`
-        let response = await fetch(`/api/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}`);
-        let messageIds = await response.json();
+        let response = await fetch(`/api/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}`)
+        let messageIds = await response.json()
         return messageIds
     }
     catch (e) {
-        console.error("Failed to fetch pinned message ids", e)
+        console.error("fetchSearch - Failed to fetch search", e)
         return []
     }
+}
+
+export async function fetchPinnedMessageIds(guildId: string | null, channelId: string) {
+    const prompt = `pinned:true in_id:${encodeURIComponent(channelId)}`
+    return fetchSearch(guildId, prompt)
 }
 
 export async function fetchGuilds() {

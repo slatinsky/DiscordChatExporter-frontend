@@ -12,9 +12,10 @@
         guildId: string
         selectedMessageId: string | null
         bottomAligned: boolean
+        debugname: string
         renderMessageSnippet: (index: number, message: Message, previousMessage: Message) => void
     }
-    let { ids, guildId, selectedMessageId = null, renderMessageSnippet, bottomAligned}: MyProps = $props();
+    let { ids, guildId, selectedMessageId = null, renderMessageSnippet, bottomAligned, debugname=""}: MyProps = $props();
 
     let maxMessages = 120
     let loadIncrement = 30
@@ -35,9 +36,9 @@
     }
 
     async function idsChanged() {
-        console.log('scroller - ids changed - selectedMessageId', selectedMessageId, "ids length", ids.length)
+        console.log(`scroller[${debugname}] - ids changed - selectedMessageId ${selectedMessageId} ids length ${ids.length}`)
         if (ids.length === 0) {
-            console.log('scroller - no messages to load')
+            console.log(`scroller[${debugname}] - no messages to load`)
             messages = []
             return
         }
@@ -47,13 +48,13 @@
         let centerIndex
         if (selectedMessageId) {
             centerIndex = ids.indexOf(selectedMessageId)
-            console.log('scroller - selected message index', centerIndex)
+            console.log(`scroller[${debugname}] - selected message index ${centerIndex}`)
         }
         else {
-            console.log('scroller - no selected message')
+            console.log(`scroller[${debugname}] - no selected message`)
         }
 
-        if (!centerIndex || centerIndex < 0) {
+        if (centerIndex == null || centerIndex < 0) {
             centerIndex = Math.round(ids.length - 1)
         }
 
@@ -79,24 +80,29 @@
 
             // scroll to selected message
             if (selectedMessageId) {
+                let failedToScroll = true
                 // find selected message index
                 if (loadedIds.includes(selectedMessageId)) {
                     let selectedMessageElement = scrollContainer.querySelector(`[data-messageid="${selectedMessageId}"]`)
                     if (selectedMessageElement) {
                         selectedMessageElement.scrollIntoView({ block: "start", behavior: "instant" })
-                        console.log('scroller - selected message scrolled into view')
-                    }
-                    else {
-                        console.log('scroller - selected message not found in loaded messages')
+                        console.log(`scroller[${debugname}] - selected message scrolled into view`)
+                        failedToScroll = false
                     }
                 }
-                else {
-                    console.log('scroller - selected message not found in loaded messages', JSON.stringify(loadedIds), selectedMessageId)
+
+                if (failedToScroll) {
+                    if (ids.includes(selectedMessageId)) {
+                        console.warn(`scroller[${debugname}] - selected message not found in loaded messages BUT found in all messages`)
+                    }
+                    else {
+                        console.warn(`scroller[${debugname}] - selected message not found in loaded messages and in all messages`)
+                    }
                 }
             }
             else {
                 scrollContainer.scrollTop = scrollContainer.scrollHeight
-                console.log('scroller - no selected message to scroll to')
+                console.log(`scroller[${debugname}] - no selected message to scroll to`)
             }
             watchScroll = true
         }, 0)
@@ -116,10 +122,11 @@
                 }
             }
             else {
-                console.log('scroller - top of the page - No more messages to load.')
+                console.log(`scroller[${debugname}] - top of the page - No more messages to load.`)
                 break
             }
         }
+        console.log(`scroller[${debugname}] - loadLowUnloadHigh`)
 
         await refetchMessages(loadedIds)
         watchScroll = true
@@ -140,10 +147,11 @@
                 }
             }
             else {
-                console.log('scroller - bottom of the page - No more messages to load.')
+                console.log(`scroller[${debugname}] - bottom of the page - No more messages to load.`)
                 break
             }
         }
+        console.log(`scroller[${debugname}] - loadHighUnloadLow`)
 
         await refetchMessages(loadedIds)
         watchScroll = true
@@ -175,12 +183,12 @@
         let margin = startLoadingPixels
         if (element.scrollTop < margin) {
             watchScroll = false
-            console.log('scroller - reached top of the page')
+            console.log(`scroller[${debugname}] - reached top of the page`)
             loadLowUnloadHigh()
         }
         if (element.scrollHeight - element.scrollTop <= element.clientHeight + margin) {
             watchScroll = false
-            console.log('scroller - reached bottom of the page')
+            console.log(`scroller[${debugname}] - reached bottom of the page`)
             loadHighUnloadLow()
         }
     }

@@ -31,7 +31,7 @@
     <div class="channel" >
         <!-- TODO: support change of selectedMessageId without rerender -->
         {#key guildState.channelMessageId}
-            <InfiniteScroll ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId} renderMessageSnippet={renderMessageSnippet} bottomaligned={true} />
+            <InfiniteScroll debugname="channel" ids={guildState.channelMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.channelMessageId} renderMessageSnippet={renderMessageSnippet} bottomaligned={true} />
         {/key}
     </div>
 </div>
