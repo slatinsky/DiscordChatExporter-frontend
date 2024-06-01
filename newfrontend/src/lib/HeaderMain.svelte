@@ -35,13 +35,18 @@
                 {/if}
             </div>
         {/if}
-        <SearchInput />
+        <div class="search-wrapper">
+            <SearchInput />
+        </div>
     </div>
 </div>
 
 
 
 <style>
+    .search-wrapper {
+        position: relative;
+    }
     .other-wrapper {
         display: flex;
         gap: 4px;

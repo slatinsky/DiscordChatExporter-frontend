@@ -38,6 +38,9 @@
     import shield from "./other/shield.svg?raw"
     import verified from "./other/verified.svg?raw"
     import magnifyingGlass from "./other/magnifying-glass.svg?raw"
+    import help from "./other/help.svg?raw"
+    import bin from "./other/bin.svg?raw"
+    import plus from "./other/plus.svg?raw"
 
     import arrowUp from "./modal/arrowUp.svg?raw"
     import modalX from "./modal/x.svg?raw"
@@ -80,6 +83,9 @@
                         "other/shield" |
                         "other/verified" |
                         "other/magnifying-glass" |
+                        "other/help" |
+                        "other/bin" |
+                        "other/plus" |
                         "modal/arrowUp" |
                         "modal/x"
 
@@ -169,6 +175,12 @@
         {@html verified}
     {:else if name === "other/magnifying-glass"}
         {@html magnifyingGlass}
+    {:else if name === "other/help"}
+        {@html help}
+    {:else if name === "other/bin"}
+        {@html bin}
+    {:else if name === "other/plus"}
+        {@html plus}
     {:else if name === "modal/arrowUp"}
         {@html arrowUp}
     {:else if name === "modal/x"}

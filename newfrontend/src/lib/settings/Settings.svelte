@@ -1,5 +1,5 @@
 <script>
-    import { nameRenderer, developerMode, theme, online, gifs, linkHandler, channelScrollPosition, hideSpoilers, font, timestampFormat, dateFormat, timeFormat, locale} from '../../js/stores/settingsStore.svelte';
+    import { nameRenderer, startingDayOfTheWeek, developerMode, theme, online, gifs, linkHandler, channelScrollPosition, hideSpoilers, font, timestampFormat, dateFormat, timeFormat, locale} from '../../js/stores/settingsStore.svelte';
     import { dateFormats, timeFormats, formatMoment, browserLocales } from '../../js/time';
     import RadioButton from './RadioButton.svelte';
     import RadioGroup from './RadioGroup.svelte';
@@ -76,6 +76,27 @@
                         value={"both"}
                         bind:group={$nameRenderer}
                     />
+                </RadioGroup>
+
+                <hr>
+
+                <RadioGroup
+                title={"Start of the week"}
+                >
+                    <RadioButton
+                        title={"Sunday"}
+                        name={"startingDayOfTheWeek"}
+                        value={0}
+                        bind:group={$startingDayOfTheWeek}
+                    />
+                    <RadioButton
+                        title={"Monday"}
+                        name={"startingDayOfTheWeek"}
+                        value={1}
+                        bind:group={$startingDayOfTheWeek}
+                    />
+
+
                 </RadioGroup>
 
                 <hr>

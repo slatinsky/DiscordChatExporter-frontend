@@ -592,7 +592,7 @@ SEARCH_CATEGORIES = [
 		"autocompleteApi": "extensions",
 	},
 	{
-		"key": 'filename',
+		"key": 'file',
 		"description": 'file',
 		"description2": "partial regex match",
 		"type": 'string',
@@ -715,6 +715,15 @@ def search_categories():
 	return SEARCH_CATEGORIES
 
 
+def username_discriminate_user(username: str):
+	"""
+	if username doesn't end with #xxxx, add #0000
+	"""
+	if re.match(r'.+#\d{4}$', username):
+		return username
+	else:
+		return f"{username}#0000"
+
 
 def parse_prompt(prompt: str):
 	"""
@@ -760,8 +769,15 @@ def parse_prompt(prompt: str):
 
 	searchCategoriesMap = {x["key"]: x for x in SEARCH_CATEGORIES}
 
-	for i, char in enumerate(prompt.strip() + " "):
-		if char == '"':
+	stripped_prompt = prompt.strip() + " "
+
+	for i, char in enumerate(stripped_prompt):
+		# ignore escaped quote
+		if char == '\\' and (i == len(stripped_prompt) - 1 or stripped_prompt[i + 1] == '"'):
+			continue
+
+		# ignore escaped quote, flip inside_quotes
+		if char == '"' and (i == 0 or stripped_prompt[i - 1] != "\\"):
 			inside_quotes = not inside_quotes
 			continue
 
@@ -887,10 +903,13 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		message_ids = search["message_ids"]
 		from_user_ids = search["from_user_ids"]
 		from_users = search["from_users"]
+		from_users = [username_discriminate_user(username) for username in from_users]
 		reaction_from_ids = search["reaction_from_ids"]
 		reaction_from = search["reaction_from"]
+		reaction_from = [username_discriminate_user(username) for username in reaction_from]
 		mentions_user_ids = search["mentions_user_ids"]
 		mentions_users = search["mentions_users"]
+		mentions_users = [username_discriminate_user(username) for username in mentions_users]
 		reaction_ids = search["reaction_ids"]
 		reactions = search["reactions"]
 		extensions = search["extensions"]

@@ -10,7 +10,7 @@ export async function fetchMessageIds(guildId: string | null, channelId: string)
         return messageIds
     }
     catch (e) {
-        console.error("Failed to fetch message ids", e)
+        console.error("api - Failed to fetch message ids", e)
         return []
     }
 }
@@ -25,7 +25,22 @@ export async function fetchSearch(guildId: string | null, prompt: string) {
         return messageIds
     }
     catch (e) {
-        console.error("fetchSearch - Failed to fetch search", e)
+        console.error("api - Failed to fetch search", e)
+        return []
+    }
+}
+
+export async function fetchAutocomplete(guildId: string | null, key: string, value: string, limit: number = 3) {
+    if (guildId === null) {
+        guildId = "000000000000000000000000"
+    }
+    try {
+        let response = await fetch(`/api/search-autocomplete?guild_id=${encodeURIComponent(guildId)}&key=${encodeURIComponent(key)}&value=${encodeURIComponent(value)}&limit=${limit}`)
+        let json = await response.json()
+        return json
+    }
+    catch (e) {
+        console.error("api - Failed to fetch autocomplete", e)
         return []
     }
 }
@@ -44,7 +59,7 @@ export async function fetchGuilds() {
         // guilds.set(response_json)
     }
     catch (e) {
-        console.error("Failed to fetch guilds", e)
+        console.error("api - Failed to fetch guilds", e)
     }
     return []
 }
@@ -162,7 +177,7 @@ export async function fetchCategoriesChannelsThreads(guildId: string): Promise<C
         return categories_temp
     }
     catch (e) {
-        console.error("Failed to fetch channels", e)
+        console.error("api - Failed to fetch channels", e)
     }
     return []
 }

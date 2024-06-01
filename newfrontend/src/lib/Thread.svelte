@@ -62,7 +62,7 @@
     <div class="thread">
         <!-- TODO: support change of threadMessageId without rerender -->
         {#key guildState.threadMessageId}
-            <InfiniteScroll debugname="thread" ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId} renderMessageSnippet={renderMessageSnippet} bottomaligned={true} />
+            <InfiniteScroll debugname="thread" ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId} renderMessageSnippet={renderMessageSnippet} bottomAligned={true} />
         {/key}
     </div>
 </div>
@@ -101,6 +101,8 @@
         border-top-left-radius: 8px;
         border-bottom-left-radius: 8px;
         overflow: hidden;
+
+        z-index: 101;
     }
     .header-main {
         height: 47px;

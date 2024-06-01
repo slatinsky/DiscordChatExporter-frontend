@@ -4,11 +4,18 @@ import { getGuildState } from "../../js/stores/guildState.svelte";
 const guildState = getGuildState();
 
 let searchPrompt = $state("");
+let selectionStart = $state(0);
+let selectionEnd = $state(0);
 let submittedSearchPrompt = $state("");
 let searchResultsIds = $state([]);
 let gotResults = $state(false);
 let searching = $state(false);
 let error = $state("");
+let searchHistory: string[] = $state([]);
+
+if (localStorage.searchHistory) {
+    searchHistory = JSON.parse(localStorage.searchHistory);
+}
 
 export function getSearchState() {
 
@@ -68,6 +75,27 @@ export function getSearchState() {
         }
     }
 
+    function setSelection(newSelectionStart: number | null, newSelectionEnd: number | null) {
+        if (newSelectionStart === null || newSelectionEnd === null) {
+            return;
+        }
+        selectionStart = newSelectionStart;
+        selectionEnd = newSelectionEnd;
+    }
+
+    function addToSearchHistory(newSearch: string) {
+        if (searchHistory.includes(newSearch)) {
+            searchHistory = searchHistory.filter((search) => search !== newSearch);
+        }
+        searchHistory = [newSearch, ...searchHistory]
+        localStorage.searchHistory = JSON.stringify(searchHistory);
+    }
+
+    function clearSearchHistory() {
+        searchHistory = [];
+        localStorage.searchHistory = JSON.stringify(searchHistory);
+    }
+
     return {
         get searchPrompt() {
             return searchPrompt;
@@ -85,8 +113,48 @@ export function getSearchState() {
         get searching() {
             return searching;
         },
+        get selection() {
+            const textBefore = searchPrompt.substring(0, selectionStart);
+            const textSelected = searchPrompt.substring(selectionStart, selectionEnd);
+            const textAfter = searchPrompt.substring(selectionEnd);
+            const lastWord = textBefore.split(' ').pop() || ''
+            const lastWordIsKey = !lastWord.includes(':');
+
+            let lastKey = ''
+            if (!lastWordIsKey) {
+                lastKey = lastWord.split(':')[0]
+            }
+            else {
+                lastKey = lastWord
+            }
+
+            let lastValue = ''
+            if (lastWordIsKey) {
+                lastValue = ''
+            }
+            else {
+                lastValue = lastWord.split(':')[1]
+            }
+            return {
+                start: selectionStart,
+                end: selectionEnd,
+                textBefore: textBefore,
+                textSelected: textSelected,
+                textAfter: textAfter,
+                lastWord: lastWord,
+                lastWordIsKey: lastWordIsKey,
+                lastKey: lastKey,
+                lastValue: lastValue,
+            };
+        },
+        get searchHistory() {
+            return searchHistory;
+        },
+        addToSearchHistory,
+        clearSearchHistory,
         setSearchPrompt,
         search,
         clearSearch,
+        setSelection,
     };
 }

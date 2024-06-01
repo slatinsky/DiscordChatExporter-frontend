@@ -15,6 +15,8 @@
 	let imageAttachments = $derived(attachments.filter(a => a.type === 'image' || (a.type === 'unknown' && !a.filenameWithoutHash.includes('.'))));
 	let otherAttachments = $derived(attachments.filter(a => a.type !== 'image' && (a.type !== 'unknown' || a.filenameWithoutHash.includes('.'))));
 
+	const audioExtensions = ['mp3', 'ogg', 'wav', 'm4a', 'flac'];
+
 </script>
 
 {#if imageAttachments.length > 0}
@@ -42,7 +44,7 @@
 						<Icon name="filetype/spreadsheet" width={24} height={32} />
 					{:else if ['ppt', 'pptx', 'doc', 'docx'].includes(attachmentExtension)}
 						<Icon name="filetype/document" width={24} height={32} />
-					{:else if ['mp3', 'wav', 'flac', 'ogg'].includes(attachmentExtension)}
+					{:else if audioExtensions.includes(attachmentExtension)}
 						<Icon name="filetype/audio" width={24} height={32} />
 					{:else}
 						<Icon name="filetype/unknown" width={24} height={32} />
@@ -53,7 +55,7 @@
 						<div class="attachment-filesize">{humanFileSize(attachment.sizeBytes, 2)}</div>
 					</div>
 				</div>
-				{#if attachment.type == 'audio'}
+				{#if audioExtensions.includes(attachmentExtension)}
 					<div style="width: 100%;padding: 0 15px 15px 15px; margin-top: -5px;">
 						<AudioPlayer
 							src="{checkUrl(attachment)}"

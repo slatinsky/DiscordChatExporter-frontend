@@ -57,7 +57,7 @@ class AssetProcessor:
 			return 'image'
 		elif extension in ('mp4', 'webm', 'mov'):
 			return 'video'
-		elif extension in('mp3', 'ogg', 'wav'):
+		elif extension in('mp3', 'ogg', 'wav', 'm4a', 'flac'):
 			return 'audio'
 		else:
 			return 'unknown'

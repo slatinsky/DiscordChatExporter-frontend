@@ -1,50 +1,114 @@
 <script lang="ts">
     import { getGuildState } from "../../js/stores/guildState.svelte";
     import Icon from "../icons/Icon.svelte";
+    import SearchAutoComplete from "./SearchAutoComplete.svelte";
     import { getSearchState } from "./searchState.svelte";
 
     const searchState = getSearchState();
     const guildState = getGuildState();
 
-    let isFocused = $state(false);
+
+    let focused = $state(false);
+    let searchPrompt = $derived.by(()=> {
+        setTimeout(() => {
+            updateSelection()
+        }, 0)
+        return searchState.searchPrompt
+    });
 
     function inputOnFocus(event: FocusEvent & { currentTarget: EventTarget & HTMLInputElement; }) {
-        isFocused = true;
+        console.log("search focus")
+        focused = true;
     }
 
 
-    function inputOnBlur(event: FocusEvent & { currentTarget: EventTarget & HTMLInputElement; }) {
-        isFocused = false;
-    }
-
-
-    function inputOnKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement; }) {
-        if (event.key === 'Enter') {
-            domInput.blur();
-            searchState.setSearchPrompt(event.currentTarget.value);
-            searchState.search(guildState.guildId);
+    function updateSelection() {
+        if (!domInput) {
+            return;
         }
+
+        searchState.setSelection(domInput.selectionStart, domInput.selectionEnd);
+        autocomplete.promptChanged();
     }
 
+    async function inputOnKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement; }) {
+        if (event.key === 'Enter') {
+            let searchTerm = event.currentTarget.value;
+            if (domInput) {
+                domInput.blur();
+            }
+            await guildState.changeThreadId(null)
+            searchState.setSearchPrompt(searchTerm);
+            searchState.search(guildState.guildId);
+            searchState.addToSearchHistory(searchTerm)
+        }
+        else if (event.key === 'ArrowDown') {
+            autocomplete.arrowDown()
+			event.preventDefault();
+		} else if (event.key === 'ArrowUp') {
+			autocomplete.arrowUp()
+		}
+    }
+
+    function inputOnKeyUp(event: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement; }) {
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            return;
+        }
+        updateSelection();
+    }
 
     function searchPromptChanged(event: Event & { currentTarget: EventTarget & HTMLInputElement; }) {
         searchState.setSearchPrompt(event.currentTarget.value)
     }
 
-    let domInput: HTMLInputElement;
+    function focusInput() {
+        if (domInput) {
+            domInput.focus();
+        }
+        else {
+            console.error("domInput is undefined")
+        }
+    }
+
+    let domInput: HTMLInputElement | undefined = $state()
+    let autocomplete: SearchAutoComplete;
+
+
+    function onPageClick(event: MouseEvent) {
+        if (!event.target) {
+            return;
+        }
+        if (event.target instanceof HTMLElement) {
+            const siw = event.target.closest(".searchinput-wrapper")
+            if (!siw) {
+                focused = false;
+                console.log("search blur")
+            }
+            else {
+                if (domInput) {
+                    domInput.focus();
+                }
+            }
+        }
+    }
 </script>
-<div class="searchinput-wrapper">
+
+<svelte:body onclick={onPageClick} />
+
+<div class="searchinput-wrapper" class:focused={focused} >
+    <!-- {searchState.selection.start} {searchState.selection.end} {searchState.selection.textBefore} {searchState.selection.textSelected} {searchState.selection.textAfter} -->
     <input
+        onfocus={inputOnFocus}
+        onkeydown={inputOnKeyDown}
+        onmouseup={updateSelection}
+        onkeyup={inputOnKeyUp}
         type="text"
         placeholder="Search"
-        value={searchState.searchPrompt}
+        value={searchPrompt}
         bind:this={domInput}
-        onfocus={inputOnFocus}
-        onblur={inputOnBlur}
-        onkeydown={inputOnKeyDown}
         oninput={searchPromptChanged}
     />
-    {#if searchState.searchPrompt === ''}
+    {#if searchPrompt === ''}
         <div class="icon">
             <Icon name="other/magnifying-glass" width={16} />
         </div>
@@ -53,6 +117,9 @@
             <Icon name="modal/x" width={16} />
         </button>
     {/if}
+    <div class="autocomplete">
+        <SearchAutoComplete domInput={domInput} visible={focused} bind:this={autocomplete} focusInput={focusInput}/>
+    </div>
 </div>
 
 
@@ -67,16 +134,13 @@
             height: 25px;
             border: 0px;
             border-radius: 3px;
-            padding: 0px 10px;
+            padding: 0px 30px 0 10px;
             outline: none;
             font-size: 14px;
             font-weight: 500;
         }
         input::placeholder {
             color: #949ba4;
-        }
-        input:focus {
-            width: 250px;
         }
 
         .icon {
@@ -90,6 +154,12 @@
         button.icon {
             cursor: pointer;
             pointer-events: all;
+        }
+    }
+
+    .searchinput-wrapper.focused {
+        input {
+            width: 250px;
         }
     }
 </style>

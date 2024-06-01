@@ -238,8 +238,11 @@ def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 	])
 	authors= []
 	for author in cursor:
+		author_key = author['names'][0]
+		if author_key.endswith("#0000"):
+			author_key = author_key[:-5]
 		new_author = {
-			"key": author['names'][0],
+			"key": author_key,
 			"description": ", ".join(author['nicknames']),
 			"description2": str(author['msg_count']) + " messages",
 			"icon": author['avatar'],

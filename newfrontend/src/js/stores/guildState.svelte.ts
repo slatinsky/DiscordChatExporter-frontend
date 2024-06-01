@@ -62,6 +62,18 @@ export function findChannelThread(channelOrThreadId: string) {
 	}
 }
 
+export function findChannelsByName(channelOrThreadName: string) {
+	const lowerCaseName = channelOrThreadName.toLowerCase()
+	const foundChannels = categories.flatMap(c => c.channels).filter(c => c.name.toLowerCase().includes(lowerCaseName))
+	return foundChannels
+}
+
+export function findThreadsByName(channelOrThreadName: string) {
+	const lowerCaseName = channelOrThreadName.toLowerCase()
+	const foundThreads = categories.flatMap(c => c.channels).flatMap(c => c.threads).filter(t => t.name.toLowerCase().includes(lowerCaseName))
+	return foundThreads
+}
+
 export function getGuildState() {
 	function _getStateObject() {
 		return {

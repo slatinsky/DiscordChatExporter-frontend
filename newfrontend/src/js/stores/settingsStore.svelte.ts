@@ -1,6 +1,7 @@
 import { derived, writable } from "svelte/store";
 
 export const nameRenderer = writable("nickname");
+export const startingDayOfTheWeek = writable(0);
 export const locale = writable('en');  // for date formatting
 export const dateFormat = writable('DD/MM/YYYY');
 export const timeFormat = writable('HH:mm');
@@ -53,6 +54,7 @@ function withLocalStorage(store, localstorageKey: string, type = "string") {
 
 
 withLocalStorage(nameRenderer, "nameRenderer", "string");
+withLocalStorage(startingDayOfTheWeek, "startingDayOfTheWeek", "int");
 withLocalStorage(locale, "locale", "string");
 withLocalStorage(dateFormat, "dateFormat2", "string");
 withLocalStorage(timeFormat, "timeFormat2", "string");
