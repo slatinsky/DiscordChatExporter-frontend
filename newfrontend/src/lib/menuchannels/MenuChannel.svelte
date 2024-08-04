@@ -18,7 +18,9 @@
     async function toggle() {
         isOpen = !isOpen
         if (isOpen) {
-            await guildState.changeChannelId(channel._id)
+            if (guildState.channelId !== channel._id) {
+                await guildState.changeChannelId(channel._id, "last")
+            }
             await guildState.pushState()
         }
     }

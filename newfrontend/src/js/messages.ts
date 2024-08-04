@@ -18,8 +18,13 @@ async function _fetchMessagesFromApi(guildId: string | null, messageIds: string[
     if (guildId === null) {
         guildId = "000000000000000000000000"
     }
+
+    messageIds = messageIds.filter((messageId) => {
+        return messageId !== "first" && messageId !== "last";
+    })
+
     let notInCache = messageIds.filter((messageId) => {
-        return !messageCacheWithoutReference[messageId]
+        return !messageCacheWithoutReference[messageId];
     })
 
     if (notInCache.length > 0) {
@@ -44,6 +49,8 @@ async function _fetchMessagesFromApi(guildId: string | null, messageIds: string[
 
 
 export async function messsageIdsToMessages(guildId: string, messageIds: string[]) {
+    const containsFirst = messageIds.includes("first");
+    const containsLast = messageIds.includes("last");
     console.log("api - fetching " + messageIds.length + " messages");
     if (messageIds.length === 0) {
         return [];
@@ -78,6 +85,13 @@ export async function messsageIdsToMessages(guildId: string, messageIds: string[
             messageCopy.referencedMessage = messageCacheWithoutReference[message.reference.messageId];
         }
         outMessages.push(messageCopy);
+    }
+
+    if (containsFirst) {
+        outMessages.unshift({_id: "first"});
+    }
+    if (containsLast) {
+        outMessages.push({_id: "last"});
     }
 
     return outMessages;

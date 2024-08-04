@@ -13,7 +13,7 @@
 </script>
 
 {#if isThread}
-    <div class="wrapper">
+    <div class="wrapper" data-messageid="first">
         <div class="thread-icon">
             <Icon name="channeltype/thread" width={30} />
         </div>
@@ -21,7 +21,7 @@
         <div class="subtitle">Started by <span class="subtitle-person"><MessageAuthorName author={messageAuthor} on:click={() => viewUserState.setUser(messageAuthor)} /></span></div>
     </div>
 {:else}
-    <div class="wrapper">
+    <div class="wrapper" data-messageid="first">
         <div class="channel-icon">
             <Icon name="channeltype/channel" width={42} />
         </div>

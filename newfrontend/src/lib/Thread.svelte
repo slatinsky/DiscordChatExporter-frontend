@@ -4,6 +4,7 @@
     import { getLayoutState } from "../js/stores/layoutState.svelte";
     import DateSeparator from "./DateSeparator.svelte";
     import InfiniteScroll from "./InfiniteScroll.svelte";
+    import InfiniteScroll2 from "./InfiniteScroll2.svelte";
     import Pinned from "./Pinned.svelte";
     import Icon from "./icons/Icon.svelte";
     import ChannelIcon from "./menuchannels/ChannelIcon.svelte";
@@ -17,12 +18,27 @@
 
     const guildState = getGuildState()
     const layoutState = getLayoutState()
+
+    let apiGuildId = $derived(guildState.guildId ? guildState.guildId : "000000000000000000000000")
+    let apiChannelId = $derived(guildState.threadId)
+
+    export async function fetchMessageIds(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
+        try {
+            let response = await fetch(`/api/message-ids-paginated?guild_id=${encodeURIComponent(apiGuildId)}&channel_id=${encodeURIComponent(apiChannelId)}&direction=${direction}&message_id=${encodeURIComponent(messageId)}&limit=${limit}`)
+            let messageIds = await response.json()
+            return messageIds
+        }
+        catch (e) {
+            console.error("api - Failed to fetch message ids", e)
+            return []
+        }
+    }
 </script>
 
 {#snippet renderMessageSnippet(index, message, previousMessage)}
-    {#if index === 0}
+    <!-- {#if index === 0}
         <ChannelStart channelName={message.channelName} isThread={true} messageAuthor={message.author} />
-    {/if}
+    {/if} -->
 
     {#if isDateDifferent(previousMessage, message)}
         <DateSeparator messageId={message._id} />
@@ -30,6 +46,22 @@
 
     <div data-messageid={message._id}>
         <Message message={message} previousMessage={previousMessage} />
+    </div>
+{/snippet}
+
+{#snippet renderMessageSnippet2(message, previousMessage)}
+    <div data-messageid={message._id}>
+        {#if message._id === "first"}
+            <!-- <ChannelStart channelName={message.channelName} isThread={true} messageAuthor={message.author} /> -->
+            <div>thread start</div>
+        {:else if message._id === "last"}
+            <div>thread end</div>
+        {:else}
+            {#if isDateDifferent(previousMessage, message)}
+                <DateSeparator messageId={message._id} />
+            {/if}
+            <Message message={message} previousMessage={previousMessage} />
+        {/if}
     </div>
 {/snippet}
 
@@ -62,7 +94,20 @@
     <div class="thread">
         <!-- TODO: support change of threadMessageId without rerender -->
         {#key guildState.threadMessageId}
-            <InfiniteScroll debugname="thread" ids={guildState.threadMessagesIds} guildId={guildState.guildId} selectedMessageId={guildState.threadMessageId} renderMessageSnippet={renderMessageSnippet} bottomAligned={true} />
+            <!-- <InfiniteScroll
+            debugname="thread"
+            ids={guildState.threadMessagesIds}
+            guildId={guildState.guildId}
+            selectedMessageId={guildState.threadMessageId}
+            renderMessageSnippet={renderMessageSnippet}
+            channelStartSnippet={channelStartSnippet}
+            channelEndSnippet={channelEndSnippet}
+            bottomAligned={true} /> -->
+            <InfiniteScroll2
+                fetchMessageIds={fetchMessageIds}
+                guildId={apiGuildId}
+                snippetMessage={renderMessageSnippet2}
+            />
         {/key}
     </div>
 </div>

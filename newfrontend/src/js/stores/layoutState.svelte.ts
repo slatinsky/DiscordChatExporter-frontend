@@ -1,6 +1,8 @@
 import { getSearchState } from "../../lib/search/searchState.svelte";
+import { getGuildState } from "./guildState.svelte";
 
 const searchState = getSearchState();
+const guildState = getGuildState();
 
 let mobilesidepanelshown = $state(false);
 let searchManuallyHidden = $state(false);
@@ -78,11 +80,35 @@ export function getLayoutState() {
         }
     }
 
-    function toggleChannelPinned() {
-        channelpinnedshown = !channelpinnedshown;
+    async function toggleChannelPinned() {
+        if (channelpinnedshown) {
+            hideChannelPinned()
+        }
+        else {
+            await showChannelPinned()
+        }
     }
-    function toggleThreadPinned() {
-        threadpinnedshown = !threadpinnedshown;
+    function hideChannelPinned() {
+        channelpinnedshown = false;
+    }
+    async function showChannelPinned() {
+        channelpinnedshown = true;
+        await guildState.fetchChannelPinnedMessagesIds()
+    }
+    async function toggleThreadPinned() {
+        if (threadpinnedshown) {
+            hideThreadPinned()
+        }
+        else {
+            await showThreadPinned()
+        }
+    }
+    function hideThreadPinned() {
+        threadpinnedshown = false;
+    }
+    async function showThreadPinned() {
+        threadpinnedshown = true;
+        await guildState.fetchThreadPinnedMessagesIds()
     }
 
     return {
@@ -133,7 +159,11 @@ export function getLayoutState() {
         hideSettingsSideMenu,
         toggleSettingsSideMenu,
         toggleChannelPinned,
+        hideChannelPinned,
+        showChannelPinned,
         toggleThreadPinned,
+        hideThreadPinned,
+        showThreadPinned,
     };
 }
 

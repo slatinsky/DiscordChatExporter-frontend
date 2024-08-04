@@ -35,8 +35,12 @@
 
     async function changeThread(guildId: string, channelId: string, threadId: string) {
         await guildState.changeGuildId(guildId)
-        await guildState.changeChannelId(channelId)
-        await guildState.changeThreadId(threadId)
+        if (guildState.channelId !== channelId) {
+            await guildState.changeChannelId(channelId, "last")
+        }
+        if (guildState.threadId !== threadId) {
+            await guildState.changeThreadId(threadId, "last")
+        }
         await guildState.pushState()
     }
 

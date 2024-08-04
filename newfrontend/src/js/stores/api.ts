@@ -1,11 +1,11 @@
 import type { Category, Channel } from "../interfaces";
 
-export async function fetchMessageIds(guildId: string | null, channelId: string) {
+export async function fetchMessageIds(guildId: string | null, channelId: string, direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number = 50) {
     if (guildId === null) {
         guildId = "000000000000000000000000"
     }
     try {
-        let response = await fetch(`/api/message-ids?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}`)
+        let response = await fetch(`/api/message-ids-paginated?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}&direction=${direction}&message_id=${encodeURIComponent(messageId)}&limit=${limit}`)
         let messageIds = await response.json()
         return messageIds
     }

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { findChannel, findThread, getGuildState, isChannel } from '../../js/stores/guildState.svelte';
-    import InfiniteScroll from '../InfiniteScroll.svelte';
+    import InfiniteScroll from '../InfiniteScroll-old.svelte';
     import Icon from '../icons/Icon.svelte';
     import ChannelIcon from '../menuchannels/ChannelIcon.svelte';
     import Message from '../message/Message.svelte';
@@ -24,10 +24,10 @@
             {#if threadObj}
                 {@const parentChannelObj = findChannel(threadObj.categoryId)}
                 <div class="channelthread-name-wrapper">
-                    <button class="thread-name" onclick={()=>guildState.changeThreadId(threadObj._id)}>
+                    <button class="thread-name" onclick={()=>guildState.changeThreadId(threadObj._id, null)}>
                         <ChannelIcon channel={threadObj} width={16} />{threadObj.name}
                     </button>
-                    <button class="channel-name-small" onclick={()=>guildState.changeChannelId(parentChannelObj._id)}>
+                    <button class="channel-name-small" onclick={()=>guildState.changeChannelId(parentChannelObj._id, null)}>
                         <ChannelIcon channel={parentChannelObj} width={12} />{parentChannelObj.name}
                     </button>
                 </div>
@@ -35,9 +35,9 @@
                 <div class="channelthread-name-wrapper">
                     <button class="channelthread-name"  onclick={()=>{
                         if (isChannel(channelObj._id)) {
-                            guildState.changeChannelId(channelObj._id)
+                            guildState.changeChannelId(channelObj._id, null)
                         } else {
-                            guildState.changeThreadId(channelObj._id)
+                            guildState.changeThreadId(channelObj._id, null)
                         }
                     }}>
                         <ChannelIcon channel={channelObj} width={16} />{channelObj.name}
@@ -75,7 +75,14 @@
             <div class="header-txt">{addCommas(searchState.searchResultsIds.length)} Results</div>
         </div>
         {#key searchState.submittedSearchPrompt}
-            <InfiniteScroll debugname="search" ids={searchState.searchResultsIds} guildId={guildState.guildId} selectedMessageId={searchState.searchResultsIds[0]} renderMessageSnippet={renderMessageSnippet} bottomAligned={false} />
+            <InfiniteScroll
+                debugname="search"
+                ids={searchState.searchResultsIds}
+                guildId={guildState.guildId}
+                selectedMessageId={searchState.searchResultsIds[0]}
+                renderMessageSnippet={renderMessageSnippet}
+                bottomAligned={false}
+            />
         {/key}
     </div>
 {/if}
