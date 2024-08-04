@@ -12,8 +12,12 @@ import pymongo
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
-import Autocomplete
-from helpers import get_denylisted_user_ids, get_global_collection, get_allowlisted_guild_ids, is_db_online, pad_id, get_guild_collection
+import src.Autocomplete
+from .status import get_status
+from .guilds import get_guilds
+from .channels import get_channels
+from .roles import get_roles
+from .helpers import get_denylisted_user_ids, get_global_collection, get_allowlisted_guild_ids, is_db_online, pad_id, get_guild_collection
 
 # fix PIPE encoding error on Windows, auto flush print
 sys.stdout.reconfigure(encoding='utf-8')
@@ -31,8 +35,6 @@ app = FastAPI(
 
 
 
-
-
 def is_compiled():
 	if os.path.exists(__file__):
 		return False
@@ -40,64 +42,11 @@ def is_compiled():
 		return True
 
 
-@app.get("/")
-async def api_status():
-	"""
-	Returns the status of the api and the database.
-	"""
-	try:
-		database_status = "online" if is_db_online() else "offline"
-	except:
-		database_status = "offline"
-	return {
-		"api_backend": "online",  # it api_backend is offline, the api would not respond
-		"database": database_status
-	}
+app.include_router(get_status.router)
+app.include_router(get_guilds.router)
+app.include_router(get_channels.router)
+app.include_router(get_roles.router)
 
-
-@app.get("/guilds")
-async def get_guilds():
-	"""
-	Returns a list of guilds
-	If allowlist is enabled (by not being an empty list), only allowlisted guilds will be returned.
-
-	all other allowlist logic is handled by get_guild_collection() method - it won't return a collection for non-allowlisted guilds
-	"""
-	collection_guilds = get_global_collection("guilds")
-	allowlisted_guild_ids = get_allowlisted_guild_ids()
-
-	if len(allowlisted_guild_ids) == 0:
-		cursor = collection_guilds.find().sort([("msg_count", pymongo.DESCENDING)])
-	else:
-		cursor = collection_guilds.find(
-			{
-				"_id": {
-					"$in": allowlisted_guild_ids
-				}
-			}
-		).sort([("msg_count", pymongo.DESCENDING)])
-	return list(cursor)
-
-
-@app.get("/channels")
-async def get_channels(guild_id: str):
-	"""
-	Returns a list of all channels in a guild.
-	That includes channels, threads and forum posts.
-	"""
-	collection_channels = get_guild_collection(guild_id, "channels")
-	cursor = collection_channels.find()
-	return list(cursor)
-
-
-@app.get("/roles")
-async def get_roles(guild_id: str):
-	"""
-	Returns a list of all roles in a guild.
-	"""
-	collection_roles = get_guild_collection(guild_id, "roles")
-	cursor = collection_roles.find().sort([("position", pymongo.DESCENDING)])
-	return list(cursor)
 
 
 

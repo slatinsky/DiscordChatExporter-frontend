@@ -2,7 +2,7 @@ from pprint import pprint
 
 import pymongo
 
-from helpers import get_denylisted_user_ids, get_guild_collection
+from .helpers import get_denylisted_user_ids, get_guild_collection
 
 
 def autocomplete_categories(guild_id: str, partial_category: str, limit: int):
