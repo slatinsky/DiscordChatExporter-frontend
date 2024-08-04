@@ -6,12 +6,13 @@ import re
 from dateutil.relativedelta import relativedelta
 
 from ..common.enrich_messages import enrich_messages
-from ..common.helpers import pad_id
+from ..common.helpers import pad_id, print_json
 from ..common.Database import Database
 
 from fastapi import APIRouter, Query
 
 from ..common.Database import Database
+
 
 router = APIRouter(
 	prefix="",
@@ -193,7 +194,8 @@ def parse_prompt(prompt: str):
 
 		word += char
 
-	print("search", search)
+	print("search")
+	print_json(search)
 	return search
 
 
@@ -313,6 +315,29 @@ def extend_users(user_ids: list, usernames: list, guild_id: str):
 	user_ids = list(set(user_ids))  # remove duplicates
 	return user_ids
 
+def message_ids_to_messages(guild_id, message_ids: list):
+	"""
+	Convert message ids to messages.
+	"""
+	collection_messages = Database.get_guild_collection(guild_id, "messages")
+	denylisted_user_ids = Database.get_denylisted_user_ids()
+
+	if len(message_ids) == 0:
+		return []
+
+	messages = collection_messages.find(
+		{
+			"_id": {
+				"$in": message_ids
+			},
+			"author._id": {
+				"$nin": denylisted_user_ids
+			}
+		}
+	)
+	list_of_messages = list(messages)
+	return list_of_messages
+
 
 @router.get("/search")
 async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = True, order_by: str = Query("newest", enum=["newest", "oldest"])):
@@ -369,8 +394,6 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		from_user_ids = [pad_id(id) for id in from_user_ids]
 		from_user_ids = extend_users(from_user_ids, from_users, guild_id)
 		from_user_ids = [user_id for user_id in from_user_ids if user_id not in denylisted_user_ids]  # remove denylisted users
-
-		print("from_user_ids", from_user_ids)
 
 		reaction_from_ids = [pad_id(id) for id in reaction_from_ids]
 		reaction_from_ids = extend_users(reaction_from_ids, reaction_from, guild_id)
@@ -583,7 +606,7 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 			del query["$and"]
 
 		print("query")
-		# pprint(query)
+		print_json(query)
 
 		cursor=collection_messages.find(query, limited_fields)
 
@@ -600,9 +623,32 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 			return ids
 		else:
 			list_of_messages = list(cursor)
-			list_of_messages = enrich_messages(list_of_messages, guild_id)
-			return list_of_messages
+			message_ids = []
+			for message in list_of_messages:
+				if "reference" in message:
+					message_ids.append(message["reference"]["messageId"])
+
+			ref_messages = message_ids_to_messages(guild_id, message_ids)
+
+			all_messages = ref_messages + list_of_messages
+
+			# enriching messages is a heavy operation - run it only one for initial list + referenced messages - then sort them later
+			enriched_all_messages = enrich_messages(all_messages, guild_id)
+
+			enriched_all_messages_lookup = {str(message["_id"]): message for message in enriched_all_messages}
+
+			list_of_messages_enriched = [enriched_all_messages_lookup.get(str(message["_id"]), None) for message in list_of_messages]
+
+			for message in list_of_messages_enriched:
+				if "reference" in message:
+					message["reference"]["message"] = enriched_all_messages_lookup.get(message["reference"]["messageId"], None)
+
+			return list_of_messages_enriched
+
+
+
 	except Exception as e:
 		print("/search error:")
 		traceback.print_exc()
 		return ["error"]
+

@@ -9,7 +9,7 @@ if not exist db mkdir db
 cd ../..
 
 
-start wt --maximized -d %~dp0/backend/fastapi cmd /k py -m uvicorn app:app --host "0.0.0.0" --port 58001 --workers 1 --reload; ^
+start wt --maximized -d %~dp0/backend/fastapi cmd /k py rundev.py; ^
 split-pane -V -d %~dp0/backend/preprocess cmd /k nodemon --exec py --ext py --ignore "temp/" "main_mongo.py" "../../exports/" "temp/"; ^
 move-focus left; ^
 split-pane -H -d %~dp0/newfrontend cmd /k npm run dev; ^
