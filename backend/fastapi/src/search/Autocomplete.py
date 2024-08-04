@@ -1,8 +1,6 @@
-from pprint import pprint
-
 import pymongo
 
-from .helpers import get_denylisted_user_ids, get_guild_collection
+from ..common.Database import Database
 
 
 def autocomplete_categories(guild_id: str, partial_category: str, limit: int):
@@ -10,7 +8,7 @@ def autocomplete_categories(guild_id: str, partial_category: str, limit: int):
 	Searches for categories.
 	limited to {limit} results * 10
 	"""
-	collection_channels = get_guild_collection(guild_id, "channels")
+	collection_channels = Database.get_guild_collection(guild_id, "channels")
 
 	# ignore "GuildPublicThread" or "GuildPrivateThread", because their category is channel name
 	query = {
@@ -63,7 +61,7 @@ def autocomplete_channels(guild_id: str, partial_channel: str, limit: int):
 	Searches for channels.
 	limited to {limit} results
 	"""
-	collection_channels = get_guild_collection(guild_id, "channels")
+	collection_channels = Database.get_guild_collection(guild_id, "channels")
 
 	query = {
 		"name": {
@@ -93,7 +91,7 @@ def autocomplete_reactions(guild_id: str, partial_reaction: str, limit: int):
 	Searches for reactions.
 	limited to {limit} results
 	"""
-	collection_emojis = get_guild_collection(guild_id, "emojis")
+	collection_emojis = Database.get_guild_collection(guild_id, "emojis")
 
 	query = {
 		"name": {
@@ -127,7 +125,7 @@ def autocomplete_filenames(guild_id: str, partial_filename: str, limit: int):
 	Searches for filenames.
 	limited to {limit} results
 	"""
-	collection_assets = get_guild_collection(guild_id, "assets")
+	collection_assets = Database.get_guild_collection(guild_id, "assets")
 
 	query = {
 		"searchable": True,
@@ -164,7 +162,7 @@ def autocomplete_extensions(guild_id: str, partial_extension: str, limit: int):
 	"""
 	searches for file extensions
 	"""
-	collection_assets = get_guild_collection(guild_id, "assets")
+	collection_assets = Database.get_guild_collection(guild_id, "assets")
 
 	query = {
 		"searchable": True,
@@ -205,10 +203,10 @@ def autocomplete_users(guild_id: str, partial_user_name: str, limit: int):
 	limited to {limit} results
 	only shows users that have messages in the guild {guild_id}
 	"""
-	collection_authors = get_guild_collection(guild_id, "authors")
+	collection_authors = Database.get_guild_collection(guild_id, "authors")
 	print("collection_authors", collection_authors)
 
-	denylisted_user_ids = get_denylisted_user_ids()
+	denylisted_user_ids = Database.get_denylisted_user_ids()
 
 	query = {
 		"$or": [

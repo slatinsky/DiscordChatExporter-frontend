@@ -1,0 +1,209 @@
+[
+	{
+		"key": "from",
+		"description": "user",
+		"description2": "exact string match",
+		"type": "string",
+		"multiple": true,
+		"mapTo": "from_users",
+		"autocompleteApi": "users"
+	},
+	{
+		"key": "mentions",
+		"description": "user",
+		"description2": "exact string match",
+		"type": "string",
+		"multiple": true,
+		"mapTo": "mentions_users",
+		"autocompleteApi": "users"
+	},
+	{
+		"key": "has",
+		"description": "link, embed or file",
+		"description2": "choice",
+		"type": "choice",
+		"multiple": true,
+		"mapTo": "has",
+		"autocompleteApi": "has"
+	},
+	{
+		"key": "before",
+		"description": "specific date",
+		"description2": "in format YYYY-MM-DD, YYYY-MM or YYYY (UTC)",
+		"type": "date",
+		"multiple": true,
+		"mapTo": "before",
+		"autocompleteApi": null
+	},
+	{
+		"key": "during",
+		"description": "specific date",
+		"description2": "in format YYYY-MM-DD, YYYY-MM or YYYY (UTC)",
+		"type": "date",
+		"multiple": true,
+		"mapTo": "during",
+		"autocompleteApi": null
+	},
+	{
+		"key": "after",
+		"description": "specific date",
+		"description2": "in format YYYY-MM-DD, YYYY-MM or YYYY (UTC)",
+		"type": "date",
+		"multiple": true,
+		"mapTo": "after",
+		"autocompleteApi": null
+	},
+	{
+		"key": "in",
+		"description": "channel",
+		"description2": "exact string match",
+		"type": "string",
+		"multiple": true,
+		"mapTo": "in_channels",
+		"autocompleteApi": "channels"
+	},
+	{
+		"key": "pinned",
+		"description": "true or false",
+		"description2": "boolean",
+		"type": "boolean",
+		"multiple": false,
+		"mapTo": "is_pinned",
+		"autocompleteApi": null
+	},
+	{
+		"key": "edited",
+		"description": "true or false",
+		"description2": "boolean",
+		"type": "boolean",
+		"multiple": false,
+		"mapTo": "is_edited",
+		"autocompleteApi": null
+	},
+	{
+		"key": "deleted",
+		"description": "true or false",
+		"description2": "boolean",
+		"type": "boolean",
+		"multiple": false,
+		"mapTo": "is_deleted",
+		"autocompleteApi": null
+	},
+	{
+		"key": "reaction_from",
+		"description": "user",
+		"description2": "exact string match",
+		"type": "string",
+		"multiple": true,
+		"mapTo": "reaction_from",
+		"autocompleteApi": "users"
+	},
+	{
+		"key": "reaction",
+		"description": "emoji",
+		"description2": "partial regex match",
+		"type": "string",
+		"multiple": true,
+		"mapTo": "reactions",
+		"autocompleteApi": "reactions"
+	},
+	{
+		"key": "extension",
+		"description": "pdf/png/jpg/etc",
+		"description2": "exact match",
+		"type": "string",
+		"multiple": true,
+		"mapTo": "extensions",
+		"autocompleteApi": "extensions"
+	},
+	{
+		"key": "file",
+		"description": "file",
+		"description2": "partial regex match",
+		"type": "string",
+		"multiple": true,
+		"mapTo": "filenames",
+		"autocompleteApi": "filenames"
+	},
+	{
+		"key": "category",
+		"description": "category",
+		"description2": "exact string match",
+		"type": "string",
+		"multiple": true,
+		"mapTo": "in_categories",
+		"autocompleteApi": "categories"
+	},
+	{
+		"key": "limit",
+		"description": "number",
+		"description2": "default 100000, 0 disables limit",
+		"type": "number",
+		"multiple": false,
+		"mapTo": "limit",
+		"autocompleteApi": null
+	},
+		{
+		"key": "message_id",
+		"description": "message id",
+		"description2": "discord snowflake",
+		"type": "discord_snowflake",
+		"multiple": true,
+		"mapTo": "message_ids",
+		"autocompleteApi": null
+	},
+	{
+		"key": "in_id",
+		"description": "channel id",
+		"description2": "discord snowflake",
+		"type": "discord_snowflake",
+		"multiple": true,
+		"mapTo": "in_channel_ids",
+		"autocompleteApi": null
+	},
+	{
+		"key": "category_id",
+		"description": "category id",
+		"description2": "discord snowflake",
+		"type": "discord_snowflake",
+		"multiple": true,
+		"mapTo": "in_category_ids",
+		"autocompleteApi": null
+	},
+	{
+		"key": "from_id",
+		"description": "author id",
+		"description2": "discord snowflake",
+		"type": "discord_snowflake",
+		"multiple": true,
+		"mapTo": "from_user_ids",
+		"autocompleteApi": null
+	},
+	{
+		"key": "mentions_id",
+		"description": "author id",
+		"description2": "discord snowflake",
+		"type": "discord_snowflake",
+		"multiple": true,
+		"mapTo": "mentions_user_ids",
+		"autocompleteApi": null
+	},
+	{
+		"key": "reaction_from_id",
+		"description": "user id",
+		"description2": "discord snowflake",
+		"type": "discord_snowflake",
+		"multiple": true,
+		"mapTo": "reaction_from_ids",
+		"autocompleteApi": null
+	},
+	{
+		"key": "reaction_id",
+		"description": "emoji id",
+		"description2": "discord snowflake",
+		"type": "discord_snowflake",
+		"multiple": true,
+		"mapTo": "reaction_ids",
+		"autocompleteApi": null
+	}
+]
