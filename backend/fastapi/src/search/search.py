@@ -339,6 +339,44 @@ def message_ids_to_messages(guild_id, message_ids: list):
 	return list_of_messages
 
 
+def simplify_mongo_query(query: dict | list):
+	"""
+	- recursively removes nested $and and $or if they are the only element in the list
+	- also removes empty $and and $or lists
+	- also removes empty objects from the list
+	"""
+	if isinstance(query, list):
+		# other lists we are not simplifying
+		return query
+
+	# remove nested $and and $or if they are the only element in the list
+	if "$and" in query:
+		query["$and"] = [simplify_mongo_query(q) for q in query["$and"]]
+		# remove empty objects
+		query["$and"] = [q for q in query["$and"] if q]
+
+		# if there is only one element in the list, remove the list
+		if len(query["$and"]) == 1:
+			query = query["$and"][0]
+
+	if "$or" in query:
+		query["$or"] = [simplify_mongo_query(q) for q in query["$or"]]
+		# remove empty objects
+		query["$or"] = [q for q in query["$or"] if q]
+
+		# if there is only one element in the list, remove the list
+		if len(query["$or"]) == 1:
+			query = query["$or"][0]
+
+	# remove empty $and and $or
+	if "$or" in query and len(query["$or"]) == 0:
+		del query["$or"]
+	if "$and" in query and len(query["$and"]) == 0:
+		del query["$and"]
+
+	return query
+
+
 @router.get("/search")
 async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = True, order_by: str = Query("newest", enum=["newest", "oldest"])):
 	"""
@@ -435,12 +473,10 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		if len(message_ids) > 0:
 			query["_id"] = {"$in": message_ids}
 
-		if len(from_user_ids) > 0 or len(denylisted_user_ids) > 0:
-			query["author._id"] = {}
-			if len(from_user_ids) > 0:
-				query["author._id"]["$in"] = from_user_ids
-			if len(denylisted_user_ids) > 0:
-				query["author._id"]["$nin"] = denylisted_user_ids
+		if len(from_user_ids) > 0:
+			query["author._id"] = {"$in": from_user_ids}
+		elif len(denylisted_user_ids) > 0:
+			query["author._id"] = {"$nin": denylisted_user_ids}
 
 		if len(reaction_from_ids) > 0:
 			query["reactions.users._id"] = {"$in": reaction_from_ids}
@@ -484,77 +520,69 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		if is_pinned is not None:
 			query["isPinned"] = is_pinned
 
-		if attachment_is_audio is not None or attachment_is_image is not None or attachment_is_video is not None:
-			or_ = []
-			if attachment_is_audio is not None:
-				if not attachment_is_audio:
-					or_.append({
-						"$and": [
-							{"attachments.type": {"$nin": ["audio"]}},
-							{"embeds.thumbnail.type": {"$nin": ["audio"]}}
-						]
-					})
-				else:
-					or_.append({
-						"$or": [
-							{"attachments.type": "audio"},
-							{"embeds.thumbnail.type": "audio"}
-						]
-					})
+		or_ = []
+		if attachment_is_audio is not None:
+			if not attachment_is_audio:
+				or_.append({
+					"$and": [
+						{"attachments.type": {"$nin": ["audio"]}},
+						{"embeds.thumbnail.type": {"$nin": ["audio"]}}
+					]
+				})
+			else:
+				or_.append({
+					"$or": [
+						{"attachments.type": "audio"},
+						{"embeds.thumbnail.type": "audio"}
+					]
+				})
 
-			if attachment_is_image is not None:
-				if not attachment_is_image:
-					or_.append({
-						"$and": [
-							{"attachments.type": {"$nin": ["image"]}},
-							{"embeds.thumbnail.type": {"$nin": ["image"]}}
-						]
-					})
-				else:
-					or_.append({
-						"$or": [
-							{"attachments.type": "image"},
-							{"embeds.thumbnail.type": "image"}
-						]
-					})
+		if attachment_is_image is not None:
+			if not attachment_is_image:
+				or_.append({
+					"$and": [
+						{"attachments.type": {"$nin": ["image"]}},
+						{"embeds.thumbnail.type": {"$nin": ["image"]}}
+					]
+				})
+			else:
+				or_.append({
+					"$or": [
+						{"attachments.type": "image"},
+						{"embeds.thumbnail.type": "image"}
+					]
+				})
 
-			if attachment_is_video is not None:
-				if not attachment_is_video:
-					or_.append({
-						"$and": [
-							{"attachments.type": {"$nin": ["video"]}},
-							{"embeds.thumbnail.type": {"$nin": ["video"]}}
-						]
-					})
-				else:
-					or_.append({
-						"$or": [
-							{"attachments.type": "video"},
-							{"embeds.thumbnail.type": "video"}
-						]
-					})
+		if attachment_is_video is not None:
+			if not attachment_is_video:
+				or_.append({
+					"$and": [
+						{"attachments.type": {"$nin": ["video"]}},
+						{"embeds.thumbnail.type": {"$nin": ["video"]}}
+					]
+				})
+			else:
+				or_.append({
+					"$or": [
+						{"attachments.type": "video"},
+						{"embeds.thumbnail.type": "video"}
+					]
+				})
 
-			query["$and"].append({"$or": or_})
+		query["$and"].append({"$or": or_})
 
 
-		if containing_links is not None:
-			# todo: check if we can really use ^ for faster search without removing valid results
-			if containing_links:
-				query["content.content"] = {"$regex": "^http|^www"}
-			# else:
-			# 	query["content.content"] = {"$not": {"$regex": "^http|^www"}}
+		if containing_links is not None and containing_links:
+			query["content.content"] = {"$regex": "^http|^www"}
 
-		if containing_stickers is not None:
-			if containing_stickers:
-				query["stickers"] = {"$exists": True}
+		if containing_stickers is not None and containing_stickers:
+			query["stickers"] = {"$exists": True}
 
-		if containing_embeds is not None:
-			if containing_embeds:
-				query["embeds"] = {"$exists": True}
+		if containing_embeds is not None and containing_embeds:
+			query["embeds"] = {"$exists": True}
 
-		if containing_attachments is not None:
-			if containing_attachments:
-				query["attachments"] = {"$exists": True}
+		if containing_attachments is not None and containing_attachments:
+			query["attachments"] = {"$exists": True}
 
 
 		if is_edited is not None:
@@ -602,8 +630,7 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		if only_ids:
 			limited_fields["_id"]=1
 
-		if query["$and"] == []:
-			del query["$and"]
+		query = simplify_mongo_query(query)
 
 		print("query")
 		print_json(query)
