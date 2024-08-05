@@ -22,7 +22,7 @@
 		let referencedMessage
 
 		if (message.reference) {
-			referencedMessage = await getMessageContent(message.reference.messageId, selectedGuildId);
+			referencedMessage = message.reference.message
 		}
 		else {
 			referencedMessage = null;

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from ..common.enrich_messages import enrich_messages
+from ..common.enrich_messages import enrich_messages_with_referenced
 
 
 from ..common.Database import Database
@@ -38,7 +38,7 @@ async def get_multiple_message_content(message_req_obj: MessageRequest):
 		}
 	)
 	list_of_messages = list(messages)
-	list_of_messages = enrich_messages(list_of_messages, guild_id)
-	return list_of_messages
+	list_of_messages_enriched = enrich_messages_with_referenced(list_of_messages, guild_id)
+	return list_of_messages_enriched
 
 

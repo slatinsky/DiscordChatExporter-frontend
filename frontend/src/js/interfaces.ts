@@ -130,11 +130,12 @@ export interface Message {
 	emotes: Reaction[] | null;   // emotes in the message
 	mentions: Mention[] | null;
 	attachments: Asset[] | null;
-	embeds: NewType[] | null;
+	embeds: Embed[] | null;
 	reference: {
 		messageId: string;
 		channelId: string;
 		guildId: string;
+		message: Message | null;
 	} | null;
 	guildId: string;
 	channelId: string;

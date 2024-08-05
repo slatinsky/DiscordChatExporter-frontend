@@ -174,3 +174,52 @@ def enrich_messages(list_of_messages: list, guild_id: str) -> list:
 			message["thread"] = get_channel_info(message["reference"]["channelId"], guild_id)
 
 	return list_of_messages
+
+def message_ids_to_messages(guild_id, message_ids: list):
+	"""
+	Convert message ids to messages.
+	"""
+	collection_messages = Database.get_guild_collection(guild_id, "messages")
+	denylisted_user_ids = Database.get_denylisted_user_ids()
+
+	if len(message_ids) == 0:
+		return []
+
+	messages = collection_messages.find(
+		{
+			"_id": {
+				"$in": message_ids
+			},
+			"author._id": {
+				"$nin": denylisted_user_ids
+			}
+		}
+	)
+	list_of_messages = list(messages)
+	return list_of_messages
+
+
+def enrich_messages_with_referenced(list_of_messages: list, guild_id: str):
+	ref_messageids = []
+	for message in list_of_messages:
+		if "reference" in message:
+			ref_messageids.append(message["reference"]["messageId"])
+
+	print("ref_messageids", ref_messageids)
+
+	ref_messages = message_ids_to_messages(guild_id, ref_messageids)
+
+	all_messages = ref_messages + list_of_messages
+
+	# enriching messages is a heavy operation - run it only one for initial list + referenced messages - then sort them later
+	enriched_all_messages = enrich_messages(all_messages, guild_id)
+
+	enriched_all_messages_lookup = {str(message["_id"]): message for message in enriched_all_messages}
+
+	list_of_messages_enriched = [enriched_all_messages_lookup.get(str(message["_id"]), None) for message in list_of_messages]
+
+	for message in list_of_messages_enriched:
+		if "reference" in message:
+			message["reference"]["message"] = enriched_all_messages_lookup.get(message["reference"]["messageId"], None)
+
+	return list_of_messages_enriched
