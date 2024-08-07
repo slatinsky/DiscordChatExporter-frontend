@@ -78,6 +78,12 @@ export function isDateDifferent(previousMessage: Message | null, message: Messag
     if (!message) {
         return true;
     }
+    if (!previousMessage._id) {
+        return true;
+    }
+    if (!message._id) {
+        return true;
+    }
 
     let prevDate = snowflakeToDate(previousMessage._id);
     let date = snowflakeToDate(message._id);

@@ -21,10 +21,10 @@
     let isLoading = $state(true)
 
     const MSGCOUNT_INITIAL = 50
-    const MSGCOUNT_MORE = 20
+    const MSGCOUNT_MORE = 25
 
 
-
+    let preMessagesMapping = new Map<string, any>()  // id (current) -> message (previous)
     async function handleScroll(event: Event) {
 
         if (loadIsThrottled) {
@@ -43,10 +43,22 @@
             loadIsThrottled = true
             scrollDisabled = true
             const bottomOffset = scrollContainer.scrollHeight - scrollContainer.clientHeight
-            const moreMessages = await fetchMessages("before", prevPage, MSGCOUNT_MORE)
-            console.log('moreMessages', moreMessages)
-            messages = [...moreMessages.messages, ...messages]
-            prevPage = moreMessages.prevPage
+            const moreMessagesObj = await fetchMessages("before", prevPage, MSGCOUNT_MORE)
+            const moreMessages = moreMessagesObj.messages
+
+
+            // --- link previous messages ---
+            if (messages.length > 0 && moreMessages.length > 0) {
+                // link the first message of the last batch to the last message of the previous batch
+                preMessagesMapping.set(messages[0]._id, moreMessages[moreMessages.length - 1])
+            }
+            for (let i = 1; i < moreMessages.length; i++) {
+                preMessagesMapping.set(moreMessages[i]._id, moreMessages[i - 1])
+            }
+            // --- end of previous message linking ---
+
+            messages = [...moreMessages, ...messages]
+            prevPage = moreMessagesObj.prevPage
             await tick();  // wait for render
 
             // restore the same bottom offset
@@ -60,10 +72,21 @@
             console.log('bottom reached')
             loadIsThrottled = true
             scrollDisabled = true
-            const moreMessages = await fetchMessages("after", nextPage, MSGCOUNT_MORE)
-            console.log('moreMessages', moreMessages)
-            messages = [...messages, ...moreMessages.messages]
-            nextPage = moreMessages.nextPage
+            const moreMessagesObj = await fetchMessages("after", nextPage, MSGCOUNT_MORE)
+            const moreMessages = moreMessagesObj.messages
+
+            // --- link previous messages ---
+            if (messages.length > 0 && moreMessages.length > 0) {
+                // link the last message of the last batch to the first message of the next batch
+                preMessagesMapping.set(moreMessages[0]._id, messages[messages.length - 1])
+            }
+            for (let i = 1; i < moreMessages.length; i++) {
+                preMessagesMapping.set(moreMessages[i]._id, moreMessages[i - 1])
+            }
+            // --- end of previous message linking ---
+
+            messages = [...messages, ...moreMessages]
+            nextPage = moreMessagesObj.nextPage
             scrollDisabled = false
             loadIsThrottled = false
         }
@@ -90,6 +113,13 @@
         const newMessages = await fetchMessages("around", scrollToMessageId, MSGCOUNT_INITIAL)
         console.log('newMessages', newMessages)
         messages = newMessages.messages
+
+        // --- link previous messages ---
+        for (let i = 1; i < messages.length; i++) {
+            preMessagesMapping.set(messages[i]._id, messages[i - 1])
+        }
+        // --- end of previous message linking ---
+
         prevPage = newMessages.prevPage
         nextPage = newMessages.nextPage
         await tick();  // wait for render
@@ -102,7 +132,6 @@
             scrollDisabled = false
         }, 500)
         isLoading = false
-
     })
 </script>
 
@@ -114,10 +143,20 @@
             <small class="debug-container">scrollToMessageId {scrollToMessageId}</small>
         {/if}
         <div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
-            {#each messages as message (message._id)}
-                <div class="message" data-messageid={message._id}>
-                    {@render snippetMessage(message, message)}
-                </div>
+            {#each messages as message, i (message._id)}
+                <!--
+                    - skip the render of the first message if it is not the true first message,
+                    else the message would render without a reference to the previous (not yet loaded) message
+
+                    - we could not rerender it later without causing a re-render of the whole list
+
+                    - this issue is not present in the other direction (for the last message), because at that point the previous message is already loaded
+                -->
+                {#if !(prevPage && i === 0)}
+                    <div class="message" data-messageid={message._id}>
+                        {@render snippetMessage(message, preMessagesMapping.get(message._id, null))}
+                    </div>
+                {/if}
             {/each}
         </div>
     </div>
