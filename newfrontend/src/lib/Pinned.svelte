@@ -43,6 +43,19 @@
     </div>
 {/snippet}
 
+{#snippet emptySnippet()}
+    <div class="channel-wrapper">
+        <div class="no-pins-wrapper">
+            <Icon name="placeholder/no-pins" width={94} height={120} />
+            <div class="no-pins-msg">This channel doesn't have any pinned messages... yet.</div>
+        </div>
+        <div class="no-pins-footer">
+            <div class="footer-title">PROTIP:</div>
+            <div class="footer-subtitle">Users with ‘Manage Messages’ permission can pin a message from its context menu.</div>
+        </div>
+    </div>
+{/snippet}
+
 {#if !channelId}
     <div class="channel-wrapper">
         <div class="pinned-header">
@@ -72,9 +85,9 @@
             bottomAligned={false} /> -->
             <InfiniteScroll3
                 fetchMessages={fetchMessagesWrapper}
-                guildId={apiGuildId}
                 scrollToMessageId={"last"}
                 snippetMessage={renderMessageSnippet2}
+                emptySnippet={emptySnippet}
             />
         </div>
     </div>
@@ -84,12 +97,15 @@
 <style>
 
     .no-pins-wrapper {
-        display: grid;
-        place-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         background-color: #2b2d31;
         color: #b5bac1;
         font-size: 16px;
         padding: 16px;
+        height: 100%;
 
         .no-pins-msg {
             max-width: 200px;
@@ -130,6 +146,10 @@
         /* height: min-content; */
         /* height: calc(100vh - 120px);
          */
+         display: flex;
+         flex-direction: column;
+         height: 100%;
+
          border: 1px solid #25262a;
          border-radius: 4px;
         .pinned-header {

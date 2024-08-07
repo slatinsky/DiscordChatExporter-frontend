@@ -75,20 +75,8 @@
     </div>
 {/snippet}
 
-<!-- <div>searchState.searching {searchState.searching}</div> -->
-<!-- <div>searchState.submittedSearchPrompt {searchState.submittedSearchPrompt}</div> -->
-
-<!-- {#if searchState.searching}
+{#snippet emptySnippet()}
     <div class="channel-wrapper">
-        <div class="search-header">
-            <div class="header-txt">Searching...</div>
-        </div>
-    </div>
-{:else if searchState.searchResultsIds.length === 0}
-    <div class="channel-wrapper">
-        <div class="search-header">
-            <div class="header-txt">0 Results</div>
-        </div>
         <div class="no-results-wrapper">
             <div class="no-results-inner">
                 <Icon name="placeholder/no-search-results" width={160} height={160} />
@@ -96,32 +84,57 @@
             </div>
         </div>
     </div>
-{:else if searchState.searchResultsIds && searchState.searchResultsIds.length > 0} -->
-    <div class="channel-wrapper">
-        {#key searchState.submittedSearchPrompt}
-            <div class="search-header">
-                <div class="header-txt">
-                    {#await fetchSearchCount(apiGuildId, searchState.submittedSearchPrompt)}
-                        Counting...
-                    {:then count}
+{/snippet}
+
+
+<div class="channel-wrapper">
+    {#key searchState.submittedSearchPrompt}
+        <div class="search-header">
+            <div class="header-txt">
+                {#await fetchSearchCount(apiGuildId, searchState.submittedSearchPrompt)}
+                    Searching... <div class="spinner"></div>
+                {:then count}
+                    {#if count === 0}
+                        No Results
+                    {:else}
                         {addCommas(count)} Results
-                    {:catch error}
-	                    <p style="color: red">{error.message}</p>
-                    {/await}
-                </div>
+                    {/if}
+                {:catch error}
+                    <p style="color: red">{error.message}</p>
+                {/await}
             </div>
-            <InfiniteScroll3
-                fetchMessages={fetchMessagesWrapper}
-                guildId={apiGuildId}
-                scrollToMessageId={"last"}
-                snippetMessage={renderMessageSnippet2}
-            />
-        {/key}
-    </div>
-<!-- {/if} -->
+        </div>
+        <InfiniteScroll3
+            fetchMessages={fetchMessagesWrapper}
+            guildId={apiGuildId}
+            scrollToMessageId={"last"}
+            snippetMessage={renderMessageSnippet2}
+            emptySnippet={emptySnippet}
+        />
+    {/key}
+</div>
 
 
 <style>
+    .spinner {
+        border: 2px solid rgba(0, 0, 0, 0);
+        border-left-color: #D6D9DC;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+
     .channelthread-name-wrapper {
         display: flex;
         gap: 8px;
@@ -220,6 +233,7 @@
                 height: 50px;
                 display: flex;
                 align-items: center;
+                gap: 12px;
             }
         }
     }

@@ -79,7 +79,7 @@ export async function fetchPinnedMessages(guildId: string | null, channelId: str
     return fetchSearch(guildId, prompt, direction, messageId, limit)
 }
 
-export async function fetchSearchCount(guildId: string | null, prompt: string) {
+export async function fetchSearchCount(guildId: string | null, prompt: string): Promise<number | string> {
     // delay a bit to make sure (faster) search query runs first
     await new Promise(r => setTimeout(r, 25));
 
@@ -89,11 +89,17 @@ export async function fetchSearchCount(guildId: string | null, prompt: string) {
     try {
         let response = await fetch(`/api/guild/search/count?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}`)
         let count = await response.text()
-        return count
+        // if numeric, return as number
+        try {
+            return Number(count)
+        }
+        catch (e) {
+            return "error"
+        }
     }
     catch (e) {
         console.error("api - Failed to fetch search count", e)
-        return []
+        return "error"
     }
 }
 

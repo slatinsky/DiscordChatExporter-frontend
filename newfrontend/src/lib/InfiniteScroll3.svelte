@@ -4,12 +4,12 @@
 
     interface MyProps {
         fetchMessages: (direction: "before" | "after" | "around" , messageId: string, limit: number) => Promise<string[]>
-        guildId: string
         snippetMessage: Snippet
         scrollToMessageId: string
+        emptySnippet?: Snippet
     }
 
-    let { fetchMessages, guildId, snippetMessage, scrollToMessageId}: MyProps = $props();
+    let { fetchMessages, snippetMessage, scrollToMessageId, emptySnippet}: MyProps = $props();
 
     let SHOWDEBUG = false
     let scrollContainer: HTMLDivElement
@@ -18,6 +18,7 @@
     let nextPage = $state<string | null>(null)
     let loadIsThrottled = false
     let scrollDisabled = $state(true)
+    let isLoading = $state(true)
 
     const MSGCOUNT_INITIAL = 50
     const MSGCOUNT_MORE = 20
@@ -100,23 +101,29 @@
             scrollToMessageIdF(scrollToMessageId)
             scrollDisabled = false
         }, 500)
+        isLoading = false
 
     })
 </script>
 
-
-<div class="wrapper">
-    {#if SHOWDEBUG}
-        <small class="debug-container">scrollToMessageId {scrollToMessageId}</small>
-    {/if}
-    <div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
-        {#each messages as message (message._id)}
-            <div class="message" data-messageid={message._id}>
-                {@render snippetMessage(message, message)}
-            </div>
-        {/each}
+{#if emptySnippet && !isLoading && messages.length === 0}
+    {@render emptySnippet()}
+{:else}
+    <div class="wrapper">
+        {#if SHOWDEBUG}
+            <small class="debug-container">scrollToMessageId {scrollToMessageId}</small>
+        {/if}
+        <div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
+            {#each messages as message (message._id)}
+                <div class="message" data-messageid={message._id}>
+                    {@render snippetMessage(message, message)}
+                </div>
+            {/each}
+        </div>
     </div>
-</div>
+{/if}
+
+
 
 <style>
     .wrapper {

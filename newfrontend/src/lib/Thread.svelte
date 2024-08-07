@@ -92,7 +92,6 @@
             {#key guildState.threadMessageId}
                 <InfiniteScroll3
                     fetchMessages={fetchMessagesWrapper}
-                    guildId={apiGuildId}
                     scrollToMessageId={guildState.threadMessageId}
                     snippetMessage={renderMessageSnippet2}
                 />

@@ -41,6 +41,8 @@
             searchState.setSearchPrompt(searchTerm);
             searchState.search(guildState.guildId);
             searchState.addToSearchHistory(searchTerm)
+
+            focused = false;
         }
         else if (event.key === 'ArrowDown') {
             autocomplete.arrowDown()
