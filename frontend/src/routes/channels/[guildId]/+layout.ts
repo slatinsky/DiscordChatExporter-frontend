@@ -18,7 +18,7 @@ export const load: Load = async({ fetch, params, parent }) => {
     let guildId = params.guildId
     let channels = channelsCached
     if (guildIdCached !== guildId) {  // is cache invalid?
-        let response = await fetch('/api/channels?guild_id=' + guildId)
+        let response = await fetch('/api/guild/channels?guild_id=' + guildId)
         channels = await response.json()
         channelsCached = channels
         guildIdCached = guildId

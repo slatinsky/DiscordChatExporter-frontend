@@ -1,12 +1,13 @@
 import datetime
 import json
 import traceback
-import pymongo
 import re
 from dateutil.relativedelta import relativedelta
 
+from ..common.cursor_pagination import cursor_pagination
+
 from ..common.enrich_messages import enrich_messages_with_referenced
-from ..common.helpers import pad_id, print_json
+from ..common.helpers import pad_id, print_json, simplify_mongo_query
 from ..common.Database import Database
 
 from fastapi import APIRouter, Query
@@ -68,7 +69,7 @@ def parse_prompt(prompt: str):
 		"containing_stickers": None,
 		"is_edited": None,               # boolean (None means both)
 		"is_deleted": None,              # boolean (None means both)
-		"limit": 100000,                 # max number of messages to return (int)
+		# "limit": 100000,                 # max number of messages to return (int)
 		"before": None,
 		"after" : None,
 	}
@@ -318,46 +319,17 @@ def extend_users(user_ids: list, usernames: list, guild_id: str):
 
 
 
-def simplify_mongo_query(query: dict | list):
-	"""
-	- recursively removes nested $and and $or if they are the only element in the list
-	- also removes empty $and and $or lists
-	- also removes empty objects from the list
-	"""
-	if isinstance(query, list):
-		# other lists we are not simplifying
-		return query
 
-	# remove nested $and and $or if they are the only element in the list
-	if "$and" in query:
-		query["$and"] = [simplify_mongo_query(q) for q in query["$and"]]
-		# remove empty objects
-		query["$and"] = [q for q in query["$and"] if q]
+@router.get("/guild/search")
+async def search_messages(guild_id: str, prompt: str = None, prev_page_cursor: str | None = None, around_page_cursor: str | None = None, next_page_cursor: str | None = None, limit=100):
+	return await search_messages_(guild_id, prompt, prev_page_cursor, around_page_cursor, next_page_cursor, limit, return_count=False)
 
-		# if there is only one element in the list, remove the list
-		if len(query["$and"]) == 1:
-			query = query["$and"][0]
-
-	if "$or" in query:
-		query["$or"] = [simplify_mongo_query(q) for q in query["$or"]]
-		# remove empty objects
-		query["$or"] = [q for q in query["$or"] if q]
-
-		# if there is only one element in the list, remove the list
-		if len(query["$or"]) == 1:
-			query = query["$or"][0]
-
-	# remove empty $and and $or
-	if "$or" in query and len(query["$or"]) == 0:
-		del query["$or"]
-	if "$and" in query and len(query["$and"]) == 0:
-		del query["$and"]
-
-	return query
+@router.get("/guild/search/count")
+async def count_messages(guild_id: str, prompt: str = None, prev_page_cursor: str | None = None, around_page_cursor: str | None = None, next_page_cursor: str | None = None, limit=100):
+	return await search_messages_(guild_id, prompt, prev_page_cursor, around_page_cursor, next_page_cursor, limit, return_count=True)
 
 
-@router.get("/search")
-async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = True, order_by: str = Query("newest", enum=["newest", "oldest"])):
+async def search_messages_(guild_id: str, prompt: str = None, prev_page_cursor: str | None = None, around_page_cursor: str | None = None, next_page_cursor: str | None = None, limit=100, return_count: bool = False):
 	"""
 	Searches for messages that contain the prompt.
 	"""
@@ -398,7 +370,7 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 		containing_links = search["containing_links"]
 		is_edited = search["is_edited"]
 		is_deleted = search["is_deleted"]
-		limit = search["limit"]
+		# limit = search["limit"]
 
 		before = search["before"]
 		after = search["after"]
@@ -437,8 +409,6 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 
 		# query builder
 		query = {}
-		limited_fields = {}
-
 		query["$and"] = []
 
 		# assuming that timestamp is always in UTC (comparing strings)
@@ -606,32 +576,15 @@ async def search_messages(guild_id: str, prompt: str = None, only_ids: bool = Tr
 
 			query["$and"].append({"$and": and_})
 
-		if only_ids:
-			limited_fields["_id"]=1
-
 		query = simplify_mongo_query(query)
 
 		print("query")
 		print_json(query)
 
-		cursor=collection_messages.find(query, limited_fields)
-
-		if limit > 0:
-			cursor.limit(limit)
-
-		if order_by == "newest":
-			cursor.sort([("_id", pymongo.DESCENDING)])
+		if return_count:
+			return collection_messages.count_documents(query)
 		else:
-			cursor.sort([("_id", pymongo.ASCENDING)])
-
-		if only_ids:
-			ids=[str(id["_id"]) for id in cursor]
-			return ids
-		else:
-			list_of_messages = list(cursor)
-			list_of_messages_enriched = enrich_messages_with_referenced(list_of_messages, guild_id)
-
-			return list_of_messages_enriched
+			return cursor_pagination(collection_messages, query, prev_page_cursor, around_page_cursor, next_page_cursor, limit)
 
 
 

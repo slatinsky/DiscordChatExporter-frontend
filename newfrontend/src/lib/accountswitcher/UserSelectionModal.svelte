@@ -26,7 +26,7 @@
     let users: AutocompletedUser[] = []
 
     async function autocompleteUsers(searchText: string, guildId: string, _: any) {
-        let response = await fetch(`/api/search-autocomplete?guild_id=${encodeURIComponent(guildId)}&key=users&value=${encodeURIComponent(searchText)}`);
+        let response = await fetch(`/api/guild/search/autocomplete?guild_id=${encodeURIComponent(guildId)}&key=users&value=${encodeURIComponent(searchText)}`);
         let json = await response.json();
 
         let newUsers = [];

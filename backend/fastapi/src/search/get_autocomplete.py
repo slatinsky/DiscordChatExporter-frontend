@@ -1,16 +1,14 @@
-import pymongo
 from fastapi import APIRouter
-from .Autocomplete import Autocomplete
-
-from ..common.Database import Database
+from ..common.helpers import pad_id
+from . import Autocomplete
 
 router = APIRouter(
 	prefix="",
-	tags=["autocomplete"]
+	tags=["search"]
 )
 
 
-@router.get("/search-autocomplete")
+@router.get("/guild/search/autocomplete")
 def search_autocomplete(guild_id: str, key: str = None, value: str = None, limit: int = 100):
 	if (key == None or value == None):
 		return []

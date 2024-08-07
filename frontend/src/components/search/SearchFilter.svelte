@@ -176,7 +176,7 @@
 					// do a fetch to the server to search for the message
 					(async () => {
 						let query = $searchPrompt;
-						let response = await fetch(`/api/search-autocomplete?guild_id=${encodeURIComponent(guildId)}&key=${encodeURIComponent(searchCategory.autocompleteApi)}&value=${encodeURIComponent(value)}`);
+						let response = await fetch(`/api/guild/search/autocomplete?guild_id=${encodeURIComponent(guildId)}&key=${encodeURIComponent(searchCategory.autocompleteApi)}&value=${encodeURIComponent(value)}`);
 						let json = await response.json();
 						console.log('json', json);
 						

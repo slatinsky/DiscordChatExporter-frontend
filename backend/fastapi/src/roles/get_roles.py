@@ -5,11 +5,11 @@ from ..common.Database import Database
 
 router = APIRouter(
 	prefix="",
-	tags=["roles"]
+	tags=["guild"]
 )
 
 
-@router.get("/roles")
+@router.get("/guild/roles")
 async def get_roles(guild_id: str):
 	"""
 	Returns a list of all roles in a guild.

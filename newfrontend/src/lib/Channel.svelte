@@ -1,9 +1,10 @@
 <script lang="ts">
     import { isDateDifferent } from "../js/helpers";
+    import { fetchMessageIds } from "../js/stores/api";
     import { getGuildState } from "../js/stores/guildState.svelte";
     import { getLayoutState } from "../js/stores/layoutState.svelte";
     import DateSeparator from "./DateSeparator.svelte";
-    import InfiniteScroll2 from "./InfiniteScroll2.svelte";
+    import InfiniteScroll3 from "./InfiniteScroll3.svelte";
     import ChannelStart from "./message/ChannelStart.svelte";
     import Message from "./message/Message.svelte";
 
@@ -14,16 +15,9 @@
     let apiChannelId = $derived(guildState.channelId)
 
 
-    export async function fetchMessageIds(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
-        try {
-            let response = await fetch(`/api/message-ids-paginated?guild_id=${encodeURIComponent(apiGuildId)}&channel_id=${encodeURIComponent(apiChannelId)}&direction=${direction}&message_id=${encodeURIComponent(messageId)}&limit=${limit}`)
-            let messageIds = await response.json()
-            return messageIds
-        }
-        catch (e) {
-            console.error("api - Failed to fetch message ids", e)
-            return []
-        }
+    async function fetchMessagesWrapper(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
+        // fetchMessageIds(guildId: string | null, channelId: string, direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number = 50) 
+        return fetchMessageIds(apiGuildId, apiChannelId, direction, messageId, limit)
     }
 </script>
 
@@ -86,9 +80,10 @@
                     bottomAligned={true}
                 /> -->
                 {#key apiChannelId}
-                <InfiniteScroll2
-                    fetchMessageIds={fetchMessageIds}
+                <InfiniteScroll3
+                    fetchMessages={fetchMessagesWrapper}
                     guildId={apiGuildId}
+                    scrollToMessageId={guildState.channelMessageId}
                     snippetMessage={renderMessageSnippet2}
                 />
                 {/key}

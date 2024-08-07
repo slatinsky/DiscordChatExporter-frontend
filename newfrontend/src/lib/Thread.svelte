@@ -1,10 +1,10 @@
 <script lang="ts">
     import { isDateDifferent } from "../js/helpers";
+    import { fetchMessageIds } from "../js/stores/api";
     import { getGuildState } from "../js/stores/guildState.svelte";
     import { getLayoutState } from "../js/stores/layoutState.svelte";
     import DateSeparator from "./DateSeparator.svelte";
-    import InfiniteScroll from "./InfiniteScroll.svelte";
-    import InfiniteScroll2 from "./InfiniteScroll2.svelte";
+    import InfiniteScroll3 from "./InfiniteScroll3.svelte";
     import Pinned from "./Pinned.svelte";
     import Icon from "./icons/Icon.svelte";
     import ChannelIcon from "./menuchannels/ChannelIcon.svelte";
@@ -22,16 +22,11 @@
     let apiGuildId = $derived(guildState.guildId ? guildState.guildId : "000000000000000000000000")
     let apiChannelId = $derived(guildState.threadId)
 
-    export async function fetchMessageIds(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
-        try {
-            let response = await fetch(`/api/message-ids-paginated?guild_id=${encodeURIComponent(apiGuildId)}&channel_id=${encodeURIComponent(apiChannelId)}&direction=${direction}&message_id=${encodeURIComponent(messageId)}&limit=${limit}`)
-            let messageIds = await response.json()
-            return messageIds
-        }
-        catch (e) {
-            console.error("api - Failed to fetch message ids", e)
+    export async function fetchMessagesWrapper(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
+        if (apiChannelId === null) {
             return []
         }
+        return fetchMessageIds(apiGuildId, apiChannelId, direction, messageId, limit)
     }
 </script>
 
@@ -93,21 +88,15 @@
     </div>
     <div class="thread">
         <!-- TODO: support change of threadMessageId without rerender -->
-        {#key guildState.threadMessageId}
-            <!-- <InfiniteScroll
-            debugname="thread"
-            ids={guildState.threadMessagesIds}
-            guildId={guildState.guildId}
-            selectedMessageId={guildState.threadMessageId}
-            renderMessageSnippet={renderMessageSnippet}
-            channelStartSnippet={channelStartSnippet}
-            channelEndSnippet={channelEndSnippet}
-            bottomAligned={true} /> -->
-            <InfiniteScroll2
-                fetchMessageIds={fetchMessageIds}
-                guildId={apiGuildId}
-                snippetMessage={renderMessageSnippet2}
-            />
+        {#key guildState.threadId}
+            {#key guildState.threadMessageId}
+                <InfiniteScroll3
+                    fetchMessages={fetchMessagesWrapper}
+                    guildId={apiGuildId}
+                    scrollToMessageId={guildState.threadMessageId}
+                    snippetMessage={renderMessageSnippet2}
+                />
+            {/key}
         {/key}
     </div>
 </div>

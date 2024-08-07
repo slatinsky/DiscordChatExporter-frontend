@@ -4,8 +4,30 @@ export async function fetchMessageIds(guildId: string | null, channelId: string,
     if (guildId === null) {
         guildId = "000000000000000000000000"
     }
+    if (messageId === null || messageId === "first") {
+        messageId = "000000000000000000000000"
+    }
+    else if (messageId === "last") {
+        messageId = "999999999999999999999999"
+    }
     try {
-        let response = await fetch(`/api/message-ids-paginated?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}&direction=${direction}&message_id=${encodeURIComponent(messageId)}&limit=${limit}`)
+        let response
+        if (direction === "first") {
+            response = await fetch(`/api/guild/messages?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}&next_page_cursor=0&limit=${encodeURIComponent(limit)}`)
+        }
+        else if (direction === "last") {
+            response = await fetch(`/api/guild/messages?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}&prev_page_cursor=999999999999999999999999&limit=${encodeURIComponent(limit)}`)
+        }
+        else if (direction === "before") {
+            response = await fetch(`/api/guild/messages?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}&prev_page_cursor=${encodeURIComponent(messageId)}&limit=${encodeURIComponent(limit)}`)
+        }
+        else if (direction === "after") {
+            response = await fetch(`/api/guild/messages?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}&next_page_cursor=${encodeURIComponent(messageId)}&limit=${encodeURIComponent(limit)}`)
+        }
+        else {
+            response = await fetch(`/api/guild/messages?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}&around_page_cursor=${encodeURIComponent(messageId)}&limit=${encodeURIComponent(limit)}`)
+        }
+
         let messageIds = await response.json()
         return messageIds
     }
@@ -20,7 +42,7 @@ export async function fetchSearch(guildId: string | null, prompt: string) {
         guildId = "000000000000000000000000"
     }
     try {
-        let response = await fetch(`/api/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}`)
+        let response = await fetch(`/api/guild/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}`)
         let messageIds = await response.json()
         return messageIds
     }
@@ -35,7 +57,7 @@ export async function fetchAutocomplete(guildId: string | null, key: string, val
         guildId = "000000000000000000000000"
     }
     try {
-        let response = await fetch(`/api/search-autocomplete?guild_id=${encodeURIComponent(guildId)}&key=${encodeURIComponent(key)}&value=${encodeURIComponent(value)}&limit=${limit}`)
+        let response = await fetch(`/api/guild/search/autocomplete?guild_id=${encodeURIComponent(guildId)}&key=${encodeURIComponent(key)}&value=${encodeURIComponent(value)}&limit=${encodeURIComponent(limit)}`)
         let json = await response.json()
         return json
     }
@@ -71,7 +93,7 @@ export async function fetchCategoriesChannelsThreads(guildId: string): Promise<C
     }
     console.log("aaaaaa fetchCategoriesChannelsThreads", guildId);
     try {
-        const response = await fetch(`/api/channels?guild_id=${guildId}`)
+        const response = await fetch(`/api/guild/channels?guild_id=${guildId}`)
         let json_response: Channel[] = await response.json()
 
         let categories_temp = []

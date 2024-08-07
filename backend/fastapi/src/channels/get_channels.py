@@ -4,11 +4,11 @@ from ..common.Database import Database
 
 router = APIRouter(
 	prefix="",
-	tags=["channels"]
+	tags=["guild"]
 )
 
 
-@router.get("/channels")
+@router.get("/guild/channels")
 async def get_channels(guild_id: str):
 	"""
 	Returns a list of all channels in a guild.
