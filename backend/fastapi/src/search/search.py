@@ -586,7 +586,7 @@ async def search_messages_(guild_id: str, prompt: str = None, prev_page_cursor: 
 		if return_count:
 			return collection_messages.count_documents(query)
 		else:
-			return cursor_pagination(collection_messages, query, prev_page_cursor, around_page_cursor, next_page_cursor, limit)
+			return cursor_pagination(collection_messages, query, prev_page_cursor, around_page_cursor, next_page_cursor, limit, guild_id)
 
 
 

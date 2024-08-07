@@ -46,4 +46,4 @@ async def get_messages_cursor_pagination(channel_id: str, guild_id: str, prev_pa
 		}
 	}
 
-	return cursor_pagination(collection_messages, base_query, prev_page_cursor, around_page_cursor, next_page_cursor, limit)
+	return cursor_pagination(collection_messages, base_query, prev_page_cursor, around_page_cursor, next_page_cursor, limit, guild_id)

@@ -1,10 +1,12 @@
 import pymongo
 import re
 
+from src.common.enrich_messages import enrich_messages_with_referenced
+
 from ..common.Database import pad_id
 
 
-def cursor_pagination(collection_messages, query: dict, prev_page_cursor: str | None = None, around_page_cursor: str | None = None, next_page_cursor: str | None = None, limit=100):
+def cursor_pagination(collection_messages, query: dict, prev_page_cursor: str | None = None, around_page_cursor: str | None = None, next_page_cursor: str | None = None, limit=100, guild_id=None):
 	#### ------------ INPUT VALIDATION ------------ ####
 	# only one of prev_id or next_id can be provided
 	if prev_page_cursor is None and next_page_cursor is None and around_page_cursor is None:
@@ -110,7 +112,7 @@ def cursor_pagination(collection_messages, query: dict, prev_page_cursor: str | 
 			nextpage = msgsg[-1]["_id"]
 		msgs = msgsl + msgsg
 
-
+	msgs = enrich_messages_with_referenced(msgs, guild_id)
 	ids = [msg["_id"] for msg in msgs]
 
 	return {
