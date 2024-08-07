@@ -77,7 +77,7 @@
             {#if layoutState.threadpinnedshown}
                 <div class="pin-messages">
                     {#key guildState.threadMessageId}
-                        <Pinned messageIds={guildState.threadPinnedMessagesIds} />
+                        <Pinned channelId={guildState.threadId} />
                     {/key}
                 </div>
             {/if}

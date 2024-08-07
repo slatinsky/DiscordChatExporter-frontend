@@ -1,6 +1,9 @@
 <script lang="ts">
+    import { isDateDifferent } from '../../js/helpers';
+    import { fetchSearch, fetchSearchCount } from '../../js/stores/api';
     import { findChannel, findThread, getGuildState, isChannel } from '../../js/stores/guildState.svelte';
-    import InfiniteScroll from '../InfiniteScroll-old.svelte';
+    import DateSeparator from '../DateSeparator.svelte';
+    import InfiniteScroll3 from '../InfiniteScroll3.svelte';
     import Icon from '../icons/Icon.svelte';
     import ChannelIcon from '../menuchannels/ChannelIcon.svelte';
     import Message from '../message/Message.svelte';
@@ -8,12 +11,33 @@
 
     const guildState = getGuildState()
     const searchState = getSearchState();
+    let apiGuildId = $derived(guildState.guildId ? guildState.guildId : "000000000000000000000000")
 
 
     function addCommas(count: number) {
         return count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
+
+    async function fetchMessagesWrapper(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
+        return fetchSearch(apiGuildId, searchState.searchPrompt, direction, messageId, limit)
+    }
 </script>
+
+{#snippet renderMessageSnippet2(message, previousMessage)}
+    <div data-messageid={message._id}>
+        {#if message._id === "first"}
+            <!-- <ChannelStart channelName={message.channelName} isThread={false} messageAuthor={message.author} /> -->
+            <div>channel start</div>
+        {:else if message._id === "last"}
+            <div>channel end</div>
+        {:else}
+            {#if isDateDifferent(previousMessage, message)}
+                <DateSeparator messageId={message._id} />
+            {/if}
+            <Message message={message} previousMessage={previousMessage} />
+        {/if}
+    </div>
+{/snippet}
 
 
 {#snippet renderMessageSnippet(index, message, previousMessage)}
@@ -51,7 +75,10 @@
     </div>
 {/snippet}
 
-{#if searchState.searching}
+<!-- <div>searchState.searching {searchState.searching}</div> -->
+<!-- <div>searchState.submittedSearchPrompt {searchState.submittedSearchPrompt}</div> -->
+
+<!-- {#if searchState.searching}
     <div class="channel-wrapper">
         <div class="search-header">
             <div class="header-txt">Searching...</div>
@@ -69,23 +96,29 @@
             </div>
         </div>
     </div>
-{:else if searchState.searchResultsIds && searchState.searchResultsIds.length > 0}
+{:else if searchState.searchResultsIds && searchState.searchResultsIds.length > 0} -->
     <div class="channel-wrapper">
-        <div class="search-header">
-            <div class="header-txt">{addCommas(searchState.searchResultsIds.length)} Results</div>
-        </div>
         {#key searchState.submittedSearchPrompt}
-            <InfiniteScroll
-                debugname="search"
-                ids={searchState.searchResultsIds}
-                guildId={guildState.guildId}
-                selectedMessageId={searchState.searchResultsIds[0]}
-                renderMessageSnippet={renderMessageSnippet}
-                bottomAligned={false}
+            <div class="search-header">
+                <div class="header-txt">
+                    {#await fetchSearchCount(apiGuildId, searchState.submittedSearchPrompt)}
+                        Counting...
+                    {:then count}
+                        {addCommas(count)} Results
+                    {:catch error}
+	                    <p style="color: red">{error.message}</p>
+                    {/await}
+                </div>
+            </div>
+            <InfiniteScroll3
+                fetchMessages={fetchMessagesWrapper}
+                guildId={apiGuildId}
+                scrollToMessageId={"last"}
+                snippetMessage={renderMessageSnippet2}
             />
         {/key}
     </div>
-{/if}
+<!-- {/if} -->
 
 
 <style>
@@ -184,6 +217,9 @@
                 font-weight: 400;
                 color: #f2f3f5;
                 padding: 0 16px;
+                height: 50px;
+                display: flex;
+                align-items: center;
             }
         }
     }

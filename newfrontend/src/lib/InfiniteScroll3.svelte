@@ -36,7 +36,6 @@
             event.preventDefault()
             return
         }
-        console.log('scrolling', prevPage, nextPage)
         // if at the top of scroll container, load more messages before
         if (prevPage && scrollContainer.scrollTop === 0) {
             console.log('top reached')

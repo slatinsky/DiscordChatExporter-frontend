@@ -1,8 +1,6 @@
 import { getSearchState } from "../../lib/search/searchState.svelte";
-import { getGuildState } from "./guildState.svelte";
 
 const searchState = getSearchState();
-const guildState = getGuildState();
 
 let mobilesidepanelshown = $state(false);
 let searchManuallyHidden = $state(false);
@@ -93,7 +91,6 @@ export function getLayoutState() {
     }
     async function showChannelPinned() {
         channelpinnedshown = true;
-        await guildState.fetchChannelPinnedMessagesIds()
     }
     async function toggleThreadPinned() {
         if (threadpinnedshown) {
@@ -108,7 +105,6 @@ export function getLayoutState() {
     }
     async function showThreadPinned() {
         threadpinnedshown = true;
-        await guildState.fetchThreadPinnedMessagesIds()
     }
 
     return {

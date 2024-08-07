@@ -37,17 +37,62 @@ export async function fetchMessageIds(guildId: string | null, channelId: string,
     }
 }
 
-export async function fetchSearch(guildId: string | null, prompt: string) {
+export async function fetchSearch(guildId: string | null, prompt: string, direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number = 50) {
     if (guildId === null) {
         guildId = "000000000000000000000000"
     }
+    if (messageId === null || messageId === "first") {
+        messageId = "000000000000000000000000"
+    }
+    else if (messageId === "last") {
+        messageId = "999999999999999999999999"
+    }
     try {
-        let response = await fetch(`/api/guild/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}`)
+        let response
+        if (direction === "first") {
+            response = await fetch(`/api/guild/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}&next_page_cursor=0&limit=${encodeURIComponent(limit)}`)
+        }
+        else if (direction === "last") {
+            response = await fetch(`/api/guild/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}&prev_page_cursor=999999999999999999999999&limit=${encodeURIComponent(limit)}`)
+        }
+        else if (direction === "before") {
+            response = await fetch(`/api/guild/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}&prev_page_cursor=${encodeURIComponent(messageId)}&limit=${encodeURIComponent(limit)}`)
+        }
+        else if (direction === "after") {
+            response = await fetch(`/api/guild/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}&next_page_cursor=${encodeURIComponent(messageId)}&limit=${encodeURIComponent(limit)}`)
+        }
+        else {
+            response = await fetch(`/api/guild/search?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}&around_page_cursor=${encodeURIComponent(messageId)}&limit=${encodeURIComponent(limit)}`)
+        }
+
         let messageIds = await response.json()
         return messageIds
     }
     catch (e) {
         console.error("api - Failed to fetch search", e)
+        return []
+    }
+}
+
+export async function fetchPinnedMessages(guildId: string | null, channelId: string, direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number = 50) {
+    const prompt = `pinned:true in_id:${encodeURIComponent(channelId)}`
+    return fetchSearch(guildId, prompt, direction, messageId, limit)
+}
+
+export async function fetchSearchCount(guildId: string | null, prompt: string) {
+    // delay a bit to make sure (faster) search query runs first
+    await new Promise(r => setTimeout(r, 25));
+
+    if (guildId === null) {
+        guildId = "000000000000000000000000"
+    }
+    try {
+        let response = await fetch(`/api/guild/search/count?guild_id=${encodeURIComponent(guildId)}&prompt=${encodeURIComponent(prompt)}`)
+        let count = await response.text()
+        return count
+    }
+    catch (e) {
+        console.error("api - Failed to fetch search count", e)
         return []
     }
 }
@@ -67,10 +112,7 @@ export async function fetchAutocomplete(guildId: string | null, key: string, val
     }
 }
 
-export async function fetchPinnedMessageIds(guildId: string | null, channelId: string) {
-    const prompt = `pinned:true in_id:${encodeURIComponent(channelId)}`
-    return fetchSearch(guildId, prompt)
-}
+
 
 export async function fetchGuilds() {
     try {

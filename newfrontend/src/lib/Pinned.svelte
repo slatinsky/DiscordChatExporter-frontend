@@ -1,15 +1,23 @@
 <script lang="ts">
+    import { isDateDifferent } from "../js/helpers";
+    import { fetchPinnedMessages } from "../js/stores/api";
     import { getGuildState } from "../js/stores/guildState.svelte";
-    import InfiniteScroll from "./InfiniteScroll.svelte";
+    import DateSeparator from "./DateSeparator.svelte";
+    import InfiniteScroll3 from "./InfiniteScroll3.svelte";
     import Icon from "./icons/Icon.svelte";
     import Message from "./message/Message.svelte";
 
     const guildState = getGuildState()
+    let apiGuildId = $derived(guildState.guildId ? guildState.guildId : "000000000000000000000000")
 
 	interface MyProps {
-        messageIds: string[];
+        channelId: string[];
     }
-    let { messageIds }: MyProps = $props();
+    let { channelId }: MyProps = $props();
+
+    async function fetchMessagesWrapper(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
+        return fetchPinnedMessages(apiGuildId, channelId, direction, messageId, limit)
+    }
 </script>
 
 
@@ -19,8 +27,23 @@
     </div>
 {/snippet}
 
+{#snippet renderMessageSnippet2(message, previousMessage)}
+    <div data-messageid={message._id}>
+        {#if message._id === "first"}
+            <!-- <ChannelStart channelName={message.channelName} isThread={false} messageAuthor={message.author} /> -->
+            <div>pinned start</div>
+        {:else if message._id === "last"}
+            <div>channel end</div>
+        {:else}
+            {#if isDateDifferent(previousMessage, message)}
+                <DateSeparator messageId={message._id} />
+            {/if}
+            <Message message={message} previousMessage={previousMessage} />
+        {/if}
+    </div>
+{/snippet}
 
-{#if messageIds.length === 0}
+{#if !channelId}
     <div class="channel-wrapper">
         <div class="pinned-header">
             <div class="header-txt">Pinned Messages</div>
@@ -40,7 +63,19 @@
             <div class="header-txt">Pinned Messages</div>
         </div>
         <div class="channel" >
-            <InfiniteScroll debugname="pinned" ids={messageIds} guildId={guildState.guildId} selectedMessageId={messageIds[0]} renderMessageSnippet={renderMessageSnippet} bottomAligned={false} />
+            <!-- <InfiniteScroll
+            debugname="pinned"
+            ids={messageIds}
+            guildId={guildState.guildId}
+            selectedMessageId={messageIds[0]}
+            renderMessageSnippet={renderMessageSnippet}
+            bottomAligned={false} /> -->
+            <InfiniteScroll3
+                fetchMessages={fetchMessagesWrapper}
+                guildId={apiGuildId}
+                scrollToMessageId={"last"}
+                snippetMessage={renderMessageSnippet2}
+            />
         </div>
     </div>
 {/if}

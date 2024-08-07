@@ -29,7 +29,7 @@
                 {#if layoutState.channelpinnedshown}
                     <div class="pin-messages">
                         {#key guildState.channelId}
-                            <Pinned messageIds={guildState.channelPinnedMessagesIds} />
+                            <Pinned channelId={guildState.channelId} />
                         {/key}
                     </div>
                 {/if}

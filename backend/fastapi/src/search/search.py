@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from ..common.cursor_pagination import cursor_pagination
 
 from ..common.enrich_messages import enrich_messages_with_referenced
-from ..common.helpers import pad_id, print_json, simplify_mongo_query
+from ..common.helpers import pad_id, print_json
 from ..common.Database import Database
 
 from fastapi import APIRouter, Query
@@ -325,8 +325,8 @@ async def search_messages(guild_id: str, prompt: str = None, prev_page_cursor: s
 	return await search_messages_(guild_id, prompt, prev_page_cursor, around_page_cursor, next_page_cursor, limit, return_count=False)
 
 @router.get("/guild/search/count")
-async def count_messages(guild_id: str, prompt: str = None, prev_page_cursor: str | None = None, around_page_cursor: str | None = None, next_page_cursor: str | None = None, limit=100):
-	return await search_messages_(guild_id, prompt, prev_page_cursor, around_page_cursor, next_page_cursor, limit, return_count=True)
+async def count_messages(guild_id: str, prompt: str = None):
+	return await search_messages_(guild_id, prompt, prev_page_cursor=None, around_page_cursor=None, next_page_cursor=None, limit=0, return_count=True)
 
 
 async def search_messages_(guild_id: str, prompt: str = None, prev_page_cursor: str | None = None, around_page_cursor: str | None = None, next_page_cursor: str | None = None, limit=100, return_count: bool = False):
@@ -469,56 +469,57 @@ async def search_messages_(guild_id: str, prompt: str = None, prev_page_cursor: 
 		if is_pinned is not None:
 			query["isPinned"] = is_pinned
 
-		or_ = []
-		if attachment_is_audio is not None:
-			if not attachment_is_audio:
-				or_.append({
-					"$and": [
-						{"attachments.type": {"$nin": ["audio"]}},
-						{"embeds.thumbnail.type": {"$nin": ["audio"]}}
-					]
-				})
-			else:
-				or_.append({
-					"$or": [
-						{"attachments.type": "audio"},
-						{"embeds.thumbnail.type": "audio"}
-					]
-				})
+		if attachment_is_audio is not None or attachment_is_image is not None or attachment_is_video is not None:
+			or_ = []
+			if attachment_is_audio is not None:
+				if not attachment_is_audio:
+					or_.append({
+						"$and": [
+							{"attachments.type": {"$nin": ["audio"]}},
+							{"embeds.thumbnail.type": {"$nin": ["audio"]}}
+						]
+					})
+				else:
+					or_.append({
+						"$or": [
+							{"attachments.type": "audio"},
+							{"embeds.thumbnail.type": "audio"}
+						]
+					})
 
-		if attachment_is_image is not None:
-			if not attachment_is_image:
-				or_.append({
-					"$and": [
-						{"attachments.type": {"$nin": ["image"]}},
-						{"embeds.thumbnail.type": {"$nin": ["image"]}}
-					]
-				})
-			else:
-				or_.append({
-					"$or": [
-						{"attachments.type": "image"},
-						{"embeds.thumbnail.type": "image"}
-					]
-				})
+			if attachment_is_image is not None:
+				if not attachment_is_image:
+					or_.append({
+						"$and": [
+							{"attachments.type": {"$nin": ["image"]}},
+							{"embeds.thumbnail.type": {"$nin": ["image"]}}
+						]
+					})
+				else:
+					or_.append({
+						"$or": [
+							{"attachments.type": "image"},
+							{"embeds.thumbnail.type": "image"}
+						]
+					})
 
-		if attachment_is_video is not None:
-			if not attachment_is_video:
-				or_.append({
-					"$and": [
-						{"attachments.type": {"$nin": ["video"]}},
-						{"embeds.thumbnail.type": {"$nin": ["video"]}}
-					]
-				})
-			else:
-				or_.append({
-					"$or": [
-						{"attachments.type": "video"},
-						{"embeds.thumbnail.type": "video"}
-					]
-				})
+			if attachment_is_video is not None:
+				if not attachment_is_video:
+					or_.append({
+						"$and": [
+							{"attachments.type": {"$nin": ["video"]}},
+							{"embeds.thumbnail.type": {"$nin": ["video"]}}
+						]
+					})
+				else:
+					or_.append({
+						"$or": [
+							{"attachments.type": "video"},
+							{"embeds.thumbnail.type": "video"}
+						]
+					})
 
-		query["$and"].append({"$or": or_})
+			query["$and"].append({"$or": or_})
 
 
 		if containing_links is not None and containing_links:
@@ -576,7 +577,8 @@ async def search_messages_(guild_id: str, prompt: str = None, prev_page_cursor: 
 
 			query["$and"].append({"$and": and_})
 
-		query = simplify_mongo_query(query)
+		if len(query["$and"]) == 0:
+			query.pop("$and")
 
 		print("query")
 		print_json(query)
