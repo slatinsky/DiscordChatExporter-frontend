@@ -36,7 +36,7 @@
     </div>
 {/snippet}
 
-{#snippet channelStartSnippet(index, message, previousMessage)}
+{#snippet channelStartSnippet(message)}
     <ChannelStart channelName={message.channelName} isThread={false} messageAuthor={message.author} />
 {/snippet}
 
@@ -84,6 +84,7 @@
                     fetchMessages={fetchMessagesWrapper}
                     scrollToMessageId={guildState.channelMessageId}
                     snippetMessage={renderMessageSnippet2}
+                    channelStartSnippet={channelStartSnippet}
                 />
                 {/key}
             {/key}

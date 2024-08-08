@@ -7,9 +7,10 @@
         snippetMessage: Snippet
         scrollToMessageId: string
         emptySnippet?: Snippet
+        channelStartSnippet?: Snippet
     }
 
-    let { fetchMessages, snippetMessage, scrollToMessageId, emptySnippet}: MyProps = $props();
+    let { fetchMessages, snippetMessage, scrollToMessageId, emptySnippet, channelStartSnippet}: MyProps = $props();
 
     let SHOWDEBUG = false
     let scrollContainer: HTMLDivElement
@@ -143,6 +144,9 @@
             <small class="debug-container">scrollToMessageId {scrollToMessageId}</small>
         {/if}
         <div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
+            {#if !prevPage && channelStartSnippet && messages.length > 0}
+                {@render channelStartSnippet(messages[0])}
+            {/if}
             {#each messages as message, i (message._id)}
                 <!--
                     - skip the render of the first message if it is not the true first message,

@@ -30,24 +30,13 @@
     }
 </script>
 
-{#snippet renderMessageSnippet(index, message, previousMessage)}
-    <!-- {#if index === 0}
-        <ChannelStart channelName={message.channelName} isThread={true} messageAuthor={message.author} />
-    {/if} -->
-
-    {#if isDateDifferent(previousMessage, message)}
-        <DateSeparator messageId={message._id} />
-    {/if}
-
-    <div data-messageid={message._id}>
-        <Message message={message} previousMessage={previousMessage} />
-    </div>
+{#snippet channelStartSnippet(message)}
+    <ChannelStart channelName={message.channelName} isThread={true} messageAuthor={message.author} />
 {/snippet}
 
 {#snippet renderMessageSnippet2(message, previousMessage)}
     <div data-messageid={message._id}>
         {#if message._id === "first"}
-            <!-- <ChannelStart channelName={message.channelName} isThread={true} messageAuthor={message.author} /> -->
             <div>thread start</div>
         {:else if message._id === "last"}
             <div>thread end</div>
@@ -94,6 +83,7 @@
                     fetchMessages={fetchMessagesWrapper}
                     scrollToMessageId={guildState.threadMessageId}
                     snippetMessage={renderMessageSnippet2}
+                    channelStartSnippet={channelStartSnippet}
                 />
             {/key}
         {/key}
