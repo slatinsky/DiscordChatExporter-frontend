@@ -359,7 +359,7 @@
                 {#each hasOptions as hasOption, i}
                     <div class="item item-user" class:highlighted={selectedSuggestionIndex === i} onclick={()=>selectFullSuggestion(`has:${hasOption} `)}>
                         {#if isKey}
-                            <span class="key">from:</span>
+                            <span class="key">has:</span>
                         {/if}
                         <span class="displayname">{hasOption}</span>
                         <div class="gradient">
