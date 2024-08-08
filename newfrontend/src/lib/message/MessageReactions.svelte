@@ -30,13 +30,13 @@
 <style>
     .message-reactions {
         display: flex;
-        gap: 4px;
+        flex-wrap: wrap;
     }
 
     .message-reaction {
         margin-right: 4px;
         display: flex;
-        margin: 5px 1px 1px 0;
+        margin: 4px 4px 0px 0;
         padding: 2px 6px;
         border: 1px solid transparent;
         border-radius: 8px;
