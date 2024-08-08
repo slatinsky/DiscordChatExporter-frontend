@@ -1,6 +1,6 @@
 <script lang="ts">
     import { isDateDifferent } from "../js/helpers";
-    import { fetchMessageIds } from "../js/stores/api";
+    import { fetchMessages } from "../js/stores/api";
     import { getGuildState } from "../js/stores/guildState.svelte";
     import { getLayoutState } from "../js/stores/layoutState.svelte";
     import DateSeparator from "./DateSeparator.svelte";
@@ -20,13 +20,10 @@
     const layoutState = getLayoutState()
 
     let apiGuildId = $derived(guildState.guildId ? guildState.guildId : "000000000000000000000000")
-    let apiChannelId = $derived(guildState.threadId)
+    let apiThreadId = $derived(guildState.threadId)
 
     export async function fetchMessagesWrapper(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
-        if (apiChannelId === null) {
-            return []
-        }
-        return fetchMessageIds(apiGuildId, apiChannelId, direction, messageId, limit)
+        return fetchMessages(apiGuildId, apiThreadId, direction, messageId, limit)
     }
 </script>
 
@@ -54,9 +51,9 @@
     <div class="header-main">
         <div class="thread-name">
             {#if layoutState.mobile}
-                <div class="hamburger-icon" onclick={layoutState.toggleSidePanel}>
+                <button class="hamburger-icon" onclick={layoutState.toggleSidePanel}>
                     <Icon name="other/hamburger" width={20} />
-                </div>
+                </button>
             {/if}
             {#if guildState.thread?.name}
                 <ChannelIcon channel={guildState.thread} width={20} /><span>{guildState.thread.name}</span>
@@ -82,16 +79,18 @@
     </div>
     <div class="thread">
         <!-- TODO: support change of threadMessageId without rerender -->
-        {#key guildState.threadId}
-            {#key guildState.threadMessageId}
-                <InfiniteScroll3
-                    fetchMessages={fetchMessagesWrapper}
-                    scrollToMessageId={guildState.threadMessageId}
-                    snippetMessage={renderMessageSnippet2}
-                    channelStartSnippet={channelStartSnippet}
-                />
+        {#if apiThreadId}
+            {#key apiThreadId}
+                {#key guildState.threadMessageId}
+                    <InfiniteScroll3
+                        fetchMessages={fetchMessagesWrapper}
+                        scrollToMessageId={guildState.threadMessageId}
+                        snippetMessage={renderMessageSnippet2}
+                        channelStartSnippet={channelStartSnippet}
+                    />
+                {/key}
             {/key}
-        {/key}
+        {/if}
     </div>
 </div>
 

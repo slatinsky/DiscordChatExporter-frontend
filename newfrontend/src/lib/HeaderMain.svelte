@@ -14,9 +14,9 @@
 <div class="header-main" class:threadshown={layoutState.threadshown}>
     <div class="channel-name">
         {#if layoutState.mobile}
-            <div class="hamburger-icon" onclick={layoutState.toggleSidePanel}>
+            <button class="hamburger-icon" onclick={layoutState.toggleSidePanel}>
                 <Icon name="other/hamburger" width={20} />
-            </div>
+            </button>
         {/if}
         {#if guildState.channel?.name}
             <ChannelIcon channel={guildState.channel} width={20} />

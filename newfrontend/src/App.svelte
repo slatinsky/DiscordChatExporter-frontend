@@ -19,7 +19,7 @@
     import ImageGallery from './lib/imagegallery/ImageGallery.svelte';
 
 
-    let hidedebug = false
+    let hidedebug = true
 
     onMount(() => {
       const unsubscribe1 = theme.subscribe(value => {

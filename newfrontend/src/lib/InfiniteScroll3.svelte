@@ -110,9 +110,7 @@
     }
 
     onMount(async () => {
-        console.log('onMount')
         const newMessages = await fetchMessages("around", scrollToMessageId, MSGCOUNT_INITIAL)
-        console.log('newMessages', newMessages)
         messages = newMessages.messages
 
         // --- link previous messages ---
@@ -144,7 +142,7 @@
             <small class="debug-container">scrollToMessageId {scrollToMessageId}</small>
         {/if}
         <div class="scroll-container" onscroll={handleScroll} bind:this={scrollContainer}>
-            {#if !prevPage && channelStartSnippet && messages.length > 0}
+            {#if !prevPage && channelStartSnippet && messages && messages.length > 0}
                 {@render channelStartSnippet(messages[0])}
             {/if}
             {#each messages as message, i (message._id)}

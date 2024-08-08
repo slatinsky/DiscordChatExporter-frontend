@@ -1,6 +1,15 @@
 import type { Category, Channel } from "../interfaces";
 
-export async function fetchMessageIds(guildId: string | null, channelId: string, direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number = 50) {
+export async function fetchMessages(guildId: string | null, channelId: string, direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number = 50) {
+    if (channelId === null) {
+        console.error("api - fetchMessageIds - channelId is null")
+        return {
+            prev_page_cursor: null,
+            messageIds: [],
+            next_page_cursor: null,
+            messages: []
+        }
+    }
     if (guildId === null) {
         guildId = "000000000000000000000000"
     }
@@ -28,12 +37,17 @@ export async function fetchMessageIds(guildId: string | null, channelId: string,
             response = await fetch(`/api/guild/messages?guild_id=${encodeURIComponent(guildId)}&channel_id=${encodeURIComponent(channelId)}&around_page_cursor=${encodeURIComponent(messageId)}&limit=${encodeURIComponent(limit)}`)
         }
 
-        let messageIds = await response.json()
-        return messageIds
+        let retObj = await response.json()
+        return retObj
     }
     catch (e) {
         console.error("api - Failed to fetch message ids", e)
-        return []
+        return {
+            prev_page_cursor: null,
+            messageIds: [],
+            next_page_cursor: null,
+            messages: []
+        }
     }
 }
 

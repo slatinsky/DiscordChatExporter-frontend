@@ -1,6 +1,6 @@
 <script lang="ts">
     import { isDateDifferent } from "../js/helpers";
-    import { fetchMessageIds } from "../js/stores/api";
+    import { fetchMessages } from "../js/stores/api";
     import { getGuildState } from "../js/stores/guildState.svelte";
     import { getLayoutState } from "../js/stores/layoutState.svelte";
     import DateSeparator from "./DateSeparator.svelte";
@@ -16,7 +16,7 @@
 
 
     async function fetchMessagesWrapper(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
-        return fetchMessageIds(apiGuildId, apiChannelId, direction, messageId, limit)
+        return fetchMessages(apiGuildId, apiChannelId, direction, messageId, limit)
     }
 </script>
 
@@ -47,16 +47,16 @@
 
 <div class="channel-wrapper" class:threadshown={layoutState.threadshown}>
     <div class="channel" >
-        {#if guildState.channelId !== null}
+        {#if apiChannelId}
             <!-- TODO: support change of selectedMessageId without rerender -->
             {#key guildState.channelMessageId}
                 {#key apiChannelId}
-                <InfiniteScroll3
-                    fetchMessages={fetchMessagesWrapper}
-                    scrollToMessageId={guildState.channelMessageId}
-                    snippetMessage={renderMessageSnippet2}
-                    channelStartSnippet={channelStartSnippet}
-                />
+                    <InfiniteScroll3
+                        fetchMessages={fetchMessagesWrapper}
+                        scrollToMessageId={guildState.channelMessageId}
+                        snippetMessage={renderMessageSnippet2}
+                        channelStartSnippet={channelStartSnippet}
+                    />
                 {/key}
             {/key}
         {/if}

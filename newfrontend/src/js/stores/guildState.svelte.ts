@@ -1,24 +1,20 @@
 import { getSearchState } from "../../lib/search/searchState.svelte";
 import { isObjectEqual } from "../helpers";
-import { fetchCategoriesChannelsThreads, fetchGuilds, fetchMessageIds } from "./api";
+import { fetchCategoriesChannelsThreads, fetchGuilds } from "./api";
 import { getLayoutState } from "./layoutState.svelte";
 
 let guilds = $state(await fetchGuilds());
 let guildId = $state("nonExistingGuildId");  // will be changed before the first load
 let guild = $derived(guilds.find(g => g._id === guildId) || null);
 
-let channelId = $state(null);
+let channelId: string | null = $state(null);
 let categories = $state([]);
 let channel = $derived(categories.flatMap(c => c.channels).find(c => c._id === channelId) || null);
 let channelMessageId = $state(null);
-let channelMessagesIds = $state([]);
-// let channelPinnedMessagesIds = $state([]);
 
-let threadId = $state(null);
+let threadId: string | null  = $state(null);
 let thread = $derived(categories.flatMap(c => c.channels).flatMap(c => c.threads).find(t => t._id === threadId) || null);
-let threadMessageId = $state(null);
-let threadMessagesIds = $state([]);
-// let threadPinnedMessagesIds = $state([]);
+let threadMessageId: string | null  = $state(null);
 
 // fast lookups:
 // key is channelId, value is channel object
@@ -150,19 +146,6 @@ export function getGuildState() {
 		console.log("router - replaced", state);
 	}
 
-	// async function fetchChannelPinnedMessagesIds() {
-	// 	if (!guildId || !channelId) {
-	// 		return []
-	// 	}
-	// 	channelPinnedMessagesIds = await fetchPinnedMessageIds(guildId, channelId)
-	// }
-
-	// async function fetchThreadPinnedMessagesIds() {
-	// 	if (!guildId || !threadId) {
-	// 		return []
-	// 	}
-	// 	threadPinnedMessagesIds = await fetchPinnedMessageIds(guildId, threadId)
-	// }
 
 	async function changeGuildId(newGuildId: string | null) {
 		if (newGuildId === "000000000000000000000000") {
@@ -186,7 +169,6 @@ export function getGuildState() {
 		if (channelId !== newChannelId) {
 			await changeThreadId(null, null)
 			layoutState.hideChannelPinned()
-			// channelPinnedMessagesIds = []
 		}
 		channelId = newChannelId;
 
@@ -194,57 +176,12 @@ export function getGuildState() {
 			channelMessageId = newChannelMessageId
 		}
 
-		if (newChannelId) {
-			if (newChannelMessageId === "last") {
-				channelMessagesIds = await fetchMessageIds(guildId, newChannelId, "last", newChannelMessageId, 50)
-			}
-			else if (newChannelMessageId === "first") {
-				channelMessagesIds = await fetchMessageIds(guildId, newChannelId, "first", newChannelMessageId, 50)
-			}
-			else {
-				channelMessagesIds = await fetchMessageIds(guildId, newChannelId, "around", newChannelMessageId, 100)
-			}
-			if (channelMessageId === null) {
-				channelMessageId = channelMessagesIds[channelMessagesIds.length - 1]  // last message
-			}
-		}
-		else {
-			channelMessagesIds = []
+		if (!newChannelId) {
 			channelMessageId = null
-			// channelPinnedMessagesIds = []
 		}
 		console.log("router - changed channelId", channelId, "messageId", channelMessageId);
 	}
 
-	async function loadChannelMessageIdsBefore() {
-		if (!channelId) {
-			return
-		}
-		if (channelMessagesIds.length === 0) {
-			return
-		}
-		const soonestMessageId = channelMessagesIds[0]
-		if (soonestMessageId === "first") {
-			return
-		}
-		const oldCount = channelMessagesIds.length
-		const newMessageIds = await fetchMessageIds(guildId, channelId, "before", soonestMessageId, 5)
-		channelMessagesIds = [...newMessageIds, ...channelMessagesIds ]
-		console.warn("router - loadChannelMessageIdsBefore - loaded", channelMessagesIds.length - oldCount, "new messages before", soonestMessageId);
-	}
-	async function loadChannelMessageIdsAfter() {
-		if (!channelId) {
-			return
-		}
-		if (channelMessagesIds.length === 0) {
-			return
-		}
-		const latestMessageId = channelMessagesIds[channelMessagesIds.length - 1]
-		let oldCount = channelMessagesIds.length
-		const newMessageIds = await fetchMessageIds(guildId, channelId, "after", latestMessageId, 5)
-		channelMessagesIds = [...channelMessagesIds, ...newMessageIds]
-		console.log("router - loadChannelMessageIdsAfter - loaded", channelMessagesIds.length - oldCount, "new messages after", latestMessageId);
-	}
 
 	async function changeThreadId(newThreadId: string | null, newThreadMessageId: string | null) {
 		if (threadId === newThreadId && threadMessageId === newThreadMessageId) {
@@ -253,7 +190,6 @@ export function getGuildState() {
 
 		if (threadId !== newThreadId) {
 			layoutState.hideThreadPinned()
-			// threadPinnedMessagesIds = []
 		}
 		threadId = newThreadId;
 
@@ -262,18 +198,10 @@ export function getGuildState() {
 		}
 
 		if (newThreadId && guildId) {
-			threadMessagesIds = await fetchMessageIds(guildId, newThreadId, "last", newThreadMessageId)
-			if (threadMessageId === null) {
-				threadMessageId = threadMessagesIds[threadMessagesIds.length - 1]  // last message
-			}
-
 			layoutState.showThread()
 		}
 		else {
-			threadMessagesIds = []
 			threadMessageId = null
-			// threadPinnedMessagesIds = []
-
 			layoutState.hideThread()
 		}
 		console.log("router - changed threadId", threadId);
@@ -339,26 +267,12 @@ export function getGuildState() {
 		get thread() {
 			return thread;
 		},
-		get channelMessagesIds() {
-			return channelMessagesIds;
-		},
 		get channelMessageId() {
 			return channelMessageId;
-		},
-		// get channelPinnedMessagesIds() {
-		// 	return channelPinnedMessagesIds;
-		// },
-		get threadMessagesIds() {
-			return threadMessagesIds;
 		},
 		get threadMessageId() {
 			return threadMessageId;
 		},
-		// get threadPinnedMessagesIds() {
-		// 	return threadPinnedMessagesIds;
-		// },
-		loadChannelMessageIdsBefore,
-		loadChannelMessageIdsAfter,
 		changeGuildId,
 		changeChannelId,
 		changeThreadId,
@@ -367,8 +281,6 @@ export function getGuildState() {
 		getUrlState,
 		pushState,
 		replaceState,
-		// fetchChannelPinnedMessagesIds,
-		// fetchThreadPinnedMessagesIds,
 	};
 }
 
@@ -393,8 +305,6 @@ async function restoreGuildState(state) {
 	await guildState.changeGuildId(state.guild);
 	await guildState.changeChannelId(state.channel, state.channelmessage);
 	await guildState.changeThreadId(state.thread, state.threadmessage);
-	// await guildState.changeChannelMessageId(state.channelmessage);
-	// await guildState.changeThreadMessageId(state.threadmessage);
 
 	await searchState.setSearchPrompt(state.search)
 	await searchState.search(guildState.guildId)
