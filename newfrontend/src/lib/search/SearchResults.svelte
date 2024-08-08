@@ -25,23 +25,6 @@
 
 {#snippet renderMessageSnippet2(message, previousMessage)}
     <div data-messageid={message._id}>
-        {#if message._id === "first"}
-            <!-- <ChannelStart channelName={message.channelName} isThread={false} messageAuthor={message.author} /> -->
-            <div>channel start</div>
-        {:else if message._id === "last"}
-            <div>channel end</div>
-        {:else}
-            {#if isDateDifferent(previousMessage, message)}
-                <DateSeparator messageId={message._id} />
-            {/if}
-            <Message message={message} previousMessage={previousMessage} />
-        {/if}
-    </div>
-{/snippet}
-
-
-{#snippet renderMessageSnippet(index, message, previousMessage)}
-    <div data-messageid={message._id}>
         {#if !previousMessage || previousMessage.channelId !== message.channelId}
             {@const channelObj = findChannel(message.channelId)}
             {@const threadObj = findThread(message.channelId)}
