@@ -53,6 +53,11 @@
 <div class="thread-wrapper">
     <div class="header-main">
         <div class="thread-name">
+            {#if layoutState.mobile}
+                <div class="hamburger-icon" onclick={layoutState.toggleSidePanel}>
+                    <Icon name="other/hamburger" width={20} />
+                </div>
+            {/if}
             {#if guildState.thread?.name}
                 <ChannelIcon channel={guildState.thread} width={20} /><span>{guildState.thread.name}</span>
             {:else}
@@ -92,6 +97,15 @@
 
 
 <style>
+    .hamburger-icon {
+        cursor: pointer;
+        color: #b5bac1;
+        margin-right: 10px;
+        &:hover {
+            color: #dbdee1;
+        }
+    }
+
     .pin-wrapper {
         position: relative;
         .pin-btn {

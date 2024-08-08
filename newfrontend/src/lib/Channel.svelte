@@ -16,25 +16,9 @@
 
 
     async function fetchMessagesWrapper(direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number) {
-        // fetchMessageIds(guildId: string | null, channelId: string, direction: "before" | "after" | "around" | "first" | "last", messageId: string | null = null, limit: number = 50) 
         return fetchMessageIds(apiGuildId, apiChannelId, direction, messageId, limit)
     }
 </script>
-
-
-{#snippet renderMessageSnippet(index, message, previousMessage)}
-    <!-- {#if index === 0}
-        <ChannelStart channelName={message.channelName} isThread={false} messageAuthor={message.author} />
-    {/if} -->
-
-    {#if isDateDifferent(previousMessage, message)}
-        <DateSeparator messageId={message._id} />
-    {/if}
-
-    <div data-messageid={message._id}>
-        <Message message={message} previousMessage={previousMessage} />
-    </div>
-{/snippet}
 
 {#snippet channelStartSnippet(message)}
     <ChannelStart channelName={message.channelName} isThread={false} messageAuthor={message.author} />
@@ -49,7 +33,6 @@
 {#snippet renderMessageSnippet2(message, previousMessage)}
     <div data-messageid={message._id}>
         {#if message._id === "first"}
-            <!-- <ChannelStart channelName={message.channelName} isThread={false} messageAuthor={message.author} /> -->
             <div>channel start</div>
         {:else if message._id === "last"}
             <div>channel end</div>
@@ -67,18 +50,6 @@
         {#if guildState.channelId !== null}
             <!-- TODO: support change of selectedMessageId without rerender -->
             {#key guildState.channelMessageId}
-                <!-- <InfiniteScroll
-                    debugname="channel"
-                    ids={guildState.channelMessagesIds}
-                    loadBefore={guildState.loadChannelMessageIdsBefore}
-                    loadAfter={guildState.loadChannelMessageIdsAfter}
-                    guildId={guildState.guildId}
-                    selectedMessageId={guildState.channelMessageId}
-                    renderMessageSnippet={renderMessageSnippet}
-                    channelStartSnippet={channelStartSnippet}
-                    channelEndSnippet={channelEndSnippet}
-                    bottomAligned={true}
-                /> -->
                 {#key apiChannelId}
                 <InfiniteScroll3
                     fetchMessages={fetchMessagesWrapper}

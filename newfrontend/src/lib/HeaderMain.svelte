@@ -13,6 +13,11 @@
 
 <div class="header-main" class:threadshown={layoutState.threadshown}>
     <div class="channel-name">
+        {#if layoutState.mobile}
+            <div class="hamburger-icon" onclick={layoutState.toggleSidePanel}>
+                <Icon name="other/hamburger" width={20} />
+            </div>
+        {/if}
         {#if guildState.channel?.name}
             <ChannelIcon channel={guildState.channel} width={20} />
             <span>{guildState.channel.name}</span>
@@ -44,6 +49,15 @@
 
 
 <style>
+    .hamburger-icon {
+        cursor: pointer;
+        color: #b5bac1;
+        margin-right: 10px;
+        &:hover {
+            color: #dbdee1;
+        }
+    }
+
     .search-wrapper {
         position: relative;
     }
