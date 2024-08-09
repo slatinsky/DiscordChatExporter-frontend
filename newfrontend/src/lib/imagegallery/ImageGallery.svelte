@@ -5,6 +5,8 @@
 
 	const imagegalleryState = getImagegalleryState();
     window.globalShowSingleAsset = imagegalleryState.showSingleAsset;
+
+    let shownAsset = $derived(imagegalleryState.shownAsset)
 </script>
 
 {#if imagegalleryState.isGalleryShown}
@@ -19,13 +21,14 @@
         {/if}
 		<button class="closebtn" on:click={imagegalleryState.closeGallery}>&times;</button>
 		<div class="imgbox" on:click|stopPropagation>
-			<img src={checkUrl(imagegalleryState.shownAsset)} width={imagegalleryState.shownAsset?.width ?? undefined} height={imagegalleryState.shownAsset?.height ?? undefined}>
+			<img src={checkUrl(shownAsset)} width={shownAsset?.width ?? undefined} height={shownAsset?.height ?? undefined}>
 			<div class="open-original">
-				<a href={checkUrl(imagegalleryState.shownAsset)} target="_blank">Open in Browser</a>
+				<a href={checkUrl(shownAsset)} target="_blank">Open in Browser</a>
 			</div>
 		</div>
 	</div>
 {/if}
+
 
 
 <style>

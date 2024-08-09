@@ -4,20 +4,34 @@ let isGalleryShown: boolean = $state(false);
 let assets: Asset[] = $state([]);
 let shownAssetIndex: number = $state(0);
 let assetsCount: number = $derived(assets.length);
-let shownAsset: Asset | null = $derived(assets.find((_, i) => i === shownAssetIndex) || null);
-
+let shownAsset: Asset | null = $state(null);
 
 export function getImagegalleryState() {
+
+    function _updateShownAsset() {
+        shownAsset = assets.find((_, i) => i === shownAssetIndex) || null;
+    }
+
     function showSingleAsset(newAsset: Asset) {
-        assets = [newAsset];
-        shownAssetIndex = 0;
-        isGalleryShown = true;
-        console.log("imagegallery - showSingleAsset", $state.snapshot(newAsset));
+        if (!newAsset) {
+            console.error("imagegallery - showSingleAsset: newAsset is empty");
+            return;
+        }
+        showMultipleAssets([newAsset], newAsset);
     }
 
     function showMultipleAssets(newAssets: Asset[], assetToShow: Asset) {
+        if (!newAssets.length) {
+            console.error("imagegallery - showMultipleAssets: newAssets is empty");
+            return;
+        }
+        if (!assetToShow) {
+            console.error("imagegallery - showMultipleAssets: assetToShow is empty");
+            return;
+        }
         assets = newAssets;
         shownAssetIndex = assets.findIndex((asset) => asset._id === assetToShow._id);
+        _updateShownAsset();
         isGalleryShown = true;
 
         console.log("imagegallery - showMultipleAssets", $state.snapshot(assets), $state.snapshot(shownAssetIndex));
@@ -26,10 +40,12 @@ export function getImagegalleryState() {
 
     function nextAsset() {
         shownAssetIndex = (shownAssetIndex + 1) % assets.length;
+        _updateShownAsset();
     }
 
     function previousAsset() {
         shownAssetIndex = (shownAssetIndex - 1 + assets.length) % assets.length;
+        _updateShownAsset();
     }
 
     function closeGallery() {
