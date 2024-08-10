@@ -72,28 +72,30 @@
 
 <div class="channel-wrapper">
     {#key searchState.submittedSearchPrompt}
-        <div class="search-header">
-            <div class="header-txt">
-                {#await fetchSearchCount(apiGuildId, searchState.submittedSearchPrompt)}
-                    Searching... <div class="spinner"></div>
-                {:then count}
-                    {#if count === 0}
-                        No Results
-                    {:else}
-                        {addCommas(count)} Results
-                    {/if}
-                {:catch error}
-                    <p style="color: red">{error.message}</p>
-                {/await}
+        {#if searchState.submittedSearchPrompt !== ""}
+            <div class="search-header">
+                <div class="header-txt">
+                    {#await fetchSearchCount(apiGuildId, searchState.submittedSearchPrompt)}
+                        Searching... <div class="spinner"></div>
+                    {:then count}
+                        {#if count === 0}
+                            No Results
+                        {:else}
+                            {addCommas(count)} Results
+                        {/if}
+                    {:catch error}
+                        <p style="color: red">{error.message}</p>
+                    {/await}
+                </div>
             </div>
-        </div>
-        <InfiniteScroll3
-            fetchMessages={fetchMessagesWrapper}
-            guildId={apiGuildId}
-            scrollToMessageId={"last"}
-            snippetMessage={renderMessageSnippet2}
-            emptySnippet={emptySnippet}
-        />
+            <InfiniteScroll3
+                fetchMessages={fetchMessagesWrapper}
+                guildId={apiGuildId}
+                scrollToMessageId={"last"}
+                snippetMessage={renderMessageSnippet2}
+                emptySnippet={emptySnippet}
+            />
+        {/if}
     {/key}
 </div>
 
