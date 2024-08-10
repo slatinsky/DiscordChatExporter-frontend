@@ -35,7 +35,7 @@
                         <ChannelIcon channel={threadObj} width={16} />{threadObj.name}
                     </button>
                     <button class="channel-name-small" onclick={()=>guildState.changeChannelId(parentChannelObj._id, null)}>
-                        <ChannelIcon channel={parentChannelObj} width={12} />{parentChannelObj.name}
+                        <ChannelIcon channel={parentChannelObj} width={12} />{parentChannelObj?.name}
                     </button>
                 </div>
             {:else if channelObj}

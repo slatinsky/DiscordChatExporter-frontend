@@ -65,7 +65,19 @@
 
     function focusInput() {
         if (domInput) {
+            focused = true;
             domInput.focus();
+        }
+        else {
+            console.error("domInput is undefined")
+        }
+    }
+
+    function blurInput() {
+        if (domInput) {
+            focused = false;
+            domInput.blur();
+            console.warn("search blur")
         }
         else {
             console.error("domInput is undefined")
@@ -89,6 +101,7 @@
             else {
                 if (domInput) {
                     domInput.focus();
+                    console.warn("search focus")
                 }
             }
         }
@@ -120,7 +133,7 @@
         </button>
     {/if}
     <div class="autocomplete">
-        <SearchAutoComplete domInput={domInput} visible={focused} bind:this={autocomplete} focusInput={focusInput}/>
+        <SearchAutoComplete domInput={domInput} visible={focused} bind:this={autocomplete} focusInput={focusInput} blurInput={blurInput} />
     </div>
 </div>
 

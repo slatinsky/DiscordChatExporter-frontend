@@ -270,7 +270,7 @@ def channel_names_to_ids(in_channel_ids: list, in_channels: list, guild_id: str)
 def extend_reactions(reaction_ids: list, reactions: list, guild_id: str):
 	"""
 	Find new reaction ids by reaction names.
-	Support partial or lowercase match.
+	Exact lowercase match.
 
 	"""
 	collection_emojis = Database.get_guild_collection(guild_id, "emojis")
@@ -282,7 +282,7 @@ def extend_reactions(reaction_ids: list, reactions: list, guild_id: str):
 
 	or_ = []
 	for reaction in reactions:
-		or_.append({"name": {"$regex": reaction, "$options": "i"}})
+		or_.append({"name": {"$regex": f"^{reaction}$", "$options": "i"}})
 
 	query = {"$or": or_}
 
@@ -337,7 +337,6 @@ async def search_messages_(guild_id: str, prompt: str = None, prev_page_cursor: 
 	collection_messages = Database.get_guild_collection(guild_id, "messages")
 
 	try:
-		# todo: parse prompt
 		search = parse_prompt(prompt)
 		message_contains = search["message_contains"]
 		message_ids = search["message_ids"]

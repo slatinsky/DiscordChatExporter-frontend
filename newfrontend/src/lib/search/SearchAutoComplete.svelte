@@ -11,8 +11,9 @@
         domInput: HTMLInputElement;
         visible: boolean;
         focusInput: () => void;
+        blurInput: () => void;
     }
-    let { domInput, visible, focusInput }: MyProps = $props();
+    let { domInput, visible, focusInput, blurInput}: MyProps = $props();
 
     const searchState = getSearchState()
     const guildState = getGuildState();
@@ -27,6 +28,7 @@
     let channelAutoComplete = $state([])
     let threadAutoComplete = $state([])
     let filenameAutoComplete = $state([])
+    let emojisAutoComplete = $state([])
     let selectBoolean = $state(false)
 
     let showCalendar = $state(false)
@@ -41,7 +43,8 @@
         { key: 'during', value: 'specific date' },
         { key: 'after', value: 'specific date' },
         { key: 'in', value: 'channel' },
-        { key: 'pinned', value: 'true or false' }
+        { key: 'pinned', value: 'true or false' },
+        { key: 'reaction', value: 'emoji' }
     ]
 
     let searchOptions = $derived.by(()=> {  // filtered by key
@@ -171,9 +174,9 @@
         searchState.setSearchPrompt(newSearchPrompt);
         searchState.search(guildState.guildId)
         searchState.addToSearchHistory(newSearchPrompt)
-        // setTimeout(() => {
-            // restoreFocus();
-        // }, 1000);
+        setTimeout(() => {
+            blurInput();
+        }, 0);
     }
 
     function selectKeySuggestion(suggestion: string): any {
@@ -228,6 +231,7 @@
             channelAutoComplete = []
             threadAutoComplete = []
             filenameAutoComplete = []
+            emojisAutoComplete = []
             selectBoolean = false
             showCalendar = false
         }
@@ -236,11 +240,13 @@
             hasOptions = allHasOptions.filter(filter => filter.startsWith(lastKey.toLowerCase()))
             const usersPromise = fetchAutocomplete(guildState.guildId, "users", searchState.selection.lastKey, 3)
             const fileNamePromise = fetchAutocomplete(guildState.guildId, "filenames", searchState.selection.lastKey, 3)
+            const emojisPromise = fetchAutocomplete(guildState.guildId, "reactions", searchState.selection.lastKey, 3)
             channelAutoComplete = findChannelsByName(searchState.selection.lastKey).slice(0, 3)
             threadAutoComplete = findThreadsByName(searchState.selection.lastKey).slice(0, 3)
             fromAutoComplete = await usersPromise
             mentionAutoComplete = await usersPromise
             filenameAutoComplete = await fileNamePromise
+            emojisAutoComplete = await emojisPromise
             selectBoolean = false
             showCalendar = false
         }
@@ -249,6 +255,7 @@
             channelAutoComplete = []
             threadAutoComplete = []
             filenameAutoComplete = []
+            emojisAutoComplete = []
             fromAutoComplete = await fetchAutocomplete(guildState.guildId, "users", searchState.selection.lastValue, 10)
             selectBoolean = false
             showCalendar = false
@@ -258,6 +265,7 @@
             channelAutoComplete = []
             threadAutoComplete = []
             filenameAutoComplete = []
+            emojisAutoComplete = []
             mentionAutoComplete = await fetchAutocomplete(guildState.guildId, "users", searchState.selection.lastValue, 10)
             selectBoolean = false
             showCalendar = false
@@ -266,6 +274,7 @@
             fromAutoComplete = []
             mentionAutoComplete = []
             filenameAutoComplete = []
+            emojisAutoComplete = []
             channelAutoComplete = findChannelsByName(searchState.selection.lastValue).slice(0, 10)
             threadAutoComplete = findThreadsByName(searchState.selection.lastValue).slice(0, 10)
             selectBoolean = false
@@ -276,6 +285,7 @@
             mentionAutoComplete = []
             channelAutoComplete = []
             threadAutoComplete = []
+            emojisAutoComplete = []
             filenameAutoComplete = await fetchAutocomplete(guildState.guildId, "filenames", searchState.selection.lastValue, 10)
             selectBoolean = false
             showCalendar = false
@@ -286,6 +296,7 @@
             channelAutoComplete = []
             threadAutoComplete = []
             filenameAutoComplete = []
+            emojisAutoComplete = []
             selectBoolean = true
             showCalendar = false
         }
@@ -295,6 +306,7 @@
             channelAutoComplete = []
             threadAutoComplete = []
             filenameAutoComplete = []
+            emojisAutoComplete = []
             selectBoolean = false
             showCalendar = true
         }
@@ -305,6 +317,17 @@
             channelAutoComplete = []
             threadAutoComplete = []
             filenameAutoComplete = []
+            emojisAutoComplete = []
+            selectBoolean = false
+            showCalendar = false
+        }
+        else if (lastKey.toLowerCase() === 'reaction') {
+            fromAutoComplete = []
+            channelAutoComplete = []
+            threadAutoComplete = []
+            filenameAutoComplete = []
+            emojisAutoComplete = await fetchAutocomplete(guildState.guildId, "reactions", searchState.selection.lastValue, 10)
+            mentionAutoComplete = []
             selectBoolean = false
             showCalendar = false
         }
@@ -315,6 +338,7 @@
             channelAutoComplete = []
             threadAutoComplete = []
             filenameAutoComplete = []
+            emojisAutoComplete = []
             selectBoolean = false
             showCalendar = false
         }
@@ -402,6 +426,26 @@
                         {/if}
                         <img src={checkUrl(user.icon)} alt="">
                         <span class="displayname">{user.description}</span> <span class="username">{user.key}</span>
+                        <div class="gradient">
+                            <div class="icon"><Icon name="other/plus" width={18} /></div>
+                        </div>
+                    </div>
+                {/each}
+            </div>
+        {/if}
+        {#if emojisAutoComplete.length > 0}
+            <hr>
+            <div class="list-group">
+                <div class="category">
+                    <div>Reaction</div>
+                </div>
+                {#each emojisAutoComplete as emoji, i}
+                    <div class="item item-emoji" class:highlighted={selectedSuggestionIndex === i} onclick={()=>selectFullSuggestion(`reaction:${escapeValue(emoji.key)} `)} title={emoji.description2}>
+                        {#if isKey}
+                            <span class="key">reaction:</span>
+                        {/if}
+                        <img src={checkUrl(emoji.icon)} alt="">
+                        <span class="displayname">{emoji.key}</span>
                         <div class="gradient">
                             <div class="icon"><Icon name="other/plus" width={18} /></div>
                         </div>
@@ -743,6 +787,30 @@
                     font-size: 16px;
                     font-weight: 500px;
                     color: #949ba4;
+                    white-space: nowrap;
+                }
+            }
+
+            .item-emoji {
+                .key {
+                    font-size: 16px;
+                    font-weight: 400;
+                    color: #949ba4;
+                    margin-right: 5px;
+                }
+
+                img {
+                    width: 20px;
+                    height: 20px;
+                    margin-right: 5px;
+                    object-fit: contain;
+                }
+
+                .displayname {
+                    font-size: 16px;
+                    font-weight: 500;
+                    color: #dbdee1;
+                    margin-right: 5px;
                     white-space: nowrap;
                 }
             }
