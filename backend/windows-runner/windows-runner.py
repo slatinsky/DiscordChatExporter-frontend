@@ -1,6 +1,7 @@
 import ctypes
 from datetime import datetime
 import os
+import shutil
 import signal
 import sys
 import time
@@ -24,10 +25,10 @@ class SingleInstance:
 		self.lasterror = GetLastError()
 
 	def is_secondary_instance(self):
-		return (self.lasterror == ERROR_ALREADY_EXISTS)
+		return self.lasterror == ERROR_ALREADY_EXISTS
 
 	def is_primary_instance(self):
-		return not self.is_secondary_instance()
+		return not self.lasterror == ERROR_ALREADY_EXISTS
 
 	def __del__(self):
 		if self.mutex:
@@ -42,7 +43,15 @@ def is_compiled():
 	else:
 		return True
 
-
+def kill_dcef_processes():
+	dcef_process_names = ['dceffastapi.exe', 'dcefnginx.exe', 'dcefmongod.exe', 'dcefpreprocess.exe']
+	for process in psutil.process_iter(['pid', 'name']):
+		if process.info['name'] in dcef_process_names:
+			custom_print("windows-runner:", "killing process", process.info['pid'])
+			try:
+				process.kill()
+			except Exception as e:
+				custom_print("windows-runner:", "error killing process", process.info['pid'], e)
 
 
 def custom_print(source, *args, **kwargs):
@@ -54,6 +63,10 @@ def custom_print(source, *args, **kwargs):
 	log_message = str(datetime_obj) + "  " + source.ljust(16) + ' '.join(str_args)
 	if 'end' in kwargs and kwargs['end'] == '':
 		log_message = log_message[:-1]
+
+	blacklist = ["Slow SessionWorkflow loop", "Slow query"]  # this just spams the logs and is not useful
+	if any([blacklisted in log_message for blacklisted in blacklist]):
+		return
 
 	print(log_message)
 
@@ -81,10 +94,6 @@ def check_used_ports():
 		custom_print("windows-runner:", 'WARNING: Needed port 21011 is already in use. This port is required by nginx')
 		required_port_is_used = True
 
-	if 21013 in used_ports:
-		custom_print("windows-runner:", 'WARNING: Needed port 21013 is already in use. This port is required by http-server.')
-		required_port_is_used = True
-
 	if 27017 in used_ports:
 		custom_print("windows-runner:", 'WARNING: Needed port 27017 is already in use. This port is required by mongodb.')
 		required_port_is_used = True
@@ -107,6 +116,8 @@ def cleanup():
 	if not terminating_now:  # Prevents cleanup from being called twice
 		terminating_now = True
 
+		kill_dcef_processes()
+
 		# kill other instances of dcef.exe except this one
 		if is_compiled() and myapp.is_primary_instance():
 			custom_print("windows-runner:", "killing other instances of dcef.exe except primary with PID " +  str(os.getpid()))
@@ -119,6 +130,11 @@ def cleanup():
 				os.kill(process.pid, signal.CTRL_C_EVENT)
 			except Exception as e:
 				custom_print("windows-runner:", "error killing process", process.pid, e)
+
+		# delete temp folder with its contents
+		temp_folder = BASE_DIR + '/temp'
+		if os.path.exists(temp_folder):
+			shutil.rmtree(temp_folder)
 
 
 
@@ -159,15 +175,8 @@ def runner(name, args, cwd):
 
 def start_preprocess():
 	cwd = os.path.realpath(BASE_DIR + '/dcef/backend/preprocess')
-	args = ['preprocess.exe', '../../../exports/', 'temp/']
+	args = ['dcefpreprocess.exe', '../../../exports/', 'temp/']
 	th = threading.Thread(target=runner, args=('preprocess', args, cwd), daemon=False)
-	th.start()
-	return th
-
-def start_http_server():
-	cwd = os.path.realpath(BASE_DIR + '/dcef/backend/http-server')
-	args = ['http-server.exe', '../../../exports', '--port', '21013', '-c-1', '--silent', '-P', 'http://127.0.0.1:21013?']
-	th = threading.Thread(target=runner, args=('http-server', args, cwd), daemon=False)
 	th.start()
 	return th
 
@@ -175,23 +184,23 @@ def start_mongodb():
 	create_dir_if_not_exists(BASE_DIR + '/dcef/backend/mongodb/db')
 
 	cwd = os.path.realpath(BASE_DIR + '/dcef/backend/mongodb')
-	args = ['mongod.exe', '--dbpath', 'db']
+	args = ['dcefmongod.exe', '--dbpath', 'db']
 	th = threading.Thread(target=runner, args=('mongodb', args, cwd), daemon=False)
 	th.start()
 	return th
 
 def start_fastapi():
 	cwd = os.path.realpath(BASE_DIR + '/dcef/backend/fastapi')
-	args = ['fastapi.exe']
+	args = ['dceffastapi.exe']
 	th = threading.Thread(target=runner, args=('fastapi', args, cwd), daemon=False)
 	th.start()
 	return th
 
 def start_nginx():
-	create_dir_if_not_exists(BASE_DIR + '/dcef/backend/nginx/logs')
-	create_dir_if_not_exists(BASE_DIR + '/dcef/backend/nginx/temp')
-	cwd = os.path.realpath(BASE_DIR + '/dcef/backend/nginx')
-	args = ['nginx.exe', '-c', 'conf/nginx-prod.conf']
+	create_dir_if_not_exists(BASE_DIR + '/logs')
+	create_dir_if_not_exists(BASE_DIR + '/temp')
+	cwd = os.path.realpath(BASE_DIR)
+	args = ['dcef\\backend\\nginx\\dcefnginx.exe', '-c', 'dcef/backend/nginx/conf/nginx-prod.conf']
 	th = threading.Thread(target=runner, args=('nginx', args, cwd), daemon=False)
 	th.start()
 	return th
@@ -222,6 +231,8 @@ def main():
 		custom_print("windows-runner:", "finished secondary instance")
 
 	else:
+		kill_dcef_processes()  # kill any running instances of dcef processes before starting new ones
+		create_dir_if_not_exists(BASE_DIR + '/logs')
 		if os.path.exists(LOG_FILE):
 			os.remove(LOG_FILE)
 
@@ -231,7 +242,6 @@ def main():
 		th_nginx = start_nginx()
 		time.sleep(1)
 		th_mongodb = start_mongodb()
-		th_http_server = start_http_server()
 		th_fastapi = start_fastapi()
 		th_preprocess = start_preprocess()
 
@@ -256,7 +266,7 @@ if is_compiled():
 else:
 	BASE_DIR = os.path.realpath(os.path.dirname(__file__) + '/../../release')
 
-LOG_FILE = BASE_DIR + '/dcef/logs.txt'
+LOG_FILE = BASE_DIR + '/logs/dcef.log'
 
 if __name__ == '__main__':
 	main()
