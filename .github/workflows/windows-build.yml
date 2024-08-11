@@ -24,100 +24,17 @@ jobs:
         with:
           node-version: 18.17.1
           cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
+          cache-dependency-path: 'src/dcef/frontend/package-lock.json'
 
-      - name: Create directories
-        run: |
-          mkdir -p build\exports
-          mkdir -p build\registry_tweaks
-          mkdir -p build\dcef\backend\preprocess
-          mkdir -p build\dcef\backend\nginx\conf
-          mkdir -p build\dcef\backend\nginx\logs
-          mkdir -p build\dcef\backend\nginx\temp
-          mkdir -p build\dcef\backend\fastapi
-          mkdir -p build\dcef\backend\http-server
-          mkdir -p build\dcef\backend\mongodb
-          mkdir -p build\dcef\backend\mongodb\db
-
-      - name: Install pkg
-        run: npm install -g pkg
-
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm install
-
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build
-
-      - name: Install backend dependencies
+      - name: Install pyinstaller
         working-directory: backend/preprocess
-        run: |
-          pip install -r requirements.txt
-          pip install pyinstaller==5.5
+        run: pip install pyinstaller==5.5
 
-      - name: Install configurator dependencies
-        working-directory: backend/configurator
-        run: |
-          pip install -r requirements.txt
-
-      - name: Install fastapi dependencies
-        working-directory: backend/fastapi
-        run: |
-          pip install -r requirements.txt
-          pip install uvicorn==0.20.0
-
-      - name: Install windows-runner dependencies
-        working-directory: backend/windows-runner
-        run: |
-          pip install -r requirements.txt
-
-      - name: Build preprocess executable with pyinstaller
-        working-directory: backend/preprocess
-        run: pyinstaller --onefile --name preprocess main_mongo.py
-
-      - name: Build fastapi executable with pyinstaller
-        working-directory: backend/fastapi
-        run: pyinstaller --onefile --name fastapi main.py --hidden-import "uvicorn.logging" --hidden-import "uvicorn.loops" --hidden-import "uvicorn.loops.auto" --hidden-import "uvicorn.protocols" --hidden-import "uvicorn.protocols.http" --hidden-import "uvicorn.protocols.http.auto" --hidden-import "uvicorn.protocols.websockets" --hidden-import "uvicorn.protocols.websockets.auto" --hidden-import "uvicorn.lifespan" --hidden-import "uvicorn.lifespan.on" --hidden-import "app"
-
-      - name: Build windows-runner executable with pyinstaller
-        working-directory: backend/windows-runner
-        run: pyinstaller --onefile --name dcef windows-runner.py --icon=icon.ico
-
-      - name: Build configurator executable with pyinstaller
-        working-directory: backend/configurator
-        run: pyinstaller --onefile --name configurator main.py
-
-      - name: Install http-server
-        working-directory: backend/http-server
-        run: npm install
-
-      - name: Create executable for http-server
-        working-directory: backend/http-server
-        run: pkg node_modules/http-server/bin/http-server --target node16-win-x64
-
-      - name: Move files to build folder
-        run: |
-          mv frontend\build build\dcef\frontend
-          mv backend\preprocess\dist\preprocess.exe build\dcef\backend\preprocess\preprocess.exe
-          mv backend\fastapi\dist\fastapi.exe build\dcef\backend\fastapi\fastapi.exe
-          cp backend\preprocess\emojiIndex.json build\dcef\backend\preprocess\emojiIndex.json
-          cp backend\nginx\nginx.exe build\dcef\backend\nginx\nginx.exe
-          cp backend\nginx\conf\nginx-prod.conf build\dcef\backend\nginx\conf\nginx-prod.conf
-          cp backend\nginx\conf\mime.types build\dcef\backend\nginx\conf\mime.types
-          cp backend\mongodb\mongod.exe build\dcef\backend\mongodb\mongod.exe
-          cp backend\mongodb\vcruntime140_1.dll build\dcef\backend\mongodb\vcruntime140_1.dll
-          cp backend\mongodb\msvcp140.dll build\dcef\backend\mongodb\msvcp140.dll
-          cp backend\http-server\http-server.exe build\dcef\backend\http-server\http-server.exe
-          cp backend\windows-runner\dist\dcef.exe build\dcef.exe
-          cp backend\configurator\dist\configurator.exe build\configurator.exe
-          Copy-Item -Path release\exports\* -Destination build\exports -Recurse
-          cp release\registry_tweaks\change_260_character_path_limit_to_32767.reg build\registry_tweaks\change_260_character_path_limit_to_32767.reg
-          cp release\registry_tweaks\restore_260_character_path_limit.reg build\registry_tweaks\restore_260_character_path_limit.reg
-          cp release\registry_tweaks\README.txt build\registry_tweaks\README.txt
+      - name: Run build script
+        run: src\BUILD_RELEASE.bat
 
       - name: Upload build folder
         uses: actions/upload-artifact@v2
         with:
           name: windows-build
-          path: build
+          path: release
