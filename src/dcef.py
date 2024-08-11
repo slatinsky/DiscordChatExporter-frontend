@@ -175,16 +175,16 @@ def runner(name, args, cwd):
 
 def start_preprocess():
 	cwd = os.path.realpath(BASE_DIR + '/dcef/backend/preprocess')
-	args = ['dcefpreprocess.exe', '../../../exports/', 'temp/']
+	args = ['dcefpreprocess.exe']
 	th = threading.Thread(target=runner, args=('preprocess', args, cwd), daemon=False)
 	th.start()
 	return th
 
 def start_mongodb():
-	create_dir_if_not_exists(BASE_DIR + '/dcef/backend/mongodb/db')
+	create_dir_if_not_exists(BASE_DIR + '/_temp/mongodb')
 
 	cwd = os.path.realpath(BASE_DIR + '/dcef/backend/mongodb')
-	args = ['dcefmongod.exe', '--dbpath', 'db']
+	args = ['dcefmongod.exe', '--dbpath', "../../../_temp/mongodb"]
 	th = threading.Thread(target=runner, args=('mongodb', args, cwd), daemon=False)
 	th.start()
 	return th
@@ -265,6 +265,8 @@ if is_compiled():
 	BASE_DIR = os.path.realpath(os.path.dirname(sys.executable))
 else:
 	BASE_DIR = os.path.realpath(os.path.dirname(__file__) + '/../../release')
+	print("DON'T RUN THIS SCRIPT DIRECTLY. RUN compiled dcef.exe in release folder instead.")
+	sys.exit(1)
 
 LOG_FILE = BASE_DIR + '/logs/dcef.log'
 

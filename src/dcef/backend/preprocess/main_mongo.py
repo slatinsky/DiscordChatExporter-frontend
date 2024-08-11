@@ -7,7 +7,6 @@ from MongoDatabase import MongoDatabase
 from ChannelCache import ChannelCache
 from AssetProcessor import AssetProcessor
 from JsonProcessor import JsonProcessor
-from Downloader import download_gg
 from Timer import Timer
 from helpers import human_file_size
 
@@ -109,7 +108,7 @@ def remove_processed_jsons(database, jsons):
 	return jsons
 
 
-def main(input_dir, output_dir):
+def main(input_dir):
 	print("main_mongo loaded")
 
 	database = MongoDatabase()
@@ -144,8 +143,6 @@ def main(input_dir, output_dir):
 		p = JsonProcessor(database, file_finder, json_path, asset_processor, index, jsons_count)
 		p.process()
 
-	download_gg(output_dir)
-
 	# if user browses exports before they are processed, cached channels may be invalid again
 	# so we need to invalidate cache again
 	channel_cache = ChannelCache()
@@ -155,8 +152,7 @@ def main(input_dir, output_dir):
 
 
 if __name__ == "__main__":
-	input_dir = sys.argv[1]
-	output_dir = sys.argv[2]
+	input_dir = "../../../exports/"
 	with Timer("Preprocess"):
-		main(input_dir, output_dir)
+		main(input_dir)
 

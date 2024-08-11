@@ -57,70 +57,70 @@
 	font-family: "gg sans";
 	font-style: normal;
 	font-weight: 400;
-	src: url(/data/fonts/ggsans-normal-400.woff2) format("woff2");
+	src: url(/fonts/ggsans-normal-400.woff2) format("woff2");
 }
 
 @font-face {
 	font-family: "gg sans";
 	font-style: italic;
 	font-weight: 400;
-	src: url(/data/fonts/ggsans-italic-400.woff2) format("woff2");
+	src: url(/fonts/ggsans-italic-400.woff2) format("woff2");
 }
 
 @font-face {
 	font-family: "gg sans";
 	font-style: normal;
 	font-weight: 500;
-	src: url(/data/fonts/ggsans-normal-500.woff2) format("woff2");
+	src: url(/fonts/ggsans-normal-500.woff2) format("woff2");
 }
 
 @font-face {
 	font-family: "gg sans";
 	font-style: italic;
 	font-weight: 500;
-	src: url(/data/fonts/ggsans-italic-500.woff2) format("woff2");
+	src: url(/fonts/ggsans-italic-500.woff2) format("woff2");
 }
 
 @font-face {
 	font-family: "gg sans";
 	font-style: normal;
 	font-weight: 600;
-	src: url(/data/fonts/ggsans-normal-600.woff2) format("woff2");
+	src: url(/fonts/ggsans-normal-600.woff2) format("woff2");
 }
 
 @font-face {
 	font-family: "gg sans";
 	font-style: italic;
 	font-weight: 600;
-	src: url(/data/fonts/ggsans-italic-600.woff2) format("woff2");
+	src: url(/fonts/ggsans-italic-600.woff2) format("woff2");
 }
 
 @font-face {
 	font-family: "gg sans";
 	font-style: normal;
 	font-weight: 700;
-	src: url(/data/fonts/ggsans-normal-700.woff2) format("woff2");
+	src: url(/fonts/ggsans-normal-700.woff2) format("woff2");
 }
 
 @font-face {
 	font-family: "gg sans";
 	font-style: italic;
 	font-weight: 700;
-	src: url(/data/fonts/ggsans-italic-700.woff2) format("woff2");
+	src: url(/fonts/ggsans-italic-700.woff2) format("woff2");
 }
 
 @font-face {
 	font-family: "gg sans";
 	font-style: normal;
 	font-weight: 800;
-	src: url(/data/fonts/ggsans-normal-800.woff2) format("woff2");
+	src: url(/fonts/ggsans-normal-800.woff2) format("woff2");
 }
 
 @font-face {
 	font-family: "gg sans";
 	font-style: italic;
 	font-weight: 800;
-	src: url(/data/fonts/ggsans-italic-800.woff2) format("woff2");
+	src: url(/fonts/ggsans-italic-800.woff2) format("woff2");
 }
 
 

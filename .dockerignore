@@ -1,2 +1,55 @@
-node_modules
+# docker specific files
 *.exe
+*.bat
+
+
+# global denylist
+.DS_Store
+node_modules
+.env
+.env.*
+!.env.example
+.vercel
+.output
+__pycache__
+.vscode
+.venv
+
+
+# releases (built files)
+/release/*.zip
+/release/dcef/backend/fastapi/
+/release/dcef/backend/mongodb/
+/release/dcef/backend/nginx/
+/release/dcef/backend/preprocess/
+/release/dcef/frontend/
+/release/logs/
+/release/temp/
+/release/_temp/
+/release/dcef.exe
+/release/dcef/storage/
+
+# build cache
+/src/_temp/
+
+# dev exports
+/src/exports/*
+
+# build exports
+/release/exports/*
+!/release/exports/README.txt
+!/release/exports/example_guild/
+
+
+
+# nginx dev
+/src/logs/
+/src/temp/
+
+
+# mongodb database
+/src/dcef/backend/mongodb/db
+
+
+# private files
+/bruno

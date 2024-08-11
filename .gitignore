@@ -8,50 +8,43 @@ node_modules
 .output
 __pycache__
 .vscode
+.venv
 
 
 # releases (built files)
 /release/*.zip
-/build/
-/release/dcef/
-/backend/preprocess/build/
-/backend/preprocess/dist/
-/build.zip
+/release/dcef/backend/fastapi/
+/release/dcef/backend/mongodb/
+/release/dcef/backend/nginx/
+/release/dcef/backend/preprocess/
+/release/dcef/frontend/
+/release/logs/
+/release/temp/
+/release/_temp/
+/release/dcef.exe
+/release/dcef/storage/
 
+# build cache
+/src/_temp/
 
-# windows-runner
-/backend/windows-runner/build/
-/backend/windows-runner/dist/
-dcef.log
-dcef.exe
-/backend/windows-runner/dcef.spec
+# dev exports
+/src/exports/*
 
-# nginx
-/backend/nginx/logs
-/backend/nginx/temp
-error.log
-access.log
-nginx.pid
-
-# mongodb
-/backend/mongodb/db
-
-
-# Preprocess
-/backend/preprocess/*.spec
-/backend/preprocess/temp/*
-
-# Frontend
-/frontend/build
-/frontend/.svelte-kit
-
-# Files containing private information (use example files as a template)
-REDOWNLOAD.bat
-
-# private files
-/exports/
+# build exports
 /release/exports/*
 !/release/exports/README.txt
 !/release/exports/example_guild/
-/backend/preprocess/temp/
-/TODO.md
+
+
+
+# nginx dev
+/src/logs/
+/src/temp/
+
+
+# mongodb database
+/src/dcef/backend/mongodb/db
+
+
+# private files
+/bruno

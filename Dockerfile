@@ -1,31 +1,35 @@
+# build using (linux):
+# docker build -t dcef .
+# ----------------------
+
 # build sveltekit static app
 FROM node:19.2.0-alpine3.15 as build
 WORKDIR /app
-COPY frontend/package.json frontend/package-lock.json ./
+COPY src/dcef/frontend/package.json src/dcef/frontend/package-lock.json ./
 RUN npm install
-COPY frontend/ .
+COPY src/dcef/frontend/ .
 RUN npm run build
 
-# first stage
+# main image
 FROM mongo:6.0.5-jammy
 WORKDIR /dcef
 RUN apt-get update && apt-get install python3.11 python3-pip nginx wget -y
 RUN mkdir -p /dcef/exports/
-COPY /release/exports/ /dcef/exports/
-COPY /backend/preprocess/requirements.txt /dcef/backend/preprocess/requirements.txt
-COPY /backend/fastapi/requirements.txt /dcef/backend/fastapi/requirements.txt
-COPY /backend/configurator/requirements.txt /dcef/backend/configurator/requirements.txt
-RUN python3.11 -m pip install -r ./backend/preprocess/requirements.txt
-RUN python3.11 -m pip install -r ./backend/fastapi/requirements.txt
-RUN python3.11 -m pip install -r ./backend/configurator/requirements.txt
+COPY release/exports/ /dcef/exports/
+COPY src/dcef/backend/preprocess/requirements.txt /dcef/backend/preprocess/requirements.txt
+COPY src/dcef/fastapi/requirements.txt /dcef/backend/fastapi/requirements.txt
+COPY src/dcef/backend/configurator/requirements.txt /dcef/backend/configurator/requirements.txt
+RUN python3.11 -m pip install -r ./src/dcef/backend/preprocess/requirements.txt
+RUN python3.11 -m pip install -r ./src/dcef/backend/fastapi/requirements.txt
+RUN python3.11 -m pip install -r ./src/dcef//backend/configurator/requirements.txt
 RUN mkdir -p /dcef/backend/nginx/logs/
-COPY /backend/nginx/conf/mime.types /dcef/backend/nginx/conf/mime.types
-COPY /backend/nginx/conf/nginx-docker.conf /dcef/backend/nginx/conf/nginx-docker.conf
+COPY src/dcef/backend/nginx/conf/mime.types /dcef/backend/nginx/conf/mime.types
+COPY src/dcef/backend/nginx/conf/nginx-docker.conf /dcef/backend/nginx/conf/nginx-docker.conf
 COPY --from=build /app/build/ ./frontend/
-COPY backend/preprocess/ ./backend/preprocess/
-COPY backend/fastapi/ ./backend/fastapi/
-COPY backend/configurator/main.py ./configurator.py
-COPY backend/docker/run_container.sh ./run_container.sh
+COPY src/dcef/backend/preprocess/ ./backend/preprocess/
+COPY src/dcef/backend/fastapi/ ./backend/fastapi/
+COPY src/dcef/backend/configurator/main.py ./configurator.py
+COPY src/dcef/backend/docker/run_container.sh ./run_container.sh
 RUN chmod 777 /dcef/run_container.sh
 EXPOSE 21011
-CMD /dcef/run_container.sh
+CMD dcef/run_container.sh
