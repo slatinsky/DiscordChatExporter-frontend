@@ -27,7 +27,7 @@ jobs:
           cache-dependency-path: 'src/dcef/frontend/package-lock.json'
 
       - name: Install pyinstaller
-        working-directory: backend/preprocess
+        working-directory: src
         run: pip install pyinstaller==5.5
 
       - name: Run build script
