@@ -115,4 +115,6 @@ mkdir "..\release\temp\"
 
 
 @REM create exports folder
-mkdir "..\release\exports"
+if not exist "..\release\exports" (
+    mkdir "..\release\exports"
+)
