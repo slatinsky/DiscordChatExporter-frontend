@@ -6,6 +6,8 @@
 @REM To remove build cache, delete the _temp folder
 @REM This is a Windows builder script. For Linux, use Dockerfile located in the root directory
 
+@REM Don't forget to install pyinstaller first:
+@REM py -m pip install pyinstaller==6.10.0
 
 
 @REM always start in this src directory
