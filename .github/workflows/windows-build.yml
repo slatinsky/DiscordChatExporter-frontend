@@ -32,7 +32,7 @@ jobs:
 
       - name: Run build script
         working-directory: src
-        run: BUILD_RELEASE.bat
+        run:  .\BUILD_RELEASE.bat
 
       - name: Verify build
         run: |
