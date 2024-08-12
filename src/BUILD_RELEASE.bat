@@ -27,10 +27,10 @@ mkdir "_temp"
 
 @REM install windows-runner dependencies
 if not exist "_temp\dcef\venv" (
-    py -m venv _temp\dcef\venv
+    call py -m venv _temp\dcef\venv
     call _temp\dcef\venv\Scripts\activate
-    pip install -r requirements.txt
-    deactivate
+    call pip install -r requirements.txt
+    call deactivate
 )
 @REM Build windows-runner
 py -m PyInstaller --onefile --name dcef       --icon "../../icon.ico"  --distpath "_temp/dcef/"       --specpath "_temp/dcef/"       --workpath "_temp/dcef/"       ./dcef.py  --paths "_temp\dcef\venv\Lib\site-packages"
@@ -41,10 +41,10 @@ move "_temp\dcef\dcef.exe" "..\release\dcef.exe"
 
 @REM install preprocess dependencies
 if not exist "_temp\preprocess\venv" (
-    py -m venv _temp\preprocess\venv
+    call py -m venv _temp\preprocess\venv
     call _temp\preprocess\venv\Scripts\activate
-    pip install -r dcef\backend\preprocess\requirements.txt
-    deactivate
+    call pip install -r dcef\backend\preprocess\requirements.txt
+    call deactivate
 )
 @REM Build preprocess
 py -m PyInstaller --onefile --name preprocess --icon "../../icon.ico"  --distpath "_temp/preprocess/" --specpath "_temp/preprocess/" --workpath "_temp/preprocess/" ./dcef/backend/preprocess/main_mongo.py --paths "_temp\preprocess\venv\Lib\site-packages"
@@ -56,10 +56,10 @@ copy "dcef\backend\preprocess\emojiIndex.json" "..\release\dcef\backend\preproce
 
 @REM install api-backend dependencies
 if not exist "_temp\fastapi\venv" (
-    py -m venv _temp\fastapi\venv
+    call py -m venv _temp\fastapi\venv
     call _temp\fastapi\venv\Scripts\activate
-    pip install -r dcef\backend\fastapi\requirements.txt
-    deactivate
+    call pip install -r dcef\backend\fastapi\requirements.txt
+    call deactivate
 )
 @REM build api-backend
 py -m PyInstaller --onefile --name fastapi    --icon "../../icon.ico"  --distpath "_temp/fastapi/"    --specpath "_temp/fastapi/"    --workpath "_temp/fastapi/"    ./dcef/backend/fastapi/prod.py           -F --hidden-import "uvicorn.logging" --hidden-import "uvicorn.loops" --hidden-import "uvicorn.loops.auto" --hidden-import "uvicorn.protocols" --hidden-import "uvicorn.protocols.http" --hidden-import "uvicorn.protocols.http.auto" --hidden-import "uvicorn.protocols.websockets" --hidden-import "uvicorn.protocols.websockets.auto" --hidden-import "uvicorn.lifespan" --hidden-import "uvicorn.lifespan.on" --hidden-import "src.main"  --paths "_temp\fastapi\venv\Lib\site-packages"

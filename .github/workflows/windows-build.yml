@@ -33,6 +33,9 @@ jobs:
       - name: Run build script
         run: src\BUILD_RELEASE.bat
 
+      - name: Verify build
+        run: if not exist release\dcef.exe exit 1
+
       - name: Upload build folder
         uses: actions/upload-artifact@v2
         with:

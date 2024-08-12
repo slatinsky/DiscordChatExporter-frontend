@@ -1,3 +1,3 @@
 pywebview==4.0.1
-pywin32==305
+pywin32==306
 psutil==5.9.4
