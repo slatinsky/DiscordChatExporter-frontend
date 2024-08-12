@@ -36,12 +36,13 @@ jobs:
 
       - name: Verify build
         run: |
-          if not exist release\dcef.exe exit 1
-          if not exist release\dcef\backend\preprocess\dcefpreprocess.exe exit 1
-          if not exist release\dcef\backend\fastapi\dceffastapi.exe exit 1
-          if not exist release\dcef\backend\mongodb\dcefmongod.exe exit 1
-          if not exist release\dcef\backend\nginx\dcefnginx.exe exit 1
-          if not exist release\dcef\frontend\index.html exit 1
+          if (-Not (Test-Path "release\dcef.exe")) { exit 1 }
+          if (-Not (Test-Path "release\dcef\backend\preprocess\dcefpreprocess.exe")) { exit 1 }
+          if (-Not (Test-Path "release\dcef\backend\fastapi\dceffastapi.exe")) { exit 1 }
+          if (-Not (Test-Path "release\dcef\backend\mongodb\dcefmongod.exe")) { exit 1 }
+          if (-Not (Test-Path "release\dcef\backend\nginx\dcefnginx.exe")) { exit 1 }
+          if (-Not (Test-Path "release\dcef\frontend\index.html")) { exit 1 }
+
 
       - name: Upload build folder
         uses: actions/upload-artifact@v2
