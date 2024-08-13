@@ -6,17 +6,13 @@ taskkill /f /im dcefmongod.exe
 
 @REM run python in venv windows
 if not exist "_temp\fastapi\venv" (
-    py -m venv _temp/fastapi/venv
-    call _temp/fastapi/venv/Scripts/activate
-    pip install -r dcef/backend/fastapi/requirements.txt
-    deactivate
+    call py -m venv _temp/fastapi/venv
+    call "_temp\fastapi\venv\Scripts\python.exe" -m pip install -r dcef/backend/fastapi/requirements.txt
 )
 
 if not exist "_temp\preprocess\venv" (
-    py -m venv _temp/preprocess/venv
-    call _temp/preprocess/venv/Scripts/activate
-    pip install -r dcef/backend/preprocess/requirements.txt
-    deactivate
+    call py -m venv _temp/preprocess/venv
+    call "_temp\preprocess\venv\Scripts\python.exe" -m pip install -r dcef/backend/preprocess/requirements.txt
 )
 
 @REM install frontend dependencies
@@ -34,7 +30,7 @@ if not exist "_temp\mongodb\" mkdir "_temp\mongodb\"
 
 @REM start the scripts
 start wt --maximized -d %~dp0\dcef\backend\fastapi cmd /k "..\..\..\_temp\fastapi\venv\Scripts\python.exe" dev.py; ^
-split-pane -V -d %~dp0\dcef\backend\preprocess cmd /k nodemon --exec py --ext "..\..\..\_temp\preprocess\venv\Scripts\python.exe" --ignore "__pycache__" main_mongo.py; ^
+split-pane -V -d %~dp0\dcef\backend\preprocess cmd /k nodemon -e py --ignore "__pycache__"  --exec "..\..\..\_temp\preprocess\venv\Scripts\python.exe" main_mongo.py; ^
 move-focus left; ^
 split-pane -H -d %~dp0\dcef\frontend cmd /k npm run dev; ^
 move-focus right; ^
