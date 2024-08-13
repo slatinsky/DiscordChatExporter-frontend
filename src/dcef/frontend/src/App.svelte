@@ -18,9 +18,6 @@
     import ViewUser from './lib/viewuser/ViewUser.svelte';
     import ImageGallery from './lib/imagegallery/ImageGallery.svelte';
 
-
-    let hidedebug = true
-
     onMount(() => {
       const unsubscribe1 = theme.subscribe(value => {
         document.documentElement.setAttribute('data-theme', value);
@@ -74,7 +71,7 @@
 <ViewUser />
 <ImageGallery />
 
-<div class:debuglayout={layoutState.debuglayout} style="width: 100%;height: 100%;">
+<div style="width: 100%;height: 100%;">
   <main
     class:mobile={layoutState.mobile} class:desktop={!layoutState.mobile}
     class:searchshown={layoutState.searchshown} class:searchhidden={!layoutState.searchshown}
@@ -93,21 +90,7 @@
   <ContextMenu />
 </div>
 
-
-
-<div class="debug-buttons" >
-  <button on:click={() => hidedebug = !hidedebug}>X</button>
-  <span style="{hidedebug ? 'display:none' : ''}">
-    <button on:click={layoutState.toggleDebugLayout}>debuglayout {layoutState.debuglayout}</button>
-    <button on:click={layoutState.toggleSidePanel}>mobilesidepanelshown {layoutState.mobilesidepanelshown}</button>
-    <button on:click={layoutState.toggleThread}>threadshown {layoutState.threadshown}</button>
-    <button on:click={layoutState.toggleSearch}>searchshown {layoutState.threadshown}</button>
-    <button on:click={layoutState.toggleSettings}>settingsshown {layoutState.settingsshown}</button>
-  </span>
-</div>
-
 <style>
-
   .settings {
     position: absolute;
     top: 0;
@@ -282,58 +265,4 @@
   main.mobile.mobilesidepanelshown .thread {
     left: calc(70px + min(236px, 100svw - 100px));
   }
-
-
-
-
-
-
-
-
-
-
-
-  /* DEBUG COLORS */
-  .debuglayout > .settings {
-    background-color: rgb(225, 0, 225);
-    border: 1px solid #ff72ff;
-  }
-  .debuglayout > main .guilds {
-    background-color: rgb(116, 58, 58);
-    border: 1px solid red;
-  }
-  .debuglayout > main .channels {
-    background-color: blue;
-    border: 1px solid #7272ff;
-  }
-  .debuglayout > main .header-main {
-    background-color: rgb(0, 151, 174);
-    border: 1px solid #08ffff;
-  }
-  .debuglayout > main .channel {
-    background-color: rgb(30, 0, 0);
-    border: 1px solid #ff7272;
-  }
-  .debuglayout > main .search-results {
-    background-color: lightgreen;
-    border: 1px solid #72ff72;
-  }
-  .debuglayout > main .thread {
-    background-color: lightblue;
-    border: 1px solid #7272ff;
-  }
-
-  .debug-buttons {
-    position: absolute;
-    bottom: 5px;
-    left: 5px;
-    z-index: 200;
-    font-size: 8px;
-  }
-  .debug-buttons button {
-    margin: 2px;
-    background-color: #f7f7f7;
-    color: black;
-  }
-
 </style>
