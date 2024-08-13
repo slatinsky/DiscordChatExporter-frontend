@@ -26,10 +26,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'src/dcef/frontend/package-lock.json'
 
-      - name: Install pyinstaller
-        working-directory: src
-        run: py -m pip install pyinstaller==6.10.0
-
       - name: Run build script
         working-directory: src
         run:  .\BUILD_RELEASE.bat

@@ -45,13 +45,10 @@ def is_compiled():
 
 def kill_dcef_processes():
 	dcef_process_names = ['dceffastapi.exe', 'dcefnginx.exe', 'dcefmongod.exe', 'dcefpreprocess.exe']
-	for process in psutil.process_iter(['pid', 'name']):
-		if process.info['name'] in dcef_process_names:
-			custom_print("windows-runner:", "killing process", process.info['pid'])
-			try:
-				process.kill()
-			except Exception as e:
-				custom_print("windows-runner:", "error killing process", process.info['pid'], e)
+	os.system('taskkill /f /im ' + ' /im '.join(dcef_process_names))
+
+def kill_windows_runner():
+	os.system('taskkill /f /im dcef.exe')
 
 
 def custom_print(source, *args, **kwargs):
@@ -118,23 +115,12 @@ def cleanup():
 
 		kill_dcef_processes()
 
-		# kill other instances of dcef.exe except this one
-		if is_compiled() and myapp.is_primary_instance():
-			custom_print("windows-runner:", "killing other instances of dcef.exe except primary with PID " +  str(os.getpid()))
-			os.system('taskkill /f /im dcef.exe /fi "PID ne ' + str(os.getpid()) + '"')
-
-		custom_print("windows-runner:", "cleaning up")
-		for process in processes:
-			custom_print("windows-runner:", "killing process", process.pid)
-			try:
-				os.kill(process.pid, signal.CTRL_C_EVENT)
-			except Exception as e:
-				custom_print("windows-runner:", "error killing process", process.pid, e)
-
-		# delete temp folder with its contents
+		# delete nginx temp folder
 		temp_folder = BASE_DIR + '/temp'
 		if os.path.exists(temp_folder):
 			shutil.rmtree(temp_folder)
+
+		kill_windows_runner()
 
 
 
@@ -232,7 +218,6 @@ def main():
 
 	else:
 		kill_dcef_processes()  # kill any running instances of dcef processes before starting new ones
-		create_dir_if_not_exists(BASE_DIR + '/logs')
 		if os.path.exists(LOG_FILE):
 			os.remove(LOG_FILE)
 
@@ -269,6 +254,7 @@ else:
 	sys.exit(1)
 
 LOG_FILE = BASE_DIR + '/logs/dcef.log'
+create_dir_if_not_exists(BASE_DIR + '/logs')
 
 if __name__ == '__main__':
 	main()
