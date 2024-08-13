@@ -161,7 +161,7 @@ def runner(name, args, cwd):
 
 def start_preprocess():
 	cwd = os.path.realpath(BASE_DIR + '/dcef/backend/preprocess')
-	args = ['dcefpreprocess.exe']
+	args = ['dcefpreprocess.exe', 'windows']
 	th = threading.Thread(target=runner, args=('preprocess', args, cwd), daemon=False)
 	th.start()
 	return th

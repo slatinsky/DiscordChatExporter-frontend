@@ -30,7 +30,7 @@ if not exist "_temp\mongodb\" mkdir "_temp\mongodb\"
 
 @REM start the scripts
 start wt --maximized -d %~dp0\dcef\backend\fastapi cmd /k "..\..\..\_temp\fastapi\venv\Scripts\python.exe" dev.py; ^
-split-pane -V -d %~dp0\dcef\backend\preprocess cmd /k nodemon -e py --ignore "__pycache__"  --exec "..\..\..\_temp\preprocess\venv\Scripts\python.exe" main_mongo.py; ^
+split-pane -V -d %~dp0\dcef\backend\preprocess cmd /k nodemon -e py --ignore "__pycache__"  --exec "..\..\..\_temp\preprocess\venv\Scripts\python.exe" main_mongo.py windows; ^
 move-focus left; ^
 split-pane -H -d %~dp0\dcef\frontend cmd /k npm run dev; ^
 move-focus right; ^
