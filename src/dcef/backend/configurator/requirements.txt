@@ -1,1 +1,2 @@
 pymongo==4.3.3
+pyinstaller==6.10.0

@@ -2,3 +2,4 @@ fastapi[all]==0.112.0
 pymongo==4.3.3
 python-dateutil==2.8.2
 uvicorn==0.30.5
+pyinstaller==6.10.0
