@@ -150,9 +150,22 @@ def main(input_dir):
 	print("preprocess done")
 
 
+def print_help():
+	print("Usage: python main.py <docker|windows>")
 
 if __name__ == "__main__":
-	input_dir = "../../../exports/"
+	if len(sys.argv) != 2:
+		print_help()
+		sys.exit(1)
+
+	if sys.argv[1] == "windows":
+		input_dir = "../../../exports/"
+	elif sys.argv[1] == "docker":
+		input_dir = "/dcef/exports/"
+	else:
+		print_help()
+		sys.exit(1)
+
 	with Timer("Preprocess"):
 		main(input_dir)
 
