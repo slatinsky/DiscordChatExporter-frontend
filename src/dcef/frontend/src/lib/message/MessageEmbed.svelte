@@ -105,7 +105,7 @@
             </div>
         {/if}
     {:else if spotifyId}
-        <iframe src={`https://open.spotify.com/embed/track/${spotifyId}`} frameborder="0" sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="width: 400px; height: 80px;"></iframe>
+        <iframe class="spotify-iframe" src={`https://open.spotify.com/embed/track/${spotifyId}`} frameborder="0" sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="width: 400px; height: 80px;"></iframe>
     {:else if embed.video && embed.title === "" && embed.description === ""}
         <MessageVideo attachment={embed.video} />
     {:else}
@@ -252,6 +252,10 @@
             max-height: 100%;
         }
 	}
+
+    .spotify-iframe {
+        max-width: 100%;
+    }
 
     .main-wrapper {
         padding: 2px 0;
