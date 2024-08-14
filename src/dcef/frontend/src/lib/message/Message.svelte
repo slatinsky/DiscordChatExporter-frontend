@@ -176,7 +176,7 @@
 
 <MesssageSpoilerHandler>
 
-    <div class="message" class:jumpable={showJump} class:notgrouped={!messageState.shouldMerge} data-id={message._id}>
+    <div class="message" class:jumpable={showJump} class:notgrouped={!messageState.shouldMerge} data-id={message._id} class:ismobile={layoutState.mobile}>
         <button class="jump-btn" on:click={jumpToMessage}>Jump</button>
         {#if message.type == "24"}
             <MessageAutoModerationAction message={message} messageState={messageState} />
@@ -221,5 +221,9 @@
         &:hover .jump-btn {
             display: block;
         }
+    }
+
+    .message.jumpable.ismobile .jump-btn {
+        display: block;
     }
 </style>
