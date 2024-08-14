@@ -6,6 +6,8 @@
     import { getGuildState } from "../../js/stores/guildState.svelte";
     import { linkHandler } from "../../js/stores/settingsStore.svelte";
     import ChannelIcon from "./ChannelIcon.svelte";
+    import { getLayoutState } from "../../js/stores/layoutState.svelte";
+
 
     interface MyProps {
         channel: Channel;
@@ -14,12 +16,17 @@
 
     let isOpen: boolean = $state(false)
     const guildState = getGuildState()
+    const layoutState = getLayoutState()
+
 
     async function toggle() {
         isOpen = !isOpen
         if (isOpen) {
             if (guildState.channelId !== channel._id) {
                 await guildState.changeChannelId(channel._id, "last")
+                if (layoutState.mobile) {
+                    layoutState.hideSidePanel()
+                }
             }
             await guildState.pushState()
         }

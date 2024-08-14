@@ -12,6 +12,7 @@ let gotResults = $state(false);
 let searching = $state(false);
 let error = $state("");
 let searchHistory: string[] = $state([]);
+let searchManuallyHidden = $state(true);
 
 if (localStorage.searchHistory) {
     searchHistory = JSON.parse(localStorage.searchHistory);
@@ -72,6 +73,7 @@ export function getSearchState() {
         finally {
             searching = false;
             gotResults = true;
+            searchManuallyHidden = false;
         }
     }
 
@@ -94,6 +96,13 @@ export function getSearchState() {
     function clearSearchHistory() {
         searchHistory = [];
         localStorage.searchHistory = JSON.stringify(searchHistory);
+    }
+
+    function hideSearch() {
+        searchManuallyHidden = true;
+    }
+    function showSearch() {
+        searchManuallyHidden = false;
     }
 
     return {
@@ -150,11 +159,16 @@ export function getSearchState() {
         get searchHistory() {
             return searchHistory;
         },
+        get searchManuallyHidden() {
+            return searchManuallyHidden;
+        },
         addToSearchHistory,
         clearSearchHistory,
         setSearchPrompt,
         search,
         clearSearch,
         setSelection,
+        hideSearch,
+        showSearch,
     };
 }

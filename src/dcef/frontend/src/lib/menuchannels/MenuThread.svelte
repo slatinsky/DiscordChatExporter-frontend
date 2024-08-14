@@ -4,6 +4,8 @@
     import { getGuildState } from "../../js/stores/guildState.svelte";
     import { contextMenuItems } from "../../js/stores/menuStore";
     import { linkHandler } from "../../js/stores/settingsStore.svelte";
+    import { getLayoutState } from "../../js/stores/layoutState.svelte";
+
 
     export let thread: Channel
     export let parentChannelId: string
@@ -35,16 +37,25 @@
 
     async function changeThread(guildId: string, channelId: string, threadId: string) {
         await guildState.changeGuildId(guildId)
+        let changed = false
         if (guildState.channelId !== channelId) {
             await guildState.changeChannelId(channelId, "last")
+            changed = true
         }
         if (guildState.threadId !== threadId) {
             await guildState.changeThreadId(threadId, "last")
+            changed = true
+        }
+        if (changed) {
+            if (layoutState.mobile) {
+                layoutState.hideSidePanel()
+            }
         }
         await guildState.pushState()
     }
 
     const guildState = getGuildState()
+    const layoutState = getLayoutState()
 </script>
 
 <div class="thread" class:selected={thread._id == guildState.threadId} on:click={()=>changeThread(thread.guildId, parentChannelId, thread._id)} on:contextmenu|preventDefault={(e) => onThreadRightClick(e, thread._id, thread.name)}>
@@ -108,7 +119,6 @@
         position: absolute;
         width: 2px;
         height: 39px;
-        z-index: 15;
     }
 
     .thread-name {

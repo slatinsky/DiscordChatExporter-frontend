@@ -6,6 +6,7 @@
     import ChannelIcon from "../menuchannels/ChannelIcon.svelte";
     import SearchCalendar from "./SearchCalendar.svelte";
     import { getSearchState } from "./searchState.svelte";
+    import { getLayoutState } from "../../js/stores/layoutState.svelte";
 
     interface MyProps {
         domInput: HTMLInputElement;
@@ -17,6 +18,7 @@
 
     const searchState = getSearchState()
     const guildState = getGuildState();
+    const layoutState = getLayoutState();
 
     let lastWord = $derived(searchState.selection.lastWord);
     let isKey = $derived(searchState.selection.lastWordIsKey);
@@ -35,21 +37,34 @@
 
     let selectedSuggestionIndex = $state(-1);
 
+    // hidden means that the option will be shown only if 2 or more characters of a new word are typed in the search prompt
     const allSearchOptions = [
-        { key: 'from', value: 'user' },
-        { key: 'mentions', value: 'user' },
-        { key: 'has', value: 'link, embed or file' },
-        { key: 'before', value: 'specific date' },
-        { key: 'during', value: 'specific date' },
-        { key: 'after', value: 'specific date' },
-        { key: 'in', value: 'channel' },
-        { key: 'pinned', value: 'true or false' },
-        { key: 'reaction', value: 'emoji' }
+        { key: 'from', value: 'user', hidden: false },
+        { key: 'mentions', value: 'user', hidden: false },
+        { key: 'has', value: 'link, embed or file', hidden: false },
+        { key: 'before', value: 'specific date', hidden: false },
+        { key: 'during', value: 'specific date', hidden: false },
+        { key: 'after', value: 'specific date', hidden: false },
+        { key: 'in', value: 'channel', hidden: false },
+        { key: 'pinned', value: 'true or false', hidden: false },
+        { key: 'reaction', value: 'emoji', hidden: false },
+        { key: 'message_id', value: 'message id', hidden: true },
+        { key: 'in_id', value: 'channel id', hidden: true },
+        { key: 'category_id', value: 'category id', hidden: true },
+        { key: 'from_id', value: 'user id', hidden: true },
+        { key: 'mentions_id', value: 'user id', hidden: true },
+        { key: 'reaction_from_id', value: 'user id', hidden: true },
+        { key: 'reaction_id', value: 'reaction id', hidden: true }
     ]
 
     let searchOptions = $derived.by(()=> {  // filtered by key
         if (isKey) {
-            return allSearchOptions.filter(filter => filter.key.startsWith(lastKey.toLowerCase()))
+            return allSearchOptions.filter(option => {
+                if (option.hidden && lastKey.length < 2) {
+                    return false
+                }
+                return option.key.startsWith(lastKey.toLowerCase())
+            })
         }
         return []
     })
@@ -141,10 +156,6 @@
         }
         return (allHistory.filter(searchPrompt => searchPrompt.includes(lastWord))).slice(0, 5)
     })
-
-    function showHelp() {
-        alert('Help is on the way!');
-    }
 
     function clearHistory() {
         searchState.clearSearchHistory();
@@ -354,7 +365,7 @@
     }
 </script>
 
-<div class="autocomplete list" class:visible={visible}>
+<div class="autocomplete list" class:visible={visible} class:ismobile={layoutState.mobile}>
     <!-- <div>lastWord: {lastWord}</div>
     <div>isKey: {isKey}</div>
     <div>lastKey: {lastKey}</div>
@@ -516,9 +527,9 @@
             <div class="list-group">
                 <div class="category">
                     <div>Search Options</div>
-                    <button class="help-btn" onclick={showHelp}>
+                    <a href="https://support.discord.com/hc/en-us/articles/115000468588-Using-Search" target="_blank" class="help-btn">
                         <Icon name="other/help" width={16} />
-                    </button>
+                    </a>
                 </div>
                 {#each searchOptions as filter, i}
                     <div class="item item-txt" class:highlighted={selectedSuggestionIndex === i} onclick={()=>selectKeySuggestion(filter.key)} title={`${filter.key}: ${filter.value}`}>
@@ -603,6 +614,35 @@
 
 
 <style>
+    .autocomplete::-webkit-scrollbar-track {
+        background-color: #111214;
+    }
+    .autocomplete::-webkit-scrollbar-corner {
+        background-color: #111214;
+    }
+    .autocomplete::-webkit-resizer {
+        background-color: #111214;
+    }
+    .autocomplete::-webkit-scrollbar {
+        width: 0px;
+        height: 3px;
+    }
+    .autocomplete:hover::-webkit-scrollbar {
+        width: 11px;
+    }
+    .autocomplete::-webkit-scrollbar-thumb {
+        height: 50px;
+        background-color: #2c2c2c;
+        border-radius: 3px;
+
+        width: 5px;
+        border-radius: 10px;
+
+        /*left+right scrollbar padding magix*/
+        background-clip: padding-box;
+        border: 3px solid #111214;
+    }
+
     .autocomplete {
         position: absolute;
         top: 32px;
@@ -612,6 +652,13 @@
         max-width: 320px;
         z-index: 100;
         border-radius: 3px;
+
+        max-height: 100svh;
+        overflow-y: auto;
+
+        &.ismobile {
+            max-width: 100%;
+        }
 
         display: none;
         &.visible {

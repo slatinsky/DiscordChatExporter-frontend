@@ -25,7 +25,6 @@
 		]
 	}
 
-    let isMenuHidden = $state(false)
 	const guildState = getGuildState()
 
 	async function changeGuildId(guildId: string | null) {
@@ -34,7 +33,7 @@
 	}
 </script>
 
-<div class="guilds" class:hidden={isMenuHidden}>
+<div class="guilds">
 	<div class="guild" class:selected={!guildState.guildId} on:click={e => changeGuildId(null)}>
 		<div class="guild-selected-indicator" />
 		<div class="home-guild"><Icon name="dcef/filled" width={30} /></div>
@@ -129,7 +128,6 @@
 		width: 6px;
 		height: 0px;
 		border-radius: 5px;
-		z-index: 100;
 
 		transition: height 0.2s ease-in-out;
 	}

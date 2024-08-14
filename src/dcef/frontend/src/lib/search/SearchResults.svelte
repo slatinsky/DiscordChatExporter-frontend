@@ -2,6 +2,7 @@
     import { isDateDifferent } from '../../js/helpers';
     import { fetchSearch, fetchSearchCount } from '../../js/stores/api';
     import { findChannel, findThread, getGuildState, isChannel } from '../../js/stores/guildState.svelte';
+    import { getLayoutState } from '../../js/stores/layoutState.svelte';
     import DateSeparator from '../DateSeparator.svelte';
     import InfiniteScroll3 from '../InfiniteScroll3.svelte';
     import Icon from '../icons/Icon.svelte';
@@ -11,7 +12,9 @@
 
     const guildState = getGuildState()
     const searchState = getSearchState();
+    const layoutState = getLayoutState()
     let apiGuildId = $derived(guildState.guildId ? guildState.guildId : "000000000000000000000000")
+
 
 
     function addCommas(count: number) {
@@ -52,6 +55,9 @@
                 </div>
             {/if}
         {/if}
+        {#if isDateDifferent(previousMessage, message)}
+            <DateSeparator messageId={message._id} />
+        {/if}
         <div class="searchresult-message-wrapper">
             <Message message={message} previousMessage={previousMessage} showJump={true} mergeMessages={false} />
         </div>
@@ -88,13 +94,15 @@
                     {/await}
                 </div>
             </div>
-            <InfiniteScroll3
-                fetchMessages={fetchMessagesWrapper}
-                guildId={apiGuildId}
-                scrollToMessageId={"last"}
-                snippetMessage={renderMessageSnippet2}
-                emptySnippet={emptySnippet}
-            />
+            <div class="scrollwrapper" class:ismobile={layoutState.mobile}>
+                <InfiniteScroll3
+                    fetchMessages={fetchMessagesWrapper}
+                    guildId={apiGuildId}
+                    scrollToMessageId={"last"}
+                    snippetMessage={renderMessageSnippet2}
+                    emptySnippet={emptySnippet}
+                />
+            </div>
         {/if}
     {/key}
 </div>
@@ -220,6 +228,13 @@
                 align-items: center;
                 gap: 12px;
             }
+        }
+
+        .scrollwrapper {
+            height: calc(100% - 56px);
+        }
+        .scrollwrapper.ismobile {
+            height: calc(100% - 56px - 47px);
         }
     }
 </style>

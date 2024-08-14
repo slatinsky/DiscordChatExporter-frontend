@@ -40,6 +40,15 @@ def cursor_pagination(collection_messages, query: dict, prev_page_cursor: str | 
 
 	print("LIMIT", limit)
 
+	if "_id" in query:
+		msgs = list(collection_messages.find(query))
+		return {
+			"prevPage": None,
+			"messageIds": [msg["_id"] for msg in msgs],
+			"nextPage": None,
+			"messages": msgs
+		}
+
 	if prev_page_cursor is not None:
 		query["_id"] = {
 			"$lt": prev_page_cursor

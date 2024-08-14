@@ -45,7 +45,7 @@
         margin-right: 11px;
     }
 
-    .categories-wrapper:hover {
+    .categories-wrapper {
         margin-right: 0;
     }
 

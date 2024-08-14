@@ -1,11 +1,13 @@
 <script lang="ts">
     import { getGuildState } from "../../js/stores/guildState.svelte";
+    import { getLayoutState } from "../../js/stores/layoutState.svelte";
     import Icon from "../icons/Icon.svelte";
     import SearchAutoComplete from "./SearchAutoComplete.svelte";
     import { getSearchState } from "./searchState.svelte";
 
     const searchState = getSearchState();
     const guildState = getGuildState();
+    const layoutState = getLayoutState();
 
 
     let focused = $state(false);
@@ -110,7 +112,7 @@
 
 <svelte:body onclick={onPageClick} />
 
-<div class="searchinput-wrapper" class:focused={focused} >
+<div class="searchinput-wrapper" class:focused={focused} class:ismobile={layoutState.mobile}>
     <!-- {searchState.selection.start} {searchState.selection.end} {searchState.selection.textBefore} {searchState.selection.textSelected} {searchState.selection.textAfter} -->
     <input
         onfocus={inputOnFocus}
@@ -143,6 +145,7 @@
         position: relative;
 
         input {
+            box-sizing: border-box;
             width: 140px;
             background-color: #202225;
             color: #dbdee1;
@@ -150,6 +153,7 @@
             border: 0px;
             border-radius: 3px;
             padding: 0px 30px 0 10px;
+            margin-right: 10px;
             outline: none;
             font-size: 14px;
             font-weight: 500;
@@ -165,6 +169,7 @@
             transform: translateY(-50%);
             color: #949ba4;
             pointer-events: none;
+            margin-right: 4px;
         }
         button.icon {
             cursor: pointer;
@@ -176,5 +181,10 @@
         input {
             width: 250px;
         }
+    }
+
+
+    .searchinput-wrapper.ismobile input {
+        width: 100%;
     }
 </style>

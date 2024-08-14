@@ -308,6 +308,14 @@ async function restoreGuildState(state) {
 
 	await searchState.setSearchPrompt(state.search)
 	await searchState.search(guildState.guildId)
+
+	if (state.search !== null || state.channel !== null || state.thread !== null) {
+		layoutState.hideSidePanel()
+	}
+	else {
+		layoutState.showSidePanel()
+	}
+
 	console.log("router - restored", state);
 }
 

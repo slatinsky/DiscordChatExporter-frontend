@@ -149,6 +149,9 @@
     margin: 7px 0 0 0;
     box-sizing: border-box;
   }
+  main.mobile {
+    margin: 0;
+  }
 
   /* DESKTOP NO SEARCH, NO THREAD */
   main.desktop.searchhidden.threadhidden {
@@ -255,7 +258,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    top: 0;
+    top: 47px;
     left: 0;
   }
 
@@ -264,5 +267,9 @@
   main.mobile.mobilesidepanelshown .header-main,
   main.mobile.mobilesidepanelshown .thread {
     left: calc(70px + min(236px, 100svw - 100px));
+  }
+
+  main.mobile.searchshown .header-main {
+    left: 0;
   }
 </style>

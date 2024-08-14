@@ -23,56 +23,58 @@
         <MessageSystemNotificationIcon messageType={message.type} />
     </div>
     <div class="system-message-content">
-        <div>
-            <MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} />
-        </div>
+        <div class="system-message-content-row">
+            <div>
+                <MessageAuthorName author={message.author} on:click={() => viewUserState.setUser(message.author)} />
+            </div>
 
-        <span on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)} role="button" tabindex="0">
-            {#if message.type == "RecipientAdd"}
-                {#if message.mentions}
-                    <span class="system-message-text">added <a title={message.mentions[0].name}>{message.mentions[0].nickname}</a> to the group</span>
-                {:else}
-                    <span class="system-message-text">added someone to the group</span>
-                {/if}
-            {:else if message.type == "RecipientRemove"}
-                {#if message.mentions}
-                    {#if message.author._id == message.mentions[0]._id}
-                        <span class="system-message-text">left the group</span>
+            <span on:contextmenu|preventDefault={e=>onMessageRightClick(e, message)} role="button" tabindex="0">
+                {#if message.type == "RecipientAdd"}
+                    {#if message.mentions}
+                        <span class="system-message-text">added <a title={message.mentions[0].name}>{message.mentions[0].nickname}</a> to the group</span>
                     {:else}
-                        <span class="system-message-text">removed <a title={message.mentions[0].name}>{message.mentions[0].nickname}</a> from the group</span>
+                        <span class="system-message-text">added someone to the group</span>
                     {/if}
+                {:else if message.type == "RecipientRemove"}
+                    {#if message.mentions}
+                        {#if message.author._id == message.mentions[0]._id}
+                            <span class="system-message-text">left the group</span>
+                        {:else}
+                            <span class="system-message-text">removed <a title={message.mentions[0].name}>{message.mentions[0].nickname}</a> from the group</span>
+                        {/if}
+                    {:else}
+                        <span class="system-message-text">Someone left the group</span>
+                    {/if}
+                {:else if message.type == "Call"}
+                    <span class="system-message-text">started a call that lasted {Math.floor((Date.parse(message.callEndedTimestamp ?? message.timestamp) - Date.parse(message.timestamp)) / 60000)} minutes</span>
+                {:else if message.type == "ChannelNameChange"}
+                    <span class="system-message-text">{message.content[0].content[0].toLowerCase()}{message.content[0].content.slice(1)}</span>
+                {:else if message.type == "ChannelIconChange"}
+                    <span class="system-message-text">changed the channel icon.</span>
+                {:else if message.type == "ChannelPinnedMessage"}
+                    {#if message?.reference?.messageId}
+                        <span class="system-message-text">pinned <span class="link" on:click={()=>changeMessageId(message.reference.channelId, message.reference.messageId)}>a message</span> to this channel. See all <span class="link" on:click={isChannel(message.reference.channelId) ? layoutState.toggleChannelPinned : layoutState.toggleThreadPinned}>pinned messages</span>.</span>
+                    {:else}
+                        <span class="system-message-text">pinned a message to this channel. See all <span class="link" on:click={isChannel(message.reference.channelId) ? layoutState.toggleChannelPinned : layoutState.toggleThreadPinned}>pinned messages</span>.</span>
+                    {/if}
+                {:else if message.type == "ThreadCreated"}
+                    <span class="system-message-text">started a thread.</span>
+                {:else if message.type == "GuildMemberJoin"}
+                    <span class="system-message-text">joined the server.</span>
+                    {:else if message.type == MessageType.GuildBoost} <!-- normal boost -->
+                    <span class="system-message-text">just boosted the server!</span>
+                    {:else if message.type == MessageType.GuildBoostTier1} <!-- Boost level 1 -->
+                    <span class="system-message-text">just boosted the server! {guildName} has achieved <strong>Level 1!</strong></span>
+                    {:else if message.type == MessageType.GuildBoostTier2} <!-- Boost level 2 -->
+                    <span class="system-message-text">just boosted the server! {guildName} has achieved <strong>Level 2!</strong></span>
+                    {:else if message.type == MessageType.GuildBoostTier3} <!-- Boost level 3 -->
+                    <span class="system-message-text">just boosted the server! {guildName} has achieved <strong>Level 3!</strong> </span>
                 {:else}
-                    <span class="system-message-text">Someone left the group</span>
+                    <span class="system-message-text">{message.content[0].content.toLowerCase()}</span>
                 {/if}
-            {:else if message.type == "Call"}
-                <span class="system-message-text">started a call that lasted {Math.floor((Date.parse(message.callEndedTimestamp ?? message.timestamp) - Date.parse(message.timestamp)) / 60000)} minutes</span>
-            {:else if message.type == "ChannelNameChange"}
-                <span class="system-message-text">{message.content[0].content[0].toLowerCase()}{message.content[0].content.slice(1)}</span>
-            {:else if message.type == "ChannelIconChange"}
-                <span class="system-message-text">changed the channel icon.</span>
-            {:else if message.type == "ChannelPinnedMessage"}
-                {#if message?.reference?.messageId}
-                    <span class="system-message-text">pinned <span class="link" on:click={()=>changeMessageId(message.reference.channelId, message.reference.messageId)}>a message</span> to this channel. See all <span class="link" on:click={isChannel(message.reference.channelId) ? layoutState.toggleChannelPinned : layoutState.toggleThreadPinned}>pinned messages</span>.</span>
-                {:else}
-                    <span class="system-message-text">pinned a message to this channel. See all <span class="link" on:click={isChannel(message.reference.channelId) ? layoutState.toggleChannelPinned : layoutState.toggleThreadPinned}>pinned messages</span>.</span>
-                {/if}
-            {:else if message.type == "ThreadCreated"}
-                <span class="system-message-text">started a thread.</span>
-            {:else if message.type == "GuildMemberJoin"}
-                <span class="system-message-text">joined the server.</span>
-                {:else if message.type == MessageType.GuildBoost} <!-- normal boost -->
-                <span class="system-message-text">just boosted the server!</span>
-                {:else if message.type == MessageType.GuildBoostTier1} <!-- Boost level 1 -->
-                <span class="system-message-text">just boosted the server! {guildName} has achieved <strong>Level 1!</strong></span>
-                {:else if message.type == MessageType.GuildBoostTier2} <!-- Boost level 2 -->
-                <span class="system-message-text">just boosted the server! {guildName} has achieved <strong>Level 2!</strong></span>
-                {:else if message.type == MessageType.GuildBoostTier3} <!-- Boost level 3 -->
-                <span class="system-message-text">just boosted the server! {guildName} has achieved <strong>Level 3!</strong> </span>
-            {:else}
-                <span class="system-message-text">{message.content[0].content.toLowerCase()}</span>
-            {/if}
-            <MessageTimestamp timestamp={message.timestamp} messageId={message._id} channelOrThreadId={message.channelId} />
-        </span>
+                <MessageTimestamp timestamp={message.timestamp} messageId={message._id} channelOrThreadId={message.channelId} />
+            </span>
+        </div>
         {#if message.reactions}
             <MessageReactions reactions={message.reactions} />
         {/if}
@@ -102,10 +104,12 @@
         }
 
         .system-message-content {
-            display: flex;
-            gap: 5px;
-            .system-message-text {
-                color: #949ba4;
+            .system-message-content-row {
+                display: flex;
+                gap: 5px;
+                .system-message-text {
+                    color: #949ba4;
+                }
             }
         }
     }

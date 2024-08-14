@@ -9,10 +9,13 @@
     let inviteLink = `https://discord.gg/${inviteId}`;
 
     const layoutState = getLayoutState()
+
+    let w = $state(0);
+    let isMobile = $derived(w < 400);
 </script>
 
 
-<div class="invite">
+<div class="invite" bind:clientWidth={w}>
     <div class="invite-title">You've been invited to join a server</div>
     <div class="invite-content-row">
         <div class="invite-guild-icon">
@@ -27,12 +30,12 @@
                 <div class="status-text">N/A Members</div>
             </div>
         </div>
-        {#if !layoutState.mobile}
+        {#if !isMobile}
             <div class="spacer"></div>
             <a class="join-btn" target="_blank" href={inviteLink}>Join</a>
         {/if}
     </div>
-    {#if layoutState.mobile}
+    {#if isMobile}
         <a class="join-btn join-btn-mobile" target="_blank" href={inviteLink}>Join</a>
     {/if}
 
@@ -47,7 +50,7 @@
         gap: 16px;
         max-width: 400px;
         width: 100%;
-        box-sizing: content-box;
+        box-sizing: border-box;
     }
     .invite-title {
         font-weight: 700;
@@ -120,7 +123,8 @@
         background-color: #457D49;
         color: white;
         border-radius: 3px;
-        width: 73px;
+        max-width: 73px;
+        width: 100%;
         height: 40px;
         font-size: 14px;
         cursor: pointer;
@@ -134,7 +138,7 @@
         background-color: #346036;
     }
     .join-btn-mobile {
-        width: 100%;
+        max-width: 100%;
     }
 
 </style>

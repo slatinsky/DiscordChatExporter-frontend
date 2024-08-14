@@ -136,6 +136,35 @@
         border-bottom-left-radius: 4px;
     }
 
+    #userselect-inner::-webkit-scrollbar-track {
+        background-color: #2b2d31;
+    }
+    #userselect-inner::-webkit-scrollbar-corner {
+        background-color: #646464;
+    }
+    #userselect-inner::-webkit-resizer {
+        background-color: #666;
+    }
+    #userselect-inner::-webkit-scrollbar {
+        width: 0px;
+        height: 3px;
+    }
+    #userselect-inner:hover::-webkit-scrollbar {
+        width: 11px;
+    }
+    #userselect-inner::-webkit-scrollbar-thumb {
+        height: 50px;
+        background-color: #1a1b1e;
+        border-radius: 3px;
+
+        width: 5px;
+        border-radius: 10px;
+
+        /*left+right scrollbar padding magix*/
+        background-clip: padding-box;
+        border: 3px solid rgba(0, 0, 0, 0);
+    }
+
     #input-wrapper {
         position: sticky;
         top: 0;

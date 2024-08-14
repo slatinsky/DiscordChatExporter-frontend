@@ -3,9 +3,8 @@ import { getSearchState } from "../../lib/search/searchState.svelte";
 const searchState = getSearchState();
 
 let mobilesidepanelshown = $state(false);
-let searchManuallyHidden = $state(false);
 let threadshown = $state(false);
-let searchshown = $derived(!searchManuallyHidden && searchState.canBeVisible && !threadshown);
+let searchshown = $derived(!searchState.searchManuallyHidden && searchState.canBeVisible && !threadshown);
 let settingsshown = $state(false);
 let debuglayout = $state(false);
 let settingssidemenushown = $state(true);
@@ -22,8 +21,17 @@ export function getLayoutState() {
     function toggleSidePanel() {
         mobilesidepanelshown = !mobilesidepanelshown;
     }
-    function toggleSearch() {
-        searchManuallyHidden = !searchManuallyHidden;
+    function showSidePanel() {
+        if (mobilesidepanelshown) {
+            return;
+        }
+        mobilesidepanelshown = true;
+    }
+    function hideSidePanel() {
+        if (!mobilesidepanelshown) {
+            return;
+        }
+        mobilesidepanelshown = false;
     }
 
     function showThread() {
@@ -145,8 +153,9 @@ export function getLayoutState() {
         showThread,
         hideThread,
         toggleThread,
-        toggleSearch,
         toggleSidePanel,
+        showSidePanel,
+        hideSidePanel,
         showSettings,
         hideSettings,
         toggleSettings,

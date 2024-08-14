@@ -5,50 +5,122 @@
     import Icon from "./icons/Icon.svelte";
     import ChannelIcon from "./menuchannels/ChannelIcon.svelte";
     import SearchInput from "./search/SearchInput.svelte";
+    import { getSearchState } from "./search/searchState.svelte";
 
     const guildState = getGuildState()
     const layoutState = getLayoutState()
+    const searchState = getSearchState();
+
+
+
+    let showSearchBar = $derived(!searchState.searchManuallyHidden && layoutState.mobile)
+
+
+    function showSearch() {
+        searchState.showSearch()
+    }
+
+    function hideSearch() {
+        searchState.hideSearch()
+    }
 </script>
 
 
+{#if !showSearchBar}
 <div class="header-main" class:threadshown={layoutState.threadshown}>
-    <div class="channel-name">
-        {#if layoutState.mobile}
-            <button class="hamburger-icon" onclick={layoutState.toggleSidePanel}>
-                <Icon name="other/hamburger" width={20} />
-            </button>
-        {/if}
-        {#if guildState.channel?.name}
-            <ChannelIcon channel={guildState.channel} width={20} />
-            <span>{guildState.channel.name}</span>
-        {:else}
-            <span>Select a channel</span>
-        {/if}
-    </div>
-    <div class="other-wrapper">
-        {#if guildState.channelId}
-            <div class="pin-wrapper">
-                <div class="pin-btn" class:active={layoutState.channelpinnedshown} onclick={layoutState.toggleChannelPinned}>
-                    <Icon name="systemmessage/pinned" width={24} />
-                </div>
-                {#if layoutState.channelpinnedshown}
-                    <div class="pin-messages">
-                        {#key guildState.channelId}
-                            <Pinned channelId={guildState.channelId} />
-                        {/key}
+    {#if !(layoutState.searchshown && layoutState.mobile)}
+        <div class="channel-name">
+            {#if layoutState.mobile}
+                <button class="hamburger-icon" onclick={layoutState.toggleSidePanel}>
+                    <Icon name="other/hamburger" width={20} />
+                </button>
+            {/if}
+            {#if guildState.channel?.name}
+                <ChannelIcon channel={guildState.channel} width={20} />
+                <span>{guildState.channel.name}</span>
+            {:else}
+                <span>Select a channel</span>
+            {/if}
+        </div>
+        <div class="other-wrapper">
+            {#if guildState.channelId}
+                <div class="pin-wrapper">
+                    <div class="pin-btn icon" class:active={layoutState.channelpinnedshown} onclick={layoutState.toggleChannelPinned}>
+                        <Icon name="systemmessage/pinned" width={24} />
                     </div>
-                {/if}
-            </div>
-        {/if}
-        <div class="search-wrapper">
+                    {#if layoutState.channelpinnedshown}
+                        <div class="pin-messages">
+                            {#key guildState.channelId}
+                                <Pinned channelId={guildState.channelId} />
+                            {/key}
+                        </div>
+                    {/if}
+                </div>
+            {/if}
+            {#if layoutState.mobile}
+                <button class="icon" onclick={showSearch}>
+                    <Icon name="other/magnifying-glass" width={24} />
+                </button>
+            {:else}
+                <div class="search-wrapper">
+                    <SearchInput />
+                </div>
+            {/if}
+        </div>
+    {:else}
+        <SearchInput />
+    {/if}
+</div>
+
+{/if}
+{#if showSearchBar}
+    <div class="searchbar">
+        <button class="icon icon-back" onclick={hideSearch}>
+            <Icon name="systemmessage/leave" width={24} />
+        </button>
+        <div class="searchinput">
             <SearchInput />
         </div>
     </div>
-</div>
+{/if}
 
 
 
 <style>
+    .searchbar {
+        height: 100%;
+        display: flex;
+        gap: 8px;
+        flex-direction: row;
+        align-items: center;
+        padding: 0 15px;
+        box-sizing: border-box;
+        gap: 5px;
+        border-bottom: 1px solid #20222599;
+        background-color: #313338;
+
+        .icon-back {
+            filter: invert(1) grayscale(1);
+        }
+
+        .searchinput {
+            flex: 1;
+        }
+    }
+
+    .icon {
+        color: #b5bac1;
+        cursor: pointer;
+        &:hover {
+            color: #dbdee1;
+        }
+        &.active {
+            color: white;
+        }
+    }
+
+
+
     .hamburger-icon {
         cursor: pointer;
         color: #b5bac1;
@@ -71,14 +143,6 @@
         position: relative;
         .pin-btn {
             margin: 0 10px;
-            cursor: pointer;
-            color: #b5bac1;
-            &:hover {
-                color: #dbdee1;
-            }
-            &.active {
-                color: white;
-            }
         }
         .pin-messages {
             position: absolute;

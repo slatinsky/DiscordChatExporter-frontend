@@ -7,6 +7,8 @@
     import MessageAutoModerationAction from "./MessageAutoModerationAction.svelte";
     import MesssageSpoilerHandler from "../MesssageSpoilerHandler.svelte";
     import { getGuildState } from "../../js/stores/guildState.svelte";
+    import { getLayoutState } from "../../js/stores/layoutState.svelte";
+    import { getSearchState } from "../search/searchState.svelte";
 
     interface MyProps {
         message: Message;
@@ -156,9 +158,16 @@
     }
 
     const guildState = getGuildState()
+    const layoutState = getLayoutState()
+    const searchState = getSearchState();
+
+
     async function jumpToMessage(){
         await guildState.comboSetGuildChannelMessage(message.guildId, message.channelId, message._id)
         await guildState.pushState()
+        if (layoutState.mobile) {
+            searchState.hideSearch()
+        }
     }
 
     const messageState = getMessageState(message, previousMessage)
