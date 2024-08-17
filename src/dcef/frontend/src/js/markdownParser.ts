@@ -559,7 +559,7 @@ export const rules = {
     url: SimpleMarkdown.defaultRules.url,
     link: SimpleMarkdown.defaultRules.link,
     image: SimpleMarkdown.defaultRules.image,
-    reflink: SimpleMarkdown.defaultRules.reflink,
+    // reflink: SimpleMarkdown.defaultRules.reflink,
     refimage: SimpleMarkdown.defaultRules.refimage,
     em: SimpleMarkdown.defaultRules.em,
     strong: SimpleMarkdown.defaultRules.strong,
