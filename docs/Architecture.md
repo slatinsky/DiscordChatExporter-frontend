@@ -1,11 +1,10 @@
-# Architecture choices
+# Architecture
 
 The project is divided into two main parts: the server and the client.
 
 ## Used port numbers
 
 - 21011 - nginx (reverse proxy)
-- 21013 - http-server (static files)
 - 27017 - mongodb (database)
 - 58000 - fastapi (backend api)
 
@@ -25,7 +24,7 @@ Specifically, the process does the following:
 - downloads ggsans font from discord cdn.
 
 
-### mongodb
+### Mongodb
 
 Database used to store data. The database is divided into multiple collections:
 - assets - precomputed assets with local paths and dimensions
@@ -36,23 +35,18 @@ Database used to store data. The database is divided into multiple collections:
 - jsons - stores sha256 hashes of processed files. This way, the preprocessor can skip already processed files.
 - messages - stores all messages, including authors, emojis, attachments, etc.
 
-### fastapi
+Collections are sharded by guilds.
 
-Middleman between the client and the mongo database. Provides JSON api for the client (search, guild list, channel list, and messages).
+### Fastapi
 
-Search and channel endpoints return message ids. Those ids are then fetched by the client when needed.
+Middleman between the client and the mongo database. Provides JSON api for the frontend client (search, guild list, channel list, and messages).
 
-### http-server
 
-http-server is used to server static files for the frontend. Nginx could be used instead, but sometimes paths exceed the maximum path length of 260 characters on Windows and nginx fails to serve the files.
-
-http-server is used as a workaround for that bug in nginx. But it is also needed to apply registry patch to increase the maximum path length (use `change_260_character_path_limit_to_32767.reg`).
-
-### windows runner (Windows only)
+### Windows runner (Windows only)
 
 Windows runner is the main entry point of the program on Windows. This script is compiled into `dcef.exe` in the release.
 
-- writes logs from other services to `logs.txt` file for easier debugging.
+- writes logs from other services to `logs/dcef.log` file for easier debugging.
 
 - checks if all required ports are free on startup
 
@@ -62,17 +56,10 @@ Windows runner is the main entry point of the program on Windows. This script is
 
 - cleans up all services on window close
 
-### nginx
 
-Nginx combines multiple services into one. See `nginx-prod.conf`.
+### Nginx
 
-1. First is server frontend files needed for the client to load (paths `/_app/`, `/css/`, `/js/`, `/fonts/`, `/`).
-
-2. Then it proxies static files from http-server from port 21013 (path `/input/`).
-
-3. Then it serves static files created by preprocess (path `/data/`) - now used only for ggsans font.
-
-4. Finally, it proxies api requests from fastapi from port 58000 (path `/api/`).
+Nginx combines fastapi backend and static frontend into one. See `nginx-prod.conf`.
 
 
 ## Client (Frontend)
