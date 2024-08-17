@@ -47,6 +47,7 @@
         { key: 'after', value: 'specific date', hidden: false },
         { key: 'in', value: 'channel', hidden: false },
         { key: 'pinned', value: 'true or false', hidden: false },
+        { key: 'deleted', value: 'true or false', hidden: false },
         { key: 'reaction', value: 'emoji', hidden: false },
         { key: 'message_id', value: 'message id', hidden: true },
         { key: 'in_id', value: 'channel id', hidden: true },
@@ -54,7 +55,7 @@
         { key: 'from_id', value: 'user id', hidden: true },
         { key: 'mentions_id', value: 'user id', hidden: true },
         { key: 'reaction_from_id', value: 'user id', hidden: true },
-        { key: 'reaction_id', value: 'reaction id', hidden: true }
+        { key: 'reaction_id', value: 'reaction id', hidden: true },
     ]
 
     let searchOptions = $derived.by(()=> {  // filtered by key
@@ -301,7 +302,7 @@
             selectBoolean = false
             showCalendar = false
         }
-        else if (lastKey.toLowerCase() === 'pinned') {
+        else if (lastKey.toLowerCase() === 'pinned' || lastKey.toLowerCase() === 'deleted') {
             fromAutoComplete = []
             mentionAutoComplete = []
             channelAutoComplete = []
