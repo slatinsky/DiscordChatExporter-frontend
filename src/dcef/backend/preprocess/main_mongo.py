@@ -4,11 +4,11 @@ import functools
 
 from FileFinder import FileFinder
 from MongoDatabase import MongoDatabase
-from ChannelCache import ChannelCache
 from AssetProcessor import AssetProcessor
 from JsonProcessor import JsonProcessor
 from Timer import Timer
-from helpers import human_file_size
+from Eta import Eta
+from Formatters import Formatters
 
 # fix PIPE encoding error on Windows, auto flush print
 sys.stdout.reconfigure(encoding='utf-8')
@@ -32,7 +32,14 @@ def wipe_database(database: MongoDatabase):
 	Deletes all collections on version bump (on program update)
 	Change EXPECTED_VERSION to force wipe on incompatible schema changes
 	"""
-	EXPECTED_VERSION = 15    # <---- change this to wipe database
+	EXPECTED_VERSION = 16    # <---- change this to wipe database
+
+	# ---- DEBUG force wipe ----
+	# import random
+	# EXPECTED_VERSION = random.randint(0, 1000)
+	# --------------------------
+
+
 	config = database.get_collection("config")
 
 	# migrate config keys to new names
@@ -77,34 +84,6 @@ def remove_processed_jsons(database, jsons):
 		if json_path in jsons:
 			jsons.remove(json_path)
 
-	# TODO: add these checks back (date modified, file size, file hash)
-	# if json == None:
-	# 	# file not found in database, it is new file
-	# 	return False
-
-	# # do quick checks first (date modified, file size), because hashing is slow
-
-	# date_modified = os.path.getmtime(json_path_with_base_dir)
-	# if json["date_modified"] == date_modified:
-	# 	# if time modified is the same, file was not modified
-	# 	return True
-
-	# file_size = os.path.getsize(json_path_with_base_dir)
-	# if json["size"] == file_size:
-	# 	# file size is the same, file was not modified
-	# 	return True
-
-	# # slow check - file hash
-	# file_hash = hashlib.sha256()
-	# with open(json_path_with_base_dir, "rb") as f:
-	# 	for byte_block in iter(lambda: f.read(4096), b""):
-	# 		file_hash.update(byte_block)
-	# hex_hash = file_hash.hexdigest()
-
-	# if json["sha256_hash"] == hex_hash:
-	# 	# file hash is the same, file was not modified
-	# 	return True
-
 	return jsons
 
 
@@ -114,10 +93,6 @@ def main(input_dir):
 	database = MongoDatabase()
 	wipe_database(database)
 
-	# DEBUG clear database
-	# database.clear_database()
-
-
 	file_finder = FileFinder(input_dir)
 
 	jsons = file_finder.find_channel_exports()
@@ -125,27 +100,34 @@ def main(input_dir):
 	jsons = remove_processed_jsons(database, jsons)
 	jsons_count = len(jsons)
 	jsons_size = 0
-	jsons_size = sum(os.path.getsize(file_finder.add_base_directory(json_path)) for json_path in jsons)
+	invalid_jsons = []
+	for json_path in jsons:
+		try:
+			jsons_size += os.path.getsize(file_finder.add_base_directory(json_path))
+		except FileNotFoundError:
+			print(f"Warning: file not found '{json_path}', DID YOU APPLY THE REGISTRY TWEAK AND RESTART to allow paths longer than 260 characters?")
+			invalid_jsons.append(json_path)
+
+	for invalid_json in invalid_jsons:
+		jsons.remove(invalid_json)
+
 	print(f"    found {jsons_count} new possible json channel exports")
 	print(f"    found {jsons_count_before - jsons_count} already processed json channel exports")
-	print(f"    {human_file_size(jsons_size)} is total size of new json exports")
+	print(f"    {Formatters.human_file_size(jsons_size)} is total size of new json exports")
 
-	channel_cache = ChannelCache()
-	channel_cache.invalidate_all()
 	asset_processor = AssetProcessor(file_finder, database)
 	asset_processor.set_fast_mode(True)  # don't process slow actions
 
 	processed_bytes = 0
-	for index, json_path in enumerate(jsons):
-		processed_bytes += os.path.getsize(file_finder.add_base_directory(json_path))
-		print(f"{index + 1}/{jsons_count} ({round(processed_bytes / jsons_size * 100, 2)}%)  processing {json_path}")
+	with Eta(jsons_size, jsons_count) as eta:
+		for index, json_path in enumerate(jsons):
+			size = os.path.getsize(file_finder.add_base_directory(json_path))
+			processed_bytes += size
+			print(f"ETA {eta.calculate_eta().ljust(8)}  {(str(index + 1) + '/' + str(jsons_count)).ljust(9)} ({(str(round(processed_bytes / jsons_size * 100, 2)) + '%)').ljust(7)}  processing {json_path}")
 
-		p = JsonProcessor(database, file_finder, json_path, asset_processor, index, jsons_count)
-		p.process()
-
-	# if user browses exports before they are processed, cached channels may be invalid again
-	# so we need to invalidate cache again
-	channel_cache = ChannelCache()
+			p = JsonProcessor(database, file_finder, json_path, asset_processor, index, jsons_count)
+			p.process()
+			eta.increment(size)
 
 	print("preprocess done")
 

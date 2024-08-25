@@ -1,7 +1,7 @@
 
 import functools
 from pymongo import MongoClient
-from helpers import pad_id
+from Formatters import Formatters
 
 print = functools.partial(print, flush=True)
 
@@ -28,7 +28,7 @@ class MongoDatabase():
 		Returns a list of collections that are guild specific
 		they are prefixed with the guild id and _ (underscore)
 		"""
-		padded_guild_id = pad_id(guild_id)
+		padded_guild_id = Formatters.pad_id(guild_id)
 		return {
 			"messages": self.database[f"g{padded_guild_id}_messages"],
 			"channels": self.database[f"g{padded_guild_id}_channels"],

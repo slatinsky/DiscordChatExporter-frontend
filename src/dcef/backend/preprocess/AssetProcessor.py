@@ -8,7 +8,7 @@ from hashlib import sha256
 
 from FileFinder import FileFinder
 from MongoDatabase import MongoDatabase
-from helpers import pad_id
+from Formatters import Formatters
 
 print = functools.partial(print, flush=True)
 

@@ -11,11 +11,11 @@ from pprint import pprint
 from pymongo import ReplaceOne, UpdateOne
 
 from AssetProcessor import AssetProcessor
-from ChannelCache import ChannelCache
 from FileFinder import FileFinder
 from MongoDatabase import MongoDatabase
 from JsonFileStreamer import JsonFileStreamer
-from helpers import find_additional_missing_numbers, get_emoji_code, pad_id, batched
+from Formatters import Formatters
+from helpers import find_additional_missing_numbers, get_emoji_code, batched
 
 print = functools.partial(print, flush=True)
 
@@ -32,7 +32,7 @@ class JsonProcessor:
 		self.total = total
 
 	def process_guild(self, guild):
-		guild["_id"] = pad_id(guild.pop("id"))
+		guild["_id"] = Formatters.pad_id(guild.pop("id"))
 		self.asset_processor.set_guild_id(guild["_id"])
 		guild["icon"] = self.asset_processor.process(guild.pop("iconUrl"), is_searchable=False)
 		return guild
@@ -42,8 +42,8 @@ class JsonProcessor:
 		process channel info
 		does not contain messages
 		"""
-		channel["_id"] = pad_id(channel.pop("id"))
-		channel["categoryId"] = pad_id(channel["categoryId"])
+		channel["_id"] = Formatters.pad_id(channel.pop("id"))
+		channel["categoryId"] = Formatters.pad_id(channel["categoryId"])
 		channel["guildId"] = guild_id
 		return channel
 
@@ -57,26 +57,26 @@ class JsonProcessor:
 		"""
 		for message in messages:
 			# pad ids so they are easier to sort
-			message["_id"] = pad_id(message.pop("id"))
+			message["_id"] = Formatters.pad_id(message.pop("id"))
 			if "author" in message:
-				message["author"]["_id"] = pad_id(message["author"].pop("id"))
+				message["author"]["_id"] = Formatters.pad_id(message["author"].pop("id"))
 				if "roles" in message["author"]:
 					for role in message["author"]["roles"]:
-						role["_id"] = pad_id(role.pop("id"))
+						role["_id"] = Formatters.pad_id(role.pop("id"))
 			if "stickers" in message:
 				for sticker in message["stickers"]:
-					sticker["_id"] = pad_id(sticker.pop("id"))
+					sticker["_id"] = Formatters.pad_id(sticker.pop("id"))
 			if "mentions" in message:
 				for mention in message["mentions"]:
-					mention["_id"] = pad_id(mention.pop("id"))
+					mention["_id"] = Formatters.pad_id(mention.pop("id"))
 			if "reference" in message:
-				message["reference"]["messageId"] = pad_id(message["reference"]["messageId"])
-				message["reference"]["channelId"] = pad_id(message["reference"]["channelId"])
-				message["reference"]["guildId"] = pad_id(message["reference"]["guildId"])
+				message["reference"]["messageId"] = Formatters.pad_id(message["reference"]["messageId"])
+				message["reference"]["channelId"] = Formatters.pad_id(message["reference"]["channelId"])
+				message["reference"]["guildId"] = Formatters.pad_id(message["reference"]["guildId"])
 
 			if "attachments" in message:
 				for attachment in message["attachments"]:
-					attachment["_id"] = pad_id(attachment.pop("id"))
+					attachment["_id"] = Formatters.pad_id(attachment.pop("id"))
 
 			# remove empty lists
 			if len(message["attachments"]) == 0:
@@ -180,8 +180,8 @@ class JsonProcessor:
 					if "emoji" in reaction:
 						reaction["emoji"]["guildIds"] = [guild_id]
 						reaction["emoji"]["source"] = "custom"
-						reaction["emoji"]["_id"] = pad_id(reaction["emoji"].pop("id"))
-						if reaction["emoji"]["_id"] == pad_id(0):
+						reaction["emoji"]["_id"] = Formatters.pad_id(reaction["emoji"].pop("id"))
+						if reaction["emoji"]["_id"] == Formatters.pad_id(0):
 							reaction["emoji"]["name"] = get_emoji_code(reaction["emoji"]["name"]).replace(":", "")
 							reaction["emoji"]["_id"] = reaction["emoji"]["name"]
 							reaction["emoji"]["source"] = "default"
@@ -190,7 +190,7 @@ class JsonProcessor:
 
 					if "users" in reaction:
 						for user in reaction["users"]:
-							user["_id"] = pad_id(user.pop("id"))
+							user["_id"] = Formatters.pad_id(user.pop("id"))
 							user["avatar"] = self.asset_processor.process(user.pop("avatarUrl"), is_searchable=False)
 
 			new_attachments = []
@@ -302,41 +302,58 @@ class JsonProcessor:
 
 		return roles
 
-	def insert_guild(self, guild):
-		database_document = self.collections["guilds"].find_one({"_id": guild["_id"]})
+	def insert_guild(self, guild, exported_at):
+		"""
+		insert guild into database if it doesn't exist or is outdated
+		"""
+		existing_guild = self.collections["guilds"].find_one({"_id": guild["_id"]})
 
-		if database_document != None:
-			# guild already exists, ignore
+		if existing_guild is None:
+			guild["msg_count"] = 0
+		elif existing_guild['exported_at'] < exported_at:
+			guild["msg_count"] = existing_guild["msg_count"]
+		else:
+			# guild is up to date
+			return
+		
+		guild['exported_at'] = exported_at
+
+		self.collections["guilds"].replace_one({"_id": guild["_id"]}, guild, upsert=True)
+
+
+	def insert_channel(self, channel, exported_at):
+		"""
+		insert channel into database if it doesn't exist or is outdated
+		"""
+		existing_channel = self.collections["channels"].find_one({"_id": channel["_id"]})
+
+		if existing_channel is None:
+			channel["msg_count"] = 0
+		elif existing_channel['exportedAt'] < exported_at:
+			channel["msg_count"] = existing_channel["msg_count"]
+		else:
+			# channel is up to date
 			return
 
-		guild["msg_count"] = 0
+		channel["guildId"] = Formatters.pad_id(channel["guildId"])
+		channel["exportedAt"] = exported_at
 
-		self.collections["guilds"].insert_one(guild)
+		self.collections["channels"].replace_one({"_id": channel["_id"]}, channel, upsert=True)
 
-	def insert_channel(self, channel):
-		database_document = self.collections["channels"].find_one({"_id": channel["_id"]})
-
-		if database_document != None:
-			# channel already exists
-			return
-
-		channel["msg_count"] = 0
-
-		self.collections["channels"].insert_one(channel)
 
 	def insert_author(self, author):
-		database_author = self.collections["authors"].find_one({"_id": author["_id"]})
+		existing_author = self.collections["authors"].find_one({"_id": author["_id"]})
 
-		if database_author == None:
+		if existing_author == None:
 			# author doesn't exist yet
 			author["msg_count"] = 0
 			self.collections["authors"].insert_one(author)
 			return
 
 		# merge new author with existing author
-		guildIds = list(set(author["guildIds"] + database_author["guildIds"]))
-		nicknames = list(set(author["nicknames"] + database_author["nicknames"]))
-		names = list(set(author["names"] + database_author["names"]))
+		guildIds = list(set(author["guildIds"] + existing_author["guildIds"]))
+		nicknames = list(set(author["nicknames"] + existing_author["nicknames"]))
+		names = list(set(author["names"] + existing_author["names"]))
 
 		# update guildIds and nicknames in database
 		self.collections["authors"].update_one({"_id": author["_id"]}, {
@@ -392,18 +409,9 @@ class JsonProcessor:
 		# get date modified
 		date_modified = os.path.getmtime(json_path_with_base_dir)
 
-		# get file hash of file content
-		file_hash = hashlib.sha256()
-		with open(json_path_with_base_dir, "rb") as f:
-			for byte_block in iter(lambda: f.read(4096), b""):
-				file_hash.update(byte_block)
-
-		hex_hash = file_hash.hexdigest()
-
 		self.collections["jsons"].insert_one({
 			"_id": json_path,
 			"size": file_size,
-			"sha256_hash": hex_hash,
 			"date_modified": date_modified
 		})
 
@@ -476,11 +484,11 @@ class JsonProcessor:
 			file_size_human = jfs.get_file_size_human()
 			file_size = jfs.get_file_size()
 			channel = jfs.get_channel()
-			print(f"guild: '{guild['name']}', channel '{channel['name']}, file size: {file_size_human}")
+			# print(f"guild: '{guild['name']}', channel '{channel['name']}, file size: {file_size_human}")
 
-			print('    getting exportedAt')
+			# print('    getting exportedAt')
 			exported_at = jfs.get_exported_at()
-			print('        exported_at:', exported_at)
+			# print('        exported_at:', exported_at)
 
 			guild = self.process_guild(guild)
 			self.collections = self.database.get_guild_collections(guild["_id"])
@@ -493,7 +501,7 @@ class JsonProcessor:
 			current_batch = 0
 			roles = {}  # role_id -> role_object
 
-			print('    deleted messages - stage 1/3')
+			# print('    deleted messages - stage 1/3')
 			iterator = self.collections["messages"].find({"channelId": channel["_id"]}, {"_id": 1, "sources": 1}).sort("_id", 1)
 			old_channel_ids_by_source = {}  # source -> set of ids
 			for message in iterator:
@@ -506,7 +514,7 @@ class JsonProcessor:
 
 
 			new_channel_ids = set()
-			print('        this channel was in', len(old_channel_ids_by_source), 'previous exports')
+			# print('        this channel was in', len(old_channel_ids_by_source), 'previous exports')
 
 			# first 10 characters of sha256 hash of self.json_path
 			# we need to keep this short, because deleted messages sorter uses this as a key and it would use too much memory
@@ -514,50 +522,50 @@ class JsonProcessor:
 			try:
 				for messages in batched(jfs.get_messages_iterator(), 10000):
 					file_pointer_position = jfs.get_file_pointer_position()
-					print(f'    processing batch {current_batch + 1} with {len(messages)} messages, file progress: {round(file_pointer_position / file_size * 100, 2)} %')
+					# print(f'    processing batch {current_batch + 1} with {len(messages)} messages, file progress: {round(file_pointer_position / file_size * 100, 2)} %')
 
 					for message in messages:
-						new_channel_ids.add(pad_id(message["id"]))
+						new_channel_ids.add(Formatters.pad_id(message["id"]))
 						message["exportedAt"] = exported_at
 						message["sources"] = [hashed_json_path]
 
-					print('        processing messages')
+					# print('        processing messages')
 					messages = self.process_messages(messages, guild["_id"], channel["_id"], channel["name"])
-					print('        processing authors')
+					# print('        processing authors')
 					authors = self.process_authors(messages, guild["_id"])
-					print('        processing emojis')
+					# print('        processing emojis')
 					emojis = self.process_emojis(messages)
-					print('        processing roles')
+					# print('        processing roles')
 					roles = self.process_roles(messages, guild["_id"], exported_at, roles)
 
 					if current_batch == 0:
 						# channel needs to be inserted before messages,
 						# because we count the messages per channel in insert_message()
-						self.insert_channel(channel)
-						self.insert_guild(guild)
+						self.insert_channel(channel, exported_at)
+						self.insert_guild(guild, exported_at)
 
 					# authors needs to be inserted before messages,
 					# because we count the messages per author in insert_message()
-					print('        inserting authors')
+					# print('        inserting authors')
 					for author in authors:
 						self.insert_author(author)
 
 					message_ids = [message["_id"] for message in messages]
-					print('        getting existing messages')
+					# print('        getting existing messages')
 					existing_messages = list(self.collections["messages"].find({"_id": {"$in": message_ids}}))
-					print('            existing messages count:', len(list(existing_messages)))
+					# print('            existing messages count:', len(list(existing_messages)))
 
-					print('        removing existing messages')
+					# print('        removing existing messages')
 					self.collections["messages"].delete_many({"_id": {"$in": message_ids}})
 
-					print('        merging messages')
+					# print('        merging messages')
 					messages = self.merge_messages(list(messages), list(existing_messages))
 
 					# insert messages
-					print('        inserting messages')
+					# print('        inserting messages')
 					self.collections["messages"].insert_many(messages)
 
-					print('        updating message counts')
+					# print('        updating message counts')
 					new_messages_count = len(messages) - len(list(existing_messages))
 					# update message count of channel
 					self.collections["channels"].update_one({"_id": message["channelId"]}, {"$inc": {"msg_count": new_messages_count}})
@@ -574,7 +582,7 @@ class JsonProcessor:
 					if len(bulk) > 0:
 						self.collections["authors"].bulk_write(bulk)
 
-					print('        inserting emojis')
+					# print('        inserting emojis')
 					for emoji in emojis:
 						self.insert_emoji(emoji, guild["_id"])
 
@@ -584,14 +592,14 @@ class JsonProcessor:
 				print(f'    ERROR: IncompleteJSONError - file "{file_path_with_base_directory}" is corrupted or incomplete')
 
 			# there is limited number of roles per guild, so we can insert them all at once at the end
-			print('    inserting roles')
+			# print('    inserting roles')
 			for role_id in roles:
 				self.insert_role(roles[role_id])
 
-		print('    deleted messages - stage 2/3')
+		# print('    deleted messages - stage 2/3')
 		deleted_messages_ids = find_additional_missing_numbers(old_channel_ids_by_source, new_channel_ids)
-		print(f'        found {len(deleted_messages_ids)} new deleted messages')
-		print('    deleted messages - stage 3/3')
+		# print(f'        found {len(deleted_messages_ids)} new deleted messages')
+		# print('    deleted messages - stage 3/3')
 		self.collections["messages"].update_many({"_id": {"$in": list(deleted_messages_ids)}}, {"$set": {"isDeleted": True}})
 
 

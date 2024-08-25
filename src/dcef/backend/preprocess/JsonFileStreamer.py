@@ -1,8 +1,7 @@
 import functools
+from Formatters import Formatters
 import ijson
 import datetime
-
-from helpers import human_file_size
 
 print = functools.partial(print, flush=True)
 
@@ -26,7 +25,7 @@ class JsonFileStreamer():
 		"""
 		file_size_bytes = self.get_file_size()
 
-		return human_file_size(file_size_bytes)
+		return Formatters.human_file_size(file_size_bytes)
 
 	def get_file_pointer_position(self) -> int:
 		return self.file.tell()
@@ -83,7 +82,7 @@ class JsonFileStreamer():
 			# print(prefix, event, value)
 			if prefix == 'exportedAt':
 				exportedAt = value
-				print('    found exportedAt field')
+				# print('    found exportedAt field')
 				return exportedAt
 
 			if prefix == 'messages.item.timestamp' or prefix == 'messages.item.timestampEdited':
