@@ -404,7 +404,11 @@ class JsonProcessor:
 		json_path_with_base_dir = self.file_finder.add_base_directory(json_path)
 
 		# get file size
-		file_size = os.path.getsize(json_path_with_base_dir)
+		try:
+			file_size = os.path.getsize(json_path_with_base_dir)
+		except FileNotFoundError:
+			print(f'    ERROR: FileNotFoundError - path is probably longer than 260 chars')
+			file_size = 0
 
 		# get date modified
 		date_modified = os.path.getmtime(json_path_with_base_dir)
