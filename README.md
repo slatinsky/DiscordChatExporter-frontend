@@ -421,7 +421,19 @@ Check the logs See logs `logs/dcef.log`.
 
 Please check, if the top of the log contains line `windows-runner: OK: All required ports are available.`. DCEF needs ports `21011`, `27017`, `58000` to be available. If you have any of these ports occupied, DCEF won't start or won't work properly.
 
-Check if one of those ports is not excluded by running `netsh int ipv4 show excludedportrange protocol=tcp`
+Check if one of those ports is not excluded by running `netsh int ipv4 show excludedportrange protocol=tcp`. If yes, you can remove the excluded ports by running the following commands in an elevated powershell window:
+
+```powershell
+# close all running DCEF processes
+Get-Process dcef* -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process $_.Id -Force }
+
+# remove excluded ports (run as administrator)
+net stop winnat
+netsh interface ipv4 delete excludedportrange protocol=tcp startport=21011 numberofports=1
+netsh interface ipv4 delete excludedportrange protocol=tcp startport=27017 numberofports=1
+netsh interface ipv4 delete excludedportrange protocol=tcp startport=58000 numberofports=1
+net start winnat
+```
 
 Find line `found X json channel exports` - if this number is 0, you don't have any valid exports in `/exports/` folder. Did you export in `json` format instead of the default `html` format? Did you apply the registry tweak and restarted your computer?
 
