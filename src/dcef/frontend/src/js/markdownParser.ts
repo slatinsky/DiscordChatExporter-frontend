@@ -297,6 +297,14 @@ const customHeading = {
   },
 }
 
+// subtext
+// -# Subtext
+const subtext : SimpleMarkdown.ParserRule & SimpleMarkdown.HtmlOutputRule = {
+  order: SimpleMarkdown.defaultRules.heading.order - 0.15,
+  match: source => /^ *-# ([^\n]+)/.exec(source),
+  parse: capture => ({ type: 'subtext', content: capture[1] }),
+  html: node => `<span class="message-subtext">${node.content}</span>`
+}
 
 // old emojis
 // :kekw:
@@ -533,6 +541,7 @@ const badlyFormattedCodeBlock = {
 export const rules = {
     array: SimpleMarkdown.defaultRules.array,
     customHeading: customHeading,
+    subtext: subtext,
     // heading: SimpleMarkdown.defaultRules.heading,  // disabled because customHeading is used instead
     nptable: SimpleMarkdown.defaultRules.nptable,
     // lheading: SimpleMarkdown.defaultRules.lheading,
