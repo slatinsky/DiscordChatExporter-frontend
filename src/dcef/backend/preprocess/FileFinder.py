@@ -82,6 +82,6 @@ class FileFinder():
 
 	def normalize_path(self, path: str):
 		"""
-		replace all \ with /
+		replace all backslashes with /
 		"""
 		return path.replace("\\", "/")
