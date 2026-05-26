@@ -17,6 +17,7 @@
         showJump?: boolean;
     }
     let { message, previousMessage, mergeMessages=true, showJump=false}: MyProps = $props();
+    const isDebugModeEnabled = typeof localStorage !== "undefined" && localStorage.getItem("DEBUG") === "1";
 
     function getMessageState(message: Message, previousMessage: Message | null) {
         function isSystemNotification(messageType: string): boolean {
@@ -170,6 +171,10 @@
         }
     }
 
+    function printMessageToConsole() {
+        console.log(JSON.stringify(message, null, 2))
+    }
+
     const messageState = getMessageState(message, previousMessage)
 </script>
 
@@ -177,13 +182,17 @@
 <MesssageSpoilerHandler>
 
     <div class="message" class:jumpable={showJump} class:notgrouped={!messageState.shouldMerge} data-id={message._id} class:ismobile={layoutState.mobile}>
-        <button class="jump-btn" on:click={jumpToMessage}>Jump</button>
+        <button class="jump-btn" type="button" onclick={jumpToMessage}>Jump</button>
         {#if message.type == "24"}
             <MessageAutoModerationAction message={message} messageState={messageState} />
         {:else if messageState.isSystemNotification}
             <MessageSystemNotification message={message} />
         {:else}
             <MessageOrdinary message={message} messageState={messageState} />
+        {/if}
+        <!-- small debugging helper - show it using `console.log(JSON.stringify(message, null, 2))` -->
+        {#if isDebugModeEnabled}
+            <button class="debug-btn" type="button" onclick={printMessageToConsole}>Print message object to devtools (F12)</button>
         {/if}
     </div>
 </MesssageSpoilerHandler>
@@ -200,6 +209,17 @@
 
         .jump-btn {
             display: none;
+        }
+
+        .debug-btn {
+            margin-top: 8px;
+            padding: 4px 8px;
+            background-color: #2b2d31;
+            color: #b5bac1;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 3px;
+            cursor: pointer;
         }
     }
 
