@@ -103,6 +103,7 @@ export interface Embed {
 	images: Asset[];
 	image?: Asset;
 	video?: Asset;
+	inlineEmojis?: any[];
 	fields: {
 		name: string;
 		value: string;
@@ -120,6 +121,41 @@ export interface Embed {
 	};
 }
 
+export interface PollAnswer {
+	answer_id?: string | number;
+	id?: string | number;
+	text?: string;
+	poll_media?: {
+		text?: string;
+		emoji?: {
+			id?: string | number;
+			name?: string;
+		};
+	};
+	emoji?: {
+		id?: string | number;
+		name?: string;
+	};
+}
+
+export interface PollResultsAnswerCount {
+	answer_id?: string | number;
+	id?: string | number;
+	count?: number;
+	votes?: number;
+}
+
+export interface Poll {
+	question?: {
+		text?: string;
+	};
+	answers?: PollAnswer[];
+	results?: {
+		total_votes?: number;
+		answer_counts?: PollResultsAnswerCount[];
+	};
+}
+
 export interface MessageContent {
 	timestamp: string;
 	content: string;
@@ -128,7 +164,7 @@ export interface MessageContent {
 
 export interface Message {
 	_id: string;
-	type: "Default" | "RecipientAdd" | "RecipientRemove" | "Call" | "ChannelNameChange" | "ChannelIconChange" | "ChannelPinnedMessage" | "GuildMemberJoin" | "ThreadCreated" | "Reply" | "24";
+	type: "Default" | "RecipientAdd" | "RecipientRemove" | "Call" | "ChannelNameChange" | "ChannelIconChange" | "ChannelPinnedMessage" | "GuildMemberJoin" | "ThreadCreated" | "Reply" | "24" | "46";
 	timestamp: string;
 	timestampEdited: string | null;
 	callEndedTimestamp: string | null;
@@ -142,10 +178,16 @@ export interface Message {
 	attachments: Asset[] | null;
 	embeds: Embed[] | null;
 	reference: {
+		type?: string;
 		messageId: string;
 		channelId: string;
-		guildId: string;
+		guildId: string | null;
+		message?: Message | null;
 	} | null;
+	referencedMessage?: Message | null;
+	poll?: Poll | null;
+	components?: any[] | null;
+	inlineEmojis?: any[] | null;
 	guildId: string;
 	channelId: string;
 	channelName: string;
