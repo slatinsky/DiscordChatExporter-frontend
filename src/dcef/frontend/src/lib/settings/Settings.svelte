@@ -1,5 +1,5 @@
 <script>
-    import { nameRenderer, startingDayOfTheWeek, developerMode, theme, online, gifs, linkHandler, channelScrollPosition, hideSpoilers, font, timestampFormat, dateFormat, timeFormat, locale} from '../../js/stores/settingsStore.svelte';
+    import { nameRenderer, startingDayOfTheWeek, developerMode, online, gifs, linkHandler, channelScrollPosition, hideSpoilers, font, timestampFormat, dateFormat, timeFormat, locale} from '../../js/stores/settingsStore.svelte';
     import { dateFormats, timeFormats, formatMoment, browserLocales } from '../../js/time';
     import RadioButton from './RadioButton.svelte';
     import RadioGroup from './RadioGroup.svelte';
@@ -166,34 +166,6 @@
                         name={"channelScrollPosition"}
                         value={"top"}
                         bind:group={$channelScrollPosition}
-                    />
-                </RadioGroup>
-
-                <hr>
-
-                <RadioGroup
-                    title={"Theme"}
-                    description={"Only dark theme works correctly at the moment"}
-                >
-                    <RadioButton
-                        title={"Dark"}
-                        name={"theme"}
-                        value={"dark"}
-                        bind:group={$theme}
-                    />
-
-                    <RadioButton
-                        title={"Black [Work in progress]"}
-                        name={"theme"}
-                        value={"black"}
-                        bind:group={$theme}
-                    />
-
-                    <RadioButton
-                        title={"White [Work in progress]"}
-                        name={"theme"}
-                        value={"white"}
-                        bind:group={$theme}
                     />
                 </RadioGroup>
             {/if}
