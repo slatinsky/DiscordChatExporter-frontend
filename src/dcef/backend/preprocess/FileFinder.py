@@ -20,7 +20,7 @@ class FileFinder():
 		for filename in glob.glob(directory + '**/*.json', recursive=True, include_hidden=True):
 			if filename.endswith('.json'):
 				# ignore attachment files - they are made by users, not DiscordChatExporter
-				if re.search(r"-([a-fA-F0-9]{5})\.json$", filename) != None:
+				if re.search(r"-([a-fA-F0-9]{5}|[a-f0-9]{16})\.json$", filename) != None:
 					continue
 
 				# ignore channel_info.json and guild_info.json
@@ -42,8 +42,9 @@ class FileFinder():
 		# file can be extensionless and without a dash
 		# valid file names
 		#  - `magic-1ED77.jpg`
+		#  - `bird-thumbnail-43c70443ab5ddf0a.png`
 		#  - `D8ADB`
-		regex_pattern = re.compile(r'.+(\-|\/)[a-fA-F0-9]{5}(?:\..+)?')
+		regex_pattern = re.compile(r'.+(\-|\/)(?:[a-fA-F0-9]{5}|[a-fA-F0-9]{16})(?:\..+)?$')
 		for path in glob.glob(input_directory + '**/*', recursive=True, include_hidden=True):
 			path = path.replace('\\', '/')
 			if regex_pattern.match(path):
