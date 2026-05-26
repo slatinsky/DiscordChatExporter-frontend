@@ -276,14 +276,18 @@ const assetLink = {
 // ### Heading
 // more than 3 # are not supported by discord
 
+function isAtStartOfLine(lookbehind: string | null) {
+    // enforcing start of the line fixes `C#` case being incorrectly parsed as a heading
+    return lookbehind === null || lookbehind.length === 0 || /[\r\n]$/.test(lookbehind);
+}
+
 const customHeading = {
   order: SimpleMarkdown.defaultRules.heading.order - 0.1,
   match: function(source, state, lookbehind) {
-    // previous match must not end with #
-    if (lookbehind !== null && lookbehind[lookbehind.length - 1] == "#") {
+        if (!isAtStartOfLine(lookbehind)) {
         return null;
     }
-    return /^ *(?<!\#)(#{1,3}) ([^\n]+?)#* *(?![^\n])/.exec(source);
+        return /^ *(#{1,3}) ([^\r\n]+?)#* *(?=\r?\n|$)/.exec(source);
   },
   parse: function(capture, recurseParse, state) {
       return {
@@ -301,7 +305,12 @@ const customHeading = {
 // -# Subtext
 const subtext : SimpleMarkdown.ParserRule & SimpleMarkdown.HtmlOutputRule = {
   order: SimpleMarkdown.defaultRules.heading.order - 0.15,
-  match: source => /^ *-# ([^\n]+)/.exec(source),
+    match: (source, state, lookbehind) => {
+        if (!isAtStartOfLine(lookbehind)) {
+            return null;
+        }
+        return /^ *-# ([^\r\n]+)/.exec(source);
+    },
   parse: capture => ({ type: 'subtext', content: capture[1] }),
   html: node => `<span class="message-subtext">${node.content}</span>`
 }
