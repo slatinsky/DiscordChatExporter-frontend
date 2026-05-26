@@ -127,6 +127,10 @@
         margin-bottom: 8px;
         font-size: 16px;
     }
+    :global(.message-subtext) {
+        color: #c5c6ca;
+        font-size: 14px;
+    }
 
     :global(.message-emoji),
     :global(.d-emoji) {
