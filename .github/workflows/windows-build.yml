@@ -1,47 +1,46 @@
 name: Build Windows binaries
 
 on:
-  push:
-    paths-ignore:
-      - '**.md'
-    branches:
-      - main
+    push:
+        paths-ignore:
+            - "**.md"
+        branches:
+            - main
 
 jobs:
-  build:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    build:
+        runs-on: windows-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11.0'
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.14.3"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18.17.1
-          cache: 'npm'
-          cache-dependency-path: 'src/dcef/frontend/package-lock.json'
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18.17.1
+                  cache: "npm"
+                  cache-dependency-path: "src/dcef/frontend/package-lock.json"
 
-      - name: Run build script
-        working-directory: src
-        run:  .\BUILD_RELEASE.bat
+            - name: Run build script
+              working-directory: src
+              run: .\BUILD_RELEASE.bat
 
-      - name: Verify build
-        run: |
-          if (-Not (Test-Path "release\dcef.exe")) { exit 1 }
-          if (-Not (Test-Path "release\dcef\backend\preprocess\dcefpreprocess.exe")) { exit 1 }
-          if (-Not (Test-Path "release\dcef\backend\fastapi\dceffastapi.exe")) { exit 1 }
-          if (-Not (Test-Path "release\dcef\backend\mongodb\dcefmongod.exe")) { exit 1 }
-          if (-Not (Test-Path "release\dcef\backend\nginx\dcefnginx.exe")) { exit 1 }
-          if (-Not (Test-Path "release\dcef\frontend\index.html")) { exit 1 }
+            - name: Verify build
+              run: |
+                  if (-Not (Test-Path "release\dcef.exe")) { exit 1 }
+                  if (-Not (Test-Path "release\dcef\backend\preprocess\dcefpreprocess.exe")) { exit 1 }
+                  if (-Not (Test-Path "release\dcef\backend\fastapi\dceffastapi.exe")) { exit 1 }
+                  if (-Not (Test-Path "release\dcef\backend\mongodb\dcefmongod.exe")) { exit 1 }
+                  if (-Not (Test-Path "release\dcef\backend\nginx\dcefnginx.exe")) { exit 1 }
+                  if (-Not (Test-Path "release\dcef\frontend\index.html")) { exit 1 }
 
-
-      - name: Upload build folder
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-build
-          path: release
+            - name: Upload build folder
+              uses: actions/upload-artifact@v4
+              with:
+                  name: windows-build
+                  path: release
