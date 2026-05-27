@@ -190,7 +190,7 @@
         {:else}
             <MessageOrdinary message={message} messageState={messageState} />
         {/if}
-        <!-- small debugging helper - show it using `console.log(JSON.stringify(message, null, 2))` -->
+        <!-- small debugging helper - show it using `localStorage.setItem("DEBUG", "1")` -->
         {#if isDebugModeEnabled}
             <button class="debug-btn" type="button" onclick={printMessageToConsole}>Print message object to devtools (F12)</button>
         {/if}
