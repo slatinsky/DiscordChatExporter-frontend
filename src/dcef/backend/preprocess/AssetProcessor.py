@@ -76,10 +76,16 @@ class AssetProcessor:
 			return None, None
 
 		try:
-			return imagesize.get(path)
+			width, height = imagesize.get(path)
 		except:
 			print("        Warning: Could not get image size of " + path)
 			return None, None
+
+		if (width, height) == (-1, -1):
+			print("        Warning: Could not get image size of " + path)
+			return None, None
+
+		return width, height
 
 	def get_file_size(self, local_path_exists: bool, path: str) -> int:
 		"""

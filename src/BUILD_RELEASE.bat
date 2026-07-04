@@ -1,6 +1,6 @@
 @REM Instructions to build the release version of the application
 
-@REM You need to have Python3 and Node.js v18.17.1+ installed on your system before running this script
+@REM You need to have Python3 and Node.js v24.18.0+ installed on your system before running this script
 @REM   Python dependencies are installed automatically in a virtual environment
 @REM Tip: You can run these commands one by one to debug it if something breaks the build
 @REM To remove build cache, delete the _temp folder

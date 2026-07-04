@@ -1,5 +1,5 @@
-fastapi[all]==0.112.0
-pymongo==4.3.3
-python-dateutil==2.8.2
-uvicorn==0.30.5
+fastapi[all]==0.139.0
+pymongo==4.17.0
+python-dateutil==2.9.0.post0
+uvicorn==0.50.0
 pyinstaller==6.20.0

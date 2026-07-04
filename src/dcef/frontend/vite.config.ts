@@ -17,7 +17,7 @@ export default defineConfig({
 		port: 5050,
 	},
 	build: {
-		target: 'ES2022',
+		target: 'es2022',
 		outDir: '../../_temp/frontend',
 		emptyOutDir: true, // also necessary
 	},

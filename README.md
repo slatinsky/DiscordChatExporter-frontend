@@ -144,7 +144,7 @@ The app will autostart with your computer if you are using `docker`. You need to
 
 <details><summary><b>[for developers] I am to run the development version directly from the source code (Windows)</b></summary>
 
-Install python3 and nodejs. Make sure that your `node --version` is at least `v18.17.1` and your `py --version` is at least `Python 3.11.0`. Make sure [Windows Terminal](https://github.com/microsoft/terminal) is installed (`wt --version`). Windows terminal is installed by default on Windows 11.
+Install python3 and nodejs. Make sure that your `node --version` is at least `v24.18.0` and your `py --version` is at least `Python 3.14.3`. Make sure [Windows Terminal](https://github.com/microsoft/terminal) is installed (`wt --version`). Windows terminal is installed by default on Windows 11.
 Install `nodemon` globally, which is used to automatically reload programs on change, by running `npm install -g nodemon`. Verify that it is installed correctly by running `nodemon --version`.
 
 Then place your exports into `src/exports/` folder. Create that folder if it doesn't exist.

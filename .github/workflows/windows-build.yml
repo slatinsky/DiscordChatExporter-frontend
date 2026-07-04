@@ -12,17 +12,17 @@ jobs:
         runs-on: windows-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Setup Python
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.14.3"
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
-                  node-version: 18.17.1
+                  node-version: 24.18.0
                   cache: "npm"
                   cache-dependency-path: "src/dcef/frontend/package-lock.json"
 
@@ -40,7 +40,7 @@ jobs:
                   if (-Not (Test-Path "release\dcef\frontend\index.html")) { exit 1 }
 
             - name: Upload build folder
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: windows-build
                   path: release

@@ -1,6 +1,7 @@
 // TODO: external links should be opened in a new tab
 
-import SimpleMarkdown from 'simple-markdown';
+import SimpleMarkdown from '@khanacademy/simple-markdown';
+import type { ParserRule, HtmlOutputRule } from '@khanacademy/simple-markdown';
 import { renderTimestamp } from './time';
 import { checkUrl } from './helpers';
 import hljs from 'highlight.js';
@@ -303,7 +304,7 @@ const customHeading = {
 
 // subtext
 // -# Subtext
-const subtext : SimpleMarkdown.ParserRule & SimpleMarkdown.HtmlOutputRule = {
+const subtext : ParserRule & HtmlOutputRule = {
   order: SimpleMarkdown.defaultRules.heading.order - 0.15,
     match: (source, state, lookbehind) => {
         if (!isAtStartOfLine(lookbehind)) {
@@ -548,7 +549,7 @@ const badlyFormattedCodeBlock = {
 
 
 export const rules = {
-    array: SimpleMarkdown.defaultRules.array,
+    Array: SimpleMarkdown.defaultRules.Array,
     customHeading: customHeading,
     subtext: subtext,
     // heading: SimpleMarkdown.defaultRules.heading,  // disabled because customHeading is used instead
