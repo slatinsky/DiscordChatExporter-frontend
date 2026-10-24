@@ -1,13 +1,13 @@
 @REM Instructions to build the release version of the application
 
-@REM You need to have Python3 and Node.js v18.17.1+ installed on your system before running this script
+@REM You need to have Python3 and Node.js v24.22.1+ installed on your system before running this script
 @REM   Python dependencies are installed automatically in a virtual environment
 @REM Tip: You can run these commands one by one to debug it if something breaks the build
 @REM To remove build cache, delete the _temp folder
 @REM This is a Windows builder script. For Linux, use Dockerfile located in the root directory
 
 @REM Don't forget to install pyinstaller first:
-@REM py -m pip install pyinstaller==6.10.0
+@REM py -m pip install pyinstaller==6.22.3
 
 
 @REM always start in this src directory

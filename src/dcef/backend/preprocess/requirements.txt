@@ -1,6 +1,6 @@
-imagesize==1.4.1
-requests==2.26.0
-pymongo==4.3.3
+imagesize==2.0.1
+requests==2.34.2
+pymongo==4.18.3
 colorthief==0.2.1
-ijson==3.2.3
-pyinstaller==6.20.0
+ijson==3.5.1
+pyinstaller==6.22.3

@@ -1,4 +1,4 @@
-pywebview==4.0.1
-pywin32==311
-psutil==5.9.4
-pyinstaller==6.20.0
+pywebview==6.2.1
+pywin32==312
+psutil==7.2.2
+pyinstaller==6.22.3

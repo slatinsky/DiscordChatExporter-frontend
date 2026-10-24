@@ -76,7 +76,11 @@ class AssetProcessor:
 			return None, None
 
 		try:
-			return imagesize.get(path)
+			width, height = imagesize.get(path)
+			# imagesize 2.0+ returns (-1, -1) instead of raising when parsing fails
+			if width == -1 or height == -1:
+				return None, None
+			return width, height
 		except:
 			print("        Warning: Could not get image size of " + path)
 			return None, None
