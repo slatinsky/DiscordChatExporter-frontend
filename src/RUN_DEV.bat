@@ -3,6 +3,9 @@ pushd "%~dp0"
 @REM kill running dcef processes
 taskkill /f /im dcefmongod.exe
 
+@REM download MongoDB and nginx (skipped if already downloaded)
+call py download_binaries.py
+if errorlevel 1 exit /b 1
 
 @REM run python in venv windows
 if not exist "_temp\fastapi\venv" (

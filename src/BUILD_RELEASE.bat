@@ -2,6 +2,7 @@
 
 @REM You need to have Python3 and Node.js v24.22.1+ installed on your system before running this script
 @REM   Python dependencies are installed automatically in a virtual environment
+@REM   MongoDB and nginx are downloaded automatically from their official sites by download_binaries.py
 @REM Tip: You can run these commands one by one to debug it if something breaks the build
 @REM To remove build cache, delete the _temp folder
 @REM This is a Windows builder script. For Linux, use Dockerfile located in the root directory
@@ -26,6 +27,10 @@ taskkill /f /im dcef.exe
 
 @REM create build artifacts folder
 mkdir "_temp"
+
+@REM download MongoDB and nginx (skipped if already downloaded)
+call py download_binaries.py
+if errorlevel 1 exit /b 1
 
 @REM install windows-runner dependencies
 if not exist "_temp\dcef\venv" (
@@ -95,8 +100,7 @@ call copy "dcef\backend\nginx\dcefnginx.exe" "..\release\dcef\backend\nginx\dcef
 mkdir "..\release\dcef\backend\mongodb\"
 mkdir "..\release\dcef\backend\mongodb\db\"
 call copy "dcef\backend\mongodb\dcefmongod.exe" "..\release\dcef\backend\mongodb\dcefmongod.exe" /y
-call copy "dcef\backend\mongodb\msvcp140.dll" "..\release\dcef\backend\mongodb\msvcp140.dll" /y
-call copy "dcef\backend\mongodb\vcruntime140_1.dll" "..\release\dcef\backend\mongodb\vcruntime140_1.dll" /y
+call copy "dcef\backend\mongodb\*.dll" "..\release\dcef\backend\mongodb\" /y
 
 
 

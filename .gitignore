@@ -45,6 +45,11 @@ __pycache__
 # mongodb database
 /src/dcef/backend/mongodb/db
 
+# binaries downloaded by src/download_binaries.py
+/src/dcef/backend/mongodb/*.exe
+/src/dcef/backend/mongodb/*.dll
+/src/dcef/backend/nginx/*.exe
+
 
 # private files
 /bruno

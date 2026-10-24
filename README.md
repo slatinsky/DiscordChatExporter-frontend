@@ -155,12 +155,13 @@ cd src
 RUN_DEV.bat
 ```
 
-This script will install Python dependencies in virtual environment (stored in `src/_temp` folder) and will install frontend nodejs dependencies into `src/dcef/frontend/node_modules/`. Then it will open windows terminal with split panes with all the services needed to develop the app.
+This script will install Python dependencies in virtual environment (stored in `src/_temp` folder) and will install frontend nodejs dependencies into `src/dcef/frontend/node_modules/`. It will also download MongoDB (~1 GB download) and nginx from their official sites using `src/download_binaries.py` and copy the Visual C++ runtime DLLs MongoDB needs from Visual Studio or from the installed [Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe). Then it will open windows terminal with split panes with all the services needed to develop the app.
 
 - frontend - automatically reloads on change. If you add a new dependency into `src/frontend/package.json`, close the watcher, run `npm install` and rerun `RUN_DEV.bat`
 - fastapi - automatically reloads on change. Delete `src/_temp/fastapi/venv/` folder if you change a dependencies. Then rerun `RUN_DEV.bat`.
 - nginx - needs to be restarted each time a config is updated - `taskkill /f /im dcefnginx.exe` and rerun `RUN_DEV.bat` again
-- mongodb - if you need to clear the database, `taskkill /f /im dcefmongod.exe`, delete `src/_temp/mongodb/` folder and rerun `RUN_DEV.bat` again (preprocess will recreate the database from the scratch)
+- mongodb - if you need to clear the database, `taskkill /f /im dcefmongod.exe`, delete `src/_temp/mongodb/` folder and rerun `RUN_DEV.bat` again (preprocess will recreate the database from the scratch). Clearing the database is also needed when MongoDB is upgraded to a new major version - `dcefmongod.exe` won't start otherwise
+- mongodb, nginx - to upgrade them, change the url, sha256 and member in `src/download_binaries.py`, kill them and rerun `RUN_DEV.bat`
 - preprocess - automatically reloads on change using nodemon. Delete `src/_temp/preprocess/venv/` folder if you change a dependencies. Then rerun `RUN_DEV.bat`.
 
 </details>

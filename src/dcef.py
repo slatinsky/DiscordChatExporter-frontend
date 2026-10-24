@@ -1,6 +1,7 @@
 import ctypes
 from datetime import datetime
 import os
+import re
 import shutil
 import signal
 import sys
@@ -166,7 +167,36 @@ def start_preprocess():
 	th.start()
 	return th
 
+def wipe_database_if_mongodb_upgraded():
+	"""
+	MongoDB can't open a database created by an older major version (it needs a step-by-step upgrade),
+	so the database is rebuilt from the exports when MongoDB's major version changes
+	"""
+	db_dir = BASE_DIR + '/_temp/mongodb'
+	version_file = BASE_DIR + '/_temp/mongodb-major-version.txt'
+	mongod_path = os.path.realpath(BASE_DIR + '/dcef/backend/mongodb/dcefmongod.exe')
+
+	version_output = subprocess.run([mongod_path, '--version'], capture_output=True, text=True).stdout
+	match = re.search(r'db version v(\d+)\.', version_output)
+	if match is None:
+		return
+	major_version = match.group(1)
+
+	previous_major_version = None
+	if os.path.exists(version_file):
+		with open(version_file) as f:
+			previous_major_version = f.read().strip()
+
+	if os.path.exists(db_dir) and len(os.listdir(db_dir)) > 0 and previous_major_version != major_version:
+		custom_print("windows-runner:", 'database was created by an older MongoDB version, deleting it. It will be rebuilt from your exports, this takes as long as the first import')
+		shutil.rmtree(db_dir)
+
+	create_dir_if_not_exists(BASE_DIR + '/_temp')
+	with open(version_file, 'w') as f:
+		f.write(major_version)
+
 def start_mongodb():
+	wipe_database_if_mongodb_upgraded()
 	create_dir_if_not_exists(BASE_DIR + '/_temp/mongodb')
 
 	cwd = os.path.realpath(BASE_DIR + '/dcef/backend/mongodb')
